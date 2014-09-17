@@ -26,6 +26,7 @@ Usage
 ---------
 
 1. Add WeekView in your xml layout.
+
     ```xml
     <com.alamkanak.weekview.WeekView
             android:id="@+id/weekView"
@@ -46,6 +47,7 @@ Usage
     ```
 
 2. Write the following code in your java file.
+
     ```java
     // Get a reference for the week view in the layout.
     mWeekView = (WeekView) findViewById(R.id.weekView);
