@@ -3,6 +3,7 @@ package com.alamkanak.weekview.sample;
 import android.app.Activity;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -22,9 +23,10 @@ import java.util.List;
 public class MainActivity extends Activity implements WeekView.MonthChangeListener,
         WeekView.EventClickListener, WeekView.EventLongPressListener {
 
-    private static final int TYPE_WEEK_VIEW = 1;
-    private static final int TYPE_DAY_VIEW = 2;
-    private int mWeekViewType = TYPE_WEEK_VIEW;
+    private static final int TYPE_DAY_VIEW = 1;
+    private static final int TYPE_THREE_DAY_VIEW = 2;
+    private static final int TYPE_WEEK_VIEW = 3;
+    private int mWeekViewType = TYPE_THREE_DAY_VIEW;
     private WeekView mWeekView;
 
     @Override
@@ -60,16 +62,40 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
             case R.id.action_today:
                 mWeekView.goToToday();
                 return true;
-            case R.id.action_type:
-                if (mWeekViewType == TYPE_WEEK_VIEW) {
+            case R.id.action_day_view:
+                if (mWeekViewType != TYPE_DAY_VIEW) {
+                    item.setChecked(!item.isChecked());
                     mWeekViewType = TYPE_DAY_VIEW;
                     mWeekView.setNumberOfVisibleDays(1);
-                    item.setTitle(R.string.action_week_view);
+
+                    // Lets change some dimensions to best fit the view.
+                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
                 }
-                else {
-                    mWeekViewType = TYPE_WEEK_VIEW;
+                return true;
+            case R.id.action_three_day_view:
+                if (mWeekViewType != TYPE_THREE_DAY_VIEW) {
+                    item.setChecked(!item.isChecked());
+                    mWeekViewType = TYPE_THREE_DAY_VIEW;
                     mWeekView.setNumberOfVisibleDays(3);
-                    item.setTitle(R.string.action_day_view);
+
+                    // Lets change some dimensions to best fit the view.
+                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                }
+                return true;
+            case R.id.action_week_view:
+                if (mWeekViewType != TYPE_WEEK_VIEW) {
+                    item.setChecked(!item.isChecked());
+                    mWeekViewType = TYPE_WEEK_VIEW;
+                    mWeekView.setNumberOfVisibleDays(7);
+
+                    // Lets change some dimensions to best fit the view.
+                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
+                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
                 }
                 return true;
         }
@@ -158,6 +184,8 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
 
         return events;
     }
+
+
 
     private String getEventTitle(Calendar time) {
         return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH)+1, time.get(Calendar.DAY_OF_MONTH));

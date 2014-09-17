@@ -25,7 +25,9 @@ Who uses it
 Usage
 ---------
 
-1. Add WeekView in your xml layout.
+1. Import the library to your project.
+
+2. Add WeekView in your xml layout.
 
     ```xml
     <com.alamkanak.weekview.WeekView
@@ -46,7 +48,7 @@ Usage
             app:headerColumnBackground="#ffffffff"/>
     ```
 
-2. Write the following code in your java file.
+3. Write the following code in your java file.
 
     ```java
     // Get a reference for the week view in the layout.
@@ -63,9 +65,20 @@ Usage
     mWeekView.setEventLongPressListener(mEventLongPressListener);
     ```
 
-3. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
+4. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
-4. Provide the events of the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
+5. Provide the events of the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
+
+    ```java
+    WeekView.MonthChangeListener mMonthChangeListener = new WeekView.MonthChangeListener() {
+        @Override
+        public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+            // Populate the week view with some events.
+            List<WeekViewEvent> events = getEvents(newYear, newMonth);
+            return events;
+        }
+    };
+    ```
 
 Customization
 -------------------

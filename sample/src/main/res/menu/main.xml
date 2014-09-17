@@ -5,9 +5,20 @@
     <item android:id="@+id/action_today"
         android:title="@string/action_today"
         android:orderInCategory="100"
-        app:showAsAction="always"/>
-    <item android:id="@+id/action_type"
-        android:title="@string/action_day_view"
-        android:orderInCategory="100"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/action_day_view"
+            android:title="@string/action_day_view"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"/>
+        <item android:id="@+id/action_three_day_view"
+            android:title="@string/action_three_day_view"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"
+            android:checked="true"/>
+        <item android:id="@+id/action_week_view"
+            android:title="@string/action_week_view"
+            android:orderInCategory="100"
+            app:showAsAction="ifRoom"/>
+    </group>
 </menu>
