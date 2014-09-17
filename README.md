@@ -26,40 +26,40 @@ Usage
 ---------
 
 1. Add WeekView in your xml layout.
-```xml
-<com.alamkanak.weekview.WeekView
-        android:id="@+id/weekView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:eventTextColor="@android:color/white"
-        app:textSize="12sp"
-        app:hourHeight="60dp"
-        app:headerColumnPadding="8dp"
-        app:headerColumnTextColor="#8f000000"
-        app:headerRowPadding="12dp"
-        app:columnGap="8dp"
-        app:noOfVisibleDays="3"
-        app:headerRowBackgroundColor="#ffefefef"
-        app:dayBackgroundColor="#05000000"
-        app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"/>
-```
+    ```xml
+    <com.alamkanak.weekview.WeekView
+            android:id="@+id/weekView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:eventTextColor="@android:color/white"
+            app:textSize="12sp"
+            app:hourHeight="60dp"
+            app:headerColumnPadding="8dp"
+            app:headerColumnTextColor="#8f000000"
+            app:headerRowPadding="12dp"
+            app:columnGap="8dp"
+            app:noOfVisibleDays="3"
+            app:headerRowBackgroundColor="#ffefefef"
+            app:dayBackgroundColor="#05000000"
+            app:todayBackgroundColor="#1848adff"
+            app:headerColumnBackground="#ffffffff"/>
+    ```
 
 2. Write the following code in your java file.
-```java
-// Get a reference for the week view in the layout.
-mWeekView = (WeekView) findViewById(R.id.weekView);
+    ```java
+    // Get a reference for the week view in the layout.
+    mWeekView = (WeekView) findViewById(R.id.weekView);
 
-// Show a toast message about the touched event.
-mWeekView.setOnEventClickListener(mEventClickListener);
+    // Show a toast message about the touched event.
+    mWeekView.setOnEventClickListener(mEventClickListener);
 
-// The week view has infinite scrolling horizontally. We have to provide the events of a
-// month every time the month changes on the week view.
-mWeekView.setMonthChangeListener(mMonthChangeListener);
+    // The week view has infinite scrolling horizontally. We have to provide the events of a
+    // month every time the month changes on the week view.
+    mWeekView.setMonthChangeListener(mMonthChangeListener);
 
-// Set long press listener for events.
-mWeekView.setEventLongPressListener(mEventLongPressListener);
-```
+    // Set long press listener for events.
+    mWeekView.setEventLongPressListener(mEventLongPressListener);
+    ```
 
 3. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
