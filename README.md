@@ -48,17 +48,17 @@ Usage
 2. Write the following code in your java file.
 ```java
 // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) findViewById(R.id.weekView);
+mWeekView = (WeekView) findViewById(R.id.weekView);
 
-        // Show a toast message about the touched event.
-        mWeekView.setOnEventClickListener(mEventClickListener);
+// Show a toast message about the touched event.
+mWeekView.setOnEventClickListener(mEventClickListener);
 
-        // The week view has infinite scrolling horizontally. We have to provide the events of a
-        // month every time the month changes on the week view.
-        mWeekView.setMonthChangeListener(mMonthChangeListener);
+// The week view has infinite scrolling horizontally. We have to provide the events of a
+// month every time the month changes on the week view.
+mWeekView.setMonthChangeListener(mMonthChangeListener);
 
-        // Set long press listener for events.
-        mWeekView.setEventLongPressListener(mEventLongPressListener);
+// Set long press listener for events.
+mWeekView.setEventLongPressListener(mEventLongPressListener);
 ```
 
 3. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
