@@ -1,11 +1,11 @@
 Android Week View
 =================
 
-**Android Week View** is an android library that displays a calendar (week view or day view) within the app. It supports custom styling.
+**Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
 
 ![](images/screen-shot.png)
 
-> Please note that this project is still in development. I will be happy if you collaborate in this project and help it become more polished.
+> Please note that this project is still under development. I will be happy if you collaborate in this project and help it become even more polished.
 
 Features
 ------------
@@ -15,7 +15,7 @@ Features
 * Custom styling
 * Horizontal and vertical scrolling
 * Infinite horizontal scrolling
-* Preview customization in xml
+* Live preview of custom styling in xml preview window
 
 Who uses it
 ---------------
@@ -25,7 +25,7 @@ Who uses it
 Usage
 ---------
 
-1. Import the library to your project.
+1. Import the library into your project.
 
 2. Add WeekView in your xml layout.
 
@@ -67,7 +67,7 @@ Usage
 
 4. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
-5. Provide the events of the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
+5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
 
     ```java
     WeekView.MonthChangeListener mMonthChangeListener = new WeekView.MonthChangeListener() {
@@ -85,29 +85,29 @@ Customization
 
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
-- `firstDayOfWeek`  
-- `hourHeight`
-- `textSize`
-- `eventTextSize`
-- `headerColumnPadding`
-- `headerRowPadding`
 - `columnGap`
-- `headerColumnTextColor`
-- `noOfVisibleDays`
-- `headerRowBackgroundColor`
 - `dayBackgroundColor`
+- `eventPadding`
+- `eventTextColor`
+- `eventTextSize`
+- `firstDayOfWeek`
+- `headerColumnBackground`
+- `headerColumnPadding`
+- `headerColumnTextColor`
+- `headerRowBackgroundColor`
+- `headerRowPadding`
+- `hourHeight`
 - `hourSeparatorColor`
+- `hourSeparatorHeight`
+- `noOfVisibleDays`
+- `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
-- `hourSeparatorHeight`
-- `eventTextColor`
-- `eventPadding`
-- `headerColumnBackground`
 
 Sample
 ----------
 
-There is also a sample app to get you started. Please check the sample project in the repository.
+There is also a [sample app](https://github.com/alamkanak/Android-Week-View/tree/master/sample) to get you started.
 
 To do
 -------
