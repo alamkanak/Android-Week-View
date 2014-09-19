@@ -26,7 +26,21 @@ Usage
 ---------
 
 1. Import the library into your project.
-
+  * Grab via maven
+  
+    ```xml
+    <dependency>
+      <groupId>com.github.alamkanak</groupId>
+      <artifactId>android-week-view</artifactId>
+      <version>1.0.0</version>
+      <type>aar</type>
+    </dependency>
+    ```
+  * Grab via gradle
+  
+    ```xml
+    compile 'com.github.alamkanak:android-week-view:1.0.0'
+    ```
 2. Add WeekView in your xml layout.
 
     ```xml
@@ -47,14 +61,13 @@ Usage
             app:todayBackgroundColor="#1848adff"
             app:headerColumnBackground="#ffffffff"/>
     ```
-
 3. Write the following code in your java file.
 
     ```java
     // Get a reference for the week view in the layout.
     mWeekView = (WeekView) findViewById(R.id.weekView);
 
-    // Show a toast message about the touched event.
+    // Set an action when any event is clicked.
     mWeekView.setOnEventClickListener(mEventClickListener);
 
     // The week view has infinite scrolling horizontally. We have to provide the events of a
@@ -64,7 +77,6 @@ Usage
     // Set long press listener for events.
     mWeekView.setEventLongPressListener(mEventLongPressListener);
     ```
-
 4. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
 5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
