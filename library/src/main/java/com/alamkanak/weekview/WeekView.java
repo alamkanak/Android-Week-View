@@ -36,6 +36,8 @@ import java.util.List;
  */
 public class WeekView extends View {
 
+    public static final int LENGTH_SHORT = 1;
+    public static final int LENGTH_LONG = 2;
     private final Context mContext;
     private Calendar mToday;
     private Calendar mStartDate;
@@ -70,7 +72,7 @@ public class WeekView extends View {
     // Attributes and their default values.
     private int mHourHeight = 50;
     private int mColumnGap = 10;
-    private int mFirstDayOfWeek = 0;
+    private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mTextSize = 12;
     private int mHeaderColumnPadding = 10;
     private int mHeaderColumnTextColor = Color.BLACK;
@@ -87,6 +89,8 @@ public class WeekView extends View {
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
+    private boolean mIsFirstDraw = true;
+    private int mDayNameLength = LENGTH_LONG;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -170,6 +174,7 @@ public class WeekView extends View {
         }
     };
 
+
     private enum Direction {
         NONE, HORIZONTAL, VERTICAL
     }
@@ -209,6 +214,7 @@ public class WeekView extends View {
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
+            mDayNameLength = a.getColor(R.styleable.WeekView_dayNameLength, mDayNameLength);
         } finally {
             a.recycle();
         }
@@ -333,6 +339,15 @@ public class WeekView extends View {
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
+
+        // If the week view is being drawn for the first time, then consider the first day of week.
+        if (mIsFirstDraw && mNumberOfVisibleDays >= 7) {
+            if (mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
+                int difference = 7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
+                mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
+            }
+            mIsFirstDraw = false;
+        }
 
         // Consider scroll offset.
         if (mCurrentScrollDirection == Direction.HORIZONTAL) mCurrentOrigin.x -= mDistanceX;
@@ -656,8 +671,6 @@ public class WeekView extends View {
         invalidate();
     }
 
-
-
     public int getHourHeight() {
         return mHourHeight;
     }
@@ -680,6 +693,18 @@ public class WeekView extends View {
         return mFirstDayOfWeek;
     }
 
+    /**
+     * Set the first day of the week. First day of the week is used only when the week view is first
+     * drawn. It does not of any effect after user starts scrolling horizontally.
+     * <p>
+     *     <b>Note:</b> This method will only work if the week view is set to display more than 6 days at
+     *     once.
+     * </p>
+     * @param firstDayOfWeek The supported values are {@link java.util.Calendar#SUNDAY},
+     * {@link java.util.Calendar#MONDAY}, {@link java.util.Calendar#TUESDAY},
+     * {@link java.util.Calendar#WEDNESDAY}, {@link java.util.Calendar#THURSDAY},
+     * {@link java.util.Calendar#FRIDAY}.
+     */
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         mFirstDayOfWeek = firstDayOfWeek;
         invalidate();
@@ -824,7 +849,22 @@ public class WeekView extends View {
         invalidate();
     }
 
+    public int getDayNameLength() {
+        return mDayNameLength;
+    }
 
+    /**
+     * Set the length of the day name displayed in the header row. Example of short day names is
+     * 'M' for 'Monday' and example of long day names is 'Mon' for 'Monday'.
+     * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
+     * {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
+     */
+    public void setDayNameLength(int length) {
+        if (length != LENGTH_LONG && length != LENGTH_SHORT) {
+            throw new IllegalArgumentException("length parameter must be either LENGTH_LONG or LENGTH_SHORT");
+        }
+        this.mDayNameLength = length;
+    }
 
     /////////////////////////////////////////////////////////////////
     //
@@ -991,13 +1031,13 @@ public class WeekView extends View {
      */
     private String getDayName(Calendar date) {
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        if (Calendar.MONDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "M" : "MON");
-        else if (Calendar.TUESDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "T" : "TUE");
-        else if (Calendar.WEDNESDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "W" : "WED");
-        else if (Calendar.THURSDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "T" : "THU");
-        else if (Calendar.FRIDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "F" : "FRI");
-        else if (Calendar.SATURDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "S" : "SAT");
-        else if (Calendar.SUNDAY == dayOfWeek) return (mNumberOfVisibleDays > 3 ? "S" : "SUN");
+        if (Calendar.MONDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "M" : "MON");
+        else if (Calendar.TUESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "TUE");
+        else if (Calendar.WEDNESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "W" : "WED");
+        else if (Calendar.THURSDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "THU");
+        else if (Calendar.FRIDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "F" : "FRI");
+        else if (Calendar.SATURDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SAT");
+        else if (Calendar.SUNDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SUN");
         return "";
     }
 }

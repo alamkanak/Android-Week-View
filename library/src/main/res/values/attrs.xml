@@ -27,6 +27,10 @@
         <attr name="eventTextColor" format="color"/>
         <attr name="eventPadding" format="dimension"/>
         <attr name="headerColumnBackground" format="color"/>
+        <attr name="dayNameLength" format="enum">
+            <enum name="length_short" value="1"/>
+            <enum name="length_long" value="2"/>
+        </attr>
 
     </declare-styleable>
 </resources>

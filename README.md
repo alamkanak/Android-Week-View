@@ -99,6 +99,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 
 - `columnGap`
 - `dayBackgroundColor`
+- `dayNameLength`
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
