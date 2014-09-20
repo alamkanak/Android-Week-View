@@ -39,7 +39,7 @@ Usage
   * Grab via gradle
   
     ```gradle
-    compile 'com.github.alamkanak:android-week-view:1.0.0'
+    compile 'com.github.alamkanak:android-week-view:1.0.1'
     ```
 2. Add WeekView in your xml layout.
 
