@@ -214,7 +214,7 @@ public class WeekView extends View {
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
-            mDayNameLength = a.getColor(R.styleable.WeekView_dayNameLength, mDayNameLength);
+            mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
         } finally {
             a.recycle();
         }
