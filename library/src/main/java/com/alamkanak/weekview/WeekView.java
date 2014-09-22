@@ -25,10 +25,13 @@ import android.view.View;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -1004,12 +1007,18 @@ public class WeekView extends View {
      * @return The string representation of the time.
      */
     private String getTimeString(int hour) {
-        String amPm;
-        if (hour >= 0 && hour < 12) amPm = "AM";
-        else amPm = "PM";
-        if (hour == 0) hour = 12;
-        if (hour > 12) hour -= 12;
-        return String.format("%02d %s", hour, amPm);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, hour);
+        boolean is24hour = android.text.format.DateFormat.is24HourFormat(getContext());
+        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+        if (timeFormat instanceof SimpleDateFormat) {
+            if (is24hour) {
+                timeFormat = new SimpleDateFormat("H", Locale.getDefault());
+            } else {
+                timeFormat = new SimpleDateFormat("K a", Locale.getDefault());
+            }
+        }
+        return timeFormat.format(calendar.getTime());
     }
 
 
@@ -1030,14 +1039,10 @@ public class WeekView extends View {
      * @return The first the characters of the day name.
      */
     private String getDayName(Calendar date) {
-        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        if (Calendar.MONDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "M" : "MON");
-        else if (Calendar.TUESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "TUE");
-        else if (Calendar.WEDNESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "W" : "WED");
-        else if (Calendar.THURSDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "THU");
-        else if (Calendar.FRIDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "F" : "FRI");
-        else if (Calendar.SATURDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SAT");
-        else if (Calendar.SUNDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SUN");
+        String fullName = date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+        if (!TextUtils.isEmpty(fullName)) {
+            return fullName.substring(0, mDayNameLength == LENGTH_SHORT ? 1 : 3).toUpperCase(Locale.getDefault());
+        }
         return "";
     }
 }
