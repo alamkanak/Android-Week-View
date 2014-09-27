@@ -496,11 +496,17 @@ public class WeekView extends View {
         StaticLayout mTextLayout = new StaticLayout(text, mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         // Crop height
-        if (mTextLayout.getHeight() > rect.height() - mEventPadding * 2) {
+        int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
+        int lineHeight = mTextLayout.getHeight() / mTextLayout.getLineCount();
+        if (lineHeight < availableHeight && mTextLayout.getHeight() > rect.height() - mEventPadding * 2) {
             int lineCount = mTextLayout.getLineCount();
-            int availableLineCount = (int) Math.floor(lineCount * (rect.bottom - originalTop - mEventPadding * 2) / mTextLayout.getHeight());
+            int availableLineCount = (int) Math.floor(lineCount * availableHeight / mTextLayout.getHeight());
             float widthAvailable = (rect.right - originalLeft - mEventPadding * 2) * availableLineCount;
             mTextLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, widthAvailable, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        }
+        else if (lineHeight >= availableHeight) {
+            int width = (int) (rect.right - originalLeft - mEventPadding * 2);
+            mTextLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, width, TextUtils.TruncateAt.END), mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
         }
 
         // Draw text
