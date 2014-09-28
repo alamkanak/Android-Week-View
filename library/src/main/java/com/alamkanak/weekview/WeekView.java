@@ -139,6 +139,9 @@ public class WeekView extends View {
             return true;
         }
 
+		private boolean checkEvent(MotionEvent e, EventRect eventRect) {
+			return (eventRect.rectF != null && eventRect.rectF.contains(e.getX(), e.getY()));
+		}
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -146,7 +149,7 @@ public class WeekView extends View {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
-                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+					if (checkEvent(e, event)) {
                         mEventClickListener.onEventClick(event.event, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         break;
@@ -164,7 +167,7 @@ public class WeekView extends View {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
-                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+					if (checkEvent(e, event)) {
                         mEventLongPressListener.onEventLongPress(event.event, event.rectF);
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                         break;
