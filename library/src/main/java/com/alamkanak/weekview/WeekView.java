@@ -373,6 +373,7 @@ public class WeekView extends View {
             }
         }
 
+        // Iterate through each day.
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
@@ -405,11 +406,14 @@ public class WeekView extends View {
                     i++;
                 }
             }
+
+            // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
 
             // Draw the events.
             drawEvents(day, startPixel, canvas);
 
+            // In the next iteration, start from the next day.
             startPixel += mWidthPerDay + mColumnGap;
         }
 
@@ -440,8 +444,6 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
-
-
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
@@ -460,6 +462,7 @@ public class WeekView extends View {
                     float right = startFromPixel + mWidthPerDay;
                     if (left < mHeaderColumnWidth) left = mHeaderColumnWidth;
 
+                    // Draw the event and the event name on top of it.
                     RectF eventRectF = new RectF(left, top, right, bottom);
                     if (bottom > mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 && left < right &&
                             eventRectF.right > mHeaderColumnWidth &&
@@ -469,7 +472,6 @@ public class WeekView extends View {
                             left < right
                             ) {
                         mEventRects.get(i).rectF = eventRectF;
-
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
                         drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, startFromPixel);
@@ -515,7 +517,6 @@ public class WeekView extends View {
         mTextLayout.draw(canvas);
         canvas.restore();
 
-
     }
 
 
@@ -540,7 +541,6 @@ public class WeekView extends View {
      * @param day The day where the user is currently is.
      */
     private void getMoreEvents(Calendar day) {
-
 
         // Delete all events if its not current month +- 1.
         deleteFarMonths(day);
@@ -605,7 +605,6 @@ public class WeekView extends View {
 
         Calendar nextMonth = (Calendar) currentDay.clone();
         nextMonth.add(Calendar.MONTH, 1);
-        int max = nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
         nextMonth.set(Calendar.DAY_OF_MONTH, nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
         nextMonth.set(Calendar.HOUR_OF_DAY, 12);
         nextMonth.set(Calendar.MINUTE, 59);
