@@ -125,7 +125,6 @@ There is also a [sample app](https://github.com/alamkanak/Android-Week-View/tree
 To do
 -------
 
-* Show overlapping events side by side
 * Add event touch feedback selector
 * Show events that expand multiple days properly
 
