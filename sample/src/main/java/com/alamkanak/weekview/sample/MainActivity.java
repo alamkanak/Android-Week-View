@@ -135,8 +135,20 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         events.add(event);
 
         startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, 05);
-        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.HOUR_OF_DAY, 4);
+        startTime.set(Calendar.MINUTE, 20);
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.YEAR, newYear);
+        endTime = (Calendar) startTime.clone();
+        endTime.set(Calendar.HOUR, 5);
+        endTime.set(Calendar.MINUTE, 0);
+        event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
+        event.setColor(getResources().getColor(R.color.event_color_03));
+        events.add(event);
+
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY, 5);
+        startTime.set(Calendar.MINUTE, 30);
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();

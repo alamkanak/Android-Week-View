@@ -28,6 +28,7 @@ import android.widget.Scroller;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -448,18 +449,19 @@ public class WeekView extends View {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
                     // Calculate top.
-                    float top = mEventRects.get(i).event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + mEventRects.get(i).event.getStartTime().get(Calendar.MINUTE);
-                    top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
+                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
                     float originalTop = top;
-                    if (top < mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2) top = mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
+                    if (top < mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2)
+                        top = mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
 
                     // Calculate bottom.
-                    float bottom = mEventRects.get(i).event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + mEventRects.get(i).event.getEndTime().get(Calendar.MINUTE);
+                    float bottom = mEventRects.get(i).bottom;
                     bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
 
                     // Calculate left and right.
-                    float left = startFromPixel;
-                    float right = startFromPixel + mWidthPerDay;
+                    float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
+                    float originalLeft = left;
+                    float right = left + mEventRects.get(i).width * mWidthPerDay;
                     if (left < mHeaderColumnWidth) left = mHeaderColumnWidth;
 
                     // Draw the event and the event name on top of it.
@@ -474,7 +476,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = eventRectF;
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
-                        drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, startFromPixel);
+                        drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -482,6 +484,7 @@ public class WeekView extends View {
             }
         }
     }
+
 
     /**
      * Draw the name of the event on top of the event rectangle.
@@ -516,7 +519,6 @@ public class WeekView extends View {
         canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
         mTextLayout.draw(canvas);
         canvas.restore();
-
     }
 
 
@@ -526,6 +528,10 @@ public class WeekView extends View {
     private class EventRect {
         public WeekViewEvent event;
         public RectF rectF;
+        public float left;
+        public float width;
+        public float top;
+        public float bottom;
 
         public EventRect(WeekViewEvent event, RectF rectF) {
             this.event = event;
@@ -564,6 +570,7 @@ public class WeekView extends View {
         if (mFetchedMonths[0] < 1 || mFetchedMonths[0] != previousMonth || mRefreshEvents) {
             if (!containsValue(lastFetchedMonth, previousMonth) && !isInEditMode()){
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange((previousMonth==12)?day.get(Calendar.YEAR)-1:day.get(Calendar.YEAR), previousMonth);
+                sortEvents(events);
                 for (WeekViewEvent event: events) {
                     mEventRects.add(new EventRect(event, null));
                 }
@@ -575,6 +582,7 @@ public class WeekView extends View {
         if (mFetchedMonths[1] < 1 || mFetchedMonths[1] != day.get(Calendar.MONTH)+1 || mRefreshEvents) {
             if (!containsValue(lastFetchedMonth, day.get(Calendar.MONTH)+1) && !isInEditMode()) {
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(day.get(Calendar.YEAR), day.get(Calendar.MONTH) + 1);
+                sortEvents(events);
                 for (WeekViewEvent event : events) {
                     mEventRects.add(new EventRect(event, null));
                 }
@@ -586,14 +594,164 @@ public class WeekView extends View {
         if (mFetchedMonths[2] < 1 || mFetchedMonths[2] != nextMonth || mRefreshEvents) {
             if (!containsValue(lastFetchedMonth, nextMonth) && !isInEditMode()) {
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(nextMonth == 1 ? day.get(Calendar.YEAR) + 1 : day.get(Calendar.YEAR), nextMonth);
+                sortEvents(events);
                 for (WeekViewEvent event : events) {
                     mEventRects.add(new EventRect(event, null));
                 }
             }
             mFetchedMonths[2] = nextMonth;
         }
+
+        // Prepare to calculate positions of each events.
+        ArrayList<EventRect> tempEvents = new ArrayList<EventRect>(mEventRects);
+        mEventRects = new ArrayList<EventRect>();
+        Calendar dayCounter = (Calendar) day.clone();
+        dayCounter.add(Calendar.MONTH, -1);
+        dayCounter.set(Calendar.DAY_OF_MONTH, 1);
+        Calendar maxDay = (Calendar) day.clone();
+        maxDay.add(Calendar.MONTH, 1);
+        maxDay.set(Calendar.DAY_OF_MONTH, maxDay.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        // Iterate through each day to calculate the position of the events.
+        while (dayCounter.getTimeInMillis() <= maxDay.getTimeInMillis()) {
+            ArrayList<EventRect> eventRects = new ArrayList<EventRect>();
+            for (EventRect eventRect : tempEvents) {
+                if (isSameDay(eventRect.event.getStartTime(), dayCounter))
+                    eventRects.add(eventRect);
+            }
+            computePositionOfEvents(eventRects);
+            dayCounter.add(Calendar.DATE, 1);
+        }
     }
 
+    /**
+     * Sorts the events in ascending order.
+     * @param events The events to be sorted.
+     */
+    private void sortEvents(List<WeekViewEvent> events) {
+        Collections.sort(events, new Comparator<WeekViewEvent>() {
+            @Override
+            public int compare(WeekViewEvent event1, WeekViewEvent event2) {
+                long start1 = event1.getStartTime().getTimeInMillis();
+                long start2 = event2.getStartTime().getTimeInMillis();
+                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
+                if (comparator == 0) {
+                    long end1 = event1.getEndTime().getTimeInMillis();
+                    long end2 = event2.getEndTime().getTimeInMillis();
+                    comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+                }
+                return comparator;
+            }
+        });
+    }
+
+    /**
+     * Calculates the left and right positions of each events. This comes handy specially if events
+     * are overlapping.
+     * @param eventRects The events along with their wrapper class.
+     */
+    private void computePositionOfEvents(List<EventRect> eventRects) {
+        // Make "collision groups" for all events that collide with others.
+        List<List<EventRect>> collisionGroups = new ArrayList<List<EventRect>>();
+        for (EventRect eventRect : eventRects) {
+            boolean isPlaced = false;
+            outerLoop:
+            for (List<EventRect> collisionGroup : collisionGroups) {
+                for (EventRect groupEvent : collisionGroup) {
+                    if (isEventsCollide(groupEvent.event, eventRect.event)) {
+                        collisionGroup.add(eventRect);
+                        isPlaced = true;
+                        break outerLoop;
+                    }
+                }
+            }
+            if (!isPlaced) {
+                List<EventRect> newGroup = new ArrayList<EventRect>();
+                newGroup.add(eventRect);
+                collisionGroups.add(newGroup);
+            }
+        }
+
+        for (List<EventRect> collisionGroup : collisionGroups) {
+            expandEventsToMaxWidth(collisionGroup);
+        }
+
+    }
+
+    /**
+     * Expands all the events to maximum possible width. The events will try to occupy maximum
+     * space available horizontally.
+     * @param collisionGroup The group of events which overlap with each other.
+     */
+    private void expandEventsToMaxWidth(List<EventRect> collisionGroup) {
+        // Expand the events to maximum possible width.
+        List<List<EventRect>> columns = new ArrayList<List<EventRect>>();
+        columns.add(new ArrayList<EventRect>());
+        for (EventRect eventRect : collisionGroup) {
+            boolean isPlaced = false;
+            for (List<EventRect> column : columns) {
+                if (column.size() == 0) {
+                    column.add(eventRect);
+                    isPlaced = true;
+                }
+                else if (!isEventsCollide(eventRect.event, column.get(column.size()-1).event)) {
+                    column.add(eventRect);
+                    isPlaced = true;
+                    break;
+                }
+            }
+            if (!isPlaced) {
+                List<EventRect> newColumn = new ArrayList<EventRect>();
+                newColumn.add(eventRect);
+                columns.add(newColumn);
+            }
+        }
+
+
+        // Calculate left and right position for all the events.
+        int maxRowCount = columns.get(0).size();
+        for (int i = 0; i < maxRowCount; i++) {
+            // Set the left and right values of the event.
+            float j = 0;
+            for (List<EventRect> column : columns) {
+                if (column.size() >= i+1) {
+                    EventRect eventRect = column.get(i);
+                    eventRect.width = 1f / columns.size();
+                    eventRect.left = j / columns.size();
+                    eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
+                    eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);;
+                    mEventRects.add(eventRect);
+                }
+                j++;
+            }
+        }
+    }
+
+
+    /**
+     * Checks if two events overlap.
+     * @param event1 The first event.
+     * @param event2 The second event.
+     * @return true if the events overlap.
+     */
+    private boolean isEventsCollide(WeekViewEvent event1, WeekViewEvent event2) {
+        long start1 = event1.getStartTime().getTimeInMillis();
+        long end1 = event1.getEndTime().getTimeInMillis();
+        long start2 = event2.getStartTime().getTimeInMillis();
+        long end2 = event2.getEndTime().getTimeInMillis();
+        return (start1 > start2 && start1 < end2) || (end1 > start2 && end1 < end2);
+    }
+
+
+    /**
+     * Checks if time1 occurs after (or at the same time) time2.
+     * @param time1 The time to check.
+     * @param time2 The time to check against.
+     * @return true if time1 and time2 are equal or if time1 is after time2. Otherwise false.
+     */
+    private boolean isTimeAfterOrEquals(Calendar time1, Calendar time2) {
+        return !(time1 == null || time2 == null) && time1.getTimeInMillis() >= time2.getTimeInMillis();
+    }
 
     /**
      * Deletes the events of the months that are too far away from the current month.
