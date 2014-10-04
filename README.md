@@ -32,14 +32,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.1.0'
+    compile 'com.github.alamkanak:android-week-view:1.1.1'
     ```
 2. Add WeekView in your xml layout.
 
@@ -127,6 +127,17 @@ To do
 
 * Add event touch feedback selector
 * Show events that expand multiple days properly
+
+Changelog
+-------
+
+**Version 1.1.1**
+
+* Overlapping event bug fixed
+
+**Version 1.1.0**
+
+* Added support for overlapping events
 
 License
 ----------

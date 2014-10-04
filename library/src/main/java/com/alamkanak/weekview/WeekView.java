@@ -619,6 +619,7 @@ public class WeekView extends View {
                 if (isSameDay(eventRect.event.getStartTime(), dayCounter))
                     eventRects.add(eventRect);
             }
+
             computePositionOfEvents(eventRects);
             dayCounter.add(Calendar.DATE, 1);
         }
@@ -739,7 +740,7 @@ public class WeekView extends View {
         long end1 = event1.getEndTime().getTimeInMillis();
         long start2 = event2.getStartTime().getTimeInMillis();
         long end2 = event2.getEndTime().getTimeInMillis();
-        return (start1 > start2 && start1 < end2) || (end1 > start2 && end1 < end2);
+        return (start1 >= start2 && start1 <= end2) || (end1 >= start2 && end1 <= end2);
     }
 
 
