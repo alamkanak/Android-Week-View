@@ -127,7 +127,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.set(Calendar.HOUR, 4);
+        endTime.set(Calendar.HOUR_OF_DAY, 4);
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth-1);
         event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
@@ -140,7 +140,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.set(Calendar.HOUR, 5);
+        endTime.set(Calendar.HOUR_OF_DAY, 5);
         endTime.set(Calendar.MINUTE, 0);
         event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_03));
@@ -152,7 +152,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 2);
+        endTime.add(Calendar.HOUR_OF_DAY, 2);
         endTime.set(Calendar.MONTH, newMonth-1);
         event = new WeekViewEvent(2, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_02));
@@ -165,7 +165,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.YEAR, newYear);
         startTime.add(Calendar.DATE, 1);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 3);
+        endTime.add(Calendar.HOUR_OF_DAY, 3);
         endTime.set(Calendar.MONTH, newMonth - 1);
         event = new WeekViewEvent(3, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_03));
@@ -178,7 +178,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 3);
+        endTime.add(Calendar.HOUR_OF_DAY, 3);
         event = new WeekViewEvent(4, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_04));
         events.add(event);
@@ -190,7 +190,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 3);
+        endTime.add(Calendar.HOUR_OF_DAY, 3);
         event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_01));
         events.add(event);
@@ -202,7 +202,7 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 3);
+        endTime.add(Calendar.HOUR_OF_DAY, 3);
         event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_02));
         events.add(event);
