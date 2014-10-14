@@ -20,7 +20,7 @@ Features
 Who uses it
 ---------------
 
-* [Series Addict](http://seriesaddict.april-shower.com) (still under development)
+* [Series Addict](https://play.google.com/store/apps/details?id=com.alamkanak.seriesaddict)
 
 Usage
 ---------
@@ -32,14 +32,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.1.2</version>
+      <version>1.1.3</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.1.2'
+    compile 'com.github.alamkanak:android-week-view:1.1.3'
     ```
 2. Add WeekView in your xml layout.
 
@@ -100,6 +100,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
+- `eventMarginVertical`
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
@@ -113,6 +114,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `hourSeparatorColor`
 - `hourSeparatorHeight`
 - `noOfVisibleDays`
+- `overlappingEventGap`
 - `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
@@ -129,7 +131,11 @@ To do
 * Show events that expand multiple days properly
 
 Changelog
--------
+---------
+
+**Version 1.1.3**
+
+* Margins support added for overlapping events
 
 **Version 1.1.2**
 

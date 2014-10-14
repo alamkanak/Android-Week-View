@@ -92,6 +92,8 @@ public class WeekView extends View {
     private int mDefaultEventColor;
     private boolean mIsFirstDraw = true;
     private int mDayNameLength = LENGTH_LONG;
+    private int mOverlappingEventGap = 0;
+    private int mEventMarginVertical = 0;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -216,6 +218,8 @@ public class WeekView extends View {
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
+            mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
+            mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
         } finally {
             a.recycle();
         }
@@ -450,19 +454,23 @@ public class WeekView extends View {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
                     // Calculate top.
-                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
+                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
                     float originalTop = top;
                     if (top < mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2)
                         top = mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
-                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
+                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 - mEventMarginVertical;
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
+                    if (left != startFromPixel)
+                        left += mOverlappingEventGap;
                     float originalLeft = left;
                     float right = left + mEventRects.get(i).width * mWidthPerDay;
+                    if (right != startFromPixel + mWidthPerDay)
+                        right -= mOverlappingEventGap;
                     if (left < mHeaderColumnWidth) left = mHeaderColumnWidth;
 
                     // Draw the event and the event name on top of it.
@@ -1029,6 +1037,33 @@ public class WeekView extends View {
             throw new IllegalArgumentException("length parameter must be either LENGTH_LONG or LENGTH_SHORT");
         }
         this.mDayNameLength = length;
+    }
+
+    public int getOverlappingEventGap() {
+        return mOverlappingEventGap;
+    }
+
+    /**
+     * Set the gap between overlapping events.
+     * @param overlappingEventGap The gap between overlapping events.
+     */
+    public void setOverlappingEventGap(int overlappingEventGap) {
+        this.mOverlappingEventGap = overlappingEventGap;
+        invalidate();
+    }
+
+    public int getEventMarginVertical() {
+        return mEventMarginVertical;
+    }
+
+    /**
+     * Set the top and bottom margin of the event. The event will release this margin from the top
+     * and bottom edge. This margin is useful for differentiation consecutive events.
+     * @param eventMarginVertical The top and bottom margin.
+     */
+    public void setEventMarginVertical(int eventMarginVertical) {
+        this.mEventMarginVertical = eventMarginVertical;
+        invalidate();
     }
 
     /////////////////////////////////////////////////////////////////

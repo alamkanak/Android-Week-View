@@ -31,6 +31,8 @@
             <enum name="length_short" value="1"/>
             <enum name="length_long" value="2"/>
         </attr>
+        <attr name="overlappingEventGap" format="dimension"/>
+        <attr name="eventMarginVertical" format="dimension"/>
 
     </declare-styleable>
 </resources>
