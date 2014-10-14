@@ -465,11 +465,11 @@ public class WeekView extends View {
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
-                    if (left != startFromPixel)
+                    if (left < startFromPixel)
                         left += mOverlappingEventGap;
                     float originalLeft = left;
                     float right = left + mEventRects.get(i).width * mWidthPerDay;
-                    if (right != startFromPixel + mWidthPerDay)
+                    if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
                     if (left < mHeaderColumnWidth) left = mHeaderColumnWidth;
 
