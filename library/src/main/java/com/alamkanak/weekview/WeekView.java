@@ -16,6 +16,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -96,6 +97,7 @@ public class WeekView extends View {
     private int mEventMarginVertical = 0;
 
     // Listeners.
+    private TimeBlockClickListener mTimeBlockClickListener;
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
@@ -143,19 +145,67 @@ public class WeekView extends View {
         }
 
 
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (mEventRects != null && mEventClickListener != null) {
+        private boolean eventSelection(MotionEvent e){
+        	if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventClickListener.onEventClick(event.event, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
-                        break;
+                        return true;                        
                     }
                 }
             }
+        	
+        	return false;        	
+        }   
+        
+        
+        private void timeBlockSelection(MotionEvent e) {
+        	
+        	if (mTimeBlockClickListener != null){
+        	
+	        	//Gets the day selected
+	        	int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));        	        
+	        	Calendar day = (Calendar) mToday.clone();
+	            day.add(Calendar.DATE, leftDaysWithGaps);
+	            
+	            float x = e.getX();
+	            for (int dayNumber = 0; dayNumber < mNumberOfVisibleDays; dayNumber++) {
+	            	
+	                if (x > mHeaderColumnWidth + ((mWidthPerDay + mColumnGap) * dayNumber) && x < mHeaderColumnWidth + ((mWidthPerDay + mColumnGap) * (dayNumber + 1))){                	
+	                	break;
+	                }
+	            
+	                day.add(Calendar.DATE, 1);
+	            }
+	            
+	            //Gets the time selected
+	            float y = e.getY();
+	            for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
+	            	float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight/2 + mHeaderMarginBottom;            
+	            	float bottom = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * (hourNumber + 1) + mTimeTextHeight/2 + mHeaderMarginBottom;            	            	
+	            	            	
+	            	if (y > top && y < bottom){
+	            		day.set(Calendar.HOUR_OF_DAY, hourNumber);
+	            		break;
+	            	}
+	            }
+	                        
+            	mTimeBlockClickListener.onTimeBlockClick(day);    
+        	}
+        }        
+        
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+        	
+        	//first hand event selection
+        	boolean isEvent = eventSelection(e);
+        	
+        	//if it's not an event, handle time block selection
+        	if (!isEvent) timeBlockSelection(e);        	        	        	
+        		
             return super.onSingleTapConfirmed(e);
         }
 
@@ -801,6 +851,10 @@ public class WeekView extends View {
     //
     /////////////////////////////////////////////////////////////////
 
+    public void setOnTimeBlockClickListener(TimeBlockClickListener listener){
+    	this.mTimeBlockClickListener = listener;    	
+    }    
+    
     public void setOnEventClickListener (EventClickListener listener) {
         this.mEventClickListener = listener;
     }
@@ -1165,6 +1219,10 @@ public class WeekView extends View {
     //
     /////////////////////////////////////////////////////////////////
 
+    public interface TimeBlockClickListener{
+    	public void onTimeBlockClick(Calendar dateSelection);
+    }
+    
     public interface EventClickListener {
         public void onEventClick(WeekViewEvent event, RectF eventRect);
     }
