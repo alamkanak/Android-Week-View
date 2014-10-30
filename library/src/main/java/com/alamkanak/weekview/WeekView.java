@@ -174,20 +174,16 @@ public class WeekView extends View {
 	            float x = e.getX();
 	            for (int dayNumber = 0; dayNumber < mNumberOfVisibleDays; dayNumber++) {
 	            	
-	                if (x > mHeaderColumnWidth + ((mWidthPerDay + mColumnGap) * dayNumber) && x < mHeaderColumnWidth + ((mWidthPerDay + mColumnGap) * (dayNumber + 1))){                	
+	                if (x > getXCoordinateForDay(dayNumber) && x < getXCoordinateForDay(dayNumber + 1))                	
 	                	break;
-	                }
-	            
+	                
 	                day.add(Calendar.DATE, 1);
 	            }
 	            
 	            //Gets the time selected
 	            float y = e.getY();
 	            for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
-	            	float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight/2 + mHeaderMarginBottom;            
-	            	float bottom = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * (hourNumber + 1) + mTimeTextHeight/2 + mHeaderMarginBottom;            	            	
-	            	            	
-	            	if (y > top && y < bottom){
+	            	if (y > getYCoordinateForHour(hourNumber) && y < getYCoordinateForHour(hourNumber + 1)){
 	            		day.set(Calendar.HOUR_OF_DAY, hourNumber);
 	            		break;
 	            	}
@@ -200,7 +196,7 @@ public class WeekView extends View {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
         	
-        	//first hand event selection
+        	//first handle event selection
         	boolean isEvent = eventSelection(e);
         	
         	//if it's not an event, handle time block selection
@@ -226,7 +222,6 @@ public class WeekView extends View {
             }
         }
     };
-
 
     private enum Direction {
         NONE, HORIZONTAL, VERTICAL
@@ -407,8 +402,8 @@ public class WeekView extends View {
         // Consider scroll offset.
         if (mCurrentScrollDirection == Direction.HORIZONTAL) mCurrentOrigin.x -= mDistanceX;
         int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
-        float startFromPixel = mCurrentOrigin.x + (mWidthPerDay+mColumnGap) * leftDaysWithGaps +
-                mHeaderColumnWidth;
+        float startFromPixel = mCurrentOrigin.x + getXCoordinateForDay(leftDaysWithGaps);
+
         float startPixel = startFromPixel;
 
         // Prepare to iterate for each day.
@@ -453,7 +448,7 @@ public class WeekView extends View {
             // Prepare the separator lines for hours.
             int i = 0;
             for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
-                float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight/2 + mHeaderMarginBottom;
+                float top = getYCoordinateForHour(hourNumber);
                 if (top > mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom - mHourSeparatorHeight && top < getHeight() && startPixel + mWidthPerDay - start > 0){
                     hourLines[i * 4] = start;
                     hourLines[i * 4 + 1] = top;
@@ -850,6 +845,15 @@ public class WeekView extends View {
     //      Functions related to setting and getting the properties.
     //
     /////////////////////////////////////////////////////////////////
+    
+    private float getXCoordinateForDay(int daysSinceStart){        
+    	return mHeaderColumnWidth + ((mWidthPerDay + mColumnGap) * daysSinceStart);
+    }
+    
+    private float getYCoordinateForHour(int hour){
+    	return mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * hour + mTimeTextHeight/2 + mHeaderMarginBottom;
+    }
+    
 
     public void setOnTimeBlockClickListener(TimeBlockClickListener listener){
     	this.mTimeBlockClickListener = listener;    	
