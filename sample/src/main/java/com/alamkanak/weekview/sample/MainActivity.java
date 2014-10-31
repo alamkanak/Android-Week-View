@@ -21,7 +21,7 @@ import java.util.List;
  * Website: http://april-shower.com
  */
 public class MainActivity extends Activity implements WeekView.MonthChangeListener,
-        WeekView.EventClickListener, WeekView.EventLongPressListener {
+        WeekView.EventClickListener, WeekView.EventLongPressListener, WeekView.TimeBlockClickListener {
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -46,6 +46,9 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
 
         // Set long press listener for events.
         mWeekView.setEventLongPressListener(this);
+        
+        // Set time block listener for creating new events.
+        mWeekView.setOnTimeBlockClickListener(this);
     }
 
 
@@ -225,4 +228,9 @@ public class MainActivity extends Activity implements WeekView.MonthChangeListen
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
         Toast.makeText(MainActivity.this, "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
     }
+
+	@Override
+	public void onTimeBlockClick(Calendar date) {
+		Toast.makeText(MainActivity.this, "Time Block Clicked: " + date.getTime().toString(), Toast.LENGTH_SHORT).show();
+	}
 }
