@@ -95,6 +95,7 @@ public class WeekView extends View {
     private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
+    private int mInitialHour = 0;
 
     // Listeners.
     private TimeBlockClickListener mTimeBlockClickListener;
@@ -265,6 +266,7 @@ public class WeekView extends View {
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mInitialHour = a.getInteger(R.styleable.WeekView_initialHour, mInitialHour);
         } finally {
             a.recycle();
         }
@@ -346,8 +348,16 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+        
+        //Set initial hour location
+        setInitialVerticalLocation();
     }
-
+    
+    private void setInitialVerticalLocation(){
+        float x = mHourHeight * mInitialHour;
+        mCurrentOrigin.y = -x;
+    }
+    
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
