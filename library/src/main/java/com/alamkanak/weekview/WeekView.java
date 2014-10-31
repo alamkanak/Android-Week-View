@@ -352,12 +352,7 @@ public class WeekView extends View {
         mDefaultEventColor = Color.parseColor("#9fc6e7");
         
         //Set initial hour location
-        setInitialVerticalLocation();
-    }
-    
-    private void setInitialVerticalLocation(){
-        float x = mHourHeight * mInitialHour;
-        mCurrentOrigin.y = -x;
+        mCurrentOrigin.y = -(mHourHeight * mInitialHour);
     }
     
     @Override
