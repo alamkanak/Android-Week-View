@@ -5,8 +5,6 @@ Android Week View
 
 ![](images/screen-shot.png)
 
-> Please note that this project is still under development. I will be happy if you collaborate in this project and help it become even more polished.
-
 Features
 ------------
 
@@ -21,6 +19,7 @@ Who uses it
 ---------------
 
 * [Series Addict](https://play.google.com/store/apps/details?id=com.alamkanak.seriesaddict)
+* Using the library? Just [tweet me](https://twitter.com/alamkanak) or [send me an email](mailto:alam.kanak@gmail.com).
 
 Usage
 ---------
@@ -32,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.1.4</version>
+      <version>1.1.5</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.1.4'
+    compile 'com.github.alamkanak:android-week-view:1.1.5'
     ```
 2. Add WeekView in your xml layout.
 
@@ -132,6 +131,11 @@ To do
 
 Changelog
 ---------
+
+**Version 1.1.5**
+
+* A bug related to overlapping events fixed
+* You can now programmatically get first and last visible day in the week view
 
 **Version 1.1.4**
 
