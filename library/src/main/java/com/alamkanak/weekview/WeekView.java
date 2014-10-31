@@ -94,6 +94,8 @@ public class WeekView extends View {
     private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
+    private Calendar mFirstVisibleDay;
+    private Calendar mLastVisibleDay;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -357,7 +359,7 @@ public class WeekView extends View {
         // Consider scroll offset.
         if (mCurrentScrollDirection == Direction.HORIZONTAL) mCurrentOrigin.x -= mDistanceX;
         int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
-        float startFromPixel = mCurrentOrigin.x + (mWidthPerDay+mColumnGap) * leftDaysWithGaps +
+        float startFromPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
                 mHeaderColumnWidth;
         float startPixel = startFromPixel;
 
@@ -379,13 +381,17 @@ public class WeekView extends View {
         }
 
         // Iterate through each day.
+        mFirstVisibleDay = (Calendar) mToday.clone();
+        mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
 
             // Check if the day is today.
             day = (Calendar) mToday.clone();
+            mLastVisibleDay = (Calendar) day.clone();
             day.add(Calendar.DATE, dayNumber - 1);
+            mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
             boolean sameDay = isSameDay(day, mToday);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
@@ -749,7 +755,7 @@ public class WeekView extends View {
         long end1 = event1.getEndTime().getTimeInMillis();
         long start2 = event2.getStartTime().getTimeInMillis();
         long end2 = event2.getEndTime().getTimeInMillis();
-        return (start1 >= start2 && start1 <= end2) || (end1 >= start2 && end1 <= end2);
+        return !((start1 >= end2) || (end1 <= start2));
     }
 
 
@@ -1064,6 +1070,22 @@ public class WeekView extends View {
     public void setEventMarginVertical(int eventMarginVertical) {
         this.mEventMarginVertical = eventMarginVertical;
         invalidate();
+    }
+
+    /**
+     * Returns the first visible day in the week view.
+     * @return The first visible day in the week view.
+     */
+    public Calendar getFirstVisibleDay() {
+        return mFirstVisibleDay;
+    }
+
+    /**
+     * Returns the last visible day in the week view.
+     * @return The last visible day in the week view.
+     */
+    public Calendar getLastVisibleDay() {
+        return mLastVisibleDay;
     }
 
     /////////////////////////////////////////////////////////////////
