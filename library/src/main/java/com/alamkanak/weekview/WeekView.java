@@ -152,7 +152,7 @@ public class WeekView extends View {
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                        mEventClickListener.onEventClick(event.event, event.rectF);
+                        mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         break;
                     }
@@ -170,7 +170,7 @@ public class WeekView extends View {
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                        mEventLongPressListener.onEventLongPress(event.event, event.rectF);
+                        mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                         break;
                     }
@@ -538,19 +538,37 @@ public class WeekView extends View {
 
 
     /**
-     * A class to hold reference to the events and their visual representation.
+     * A class to hold reference to the events and their visual representation. An EventRect is
+     * actually the rectangle that is drawn on the calendar for a given event. There may be more
+     * than one rectangle for a single event (an event that expands more than one day). In that
+     * case two instances of the EventRect will be used for a single event. The given event will be
+     * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
+     * instance will be stored in "event".
      */
     private class EventRect {
         public WeekViewEvent event;
+        public WeekViewEvent originalEvent;
         public RectF rectF;
         public float left;
         public float width;
         public float top;
         public float bottom;
 
-        public EventRect(WeekViewEvent event, RectF rectF) {
+        /**
+         * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
+         * on the calendar for a given event. There may be more than one rectangle for a single
+         * event (an event that expands more than one day). In that case two instances of the
+         * EventRect will be used for a single event. The given event will be stored in
+         * "originalEvent". But the event that corresponds to rectangle the rectangle instance will
+         * be stored in "event".
+         * @param event Represents the event which this instance of rectangle represents.
+         * @param originalEvent The original event that was passed by the user.
+         * @param rectF The rectangle.
+         */
+        public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
             this.event = event;
             this.rectF = rectF;
+            this.originalEvent = originalEvent;
         }
     }
 
@@ -587,7 +605,7 @@ public class WeekView extends View {
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange((previousMonth==12)?day.get(Calendar.YEAR)-1:day.get(Calendar.YEAR), previousMonth);
                 sortEvents(events);
                 for (WeekViewEvent event: events) {
-                    mEventRects.add(new EventRect(event, null));
+                    cacheEvent(event);
                 }
             }
             mFetchedMonths[0] = previousMonth;
@@ -599,7 +617,7 @@ public class WeekView extends View {
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(day.get(Calendar.YEAR), day.get(Calendar.MONTH) + 1);
                 sortEvents(events);
                 for (WeekViewEvent event : events) {
-                    mEventRects.add(new EventRect(event, null));
+                    cacheEvent(event);
                 }
             }
             mFetchedMonths[1] = day.get(Calendar.MONTH)+1;
@@ -611,7 +629,7 @@ public class WeekView extends View {
                 List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(nextMonth == 1 ? day.get(Calendar.YEAR) + 1 : day.get(Calendar.YEAR), nextMonth);
                 sortEvents(events);
                 for (WeekViewEvent event : events) {
-                    mEventRects.add(new EventRect(event, null));
+                    cacheEvent(event);
                 }
             }
             mFetchedMonths[2] = nextMonth;
@@ -638,6 +656,25 @@ public class WeekView extends View {
             computePositionOfEvents(eventRects);
             dayCounter.add(Calendar.DATE, 1);
         }
+    }
+
+    private void cacheEvent(WeekViewEvent event) {
+        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
+            Calendar endTime = (Calendar) event.getStartTime().clone();
+            endTime.set(Calendar.HOUR_OF_DAY, 23);
+            endTime.set(Calendar.MINUTE, 59);
+            Calendar startTime = (Calendar) event.getEndTime().clone();
+            startTime.set(Calendar.HOUR_OF_DAY, 00);
+            startTime.set(Calendar.MINUTE, 0);
+            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
+            event1.setColor(event.getColor());
+            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), startTime, event.getEndTime());
+            event2.setColor(event.getColor());
+            mEventRects.add(new EventRect(event1, event, null));
+            mEventRects.add(new EventRect(event2, event, null));
+        }
+        else
+            mEventRects.add(new EventRect(event, event, null));
     }
 
     /**
@@ -691,7 +728,6 @@ public class WeekView extends View {
         for (List<EventRect> collisionGroup : collisionGroups) {
             expandEventsToMaxWidth(collisionGroup);
         }
-
     }
 
     /**
@@ -735,7 +771,7 @@ public class WeekView extends View {
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
                     eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
-                    eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);;
+                    eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
                     mEventRects.add(eventRect);
                 }
                 j++;
