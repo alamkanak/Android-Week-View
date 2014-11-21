@@ -1215,6 +1215,23 @@ public class WeekView extends View {
         invalidate();
     }
 
+    /**
+     * Vertically scroll to a specific hour in the week view.
+     * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
+     */
+    public void goToHour(double hour){
+        if (hour < 0)
+            throw new IllegalArgumentException("Cannot scroll to an hour of negative value.");
+        else if (hour > 24)
+            throw new IllegalArgumentException("Cannot scroll to an hour of value greater than 24.");
+        else if (hour * mHourHeight > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
+            throw new IllegalArgumentException("Cannot scroll to an hour which will result the calendar to go off the screen.");
+
+        int verticalOffset = (int) (mHourHeight * hour);
+        mCurrentOrigin.y = -verticalOffset;
+        invalidate();
+    }
+
 
 
     /////////////////////////////////////////////////////////////////

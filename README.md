@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.1.6</version>
+      <version>1.1.7</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.1.6'
+    compile 'com.github.alamkanak:android-week-view:1.1.7'
     ```
 2. Add WeekView in your xml layout.
 
@@ -131,6 +131,10 @@ To do
 
 Changelog
 ---------
+
+**Version 1.1.7**
+
+* You can now dynamically scroll to an hour of your preference.
 
 **Version 1.1.6**
 
