@@ -1193,6 +1193,7 @@ public class WeekView extends View {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
         date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
 
         mRefreshEvents = true;
 
@@ -1200,8 +1201,9 @@ public class WeekView extends View {
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
 
-        int dateDifference = (int) (date.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24);
+        int dateDifference = (int) ((date.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24));
         mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
 
         invalidate();
