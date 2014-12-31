@@ -101,6 +101,8 @@ public class WeekView extends View {
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
+    private HourClickListener mHourClickListener;
+
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -158,10 +160,18 @@ public class WeekView extends View {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
-                        break;
+                        return super.onSingleTapConfirmed(e);
                     }
                 }
             }
+            if(mHourClickListener != null) {
+                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                mHourClickListener.onHourClicked(selectedTime);
+            }
+            else{
+                throw new IllegalStateException("You must provide a HourClickListener");
+            }
+
             return super.onSingleTapConfirmed(e);
         }
 
@@ -459,6 +469,30 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+    }
+
+    private Calendar getTimeFromPoint(float x, float y){
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+        float startFromPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
+                mHeaderColumnWidth;
+        float startPixel = startFromPixel;
+        for (int dayNumber = leftDaysWithGaps + 1;
+             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber++) {
+            float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+            if (mWidthPerDay + startPixel - start> 0
+                    && x>start && x<startPixel + mWidthPerDay){
+                Calendar day = (Calendar) mToday.clone();
+                day.add(Calendar.DATE, dayNumber - 1);
+                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderTextHeight
+                        - mHeaderRowPadding * 2 - mTimeTextHeight/2 - mHeaderMarginBottom;
+                int hour = (int)(pixelsFromZero / mHourHeight);
+                day.add(Calendar.HOUR, hour);
+                return day;
+            }
+            startPixel += mWidthPerDay + mColumnGap;
+        }
+        return null;
     }
 
     /**
@@ -880,6 +914,15 @@ public class WeekView extends View {
         this.mEventLongPressListener = eventLongPressListener;
     }
 
+    public HourClickListener getHourClickListener(){
+        return mHourClickListener;
+    }
+
+    public void setHourClickListener(HourClickListener mHourClickListener){
+        this.mHourClickListener = mHourClickListener;
+    }
+
+
     /**
      * Get the number of visible days in a week.
      * @return The number of visible days in a week.
@@ -1266,6 +1309,14 @@ public class WeekView extends View {
     public interface EventLongPressListener {
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
+
+    /**
+     *   Added by Fan Chen on 12/19/2014
+     */
+    public interface HourClickListener{
+        public void onHourClicked(Calendar startTime);
+    }
+
 
     /////////////////////////////////////////////////////////////////
     //
