@@ -114,12 +114,8 @@ public class WeekView extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (mCurrentScrollDirection == Direction.NONE) {
                 if (Math.abs(distanceX) > Math.abs(distanceY)){
-                    if(distanceX > 0)
-                        mCurrentScrollDirection = Direction.LEFT;
-                    else
-                        mCurrentScrollDirection = Direction.RIGHT;
-
-                    mCurrentFlingDirection = mCurrentScrollDirection;
+                    mCurrentScrollDirection = Direction.HORIZONTAL;
+                    mCurrentFlingDirection = Direction.HORIZONTAL;
                 }
                 else {
                     mCurrentFlingDirection = Direction.VERTICAL;
@@ -137,7 +133,7 @@ public class WeekView extends View {
             mScroller.forceFinished(true);
             mStickyScroller.forceFinished(true);
 
-            if (mCurrentFlingDirection.isHorizontal()){
+            if (mCurrentFlingDirection == Direction.HORIZONTAL){
                 mScroller.fling((int) mCurrentOrigin.x, 0, (int) velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
             }
             else if (mCurrentFlingDirection == Direction.VERTICAL){
@@ -185,16 +181,7 @@ public class WeekView extends View {
 
 
     private enum Direction {
-        NONE(false), VERTICAL(false), LEFT(true), RIGHT(true);
-
-        public boolean isHorizontal(){
-            return this.isHorizontal;
-        }
-
-        Direction(boolean isHorizontal){
-            this.isHorizontal = isHorizontal;
-        }
-        private boolean isHorizontal;
+        NONE, HORIZONTAL, VERTICAL
     }
 
     public WeekView(Context context) {
@@ -370,7 +357,7 @@ public class WeekView extends View {
         }
 
         // Consider scroll offset.
-        if (mCurrentScrollDirection.isHorizontal()) mCurrentOrigin.x -= mDistanceX;
+        if (mCurrentScrollDirection == Direction.HORIZONTAL) mCurrentOrigin.x -= mDistanceX;
         int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
         float startFromPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
                 mHeaderColumnWidth;
@@ -1146,15 +1133,18 @@ public class WeekView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (mCurrentScrollDirection.isHorizontal()) {
+
+            if (mCurrentScrollDirection == Direction.HORIZONTAL) {
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
                 int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
                 ViewCompat.postInvalidateOnAnimation(WeekView.this);
             }
+            mCurrentScrollDirection = Direction.NONE;
         }
         return mGestureDetector.onTouchEvent(event);
     }
+
 
     @Override
     public void computeScroll() {
@@ -1163,11 +1153,7 @@ public class WeekView extends View {
             if (Math.abs(mScroller.getFinalX() - mScroller.getCurrX()) < mWidthPerDay + mColumnGap && Math.abs(mScroller.getFinalX() - mScroller.getStartX()) != 0) {
                 mScroller.forceFinished(true);
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
-                if(mCurrentScrollDirection == Direction.LEFT)
-                    leftDays--;
-                else
-                    leftDays++;
-                int nearestOrigin = (int) ((mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap)));
+                int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
                 ViewCompat.postInvalidateOnAnimation(WeekView.this);
             }
@@ -1176,7 +1162,6 @@ public class WeekView extends View {
                 else mCurrentOrigin.x = mScroller.getCurrX();
                 ViewCompat.postInvalidateOnAnimation(this);
             }
-            mCurrentScrollDirection = Direction.NONE;
         }
         if (mStickyScroller.computeScrollOffset()) {
             mCurrentOrigin.x = mStickyScroller.getCurrX();
