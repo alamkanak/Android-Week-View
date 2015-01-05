@@ -96,6 +96,7 @@ public class WeekView extends View {
     private int mEventMarginVertical = 0;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private float mXScrollingSpeed = 1f;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -138,7 +139,7 @@ public class WeekView extends View {
             mStickyScroller.forceFinished(true);
 
             if (mCurrentFlingDirection.isHorizontal()){
-                mScroller.fling((int) mCurrentOrigin.x, 0, (int) velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
+                mScroller.fling((int) mCurrentOrigin.x, 0, (int) (velocityX*mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
             }
             else if (mCurrentFlingDirection == Direction.VERTICAL){
                 mScroller.fling(0, (int) mCurrentOrigin.y, 0, (int) velocityY, 0, 0, (int) -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight()), 0);
@@ -235,6 +236,7 @@ public class WeekView extends View {
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
         } finally {
             a.recycle();
         }
@@ -1137,6 +1139,17 @@ public class WeekView extends View {
         return mLastVisibleDay;
     }
 
+    public float getXScrollingSpeed() {
+        return mXScrollingSpeed;
+    }
+
+    /**
+     * Sets the speed for horizontal scrolling.
+     * @param xScrollingSpeed The new horizontal scrolling speed.
+     */
+    public void setXScrollingSpeed(float xScrollingSpeed) {
+        this.mXScrollingSpeed = xScrollingSpeed;
+    }
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
