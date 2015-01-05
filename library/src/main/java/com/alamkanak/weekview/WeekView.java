@@ -94,6 +94,7 @@ public class WeekView extends View {
     private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
+    private float mXScrollingSpeed = 1f;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
 
@@ -134,7 +135,7 @@ public class WeekView extends View {
             mStickyScroller.forceFinished(true);
 
             if (mCurrentFlingDirection == Direction.HORIZONTAL){
-                mScroller.fling((int) mCurrentOrigin.x, 0, (int) velocityX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
+                mScroller.fling((int) mCurrentOrigin.x, 0, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
             }
             else if (mCurrentFlingDirection == Direction.VERTICAL){
                 mScroller.fling(0, (int) mCurrentOrigin.y, 0, (int) velocityY, 0, 0, (int) -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight()), 0);
@@ -222,6 +223,7 @@ public class WeekView extends View {
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
         } finally {
             a.recycle();
         }
@@ -1124,6 +1126,21 @@ public class WeekView extends View {
         return mLastVisibleDay;
     }
 
+    /**
+     * Get the scrolling speed factor in horizontal direction.
+     * @return The speed factor in horizontal direction.
+     */
+    public float getXScrollingSpeed() {
+        return mXScrollingSpeed;
+    }
+
+    /**
+     * Sets the speed for horizontal scrolling.
+     * @param xScrollingSpeed The new horizontal scrolling speed.
+     */
+    public void setXScrollingSpeed(float xScrollingSpeed) {
+        this.mXScrollingSpeed = xScrollingSpeed;
+    }
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
