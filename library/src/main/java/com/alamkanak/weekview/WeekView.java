@@ -276,8 +276,9 @@ public class WeekView extends View {
         mTimeTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
-        mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
-        mTimeTextWidth = mTimeTextPaint.measureText("00 PM");
+        String timeSample = getDateTimeInterpreter().interpretTime(23);
+        mTimeTextPaint.getTextBounds(timeSample, 0, timeSample.length(), rect);
+        mTimeTextWidth = mTimeTextPaint.measureText(timeSample);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
 
