@@ -106,7 +106,8 @@ public class WeekView extends View {
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
-    private TimeClickListener mTimeClickListener;
+    private EmptyViewClickListener mEmptyViewClickListener;
+    private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -169,11 +170,11 @@ public class WeekView extends View {
             }
 
             // If the tap was on in an empty space, then trigger the callback.
-            if (mTimeClickListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
+            if (mEmptyViewClickListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
                 Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                 if (selectedTime != null) {
                     playSoundEffect(SoundEffectConstants.CLICK);
-                    mTimeClickListener.onTimeClicked(selectedTime);
+                    mEmptyViewClickListener.onEmptyViewClicked(selectedTime);
                 }
             }
 
@@ -191,8 +192,17 @@ public class WeekView extends View {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                        break;
+                        return;
                     }
+                }
+            }
+
+            // If the tap was on in an empty space, then trigger the callback.
+            if (mEmptyViewLongPressListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
+                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                if (selectedTime != null) {
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                    mEmptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
                 }
             }
         }
@@ -926,12 +936,20 @@ public class WeekView extends View {
         this.mEventLongPressListener = eventLongPressListener;
     }
 
-    public void setHourClickListener(TimeClickListener mTimeClickListener){
-        this.mTimeClickListener = mTimeClickListener;
+    public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener){
+        this.mEmptyViewClickListener = emptyViewClickListener;
     }
 
-    public TimeClickListener getHourClickListener(){
-        return mTimeClickListener;
+    public EmptyViewClickListener getEmptyViewClickListener(){
+        return mEmptyViewClickListener;
+    }
+
+    public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener){
+        this.mEmptyViewLongPressListener = emptyViewLongPressListener;
+    }
+
+    public EmptyViewLongPressListener getEmptyViewLongPressListener(){
+        return mEmptyViewLongPressListener;
     }
 
     /**
@@ -1393,8 +1411,12 @@ public class WeekView extends View {
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
 
-    public interface TimeClickListener {
-        public void onTimeClicked(Calendar time);
+    public interface EmptyViewClickListener {
+        public void onEmptyViewClicked(Calendar time);
+    }
+
+    public interface EmptyViewLongPressListener {
+        public void onEmptyViewLongPress(Calendar time);
     }
 
 
