@@ -2,7 +2,12 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-
+        <item name="colorPrimary">@color/toolbar</item>
+        <item name="colorPrimaryDark">@color/accent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:textColorPrimary">@color/toolbar_text</item>
+        <item name="actionMenuTextColor">@color/toolbar_text</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="colorControlActivated">@color/accent</item>
     </style>
-
 </resources>
