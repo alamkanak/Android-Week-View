@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.Layout;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,7 +39,9 @@ import java.util.List;
  */
 public class WeekView extends View {
 
+    @Deprecated
     public static final int LENGTH_SHORT = 1;
+    @Deprecated
     public static final int LENGTH_LONG = 2;
     private final Context mContext;
     private Calendar mToday;
@@ -91,7 +95,7 @@ public class WeekView extends View {
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
     private boolean mIsFirstDraw = true;
-    private int mDayNameLength = LENGTH_LONG;
+    @Deprecated private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
     private float mXScrollingSpeed = 1f;
@@ -103,6 +107,7 @@ public class WeekView extends View {
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
     private TimeClickListener mTimeClickListener;
+    private DateTimeInterpreter mDateTimeInterpreter;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -192,7 +197,6 @@ public class WeekView extends View {
             }
         }
     };
-
 
     private enum Direction {
         NONE, HORIZONTAL, VERTICAL
@@ -352,7 +356,10 @@ public class WeekView extends View {
             float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
-            if (top < getHeight()) canvas.drawText(getTimeString(i), mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+            String time = getDateTimeInterpreter().interpretTime(i);
+            if (time == null)
+                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+            if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
     }
 
@@ -456,7 +463,9 @@ public class WeekView extends View {
             boolean sameDay = isSameDay(day, mToday);
 
             // Draw the day labels.
-            String dayLabel = String.format("%s %d/%02d", getDayName(day), day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
+            String dayLabel = getDateTimeInterpreter().interpretDate(day);
+            if (dayLabel == null)
+                throw new IllegalStateException("A DateTimeInterpreter must not return null date");
             canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
             startPixel += mWidthPerDay + mColumnGap;
         }
@@ -917,12 +926,54 @@ public class WeekView extends View {
         this.mEventLongPressListener = eventLongPressListener;
     }
 
+    public void setHourClickListener(TimeClickListener mTimeClickListener){
+        this.mTimeClickListener = mTimeClickListener;
+    }
+
     public TimeClickListener getHourClickListener(){
         return mTimeClickListener;
     }
 
-    public void setHourClickListener(TimeClickListener mTimeClickListener){
-        this.mTimeClickListener = mTimeClickListener;
+    /**
+     * Get the interpreter which provides the text to show in the header column and the header row.
+     * @return The date, time interpreter.
+     */
+    public @NonNull DateTimeInterpreter getDateTimeInterpreter() {
+        if (mDateTimeInterpreter == null) {
+            mDateTimeInterpreter = new DateTimeInterpreter() {
+                @Override
+                public String interpretDate(Calendar date) {
+                    SimpleDateFormat sdf;
+                    sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE") : new SimpleDateFormat("EEE");
+                    try{
+                        String dayName = sdf.format(date.getTime()).toUpperCase();
+                        return String.format("%s %d/%02d", dayName, date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return "";
+                    }
+                }
+
+                @Override
+                public String interpretTime(int hour) {
+                    String amPm;
+                    if (hour >= 0 && hour < 12) amPm = "AM";
+                    else amPm = "PM";
+                    if (hour == 0) hour = 12;
+                    if (hour > 12) hour -= 12;
+                    return String.format("%02d %s", hour, amPm);
+                }
+            };
+        }
+        return mDateTimeInterpreter;
+    }
+
+    /**
+     * Set the interpreter which provides the text to show in the header column and the header row.
+     * @param dateTimeInterpreter The date, time interpreter.
+     */
+    public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter){
+        this.mDateTimeInterpreter = dateTimeInterpreter;
     }
 
 
@@ -1123,6 +1174,12 @@ public class WeekView extends View {
         invalidate();
     }
 
+    /**
+     * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} and
+     * {@link #getDateTimeInterpreter()} instead.
+     * @return
+     */
+    @Deprecated
     public int getDayNameLength() {
         return mDayNameLength;
     }
@@ -1130,9 +1187,13 @@ public class WeekView extends View {
     /**
      * Set the length of the day name displayed in the header row. Example of short day names is
      * 'M' for 'Monday' and example of long day names is 'Mon' for 'Monday'.
+     * <p>
+     *     <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
+     * </p>
      * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
      * {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
      */
+    @Deprecated
     public void setDayNameLength(int length) {
         if (length != LENGTH_LONG && length != LENGTH_SHORT) {
             throw new IllegalArgumentException("length parameter must be either LENGTH_LONG or LENGTH_SHORT");
@@ -1357,22 +1418,6 @@ public class WeekView extends View {
         return false;
     }
 
-
-    /**
-     * Converts an int (0-23) to time string (e.g. 12 PM).
-     * @param hour The time. Limit: 0-23.
-     * @return The string representation of the time.
-     */
-    private String getTimeString(int hour) {
-        String amPm;
-        if (hour >= 0 && hour < 12) amPm = "AM";
-        else amPm = "PM";
-        if (hour == 0) hour = 12;
-        if (hour > 12) hour -= 12;
-        return String.format("%02d %s", hour, amPm);
-    }
-
-
     /**
      * Checks if two times are on the same day.
      * @param dayOne The first day.
@@ -1383,21 +1428,4 @@ public class WeekView extends View {
         return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
     }
 
-
-    /**
-     * Get the day name of a given date.
-     * @param date The date.
-     * @return The first the characters of the day name.
-     */
-    private String getDayName(Calendar date) {
-        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        if (Calendar.MONDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "M" : "MON");
-        else if (Calendar.TUESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "TUE");
-        else if (Calendar.WEDNESDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "W" : "WED");
-        else if (Calendar.THURSDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "T" : "THU");
-        else if (Calendar.FRIDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "F" : "FRI");
-        else if (Calendar.SATURDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SAT");
-        else if (Calendar.SUNDAY == dayOfWeek) return (mDayNameLength == LENGTH_SHORT ? "S" : "SUN");
-        return "";
-    }
 }
