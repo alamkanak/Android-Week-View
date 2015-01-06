@@ -15,6 +15,7 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -275,8 +276,9 @@ public class WeekView extends View {
         mTimeTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
-        mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
-        mTimeTextWidth = mTimeTextPaint.measureText("00 PM");
+        String timeSample = getDateTimeInterpreter().interpretTime(23);
+        mTimeTextPaint.getTextBounds(timeSample, 0, timeSample.length(), rect);
+        mTimeTextWidth = mTimeTextPaint.measureText(timeSample);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
 
@@ -961,11 +963,10 @@ public class WeekView extends View {
                 @Override
                 public String interpretDate(Calendar date) {
                     SimpleDateFormat sdf;
-                    sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE") : new SimpleDateFormat("EEE");
+                    sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE M/dd") : new SimpleDateFormat("EEE M/dd");
                     try{
-                        String dayName = sdf.format(date.getTime()).toUpperCase();
-                        return String.format("%s %d/%02d", dayName, date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
-                    }catch (Exception e){
+                        return sdf.format(date.getTime()).toUpperCase();
+                    } catch (Exception e){
                         e.printStackTrace();
                         return "";
                     }
@@ -973,12 +974,17 @@ public class WeekView extends View {
 
                 @Override
                 public String interpretTime(int hour) {
-                    String amPm;
-                    if (hour >= 0 && hour < 12) amPm = "AM";
-                    else amPm = "PM";
-                    if (hour == 0) hour = 12;
-                    if (hour > 12) hour -= 12;
-                    return String.format("%02d %s", hour, amPm);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar.set(Calendar.MINUTE, 0);
+
+                    SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm") : new SimpleDateFormat("hh a");
+                    try {
+                        return sdf.format(calendar.getTime());
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        return "";
+                    }
                 }
             };
         }
