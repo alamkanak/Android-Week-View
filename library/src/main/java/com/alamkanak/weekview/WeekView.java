@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.Layout;
@@ -956,7 +955,7 @@ public class WeekView extends View {
      * Get the interpreter which provides the text to show in the header column and the header row.
      * @return The date, time interpreter.
      */
-    public @NonNull DateTimeInterpreter getDateTimeInterpreter() {
+    public DateTimeInterpreter getDateTimeInterpreter() {
         if (mDateTimeInterpreter == null) {
             mDateTimeInterpreter = new DateTimeInterpreter() {
                 @Override
@@ -1195,7 +1194,7 @@ public class WeekView extends View {
     /**
      * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} and
      * {@link #getDateTimeInterpreter()} instead.
-     * @return
+     * @return Either long or short day name is being used.
      */
     @Deprecated
     public int getDayNameLength() {

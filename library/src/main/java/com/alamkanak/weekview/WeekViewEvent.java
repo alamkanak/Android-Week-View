@@ -19,6 +19,7 @@ public class WeekViewEvent {
 
     /**
      * Initializes the event for week view.
+     * @param id The id of the event.
      * @param name Name of the event.
      * @param startYear Year when the event starts.
      * @param startMonth Month when the event starts.
@@ -53,6 +54,7 @@ public class WeekViewEvent {
 
     /**
      * Initializes the event for week view.
+     * @param id The id of the event.
      * @param name Name of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.

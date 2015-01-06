@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.1.7</version>
+      <version>1.2.1</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.1.7'
+    compile 'com.github.alamkanak:android-week-view:1.2.1'
     ```
 2. Add WeekView in your xml layout.
 
@@ -78,7 +78,7 @@ Usage
     ```
 4. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
-5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar preloads events of three consecutive months to enable lag-free scrolling.
+5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar pre-loads events of three consecutive months to enable lag-free scrolling.
 
     ```java
     WeekView.MonthChangeListener mMonthChangeListener = new WeekView.MonthChangeListener() {
@@ -118,6 +118,18 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
 
+Interfaces
+----------
+
+Use the following interfaces according to your need.
+
+- `mWeekView.setMonthChangeListener()` to provide events to the calendar
+- `mWeekView.setOnEventClickListener()` to get a callback when an event is clicked
+- `mWeekView.setEventLongPressListener()` to get a callback when an event is long pressed
+- `mWeekView.setEmptyViewClickListener()` to get a callback when any empty space is clicked
+- `mWeekView.setEmptyViewLongPressListener()` to get a callback when any empty space is long pressed
+- `mWeekView.setDateTimeInterpreter()` to set your own labels for the calendar header row and header column
+
 Sample
 ----------
 
@@ -131,6 +143,14 @@ To do
 
 Changelog
 ---------
+
+**Version 1.2.1**
+
+* Better scrolling added
+* Get callbacks when empty view is tapped/long pressed
+* Control the speed of scrolling
+* Support for multiple language added
+* Ability to set your own interpreter for header row and column added
 
 **Version 1.1.7**
 
