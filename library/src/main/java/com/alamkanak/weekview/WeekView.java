@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://april-shower.com
+ * Website: http://alamkanak.me
  */
 public class WeekView extends View {
 
@@ -102,6 +102,8 @@ public class WeekView extends View {
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
+    private TimeClickListener mTimeClickListener;
+
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -148,6 +150,7 @@ public class WeekView extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            // If the tap was on an event then trigger the callback.
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
@@ -155,10 +158,20 @@ public class WeekView extends View {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
-                        break;
+                        return super.onSingleTapConfirmed(e);
                     }
                 }
             }
+
+            // If the tap was on in an empty space, then trigger the callback.
+            if (mTimeClickListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
+                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                if (selectedTime != null) {
+                    playSoundEffect(SoundEffectConstants.CLICK);
+                    mTimeClickListener.onTimeClicked(selectedTime);
+                }
+            }
+
             return super.onSingleTapConfirmed(e);
         }
 
@@ -375,7 +388,7 @@ public class WeekView extends View {
         lineCount = (lineCount) * (mNumberOfVisibleDays+1);
         float[] hourLines = new float[lineCount * 4];
 
-        // Clear the cache for events rectangles.
+        // Clear the cache for event rectangles.
         if (mEventRects != null) {
             for (EventRect eventRect: mEventRects) {
                 eventRect.rectF = null;
@@ -448,6 +461,37 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+    }
+
+    /**
+     * Get the time and date where the user clicked on.
+     * @param x The x position of the touch event.
+     * @param y The y position of the touch event.
+     * @return The time and date at the clicked position.
+     */
+    private Calendar getTimeFromPoint(float x, float y){
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+        float startPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
+                mHeaderColumnWidth;
+        for (int dayNumber = leftDaysWithGaps + 1;
+             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber++) {
+            float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+            if (mWidthPerDay + startPixel - start> 0
+                    && x>start && x<startPixel + mWidthPerDay){
+                Calendar day = (Calendar) mToday.clone();
+                day.add(Calendar.DATE, dayNumber - 1);
+                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderTextHeight
+                        - mHeaderRowPadding * 2 - mTimeTextHeight/2 - mHeaderMarginBottom;
+                int hour = (int)(pixelsFromZero / mHourHeight);
+                int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
+                day.add(Calendar.HOUR, hour);
+                day.set(Calendar.MINUTE, minute);
+                return day;
+            }
+            startPixel += mWidthPerDay + mColumnGap;
+        }
+        return null;
     }
 
     /**
@@ -660,13 +704,17 @@ public class WeekView extends View {
         }
     }
 
+    /**
+     * Cache the event for smooth scrolling functionality.
+     * @param event The event to cache.
+     */
     private void cacheEvent(WeekViewEvent event) {
         if (!isSameDay(event.getStartTime(), event.getEndTime())) {
             Calendar endTime = (Calendar) event.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
             Calendar startTime = (Calendar) event.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 00);
+            startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
             WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
             event1.setColor(event.getColor());
@@ -868,6 +916,15 @@ public class WeekView extends View {
     public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
         this.mEventLongPressListener = eventLongPressListener;
     }
+
+    public TimeClickListener getHourClickListener(){
+        return mTimeClickListener;
+    }
+
+    public void setHourClickListener(TimeClickListener mTimeClickListener){
+        this.mTimeClickListener = mTimeClickListener;
+    }
+
 
     /**
      * Get the number of visible days in a week.
@@ -1274,6 +1331,11 @@ public class WeekView extends View {
     public interface EventLongPressListener {
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
+
+    public interface TimeClickListener {
+        public void onTimeClicked(Calendar time);
+    }
+
 
     /////////////////////////////////////////////////////////////////
     //
