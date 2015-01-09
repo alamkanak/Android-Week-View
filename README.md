@@ -129,6 +129,7 @@ Use the following interfaces according to your need.
 - `mWeekView.setEmptyViewClickListener()` to get a callback when any empty space is clicked
 - `mWeekView.setEmptyViewLongPressListener()` to get a callback when any empty space is long pressed
 - `mWeekView.setDateTimeInterpreter()` to set your own labels for the calendar header row and header column
+- `mWeekView.setScrolledListener()` to get an event every time the first visible day has changed
 
 Sample
 ----------
