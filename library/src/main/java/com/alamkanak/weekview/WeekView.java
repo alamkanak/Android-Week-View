@@ -100,6 +100,7 @@ public class WeekView extends View {
     private float mXScrollingSpeed = 1f;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private int mNumOfDaysToScroll = 0;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -378,9 +379,12 @@ public class WeekView extends View {
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
 
-        // If the week view is being drawn for the first time, then consider the first day of week.
-        if (mIsFirstDraw && mNumberOfVisibleDays >= 7) {
-            if (mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
+        if (mIsFirstDraw){
+            if(mNumOfDaysToScroll != 0)
+                mCurrentOrigin.x = mNumOfDaysToScroll * (mWidthPerDay + mColumnGap);
+
+            // If the week view is being drawn for the first time, then consider the first day of the week.
+            if(mNumberOfVisibleDays >= 7 && mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
                 int difference = 7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
@@ -1361,6 +1365,7 @@ public class WeekView extends View {
 
         int dateDifference = (int) ((date.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24));
         mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
+        mNumOfDaysToScroll = -dateDifference;
 
         invalidate();
     }
