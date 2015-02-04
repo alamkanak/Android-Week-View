@@ -139,7 +139,6 @@ public class WeekView extends View {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             mScroller.forceFinished(true);
-            mStickyScroller.forceFinished(true);
 
             if (mCurrentFlingDirection == Direction.HORIZONTAL){
                 mScroller.fling((int) mCurrentOrigin.x, 0, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, 0);
@@ -1288,6 +1287,10 @@ public class WeekView extends View {
 
             if (mCurrentScrollDirection == Direction.HORIZONTAL) {
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
+                if(mDistanceX > 0)
+                    leftDays--;
+                else
+                    leftDays++;
                 int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
                 ViewCompat.postInvalidateOnAnimation(WeekView.this);
