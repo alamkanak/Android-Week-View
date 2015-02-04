@@ -12,9 +12,11 @@ import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -568,7 +570,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = eventRectF;
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
-                        drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -580,17 +582,27 @@ public class WeekView extends View {
 
     /**
      * Draw the name of the event on top of the event rectangle.
-     * @param text The text to draw.
+     * @param event The event of which the title (and location) should be drawn.
      * @param rect The rectangle on which the text is to be drawn.
      * @param canvas The canvas to draw upon.
      * @param originalTop The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      */
-    private void drawText(String text, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
+    private void drawEventTitle(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         if (rect.right - rect.left - mEventPadding * 2 < 0) return;
 
+        SpannableStringBuilder bob = new SpannableStringBuilder();
+        if (event.getName() != null) {
+            bob.append(event.getName());
+            bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD),0,bob.length(),0);
+            bob.append(' ');
+        }
+        if (event.getLocation() != null) {
+            bob.append(event.getLocation());
+        }
+
         // Get text dimensions
-        StaticLayout textLayout = new StaticLayout(text, mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         // Crop height
         int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
@@ -599,11 +611,11 @@ public class WeekView extends View {
             int lineCount = textLayout.getLineCount();
             int availableLineCount = (int) Math.floor(lineCount * availableHeight / textLayout.getHeight());
             float widthAvailable = (rect.right - originalLeft - mEventPadding * 2) * availableLineCount;
-            textLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, widthAvailable, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, widthAvailable, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         }
         else if (lineHeight >= availableHeight) {
             int width = (int) (rect.right - originalLeft - mEventPadding * 2);
-            textLayout = new StaticLayout(TextUtils.ellipsize(text, mEventTextPaint, width, TextUtils.TruncateAt.END), mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
+            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, width, TextUtils.TruncateAt.END), mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
         }
 
         // Draw text
