@@ -277,9 +277,9 @@ public class WeekView extends View {
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
         mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
-        mTimeTextWidth = mTimeTextPaint.measureText("00 PM");
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
+        initTextTimeWidth();
 
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -332,6 +332,14 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+    }
+
+    /**
+     * Initialize time column width. Calculate value with latest possible hour (supposed widest text)
+     */
+    private void initTextTimeWidth() {
+        String timeSample = getDateTimeInterpreter().interpretTime(23);
+        mTimeTextWidth = mTimeTextPaint.measureText(timeSample);
     }
 
     @Override
@@ -1003,6 +1011,9 @@ public class WeekView extends View {
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter){
         this.mDateTimeInterpreter = dateTimeInterpreter;
+
+        // refresh time column width
+        initTextTimeWidth();
     }
 
 
