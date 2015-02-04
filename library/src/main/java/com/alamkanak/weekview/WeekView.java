@@ -45,8 +45,6 @@ public class WeekView extends View {
     @Deprecated
     public static final int LENGTH_LONG = 2;
     private final Context mContext;
-    private Calendar mToday;
-    private Calendar mStartDate;
     private Paint mTimeTextPaint;
     private float mTimeTextWidth;
     private float mTimeTextHeight;
@@ -62,6 +60,11 @@ public class WeekView extends View {
     private Paint mHourSeparatorPaint;
     private float mHeaderMarginBottom;
     private Paint mTodayBackgroundPaint;
+    private Paint mFutureBackgroundPaint;
+    private Paint mPastBackgroundPaint;
+    private Paint mFutureWeekendBackgroundPaint;
+    private Paint mPastWeekendBackgroundPaint;
+    private Paint mNowLinePaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
     private float mHeaderColumnWidth;
@@ -86,6 +89,13 @@ public class WeekView extends View {
     private int mHeaderRowPadding = 10;
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.rgb(245, 245, 245);
+    private int mPastBackgroundColor = Color.rgb(227, 227, 227);
+    private int mFutureBackgroundColor = Color.rgb(245, 245, 245);
+    private int mPastWeekendBackgroundColor = 0;
+    private int mFutureWeekendBackgroundColor = 0;
+    private int mNowLineColor = Color.rgb(102, 102, 102);
+    private int mNowLineThickness = 5;
+    private boolean mUseNewColoring = false;
     private int mHourSeparatorColor = Color.rgb(230, 230, 230);
     private int mTodayBackgroundColor = Color.rgb(239, 247, 254);
     private int mHourSeparatorHeight = 2;
@@ -240,6 +250,13 @@ public class WeekView extends View {
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, mHeaderRowBackgroundColor);
             mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
+            mFutureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, mFutureBackgroundColor);
+            mPastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, mPastBackgroundColor);
+            mFutureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, mFutureBackgroundColor); // If not set, use the same color as in the week
+            mPastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, mPastBackgroundColor);
+            mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
+            mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
+            mUseNewColoring = a.getBoolean(R.styleable.WeekView_useNewColoringStyle, mUseNewColoring);
             mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
             mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
             mHourSeparatorHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mHourSeparatorHeight);
@@ -260,12 +277,6 @@ public class WeekView extends View {
     }
 
     private void init() {
-        // Get the date today.
-        mToday = Calendar.getInstance();
-        mToday.set(Calendar.HOUR_OF_DAY, 0);
-        mToday.set(Calendar.MINUTE, 0);
-        mToday.set(Calendar.SECOND, 0);
-
         // Scrolling initialization.
         mGestureDetector = new GestureDetectorCompat(mContext, mGestureListener);
         mScroller = new OverScroller(mContext);
@@ -298,12 +309,25 @@ public class WeekView extends View {
         // Prepare day background color paint.
         mDayBackgroundPaint = new Paint();
         mDayBackgroundPaint.setColor(mDayBackgroundColor);
+        mFutureBackgroundPaint = new Paint();
+        mFutureBackgroundPaint.setColor(mFutureBackgroundColor);
+        mPastBackgroundPaint = new Paint();
+        mPastBackgroundPaint.setColor(mPastBackgroundColor);
+        mFutureWeekendBackgroundPaint = new Paint();
+        mFutureWeekendBackgroundPaint.setColor(mFutureWeekendBackgroundColor);
+        mPastWeekendBackgroundPaint = new Paint();
+        mPastWeekendBackgroundPaint.setColor(mPastWeekendBackgroundColor);
 
         // Prepare hour separator color paint.
         mHourSeparatorPaint = new Paint();
         mHourSeparatorPaint.setStyle(Paint.Style.STROKE);
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
         mHourSeparatorPaint.setColor(mHourSeparatorColor);
+
+        // Prepare the "now" line color paint
+        mNowLinePaint = new Paint();
+        mNowLinePaint.setStrokeWidth(mNowLineThickness);
+        mNowLinePaint.setColor(mNowLineColor);
 
         // Prepare today background color paint.
         mTodayBackgroundPaint = new Paint();
@@ -329,7 +353,6 @@ public class WeekView extends View {
         mEventTextPaint.setStyle(Paint.Style.FILL);
         mEventTextPaint.setColor(mEventTextColor);
         mEventTextPaint.setTextSize(mEventTextSize);
-        mStartDate = (Calendar) mToday.clone();
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
@@ -388,10 +411,12 @@ public class WeekView extends View {
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
 
+        Calendar today = today();
+
         // If the week view is being drawn for the first time, then consider the first day of week.
         if (mIsFirstDraw && mNumberOfVisibleDays >= 7) {
-            if (mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
-                int difference = 7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
+            if (today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
+                int difference = 7 + (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
             mIsFirstDraw = false;
@@ -405,7 +430,7 @@ public class WeekView extends View {
         float startPixel = startFromPixel;
 
         // Prepare to iterate for each day.
-        Calendar day = (Calendar) mToday.clone();
+        Calendar day = (Calendar) today.clone();
         day.add(Calendar.HOUR, 6);
 
         // Prepare to iterate for each hour to draw the hour lines.
@@ -423,7 +448,7 @@ public class WeekView extends View {
 
         // Iterate through each day.
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
-        mFirstVisibleDay = (Calendar) mToday.clone();
+        mFirstVisibleDay = (Calendar) today.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
         if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrolledListener != null){
             mScrolledListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
@@ -433,11 +458,11 @@ public class WeekView extends View {
              dayNumber++) {
 
             // Check if the day is today.
-            day = (Calendar) mToday.clone();
+            day = (Calendar) today.clone();
             mLastVisibleDay = (Calendar) day.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
-            boolean sameDay = isSameDay(day, mToday);
+            boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
@@ -448,8 +473,27 @@ public class WeekView extends View {
 
             // Draw background color for each day.
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-            if (mWidthPerDay + startPixel - start> 0)
-                canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+            if (mWidthPerDay + startPixel - start> 0){
+                if(mUseNewColoring){
+                    boolean isWeekend = (day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+                    Paint pastPaint = isWeekend ? mPastWeekendBackgroundPaint : mPastBackgroundPaint;
+                    Paint futurePaint = isWeekend ? mFutureWeekendBackgroundPaint : mFutureBackgroundPaint;
+                    float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
+
+                    if(sameDay){
+                        Calendar now = Calendar.getInstance();
+                        float beforeNow = (now.get(Calendar.HOUR_OF_DAY)+now.get(Calendar.MINUTE)/60.0f)*mHourHeight;
+                        canvas.drawRect(start, startY, startPixel + mWidthPerDay, startY+beforeNow, pastPaint);
+                        canvas.drawRect(start, startY+beforeNow, startPixel + mWidthPerDay, getHeight(), futurePaint);
+                    } else if(day.before(today)) {
+                        canvas.drawRect(start, startY, startPixel + mWidthPerDay, getHeight(), pastPaint);
+                    } else {
+                        canvas.drawRect(start, startY, startPixel + mWidthPerDay, getHeight(), futurePaint);
+                    }
+                }else{
+                    canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+                }
+            }
 
             // Prepare the separator lines for hours.
             int i = 0;
@@ -470,6 +514,14 @@ public class WeekView extends View {
             // Draw the events.
             drawEvents(day, startPixel, canvas);
 
+            //Draw the line at the current time
+            if(mUseNewColoring && sameDay){
+                float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
+                Calendar now = Calendar.getInstance();
+                float beforeNow = (now.get(Calendar.HOUR_OF_DAY)+now.get(Calendar.MINUTE)/60.0f)*mHourHeight;
+                canvas.drawLine(start, startY+beforeNow, startPixel + mWidthPerDay, startY+beforeNow, mNowLinePaint);
+            }
+
             // In the next iteration, start from the next day.
             startPixel += mWidthPerDay + mColumnGap;
         }
@@ -481,9 +533,9 @@ public class WeekView extends View {
         startPixel = startFromPixel;
         for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
-            day = (Calendar) mToday.clone();
+            day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            boolean sameDay = isSameDay(day, mToday);
+            boolean sameDay = isSameDay(day, today);
 
             // Draw the day labels.
             String dayLabel = getDateTimeInterpreter().interpretDate(day);
@@ -511,7 +563,7 @@ public class WeekView extends View {
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
             if (mWidthPerDay + startPixel - start> 0
                     && x>start && x<startPixel + mWidthPerDay){
-                Calendar day = (Calendar) mToday.clone();
+                Calendar day = today();
                 day.add(Calendar.DATE, dayNumber - 1);
                 float pixelsFromZero = y - mCurrentOrigin.y - mHeaderTextHeight
                         - mHeaderRowPadding * 2 - mTimeTextHeight/2 - mHeaderMarginBottom;
@@ -1496,6 +1548,19 @@ public class WeekView extends View {
      */
     private boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
         return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
+    }
+
+    /**
+     * Returns a calendar instance at the start of this day
+     * @return the calendar instance
+     */
+    private Calendar today(){
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        return today;
     }
 
 }
