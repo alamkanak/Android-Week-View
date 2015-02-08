@@ -22,6 +22,7 @@ import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.widget.OverScroller;
@@ -80,6 +81,10 @@ public class WeekView extends View {
 
     // Attributes and their default values.
     private int mHourHeight = 50;
+    private int mNewHourHeight = -1;
+    private int mMinHourHeight = 0; //no minimum specified (will be dynamic, based on screen)
+    private int mEffectiveMinHourHeight = mMinHourHeight; //compensates for the fact that you can't keep zooming out.
+    private int mMaxHourHeight = 250;
     private int mColumnGap = 10;
     private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mTextSize = 12;
@@ -115,6 +120,8 @@ public class WeekView extends View {
     private Calendar mLastVisibleDay;
     private Calendar mScrollToDay = null;
     private double mScrollToHour = -1;
+    private ScaleGestureDetector mScaleDetector;
+    private boolean mIsZooming;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -136,6 +143,8 @@ public class WeekView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if(mIsZooming)
+                return true;
             if (mCurrentScrollDirection == Direction.NONE) {
                 if (Math.abs(distanceX) > Math.abs(distanceY)){
                     mCurrentScrollDirection = Direction.HORIZONTAL;
@@ -245,6 +254,9 @@ public class WeekView extends View {
         try {
             mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
             mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
+            mMinHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, mMinHourHeight);
+            mEffectiveMinHourHeight = mMinHourHeight;
+            mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
             mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
             mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
@@ -359,6 +371,33 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+
+        mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
+            @Override
+            public void onScaleEnd(ScaleGestureDetector detector) {
+                mIsZooming = false;
+            }
+
+            @Override
+            public boolean onScaleBegin(ScaleGestureDetector detector) {
+                mIsZooming = true;
+                mScroller.forceFinished(true);
+                mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
+                goToNearestOrigin();
+                return true;
+            }
+
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                mNewHourHeight = Math.round(mHourHeight * detector.getScaleFactor());
+                if(mNewHourHeight < mEffectiveMinHourHeight)
+                    mNewHourHeight = mEffectiveMinHourHeight;
+                else if(mNewHourHeight > mMaxHourHeight)
+                    mNewHourHeight = mMaxHourHeight;
+                invalidate();
+                return true;
+            }
+        });
     }
 
     /**
@@ -387,13 +426,6 @@ public class WeekView extends View {
     }
 
     private void drawTimeColumnAndAxes(Canvas canvas) {
-        // Do not let the view go above/below the limit due to scrolling. Set the max and min limit of the scroll.
-        if (mCurrentScrollDirection == Direction.VERTICAL) {
-            if (mCurrentOrigin.y - mDistanceY > 0) mCurrentOrigin.y = 0;
-            else if (mCurrentOrigin.y - mDistanceY < -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight())) mCurrentOrigin.y = -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight());
-            else mCurrentOrigin.y -= mDistanceY;
-        }
-
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
@@ -418,6 +450,7 @@ public class WeekView extends View {
 
         if (mAreDimensionsInvalid) {
             mAreDimensionsInvalid = false;
+            mEffectiveMinHourHeight= Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderTextHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / 24));
 
             if(mScrollToDay != null)
                 goToDate(mScrollToDay);
@@ -433,6 +466,25 @@ public class WeekView extends View {
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
         }
+
+        // Do not let the view go above/below the limit due to scrolling. Set the max and min limit of the scroll.
+        if (mCurrentScrollDirection == Direction.VERTICAL)
+            mCurrentOrigin.y -= mDistanceY;
+
+
+        //Calculate the new height due to the zooming.
+        if (mNewHourHeight > 0){
+            mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
+            mHourHeight = mNewHourHeight;
+            mNewHourHeight = -1;
+        }
+
+        //if the new mCurrentOrigin.y is invalid, make it valid.
+        if (mCurrentOrigin.y < getHeight() - mHourHeight * 24 - mHeaderTextHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom)
+            mCurrentOrigin.y = getHeight() - mHourHeight * 24 - mHeaderTextHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom;
+        //Don't put an else if because it will trigger a glitch when completly zoomed out and scrolling vertically.
+        if(mCurrentOrigin.y > 0)
+            mCurrentOrigin.y = 0;
 
         // Consider scroll offset.
         if (mCurrentScrollDirection == Direction.HORIZONTAL) mCurrentOrigin.x -= mDistanceX;
@@ -1389,21 +1441,27 @@ public class WeekView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-
+        if (event.getAction() == MotionEvent.ACTION_UP && !mIsZooming) {
             if (mCurrentScrollDirection == Direction.HORIZONTAL) {
-                float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
-                if(mDistanceX > 0)
-                    leftDays--;
-                else
-                    leftDays++;
-                int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
-                mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
-                ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                goToNearestOrigin();
             }
             mCurrentScrollDirection = Direction.NONE;
         }
+        mScaleDetector.onTouchEvent(event);
         return mGestureDetector.onTouchEvent(event);
+    }
+
+    private void goToNearestOrigin(){
+        float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
+        if(!mIsZooming){
+            if(mDistanceX > 0)
+                leftDays--;
+            else
+                leftDays++;
+        }
+        int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
+        mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
+        ViewCompat.postInvalidateOnAnimation(WeekView.this);
     }
 
 
