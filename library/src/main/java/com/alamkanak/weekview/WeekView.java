@@ -1509,6 +1509,14 @@ public class WeekView extends View {
         invalidate();
     }
 
+    /**
+     * Get the first hour that is visible on the screen.
+     * @return The first hour that is visible.
+     */
+    public double getFirstVisibleHour(){
+        return -mCurrentOrigin.y / mHourHeight;
+    }
+
 
 
     /////////////////////////////////////////////////////////////////
