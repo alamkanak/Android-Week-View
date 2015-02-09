@@ -418,11 +418,12 @@ public class WeekView extends View {
 
         if (mAreDimensionsInvalid) {
             mAreDimensionsInvalid = false;
+            double scrollToHour = mScrollToHour;
 
             if(mScrollToDay != null)
                 goToDate(mScrollToDay);
-            if(mScrollToHour >= 0)
-                goToHour(mScrollToHour);
+            if(scrollToHour >= 0)
+                goToHour(scrollToHour);
         }
         if (mIsFirstDraw){
             mIsFirstDraw = false;
