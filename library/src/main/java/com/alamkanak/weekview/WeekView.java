@@ -70,10 +70,13 @@ public class WeekView extends View {
     private Paint mEventBackgroundPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
+    private List<WeekViewEvent> mPreviousPeriodEvents;
+    private List<WeekViewEvent> mCurrentPeriodEvents;
+    private List<WeekViewEvent> mNextPeriodEvents;
     private TextPaint mEventTextPaint;
     private Paint mHeaderColumnBackgroundPaint;
     private Scroller mStickyScroller;
-    private int mFetchedMonths[] = new int[3];
+    private int mFetchedPeriod = -1; // the middle period the calendar has fetched.
     private boolean mRefreshEvents = false;
     private float mDistanceY = 0;
     private float mDistanceX = 0;
@@ -126,7 +129,7 @@ public class WeekView extends View {
     // Listeners.
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
-    private MonthChangeListener mMonthChangeListener;
+    private WeekViewLoader mWeekViewLoader;
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
@@ -531,7 +534,9 @@ public class WeekView extends View {
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
-            if (mEventRects == null || mRefreshEvents || (dayNumber == leftDaysWithGaps + 1 && mFetchedMonths[1] != day.get(Calendar.MONTH)+1 && day.get(Calendar.DAY_OF_MONTH) == 15)) {
+            if (mEventRects == null || mRefreshEvents ||
+                    (dayNumber == leftDaysWithGaps + 1 && mFetchedPeriod != (int) mWeekViewLoader.toWeekViewPeriodIndex(day) &&
+                            Math.abs(mFetchedPeriod - mWeekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
                 getMoreEvents(day);
                 mRefreshEvents = false;
             }
@@ -785,59 +790,60 @@ public class WeekView extends View {
      * @param day The day where the user is currently is.
      */
     private void getMoreEvents(Calendar day) {
-
-        // Delete all events if its not current month +- 1.
-        deleteFarMonths(day);
-
         // Get more events if the month is changed.
         if (mEventRects == null)
             mEventRects = new ArrayList<EventRect>();
-        if (mMonthChangeListener == null && !isInEditMode())
+        if (mWeekViewLoader == null && !isInEditMode())
             throw new IllegalStateException("You must provide a MonthChangeListener");
 
         // If a refresh was requested then reset some variables.
         if (mRefreshEvents) {
             mEventRects.clear();
-            mFetchedMonths = new int[3];
+            mPreviousPeriodEvents = null;
+            mCurrentPeriodEvents = null;
+            mNextPeriodEvents = null;
+            mFetchedPeriod = -1;
         }
 
-        // Get events of previous month.
-        int previousMonth = (day.get(Calendar.MONTH) == 0?12:day.get(Calendar.MONTH));
-        int nextMonth = (day.get(Calendar.MONTH)+2 == 13 ?1:day.get(Calendar.MONTH)+2);
-        int[] lastFetchedMonth = mFetchedMonths.clone();
-        if (mFetchedMonths[0] < 1 || mFetchedMonths[0] != previousMonth || mRefreshEvents) {
-            if (!containsValue(lastFetchedMonth, previousMonth) && !isInEditMode()){
-                List<WeekViewEvent> events = mMonthChangeListener.onMonthChange((previousMonth==12)?day.get(Calendar.YEAR)-1:day.get(Calendar.YEAR), previousMonth);
-                sortEvents(events);
-                for (WeekViewEvent event: events) {
-                    cacheEvent(event);
-                }
-            }
-            mFetchedMonths[0] = previousMonth;
-        }
+        if(mWeekViewLoader != null){
+            int periodToFetch = (int) mWeekViewLoader.toWeekViewPeriodIndex(day);
+            if (!isInEditMode() && (mFetchedPeriod < 0 || mFetchedPeriod != periodToFetch || mRefreshEvents)) {
+                List<WeekViewEvent> previousPeriodEvents = null;
+                List<WeekViewEvent> currentPeriodEvents = null;
+                List<WeekViewEvent> nextPeriodEvents = null;
 
-        // Get events of this month.
-        if (mFetchedMonths[1] < 1 || mFetchedMonths[1] != day.get(Calendar.MONTH)+1 || mRefreshEvents) {
-            if (!containsValue(lastFetchedMonth, day.get(Calendar.MONTH)+1) && !isInEditMode()) {
-                List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(day.get(Calendar.YEAR), day.get(Calendar.MONTH) + 1);
-                sortEvents(events);
-                for (WeekViewEvent event : events) {
-                    cacheEvent(event);
+                if(mPreviousPeriodEvents != null && mCurrentPeriodEvents != null && mNextPeriodEvents != null){
+                    if(periodToFetch == mFetchedPeriod-1){
+                        currentPeriodEvents = mPreviousPeriodEvents;
+                        nextPeriodEvents = mCurrentPeriodEvents;
+                    }else if(periodToFetch == mFetchedPeriod){
+                        previousPeriodEvents = mPreviousPeriodEvents;
+                        currentPeriodEvents = mCurrentPeriodEvents;
+                        nextPeriodEvents = mNextPeriodEvents;
+                    }else if(periodToFetch == mFetchedPeriod+1){
+                        previousPeriodEvents = mCurrentPeriodEvents;
+                        currentPeriodEvents = mNextPeriodEvents;
+                    }
                 }
-            }
-            mFetchedMonths[1] = day.get(Calendar.MONTH)+1;
-        }
+                if(currentPeriodEvents == null)
+                    currentPeriodEvents = mWeekViewLoader.onLoad(periodToFetch);
+                if(previousPeriodEvents == null)
+                    previousPeriodEvents = mWeekViewLoader.onLoad(periodToFetch-1);
+                if(nextPeriodEvents == null)
+                    nextPeriodEvents = mWeekViewLoader.onLoad(periodToFetch+1);
 
-        // Get events of next month.
-        if (mFetchedMonths[2] < 1 || mFetchedMonths[2] != nextMonth || mRefreshEvents) {
-            if (!containsValue(lastFetchedMonth, nextMonth) && !isInEditMode()) {
-                List<WeekViewEvent> events = mMonthChangeListener.onMonthChange(nextMonth == 1 ? day.get(Calendar.YEAR) + 1 : day.get(Calendar.YEAR), nextMonth);
-                sortEvents(events);
-                for (WeekViewEvent event : events) {
-                    cacheEvent(event);
-                }
+
+                //clear events
+                mEventRects.clear();
+                sortAndCacheEvents(previousPeriodEvents);
+                sortAndCacheEvents(currentPeriodEvents);
+                sortAndCacheEvents(nextPeriodEvents);
+
+                mPreviousPeriodEvents = previousPeriodEvents;
+                mCurrentPeriodEvents = currentPeriodEvents;
+                mNextPeriodEvents = nextPeriodEvents;
+                mFetchedPeriod = periodToFetch;
             }
-            mFetchedMonths[2] = nextMonth;
         }
 
         // Prepare to calculate positions of each events.
@@ -884,6 +890,13 @@ public class WeekView extends View {
         }
         else
             mEventRects.add(new EventRect(event, event, null));
+    }
+
+    private void sortAndCacheEvents(List<WeekViewEvent> events){
+        sortEvents(events);
+        for(WeekViewEvent event : events){
+            cacheEvent(event);
+        }
     }
 
     /**
@@ -1014,37 +1027,6 @@ public class WeekView extends View {
         return !(time1 == null || time2 == null) && time1.getTimeInMillis() >= time2.getTimeInMillis();
     }
 
-    /**
-     * Deletes the events of the months that are too far away from the current month.
-     * @param currentDay The current day.
-     */
-    private void deleteFarMonths(Calendar currentDay) {
-
-        if (mEventRects == null) return;
-
-        Calendar nextMonth = (Calendar) currentDay.clone();
-        nextMonth.add(Calendar.MONTH, 1);
-        nextMonth.set(Calendar.DAY_OF_MONTH, nextMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
-        nextMonth.set(Calendar.HOUR_OF_DAY, 12);
-        nextMonth.set(Calendar.MINUTE, 59);
-        nextMonth.set(Calendar.SECOND, 59);
-
-        Calendar prevMonth = (Calendar) currentDay.clone();
-        prevMonth.add(Calendar.MONTH, -1);
-        prevMonth.set(Calendar.DAY_OF_MONTH, 1);
-        prevMonth.set(Calendar.HOUR_OF_DAY, 0);
-        prevMonth.set(Calendar.MINUTE, 0);
-        prevMonth.set(Calendar.SECOND, 0);
-
-        List<EventRect> newEvents = new ArrayList<EventRect>();
-        for (EventRect eventRect : mEventRects) {
-            boolean isFarMonth = eventRect.event.getStartTime().getTimeInMillis() > nextMonth.getTimeInMillis() || eventRect.event.getEndTime().getTimeInMillis() < prevMonth.getTimeInMillis();
-            if (!isFarMonth) newEvents.add(eventRect);
-        }
-        mEventRects.clear();
-        mEventRects.addAll(newEvents);
-    }
-
     @Override
     public void invalidate() {
         super.invalidate();
@@ -1068,11 +1050,21 @@ public class WeekView extends View {
     }
 
     public MonthChangeListener getMonthChangeListener() {
-        return mMonthChangeListener;
+        if(mWeekViewLoader instanceof MonthLoader)
+            return ((MonthLoader) mWeekViewLoader).getOnMonthChangeListener();
+        return null;
     }
 
     public void setMonthChangeListener(MonthChangeListener monthChangeListener) {
-        this.mMonthChangeListener = monthChangeListener;
+        this.mWeekViewLoader = new MonthLoader(monthChangeListener);
+    }
+
+    public WeekViewLoader getWeekViewLoader(){
+        return mWeekViewLoader;
+    }
+
+    public void setWeekViewLoader(WeekViewLoader loader){
+        this.mWeekViewLoader = loader;
     }
 
     public EventLongPressListener getEventLongPressListener() {
