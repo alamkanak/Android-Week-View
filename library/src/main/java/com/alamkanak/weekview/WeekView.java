@@ -383,12 +383,16 @@ public class WeekView extends View {
 
         if (mAreDimensionsInvalid) {
             mAreDimensionsInvalid = false;
-            double scrollToHour = mScrollToHour;
-
             if(mScrollToDay != null)
                 goToDate(mScrollToDay);
-            if(scrollToHour >= 0)
-                goToHour(scrollToHour);
+
+            mAreDimensionsInvalid = false;
+            if(mScrollToHour >= 0)
+                goToHour(mScrollToHour);
+
+            mScrollToDay = null;
+            mScrollToHour = -1;
+            mAreDimensionsInvalid = false;
         }
         if (mIsFirstDraw){
             mIsFirstDraw = false;
@@ -921,8 +925,6 @@ public class WeekView extends View {
     public void invalidate() {
         super.invalidate();
         mAreDimensionsInvalid = true;
-        mScrollToDay = null;
-        mScrollToHour = -1;
     }
 
     /////////////////////////////////////////////////////////////////
