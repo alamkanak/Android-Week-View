@@ -413,7 +413,7 @@ public class WeekView extends View {
 
         // Iterate through each day.
         mFirstVisibleDay = (Calendar) mToday.clone();
-        mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
+        mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap))));
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
