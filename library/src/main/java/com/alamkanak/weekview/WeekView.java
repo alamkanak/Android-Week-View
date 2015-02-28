@@ -390,10 +390,6 @@ public class WeekView extends View {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
                 mNewHourHeight = Math.round(mHourHeight * detector.getScaleFactor());
-                if(mNewHourHeight < mEffectiveMinHourHeight)
-                    mNewHourHeight = mEffectiveMinHourHeight;
-                else if(mNewHourHeight > mMaxHourHeight)
-                    mNewHourHeight = mMaxHourHeight;
                 invalidate();
                 return true;
             }
@@ -474,6 +470,11 @@ public class WeekView extends View {
 
         //Calculate the new height due to the zooming.
         if (mNewHourHeight > 0){
+            if(mNewHourHeight < mEffectiveMinHourHeight)
+                mNewHourHeight = mEffectiveMinHourHeight;
+            else if(mNewHourHeight > mMaxHourHeight)
+                mNewHourHeight = mMaxHourHeight;
+
             mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
             mHourHeight = mNewHourHeight;
             mNewHourHeight = -1;
@@ -1175,7 +1176,7 @@ public class WeekView extends View {
     }
 
     public void setHourHeight(int hourHeight) {
-        mHourHeight = hourHeight;
+        mNewHourHeight = hourHeight;
         invalidate();
     }
 
