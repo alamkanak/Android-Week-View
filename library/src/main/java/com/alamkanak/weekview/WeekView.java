@@ -452,14 +452,19 @@ public class WeekView extends View {
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
-            mAreDimensionsInvalid = false;
             mEffectiveMinHourHeight= Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderTextHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / 24));
 
-            double scrollToHour = mScrollToHour;
+            mAreDimensionsInvalid = false;
             if(mScrollToDay != null)
                 goToDate(mScrollToDay);
-            if(scrollToHour >= 0)
-                goToHour(scrollToHour);
+
+            mAreDimensionsInvalid = false;
+            if(mScrollToHour >= 0)
+                goToHour(mScrollToHour);
+
+            mScrollToDay = null;
+            mScrollToHour = -1;
+            mAreDimensionsInvalid = false;
         }
         if (mIsFirstDraw){
             mIsFirstDraw = false;
@@ -1031,8 +1036,6 @@ public class WeekView extends View {
     public void invalidate() {
         super.invalidate();
         mAreDimensionsInvalid = true;
-        mScrollToDay = null;
-        mScrollToHour = -1;
     }
 
     /////////////////////////////////////////////////////////////////
