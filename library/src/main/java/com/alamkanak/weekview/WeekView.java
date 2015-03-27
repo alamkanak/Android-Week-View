@@ -111,6 +111,7 @@ public class WeekView extends View {
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
+    private ScrollListener mScrollListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -429,8 +430,12 @@ public class WeekView extends View {
         }
 
         // Iterate through each day.
+        Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) mToday.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
+        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null){
+            mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
+        }
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
@@ -973,6 +978,13 @@ public class WeekView extends View {
         return mEmptyViewLongPressListener;
     }
 
+    public void setScrollListener(ScrollListener scrolledListener){
+        this.mScrollListener = scrolledListener;
+    }
+
+    public ScrollListener getScrollListener(){
+        return mScrollListener;
+    }
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
      * @return The date, time interpreter.
@@ -1447,6 +1459,17 @@ public class WeekView extends View {
 
     public interface EmptyViewLongPressListener {
         public void onEmptyViewLongPress(Calendar time);
+    }
+
+    public interface ScrollListener {
+        /**
+         * Called when the first visible day has changed.
+         *
+         * (this will also be called during the first draw of the weekview)
+         * @param newFirstVisibleDay The new first visible day
+         * @param oldFirstVisibleDay The old first visible day (is null on the first call).
+         */
+        public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
 
 
