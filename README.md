@@ -38,7 +38,7 @@ Usage
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.1@aar'
+    compile 'com.github.alamkanak:android-week-view:1.2.1'
     ```
 2. Add WeekView in your xml layout.
 
