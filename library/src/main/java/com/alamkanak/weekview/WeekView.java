@@ -108,7 +108,7 @@ public class WeekView extends View {
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
-    private ScrolledListener mScrolledListener;
+    private ScrollListener mScrollListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -416,8 +416,8 @@ public class WeekView extends View {
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) mToday.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
-        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrolledListener != null){
-            mScrolledListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
+        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null){
+            mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
         }
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
@@ -956,12 +956,12 @@ public class WeekView extends View {
         return mEmptyViewLongPressListener;
     }
 
-    public void setScrolledListener(ScrolledListener scrolledListener){
-        this.mScrolledListener = scrolledListener;
+    public void setScrollListener(ScrollListener scrolledListener){
+        this.mScrollListener = scrolledListener;
     }
 
-    public ScrolledListener getScrolledListener(){
-        return mScrolledListener;
+    public ScrollListener getScrollListener(){
+        return mScrollListener;
     }
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
@@ -1430,7 +1430,7 @@ public class WeekView extends View {
         public void onEmptyViewLongPress(Calendar time);
     }
 
-    public interface ScrolledListener {
+    public interface ScrollListener {
         /**
          * Called when the first visible day has changed.
          *
