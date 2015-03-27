@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -128,6 +129,7 @@ public class WeekView extends View {
     private ScaleGestureDetector mScaleDetector;
     private boolean mIsZooming;
     private int mEventCornerRadius = 0;
+    private boolean showHalfHours = false;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -291,6 +293,7 @@ public class WeekView extends View {
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
+            showHalfHours = a.getBoolean(R.styleable.WeekView_showHalfHours, showHalfHours);
         } finally {
             a.recycle();
         }
@@ -310,7 +313,9 @@ public class WeekView extends View {
         mTimeTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
-        mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
+        final String exampleTime = showHalfHours ? "00:00 PM" : "00 PM";
+        mTimeTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
+        mTimeTextWidth = mTimeTextPaint.measureText(exampleTime);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
         initTextTimeWidth();
@@ -320,7 +325,7 @@ public class WeekView extends View {
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
+        mHeaderTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
         mHeaderTextHeight = rect.height();
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
@@ -410,7 +415,7 @@ public class WeekView extends View {
         mTimeTextWidth = 0;
         for (int i = 0; i < 24; i++) {
             // measure time string and get max width
-            String time = getDateTimeInterpreter().interpretTime(i);
+            String time = getDateTimeInterpreter().interpretTime(i, 0);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             mTimeTextWidth = Math.max(mTimeTextWidth, mTimeTextPaint.measureText(time));
@@ -438,11 +443,35 @@ public class WeekView extends View {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
-        for (int i = 0; i < 24; i++) {
-            float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
+        int numPeriodsInDay = showHalfHours ? 48 : 24;
+        for (int i = 0; i < numPeriodsInDay; i++) {
+            // If we are showing half hours (eg. 5:30am), space the times out by half the hour height
+            // and need to provide 30 minutes on each odd period, otherwise, minutes is always 0.
+            int timeSpacing;
+            int minutes;
+            int hour;
+            if (showHalfHours) {
+                timeSpacing = mHourHeight / 2;
+                hour = i / 2;
+                if (i % 2 == 0) {
+                    minutes = 0;
+                }
+                else {
+                    minutes = 30;
+                }
+            } else {
+                timeSpacing = mHourHeight;
+                hour = i;
+                minutes = 0;
+            }
+
+            // Calculate the top of the rectangle where the time text will go
+            float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + timeSpacing * i + mHeaderMarginBottom;
+
+            // Get the time to be displayed, as a String.
+            String time = getDateTimeInterpreter().interpretTime(hour, minutes);
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
-            String time = getDateTimeInterpreter().interpretTime(i);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
@@ -1130,13 +1159,18 @@ public class WeekView extends View {
                 }
 
                 @Override
-                public String interpretTime(int hour) {
+                public String interpretTime(int hour, int minutes) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, hour);
-                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.MINUTE, minutes);
 
                     try {
-                        SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        SimpleDateFormat sdf;
+                        if (showHalfHours) {
+                            sdf = new SimpleDateFormat("HH:mm a", Locale.getDefault());
+                        } else {
+                            sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        }
                         return sdf.format(calendar.getTime());
                     } catch (Exception e) {
                         e.printStackTrace();

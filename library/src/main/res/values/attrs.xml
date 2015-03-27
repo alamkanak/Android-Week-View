@@ -44,5 +44,6 @@
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
+        <attr name="showHalfHours" format="boolean" />
     </declare-styleable>
 </resources>
