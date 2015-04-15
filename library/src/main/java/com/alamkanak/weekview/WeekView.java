@@ -640,6 +640,28 @@ public class WeekView extends View {
         public float top;
         public float bottom;
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            EventRect eventRect = (EventRect) o;
+
+            if (event != null ? !event.equals(eventRect.event) : eventRect.event != null)
+                return false;
+            if (originalEvent != null ? !originalEvent.equals(eventRect.originalEvent) : eventRect.originalEvent != null)
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = event != null ? event.hashCode() : 0;
+            result = 31 * result + (originalEvent != null ? originalEvent.hashCode() : 0);
+            return result;
+        }
+
         /**
          * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
          * on the calendar for a given event. There may be more than one rectangle for a single
@@ -735,8 +757,11 @@ public class WeekView extends View {
         while (dayCounter.getTimeInMillis() <= maxDay.getTimeInMillis()) {
             ArrayList<EventRect> eventRects = new ArrayList<EventRect>();
             for (EventRect eventRect : tempEvents) {
-                if (isSameDay(eventRect.event.getStartTime(), dayCounter))
-                    eventRects.add(eventRect);
+                if (isSameDay(eventRect.event.getStartTime(), dayCounter)){
+                    if (!eventRects.contains(eventRect)){
+                        eventRects.add(eventRect);
+                    }
+                }
             }
 
             computePositionOfEvents(eventRects);
