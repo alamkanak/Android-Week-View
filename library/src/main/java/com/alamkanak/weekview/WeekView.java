@@ -103,6 +103,13 @@ public class WeekView extends View {
     private Calendar mLastVisibleDay;
     private Calendar mScrollToDay = null;
     private double mScrollToHour = -1;
+    /**
+     * The minimal height of an appointment (in minutes)
+     * Default is the minimum at 1 (an appointment cannot be
+     * smaller than 1 minute)
+     */
+    private int mMinimalHeight = 1;
+
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -254,6 +261,7 @@ public class WeekView extends View {
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
+            mMinimalHeight = a.getInt(R.styleable.WeekView_eventMinDurationRepresentation, mMinimalHeight);
         } finally {
             a.recycle();
         }
@@ -548,14 +556,75 @@ public class WeekView extends View {
                     // Calculate top.
                     float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
                     float originalTop = top;
-                    if (top < mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2)
-                        top = mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
                     bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 - mEventMarginVertical;
 
-                    // Calculate left and right.
+                    /*
+                    In pixel, what x Minutes represents.
+                     */
+                    int graphicalMinimumHeight = (int) (mHourHeight / (60f / mMinimalHeight));
+                    float height = bottom - top;
+
+                    boolean isTop = false;
+                    boolean isBottom = false;
+
+                    /*
+                    If the top (which is in minute) is smaller than required #mMinimalHeight, we set a flag
+                     */
+                    if (mEventRects.get(i).top<mMinimalHeight){
+                        // Is at the top
+                        isTop = true;
+                    }
+                    /*
+                    If the bottom (which is in minute) is bigger than required #mMinimalHeight, we set a flag
+                     */
+                    if (mEventRects.get(i).bottom>1440-mMinimalHeight){
+                        // Is at the bottom
+                        isBottom = true;
+                    }
+                    /*
+                    There is three cases:
+                        - We are not blocked by the bottom nor the top to extend or appointment
+                        - We are blocked by the top
+                        - We are blocked by the bottom
+                    We check if the appointment is smaller than the required #graphicalMinimumHeight
+                    and if yes, we apply the workflow depending on the upper-defined cases.
+                     */
+                    if (height < graphicalMinimumHeight) {
+                        if (!isBottom && !isTop) {
+                            /*
+                            Here we can expand in the two directions, so let's take the middle point
+                            of the too small appointment and let's expand it (half of #graphicalMinimumHeight in
+                            both directions
+                             */
+                            float middlePoint = top + (height / 2);
+                            // The idea is to take the middle point and to redefine the top and the height relatively to it and to the wanted height
+                            top = (float) (middlePoint - (graphicalMinimumHeight * 0.5));
+                            bottom = (float) (middlePoint + (graphicalMinimumHeight * 0.5));
+                            // #originalTop is used to set the start point of the text
+                        } else if (!isBottom && isTop) {
+                            /*
+                            Here, we do not have the possibility to expand to the top -->
+                            It means we'll expand the appointment only to the bottom
+                             */
+                            bottom = top + graphicalMinimumHeight;
+                        } else if (!isTop && isBottom) {
+                           /*
+                           Here, we do not have the possibility to expand to the bottom -->
+                           It means we'll expand the appointment only to the top
+                           The "20" is just an adjustment, not very clean but the only way to proceed
+                           if you create an appointment on 23.59...
+                            */
+                            top = bottom - graphicalMinimumHeight - 20;
+                        }
+                        // #originalTop is used to set the y coordinates of the text, so we need to
+                        // update it.
+                        originalTop = top;
+                    }
+
+                        // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
                     if (left < startFromPixel)
                         left += mOverlappingEventGap;

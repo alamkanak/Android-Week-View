@@ -26,6 +26,7 @@
         <attr name="hourSeparatorHeight" format="dimension"/>
         <attr name="eventTextColor" format="color"/>
         <attr name="eventPadding" format="dimension"/>
+        <attr name="eventMinDurationRepresentation" format="integer"/>
         <attr name="headerColumnBackground" format="color"/>
         <attr name="dayNameLength" format="enum">
             <enum name="length_short" value="1"/>
