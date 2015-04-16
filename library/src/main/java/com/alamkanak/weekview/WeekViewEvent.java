@@ -106,4 +106,21 @@ public class WeekViewEvent {
     public void setId(long id) {
         this.mId = id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WeekViewEvent that = (WeekViewEvent) o;
+
+        if (mId != that.mId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (mId ^ (mId >>> 32));
+    }
 }
