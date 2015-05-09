@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.3</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.1'
+    compile 'com.github.alamkanak:android-week-view:1.2.3'
     ```
 2. Add WeekView in your xml layout.
 
@@ -144,6 +144,12 @@ To do
 
 Changelog
 ---------
+
+**Version 1.2.3**
+
+* Get callbacks when scrolling horizontally
+* `goToHour` and `goToDate` methods has been fixed
+* Use `getFirstVisibleHour` method to get the first visible hour in the week view
 
 **Version 1.2.1**
 
