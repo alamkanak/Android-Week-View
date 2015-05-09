@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://alamkanak.me
+ * Website: http://alamkanak.github.io/
  */
 public class WeekView extends View {
 
