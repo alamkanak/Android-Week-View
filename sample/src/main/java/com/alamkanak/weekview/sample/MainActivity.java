@@ -49,6 +49,10 @@ public class MainActivity extends ActionBarActivity implements WeekView.MonthCha
 
         // Set long press listener for events.
         mWeekView.setEventLongPressListener(this);
+
+        // Set up a date time interpreter to interpret how the date and time will be formatted in
+        // the week view. This is optional.
+        setupDateTimeInterpreter(false);
     }
 
 
@@ -125,12 +129,12 @@ public class MainActivity extends ActionBarActivity implements WeekView.MonthCha
                 // Details: http://stackoverflow.com/questions/16959502/get-one-letter-abbreviation-of-week-day-of-a-date-in-java#answer-16959657
                 if (shortDate)
                     weekday = String.valueOf(weekday.charAt(0));
-                return weekday + format.format(date.getTime());
+                return weekday.toUpperCase() + format.format(date.getTime());
             }
 
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + "PM" : hour + "AM";
+                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
             }
         });
     }
