@@ -1,8 +1,8 @@
 package com.alamkanak.weekview.sample;
 
-import android.app.Activity;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,9 +18,9 @@ import java.util.List;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://april-shower.com
+ * Website: http://alamkanak.github.io
  */
-public class MainActivity extends Activity implements WeekView.MonthChangeListener,
+public class MainActivity extends ActionBarActivity implements WeekView.MonthChangeListener,
         WeekView.EventClickListener, WeekView.EventLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;

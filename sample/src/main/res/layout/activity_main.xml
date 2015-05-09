@@ -14,13 +14,14 @@
         app:textSize="12sp"
         app:hourHeight="60dp"
         app:headerColumnPadding="8dp"
-        app:headerColumnTextColor="#8f000000"
+        app:headerColumnTextColor="@color/toolbar_text"
         app:headerRowPadding="12dp"
         app:columnGap="8dp"
         app:noOfVisibleDays="3"
-        app:headerRowBackgroundColor="#ffefefef"
+        app:headerRowBackgroundColor="@color/toolbar"
         app:dayBackgroundColor="#05000000"
         app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"/>
+        app:headerColumnBackground="#ffffffff"
+        app:todayHeaderTextColor="@color/accent"/>
 
 </RelativeLayout>
