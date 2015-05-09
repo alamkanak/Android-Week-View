@@ -134,7 +134,7 @@ public class WeekView extends View {
                     mCurrentScrollDirection = Direction.VERTICAL;
                 }
             }
-            mDistanceX = distanceX;
+            mDistanceX = distanceX * mXScrollingSpeed;
             mDistanceY = distanceY;
             invalidate();
             return true;
