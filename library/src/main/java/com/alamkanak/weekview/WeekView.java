@@ -1357,6 +1357,8 @@ public class WeekView extends View {
 
     public void setHeaderColumnTextColor(int headerColumnTextColor) {
         mHeaderColumnTextColor = headerColumnTextColor;
+        mHeaderTextPaint.setColor(mHeaderColumnTextColor);
+        mTimeTextPaint.setColor(mHeaderColumnTextColor);
         invalidate();
     }
 
@@ -1375,6 +1377,7 @@ public class WeekView extends View {
 
     public void setHeaderRowBackgroundColor(int headerRowBackgroundColor) {
         mHeaderRowBackgroundColor = headerRowBackgroundColor;
+        mHeaderBackgroundPaint.setColor(mHeaderRowBackgroundColor);
         invalidate();
     }
 
@@ -1384,6 +1387,7 @@ public class WeekView extends View {
 
     public void setDayBackgroundColor(int dayBackgroundColor) {
         mDayBackgroundColor = dayBackgroundColor;
+        mDayBackgroundPaint.setColor(mDayBackgroundColor);
         invalidate();
     }
 
@@ -1393,6 +1397,7 @@ public class WeekView extends View {
 
     public void setHourSeparatorColor(int hourSeparatorColor) {
         mHourSeparatorColor = hourSeparatorColor;
+        mHourSeparatorPaint.setColor(mHourSeparatorColor);
         invalidate();
     }
 
@@ -1402,6 +1407,7 @@ public class WeekView extends View {
 
     public void setTodayBackgroundColor(int todayBackgroundColor) {
         mTodayBackgroundColor = todayBackgroundColor;
+        mTodayBackgroundPaint.setColor(mTodayBackgroundColor);
         invalidate();
     }
 
@@ -1411,6 +1417,7 @@ public class WeekView extends View {
 
     public void setHourSeparatorHeight(int hourSeparatorHeight) {
         mHourSeparatorHeight = hourSeparatorHeight;
+        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
         invalidate();
     }
 
@@ -1420,6 +1427,7 @@ public class WeekView extends View {
 
     public void setTodayHeaderTextColor(int todayHeaderTextColor) {
         mTodayHeaderTextColor = todayHeaderTextColor;
+        mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
         invalidate();
     }
 
@@ -1439,6 +1447,7 @@ public class WeekView extends View {
 
     public void setEventTextColor(int eventTextColor) {
         mEventTextColor = eventTextColor;
+        mEventTextPaint.setColor(mEventTextColor);
         invalidate();
     }
 
@@ -1457,6 +1466,7 @@ public class WeekView extends View {
 
     public void setHeaderColumnBackgroundColor(int headerColumnBackgroundColor) {
         mHeaderColumnBackgroundColor = headerColumnBackgroundColor;
+        mHeaderColumnBackgroundPaint.setColor(mHeaderColumnBackgroundColor);
         invalidate();
     }
 
