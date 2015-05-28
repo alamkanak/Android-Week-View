@@ -400,7 +400,7 @@ public class WeekView extends View {
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
             if(mNumberOfVisibleDays >= 7 && mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
-                int difference = 7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
+                int difference = (7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek)) % 7;
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
         }
