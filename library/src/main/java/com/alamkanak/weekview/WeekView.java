@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://alamkanak.me
+ * Website: http://alamkanak.github.io/
  */
 public class WeekView extends View {
 
@@ -94,12 +94,15 @@ public class WeekView extends View {
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
     private boolean mIsFirstDraw = true;
+    private boolean mAreDimensionsInvalid = true;
     @Deprecated private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
     private float mXScrollingSpeed = 1f;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private Calendar mScrollToDay = null;
+    private double mScrollToHour = -1;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -108,6 +111,7 @@ public class WeekView extends View {
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
+    private ScrollListener mScrollListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -130,7 +134,7 @@ public class WeekView extends View {
                     mCurrentScrollDirection = Direction.VERTICAL;
                 }
             }
-            mDistanceX = distanceX;
+            mDistanceX = distanceX * mXScrollingSpeed;
             mDistanceY = distanceY;
             invalidate();
             return true;
@@ -392,13 +396,27 @@ public class WeekView extends View {
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
 
-        // If the week view is being drawn for the first time, then consider the first day of week.
-        if (mIsFirstDraw && mNumberOfVisibleDays >= 7) {
-            if (mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
+        if (mAreDimensionsInvalid) {
+            mAreDimensionsInvalid = false;
+            if(mScrollToDay != null)
+                goToDate(mScrollToDay);
+
+            mAreDimensionsInvalid = false;
+            if(mScrollToHour >= 0)
+                goToHour(mScrollToHour);
+
+            mScrollToDay = null;
+            mScrollToHour = -1;
+            mAreDimensionsInvalid = false;
+        }
+        if (mIsFirstDraw){
+            mIsFirstDraw = false;
+
+            // If the week view is being drawn for the first time, then consider the first day of the week.
+            if(mNumberOfVisibleDays >= 7 && mToday.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
                 int difference = 7 + (mToday.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
-            mIsFirstDraw = false;
         }
 
         // Consider scroll offset.
@@ -426,8 +444,12 @@ public class WeekView extends View {
         }
 
         // Iterate through each day.
+        Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) mToday.clone();
         mFirstVisibleDay.add(Calendar.DATE, leftDaysWithGaps);
+        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null){
+            mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
+        }
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
@@ -918,6 +940,11 @@ public class WeekView extends View {
         mEventRects.addAll(newEvents);
     }
 
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        mAreDimensionsInvalid = true;
+    }
 
     /////////////////////////////////////////////////////////////////
     //
@@ -965,6 +992,13 @@ public class WeekView extends View {
         return mEmptyViewLongPressListener;
     }
 
+    public void setScrollListener(ScrollListener scrolledListener){
+        this.mScrollListener = scrolledListener;
+    }
+
+    public ScrollListener getScrollListener(){
+        return mScrollListener;
+    }
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
      * @return The date, time interpreter.
@@ -1368,6 +1402,11 @@ public class WeekView extends View {
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 
+        if(mAreDimensionsInvalid) {
+            mScrollToDay = date;
+            return;
+        }
+
         mRefreshEvents = true;
 
         Calendar today = Calendar.getInstance();
@@ -1376,9 +1415,12 @@ public class WeekView extends View {
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MILLISECOND, 0);
 
-        int dateDifference = (int) ((date.getTimeInMillis() - today.getTimeInMillis()) / (1000 * 60 * 60 * 24));
-        mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
+        long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
+        long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
+        int dateDifference = (int) ((dateInMillis - todayInMillis) / (1000 * 60 * 60 * 24));
 
+        mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
+        // mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, (int) (-dateDifference*(mWidthPerDay + mColumnGap)-mCurrentOrigin.x), 0);
         invalidate();
     }
 
@@ -1395,16 +1437,28 @@ public class WeekView extends View {
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
     public void goToHour(double hour){
-        if (hour < 0)
-            throw new IllegalArgumentException("Cannot scroll to an hour of negative value.");
-        else if (hour > 24)
-            throw new IllegalArgumentException("Cannot scroll to an hour of value greater than 24.");
-        else if (hour * mHourHeight > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
-            throw new IllegalArgumentException("Cannot scroll to an hour which will result the calendar to go off the screen.");
-
         int verticalOffset = (int) (mHourHeight * hour);
+        if (hour < 0)
+            verticalOffset = 0;
+        else if (hour > 24)
+            verticalOffset = mHourHeight * 24;
+
+        if (mAreDimensionsInvalid) {
+            mScrollToHour = hour;
+            return;
+        } else if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
+            verticalOffset = (int)(mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom);
+
         mCurrentOrigin.y = -verticalOffset;
         invalidate();
+    }
+
+    /**
+     * Get the first hour that is visible on the screen.
+     * @return The first hour that is visible.
+     */
+    public double getFirstVisibleHour(){
+        return -mCurrentOrigin.y / mHourHeight;
     }
 
 
@@ -1433,6 +1487,17 @@ public class WeekView extends View {
 
     public interface EmptyViewLongPressListener {
         public void onEmptyViewLongPress(Calendar time);
+    }
+
+    public interface ScrollListener {
+        /**
+         * Called when the first visible day has changed.
+         *
+         * (this will also be called during the first draw of the weekview)
+         * @param newFirstVisibleDay The new first visible day
+         * @param oldFirstVisibleDay The old first visible day (is null on the first call).
+         */
+        public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
 
 
