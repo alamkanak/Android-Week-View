@@ -1420,16 +1420,18 @@ public class WeekView extends View {
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
     public void goToHour(double hour){
-        int verticalOffset = (int) (mHourHeight * hour);
-        if (hour < 0)
-            verticalOffset = 0;
-        else if (hour > 24)
-            verticalOffset = mHourHeight * 24;
-
         if (mAreDimensionsInvalid) {
             mScrollToHour = hour;
             return;
-        } else if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
+        }
+
+        int verticalOffset = 0;
+        if (hour > 24)
+            verticalOffset = mHourHeight * 24;
+        else if (hour > 0)
+            verticalOffset = (int) (mHourHeight * hour);
+
+        if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)
             verticalOffset = (int)(mHourHeight * 24 - getHeight() + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom);
 
         mCurrentOrigin.y = -verticalOffset;
