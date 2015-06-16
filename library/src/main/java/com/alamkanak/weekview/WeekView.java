@@ -1477,7 +1477,7 @@ public class WeekView extends View {
 
     public interface EventLongPressListener {
         /**
-         * Similar to #EventClickListener but with a long press.
+         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
          * @param event: event clicked.
          * @param eventRect: view containing the clicked event.
          */
@@ -1487,15 +1487,15 @@ public class WeekView extends View {
     public interface EmptyViewClickListener {
         /**
          * Triggered when the users clicks on a empty space of the calendar.
-         * @param time: #Calendar object set with the date and time of the clicked position on the view.
+         * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
          */
         public void onEmptyViewClicked(Calendar time);
     }
 
     public interface EmptyViewLongPressListener {
         /**
-         * Similar to EmptyViewClickListener but with long press.
-         * @param time: #Calendar object set with the date and time of the long pressed position on the view.
+         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
+         * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
          */
         public void onEmptyViewLongPress(Calendar time);
     }
