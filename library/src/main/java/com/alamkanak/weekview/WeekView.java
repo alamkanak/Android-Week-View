@@ -1457,22 +1457,46 @@ public class WeekView extends View {
     /////////////////////////////////////////////////////////////////
 
     public interface EventClickListener {
+        /**
+         * Triggered when clicked on one existing event
+         * @param event: event clicked.
+         * @param eventRect: view containing the clicked event.
+         */
         public void onEventClick(WeekViewEvent event, RectF eventRect);
     }
 
     public interface MonthChangeListener {
+        /**
+         * Very important interface, it's the base to load events in the calendar.
+         * @param newYear: year of the events required by the view.
+         * @param newMonth: month of the events required by the view.
+         * @return a list of the events happening <strong>during the specified month</strong>.
+         */
         public List<WeekViewEvent> onMonthChange(int newYear, int newMonth);
     }
 
     public interface EventLongPressListener {
+        /**
+         * Similar to #EventClickListener but with a long press.
+         * @param event: event clicked.
+         * @param eventRect: view containing the clicked event.
+         */
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
 
     public interface EmptyViewClickListener {
+        /**
+         * Triggered when the users clicks on a empty space of the calendar.
+         * @param time: #Calendar object set with the date and time of the clicked position on the view.
+         */
         public void onEmptyViewClicked(Calendar time);
     }
 
     public interface EmptyViewLongPressListener {
+        /**
+         * Similar to EmptyViewClickListener but with long press.
+         * @param time: #Calendar object set with the date and time of the long pressed position on the view.
+         */
         public void onEmptyViewLongPress(Calendar time);
     }
 
