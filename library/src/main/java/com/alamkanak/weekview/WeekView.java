@@ -894,29 +894,62 @@ public class WeekView extends View {
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
+        // do not cache twice
+        if (alreadyCached(event)) return;
+
         if (!isSameDay(event.getStartTime(), event.getEndTime())) {
+            // add first day
             Calendar endTime = (Calendar) event.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
+            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime);
+            event1.setColor(event.getColor());
+            mEventRects.add(new EventRect(event1, event, null));
+
+            // add over days
+            Calendar otherDay = (Calendar) event.getStartTime().clone();
+            otherDay.add(Calendar.DATE, 1);
+            while (!isSameDay(otherDay, event.getEndTime())) {
+                Calendar overDay = (Calendar) otherDay.clone();
+                overDay.set(Calendar.HOUR_OF_DAY, 0);
+                overDay.set(Calendar.MINUTE, 0);
+                Calendar endOfOverDay = (Calendar) overDay.clone();
+                endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
+                endOfOverDay.set(Calendar.MINUTE, 59);
+                WeekViewEvent eventMore = new WeekViewEvent(event.getId(), event.getName(), overDay, endOfOverDay);
+                eventMore.setColor(event.getColor());
+                mEventRects.add(new EventRect(eventMore, event, null));
+
+                // next day
+                otherDay.add(Calendar.DATE, 1);
+            }
+
+            // add last day
             Calendar startTime = (Calendar) event.getEndTime().clone();
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime);
-            event1.setColor(event.getColor());
             WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime());
             event2.setColor(event.getColor());
-            mEventRects.add(new EventRect(event1, event, null));
             mEventRects.add(new EventRect(event2, event, null));
         }
         else
             mEventRects.add(new EventRect(event, event, null));
     }
 
-    private void sortAndCacheEvents(List<WeekViewEvent> events){
+    private void sortAndCacheEvents(List<WeekViewEvent> events) {
         sortEvents(events);
-        for(WeekViewEvent event : events){
+        for (WeekViewEvent event : events) {
             cacheEvent(event);
         }
+    }
+
+    private boolean alreadyCached(WeekViewEvent event) {
+        for (EventRect eventRect : mEventRects) {
+            if (eventRect.originalEvent.getId() == event.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
