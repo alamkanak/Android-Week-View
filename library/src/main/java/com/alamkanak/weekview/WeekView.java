@@ -671,8 +671,7 @@ public class WeekView extends View {
 
         }
     }
-
-
+    
     /**
      * Draw the name of the event on top of the event rectangle.
      *
