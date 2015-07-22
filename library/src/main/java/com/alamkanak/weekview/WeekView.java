@@ -189,6 +189,7 @@ public class WeekView extends View {
                     mEmptyEventX = e.getX();
                     mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
                     mCacheEmptyEventDay = selectedTime;
+                    invalidate();
                 }
             }
 
@@ -350,7 +351,6 @@ public class WeekView extends View {
         mEmptyEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         mEmptyEventTextPaint.setStyle(Paint.Style.FILL);
         mEmptyEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        mEmptyEventTextPaint.setTextSize(mEventTextSize);
         mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
         mStartDate = (Calendar) mToday.clone();
 
@@ -364,9 +364,6 @@ public class WeekView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Draw the header row.
-        drawHeaderRowAndEvents(canvas);
-
         // Draw the time column and all the axes/separators.
         drawTimeColumnAndAxes(canvas);
 
@@ -375,6 +372,8 @@ public class WeekView extends View {
             if (mCacheEmptyEventDay != null) drawEmptyEvent(mCacheEmptyEventDay, canvas);
         } else mCacheEmptyEventDay = null;
 
+        // Draw the header row.
+        drawHeaderRowAndEvents(canvas);
         // Hide everything in the first cell (top left corner).
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
@@ -715,7 +714,7 @@ public class WeekView extends View {
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(metrics);
-        float textSize = mEventTextSize;
+        float textSize = 18f;
         switch (metrics.densityDpi) {
             case DisplayMetrics.DENSITY_LOW:
                 textSize = textSize * 0.75f;
