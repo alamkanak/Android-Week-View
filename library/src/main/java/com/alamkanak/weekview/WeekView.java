@@ -574,6 +574,12 @@ public class WeekView extends View {
             mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
             boolean isToday = isSameDay(day, today);
 
+            // Don't draw days which are outside the requested date range
+            if (mMinDate != null && day.before(mMinDate))
+                continue;
+            if (mMaxDate != null && day.after(mMaxDate))
+                continue;
+
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
             if (mEventRects == null || mRefreshEvents ||
@@ -648,6 +654,12 @@ public class WeekView extends View {
             day = (Calendar) mHomeDate.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             boolean isToday = isSameDay(day, today);
+
+            // Don't draw days which are outside the requested date range
+            if (mMinDate != null && day.before(mMinDate))
+                continue;
+            if (mMaxDate != null && day.after(mMaxDate))
+                continue;
 
             // Draw the day labels.
             String dayLabel = getDateTimeInterpreter().interpretDate(day);
@@ -1075,13 +1087,33 @@ public class WeekView extends View {
     }
 
     /**
-     * Reset day zero to the current day.
+     * Recalculate a suitable home date.
+     *
+     * When the scroll offset is zero, the home date will be the leftmost day visible in the view.
      */
     private void resetHomeDate() {
-        mHomeDate = Calendar.getInstance();
-        mHomeDate.set(Calendar.HOUR_OF_DAY, 0);
-        mHomeDate.set(Calendar.MINUTE, 0);
-        mHomeDate.set(Calendar.SECOND, 0);
+        // Start by trying to use the current date as the home date
+        Calendar newHomeDate = Calendar.getInstance();
+        newHomeDate.set(Calendar.HOUR_OF_DAY, 0);
+        newHomeDate.set(Calendar.MINUTE, 0);
+        newHomeDate.set(Calendar.SECOND, 0);
+        newHomeDate.set(Calendar.MILLISECOND, 0);
+
+        // Ensure the date falls within any date limits that have been set
+        if (mMinDate != null && newHomeDate.before(mMinDate))
+            newHomeDate = (Calendar) mMinDate.clone();
+        if (mMaxDate != null && newHomeDate.after(mMaxDate))
+            newHomeDate = (Calendar) mMaxDate.clone();
+
+        // If there is a maximum date set, try to minimize the amount of blank space that will appear
+        // to the right of the home date when at scroll offset zero.
+        if (mMaxDate != null) {
+            newHomeDate.add(Calendar.DATE, 1 - mNumberOfVisibleDays);
+            while (newHomeDate.before(mMinDate))
+                newHomeDate.add(Calendar.DATE, 1);
+        }
+
+        mHomeDate = newHomeDate;
     }
 
     /**
@@ -1108,8 +1140,14 @@ public class WeekView extends View {
     private float getXMinLimit() {
         if (mMaxDate == null)
             return Integer.MIN_VALUE;
-        else
-            return getXOriginForDate(mMaxDate);
+        else {
+            Calendar date = (Calendar) mMaxDate.clone();
+            date.add(Calendar.DATE, 1-mNumberOfVisibleDays);
+            while (date.before(mMinDate))
+                date.add(Calendar.DATE, 1);
+
+            return getXOriginForDate(date);
+        }
     }
 
     private float getXMaxLimit() {
@@ -1246,6 +1284,7 @@ public class WeekView extends View {
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
         this.mNumberOfVisibleDays = numberOfVisibleDays;
+        resetHomeDate();
         mCurrentOrigin.x = 0;
         mCurrentOrigin.y = 0;
         invalidate();
@@ -1542,19 +1581,18 @@ public class WeekView extends View {
      * @param minDate The new minimum date (pass null for no minimum)
      */
     public void setMinDate(Calendar minDate) {
-        if (minDate == null) {
-            resetHomeDate();
-        } else {
+        if (minDate != null) {
             minDate.set(Calendar.HOUR_OF_DAY, 0);
             minDate.set(Calendar.MINUTE, 0);
             minDate.set(Calendar.SECOND, 0);
+            minDate.set(Calendar.MILLISECOND, 0);
             if (mMaxDate != null && minDate.after(mMaxDate)) {
                 throw new IllegalArgumentException("minDate cannot be later than maxDate");
             }
-            mHomeDate = minDate;
         }
 
         mMinDate = minDate;
+        resetHomeDate();
         mCurrentOrigin.x = 0;
         invalidate();
     }
@@ -1573,22 +1611,18 @@ public class WeekView extends View {
      * @param maxDate The new maximum date (pass null for no maximum)
      */
     public void setMaxDate(Calendar maxDate) {
-        if (maxDate == null) {
-            if (mMinDate == null) {
-                resetHomeDate();
-            }
-        } else {
+        if (maxDate != null) {
             maxDate.set(Calendar.HOUR_OF_DAY, 0);
             maxDate.set(Calendar.MINUTE, 0);
             maxDate.set(Calendar.SECOND, 0);
+            maxDate.set(Calendar.MILLISECOND, 0);
             if (mMinDate != null && maxDate.before(mMinDate)) {
                 throw new IllegalArgumentException("maxDate cannot be earlier than minDate");
             }
-            if (mHomeDate.after(maxDate))
-                mHomeDate = maxDate;
         }
 
         mMaxDate = maxDate;
+        resetHomeDate();
         mCurrentOrigin.x = 0;
         invalidate();
     }
