@@ -575,9 +575,7 @@ public class WeekView extends View {
             boolean isToday = isSameDay(day, today);
 
             // Don't draw days which are outside the requested date range
-            if (mMinDate != null && day.before(mMinDate))
-                continue;
-            if (mMaxDate != null && day.after(mMaxDate))
+            if (!dateIsValid(day))
                 continue;
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
@@ -656,9 +654,7 @@ public class WeekView extends View {
             boolean isToday = isSameDay(day, today);
 
             // Don't draw days which are outside the requested date range
-            if (mMinDate != null && day.before(mMinDate))
-                continue;
-            if (mMaxDate != null && day.after(mMaxDate))
+            if (!dateIsValid(day))
                 continue;
 
             // Draw the day labels.
@@ -1717,9 +1713,19 @@ public class WeekView extends View {
             return;
         }
 
-        mRefreshEvents = true;
-        mCurrentOrigin.x = getXOriginForDate(date);
+        // Don't try to show a date that this view will not render
+        if (!dateIsValid(date))
+            return;
 
+        // Clamp the new offset if it would fall outside the scroll limits
+        float newX = getXOriginForDate(date);
+        if (newX < getXMinLimit())
+            newX = getXMinLimit();
+        else if (newX > getXMaxLimit())
+            newX = getXMaxLimit();
+
+        mRefreshEvents = true;
+        mCurrentOrigin.x = newX;
         invalidate();
     }
 
@@ -1760,6 +1766,21 @@ public class WeekView extends View {
      */
     public double getFirstVisibleHour(){
         return -mCurrentOrigin.y / mHourHeight;
+    }
+
+    /**
+     * Determine whether a given calendar day falls within the scroll limits set for this view.
+     * @see #setMinDate(Calendar)
+     * @see #setMaxDate(Calendar)
+     * @return True if there are no limits or the date is within the limits.
+     */
+    public boolean dateIsValid(Calendar day){
+        if (mMinDate != null && day.before(mMinDate))
+            return false;
+        if (mMaxDate != null && day.after(mMaxDate))
+            return false;
+
+        return true;
     }
 
 
