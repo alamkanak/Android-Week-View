@@ -1089,11 +1089,7 @@ public class WeekView extends View {
      */
     private void resetHomeDate() {
         // Start by trying to use the current date as the home date
-        Calendar newHomeDate = Calendar.getInstance();
-        newHomeDate.set(Calendar.HOUR_OF_DAY, 0);
-        newHomeDate.set(Calendar.MINUTE, 0);
-        newHomeDate.set(Calendar.SECOND, 0);
-        newHomeDate.set(Calendar.MILLISECOND, 0);
+        Calendar newHomeDate = today();
 
         // Ensure the date falls within any date limits that have been set
         if (mMinDate != null && newHomeDate.before(mMinDate))
@@ -1104,9 +1100,14 @@ public class WeekView extends View {
         // If there is a maximum date set, try to minimize the amount of blank space that will appear
         // to the right of the home date when at scroll offset zero.
         if (mMaxDate != null) {
-            newHomeDate.add(Calendar.DATE, 1 - mNumberOfVisibleDays);
-            while (newHomeDate.before(mMinDate))
-                newHomeDate.add(Calendar.DATE, 1);
+            // Same calculation as getXMinLimit()
+            Calendar date = (Calendar) mMaxDate.clone();
+            date.add(Calendar.DATE, 1-mNumberOfVisibleDays);
+            while (date.before(mMinDate))
+                date.add(Calendar.DATE, 1);
+
+            if (newHomeDate.after(date))
+                newHomeDate = date;
         }
 
         mHomeDate = newHomeDate;
