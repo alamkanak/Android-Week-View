@@ -125,6 +125,7 @@ public class WeekView extends View {
     private double mScrollToHour = -1;
     private ScaleGestureDetector mScaleDetector;
     private boolean mIsZooming;
+    private int mEventCornerRadius = 0;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -287,6 +288,7 @@ public class WeekView extends View {
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
+            mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
         } finally {
             a.recycle();
         }
@@ -421,7 +423,7 @@ public class WeekView extends View {
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Hide anything that is in the bottom margin of the header row.
-        canvas.drawRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderRowPadding * 2 + mHeaderTextHeight + mHeaderMarginBottom + mTimeTextHeight/2 - mHourSeparatorHeight / 2, mHeaderColumnBackgroundPaint);
+        canvas.drawRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderRowPadding * 2 + mHeaderTextHeight + mHeaderMarginBottom + mTimeTextHeight/2, mHeaderColumnBackgroundPaint);
     }
 
     private void drawTimeColumnAndAxes(Canvas canvas) {
@@ -667,9 +669,6 @@ public class WeekView extends View {
 
                     // Calculate top.
                     float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
-                    float originalTop = top;
-                    if (top < mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2)
-                        top = mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
@@ -679,11 +678,9 @@ public class WeekView extends View {
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
                     if (left < startFromPixel)
                         left += mOverlappingEventGap;
-                    float originalLeft = left;
                     float right = left + mEventRects.get(i).width * mWidthPerDay;
                     if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
-                    if (left < mHeaderColumnWidth) left = mHeaderColumnWidth;
 
                     // Draw the event and the event name on top of it.
                     RectF eventRectF = new RectF(left, top, right, bottom);
@@ -696,8 +693,8 @@ public class WeekView extends View {
                             ) {
                         mEventRects.get(i).rectF = eventRectF;
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
-                        canvas.drawRect(mEventRects.get(i).rectF, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, originalTop, originalLeft);
+                        canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -1387,6 +1384,19 @@ public class WeekView extends View {
     public void setOverlappingEventGap(int overlappingEventGap) {
         this.mOverlappingEventGap = overlappingEventGap;
         invalidate();
+    }
+
+    public int getEventCornerRadius() {
+        return mEventCornerRadius;
+    }
+
+    /**
+     * Set corner radius for event rect.
+     *
+     * @param eventCornerRadius the radius in px.
+     */
+    public void setEventCornerRadius(int eventCornerRadius) {
+        mEventCornerRadius = eventCornerRadius;
     }
 
     public int getEventMarginVertical() {
