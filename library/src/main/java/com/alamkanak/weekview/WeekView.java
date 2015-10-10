@@ -400,11 +400,17 @@ public class WeekView extends View {
     }
 
     /**
-     * Initialize time column width. Calculate value with latest possible hour (supposed widest text)
+     * Initialize time column width. Calculate value with all possible hours (supposed widest text)
      */
     private void initTextTimeWidth() {
-        String timeSample = getDateTimeInterpreter().interpretTime(23);
-        mTimeTextWidth = mTimeTextPaint.measureText(timeSample);
+        mTimeTextWidth = 0;
+        for (int i = 0; i < 24; i++) {
+            // measure time string and get max width
+            String time = getDateTimeInterpreter().interpretTime(i);
+            if (time == null)
+                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+            mTimeTextWidth = Math.max(mTimeTextWidth, mTimeTextPaint.measureText(time));
+        }
     }
 
     @Override
