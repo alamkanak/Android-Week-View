@@ -16,6 +16,7 @@ import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -34,6 +35,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -400,11 +402,17 @@ public class WeekView extends View {
     }
 
     /**
-     * Initialize time column width. Calculate value with latest possible hour (supposed widest text)
+     * Initialize time column width. Calculate value with all possible hours (supposed widest text)
      */
     private void initTextTimeWidth() {
-        String timeSample = getDateTimeInterpreter().interpretTime(23);
-        mTimeTextWidth = mTimeTextPaint.measureText(timeSample);
+        mTimeTextWidth = 0;
+        for (int i = 0; i < 24; i++) {
+            // measure time string and get max width
+            String time = getDateTimeInterpreter().interpretTime(i);
+            if (time == null)
+                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+            mTimeTextWidth = Math.max(mTimeTextWidth, mTimeTextPaint.measureText(time));
+        }
     }
 
     @Override
@@ -524,8 +532,8 @@ public class WeekView extends View {
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) today.clone();
         mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap))));
-        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrolledListener != null){
-            mScrolledListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
+        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null){
+            mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
         }
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
@@ -887,9 +895,9 @@ public class WeekView extends View {
             Calendar startTime = (Calendar) event.getEndTime().clone();
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getStartTime(), endTime);
+            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime);
             event1.setColor(event.getColor());
-            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), startTime, event.getEndTime());
+            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime());
             event2.setColor(event.getColor());
             mEventRects.add(new EventRect(event1, event, null));
             mEventRects.add(new EventRect(event2, event, null));
@@ -1115,12 +1123,10 @@ public class WeekView extends View {
             mDateTimeInterpreter = new DateTimeInterpreter() {
                 @Override
                 public String interpretDate(Calendar date) {
-                    SimpleDateFormat sdf;
-                    sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE") : new SimpleDateFormat("EEE");
-                    try{
-                        String dayName = sdf.format(date.getTime()).toUpperCase();
-                        return String.format("%s %d/%02d", dayName, date.get(Calendar.MONTH) + 1, date.get(Calendar.DAY_OF_MONTH));
-                    }catch (Exception e){
+                    try {
+                        SimpleDateFormat sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) : new SimpleDateFormat("EEE M/dd", Locale.getDefault());
+                        return sdf.format(date.getTime()).toUpperCase();
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return "";
                     }
@@ -1128,12 +1134,17 @@ public class WeekView extends View {
 
                 @Override
                 public String interpretTime(int hour) {
-                    String amPm;
-                    if (hour >= 0 && hour < 12) amPm = "AM";
-                    else amPm = "PM";
-                    if (hour == 0) hour = 12;
-                    if (hour > 12) hour -= 12;
-                    return String.format("%02d %s", hour, amPm);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar.set(Calendar.MINUTE, 0);
+
+                    try {
+                        SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        return sdf.format(calendar.getTime());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return "";
+                    }
                 }
             };
         }
@@ -1588,22 +1599,48 @@ public class WeekView extends View {
     /////////////////////////////////////////////////////////////////
 
     public interface EventClickListener {
+        /**
+         * Triggered when clicked on one existing event
+         * @param event: event clicked.
+         * @param eventRect: view containing the clicked event.
+         */
         public void onEventClick(WeekViewEvent event, RectF eventRect);
     }
 
     public interface MonthChangeListener {
+        /**
+         * Very important interface, it's the base to load events in the calendar.
+         * This method is called three times: once to load the previous month, once to load the next month and once to load the current month.<br/>
+         * <strong>That's why you can have three times the same event at the same place if you mess up with the configuration</strong>
+         * @param newYear: year of the events required by the view.
+         * @param newMonth: month of the events required by the view <br/><strong>1 based (not like JAVA API) --> January = 1 and December = 12</strong>.
+         * @return a list of the events happening <strong>during the specified month</strong>.
+         */
         public List<WeekViewEvent> onMonthChange(int newYear, int newMonth);
     }
 
     public interface EventLongPressListener {
+        /**
+         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
+         * @param event: event clicked.
+         * @param eventRect: view containing the clicked event.
+         */
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
     }
 
     public interface EmptyViewClickListener {
+        /**
+         * Triggered when the users clicks on a empty space of the calendar.
+         * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
+         */
         public void onEmptyViewClicked(Calendar time);
     }
 
     public interface EmptyViewLongPressListener {
+        /**
+         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
+         * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
+         */
         public void onEmptyViewLongPress(Calendar time);
     }
 
