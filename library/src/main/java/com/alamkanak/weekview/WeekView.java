@@ -96,6 +96,7 @@ public class WeekView extends View {
     private int mHeaderColumnPadding = 10;
     private int mHeaderColumnTextColor = Color.BLACK;
     private int mNumberOfVisibleDays = 3;
+    private int mMinEventDurationMillis = 15*60*1000;
     private int mHeaderRowPadding = 10;
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.rgb(245, 245, 245);
@@ -690,6 +691,11 @@ public class WeekView extends View {
                     if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
 
+                    float minTextHeight = mHeaderTextHeight + mHeaderRowPadding * 2;
+                    if (bottom - top < minTextHeight) {
+                        bottom = top + minTextHeight;
+                    }
+
                     // Draw the event and the event name on top of it.
                     RectF eventRectF = new RectF(left, top, right, bottom);
                     if (bottom > mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 && left < right &&
@@ -1025,9 +1031,9 @@ public class WeekView extends View {
      */
     private boolean isEventsCollide(WeekViewEvent event1, WeekViewEvent event2) {
         long start1 = event1.getStartTime().getTimeInMillis();
-        long end1 = event1.getEndTime().getTimeInMillis();
+        long end1 = event1.getEndTime().getTimeInMillis() + mMinEventDurationMillis;
         long start2 = event2.getStartTime().getTimeInMillis();
-        long end2 = event2.getEndTime().getTimeInMillis();
+        long end2 = event2.getEndTime().getTimeInMillis() + mMinEventDurationMillis;
         return !((start1 >= end2) || (end1 <= start2));
     }
 
@@ -1268,6 +1274,15 @@ public class WeekView extends View {
 
     public int getDayBackgroundColor() {
         return mDayBackgroundColor;
+    }
+
+    public void setMinEventDurationMillis(int minEventDuration) {
+        mMinEventDurationMillis = minEventDuration;
+        invalidate();
+    }
+
+    public int getMinEventDurationMillis() {
+        return mMinEventDurationMillis;
     }
 
     public void setDayBackgroundColor(int dayBackgroundColor) {
