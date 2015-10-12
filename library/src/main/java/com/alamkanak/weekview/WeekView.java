@@ -691,7 +691,7 @@ public class WeekView extends View {
                     if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
 
-                    float minTextHeight = mHeaderTextHeight + mHeaderRowPadding * 2;
+                    float minTextHeight = mHeaderTextHeight + mHeaderRowPadding;
                     if (bottom - top < minTextHeight) {
                         bottom = top + minTextHeight;
                     }
