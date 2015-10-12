@@ -22,6 +22,7 @@
         app:dayBackgroundColor="#05000000"
         app:todayBackgroundColor="#1848adff"
         app:headerColumnBackground="#ffffffff"
-        app:todayHeaderTextColor="@color/accent"/>
+        app:todayHeaderTextColor="@color/accent"
+        app:showHalfHours="false"/>
 
 </RelativeLayout>
