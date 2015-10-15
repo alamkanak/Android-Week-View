@@ -673,6 +673,7 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
+            Rect rect = new Rect();
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
@@ -691,7 +692,9 @@ public class WeekView extends View {
                     if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
 
-                    float minTextHeight = mHeaderTextHeight + mHeaderRowPadding;
+                    mEventTextPaint.getTextBounds(mEventRects.get(i).event.getName(), 0, mEventRects.get(i).event.getName().length(), rect);
+
+                    float minTextHeight = rect.height() + mHeaderRowPadding;
                     if (bottom - top < minTextHeight) {
                         bottom = top + minTextHeight;
                     }
