@@ -694,7 +694,7 @@ public class WeekView extends View {
 
                     mEventTextPaint.getTextBounds(mEventRects.get(i).event.getName(), 0, mEventRects.get(i).event.getName().length(), rect);
 
-                    float minTextHeight = rect.height() + mHeaderRowPadding;
+                    float minTextHeight = rect.height() + 2*mEventPadding;
                     if (bottom - top < minTextHeight) {
                         bottom = top + minTextHeight;
                     }
