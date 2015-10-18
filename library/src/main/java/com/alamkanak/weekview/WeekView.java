@@ -858,25 +858,29 @@ public class WeekView extends View {
         }
 
         // Prepare to calculate positions of each events.
-        ArrayList<EventRect> tempEvents = new ArrayList<EventRect>(mEventRects);
+        List<EventRect> tempEvents = mEventRects;
         mEventRects = new ArrayList<EventRect>();
-        Calendar dayCounter = (Calendar) day.clone();
-        dayCounter.add(Calendar.MONTH, -1);
-        dayCounter.set(Calendar.DAY_OF_MONTH, 1);
-        Calendar maxDay = (Calendar) day.clone();
-        maxDay.add(Calendar.MONTH, 1);
-        maxDay.set(Calendar.DAY_OF_MONTH, maxDay.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        // Iterate through each day to calculate the position of the events.
-        while (dayCounter.getTimeInMillis() <= maxDay.getTimeInMillis()) {
-            ArrayList<EventRect> eventRects = new ArrayList<EventRect>();
-            for (EventRect eventRect : tempEvents) {
-                if (isSameDay(eventRect.event.getStartTime(), dayCounter))
-                    eventRects.add(eventRect);
+        // Iterate through each day with events to calculate the position of the events.
+        while (tempEvents.size() > 0) {
+            ArrayList<EventRect> eventRects = new ArrayList<>(tempEvents.size());
+
+            // get first event for a day
+            EventRect eventRect1 = tempEvents.remove(0);
+            eventRects.add(eventRect1);
+
+            int i = 0;
+            while (i < tempEvents.size()) {
+                // collect all other events for same day
+                EventRect eventRect2 = tempEvents.get(i);
+                if (isSameDay(eventRect1.event.getStartTime(), eventRect2.event.getStartTime())) {
+                    tempEvents.remove(i);
+                    eventRects.add(eventRect2);
+                } else {
+                    i++;
+                }
             }
-
             computePositionOfEvents(eventRects);
-            dayCounter.add(Calendar.DATE, 1);
         }
     }
 
