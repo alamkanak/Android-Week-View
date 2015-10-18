@@ -43,5 +43,6 @@
         <attr name="overlappingEventGap" format="dimension"/>
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
+        <attr name="eventCornerRadius" format="dimension"/>
     </declare-styleable>
 </resources>
