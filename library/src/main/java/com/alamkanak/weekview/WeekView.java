@@ -403,6 +403,13 @@ public class WeekView extends View {
         });
     }
 
+    // fix rotation changes
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mAreDimensionsInvalid = true;
+    }
+
     /**
      * Initialize time column width. Calculate value with all possible hours (supposed widest text)
      */
