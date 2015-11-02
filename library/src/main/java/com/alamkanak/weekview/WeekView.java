@@ -727,6 +727,7 @@ public class WeekView extends View {
      */
     private void drawEventTitle(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         if (rect.right - rect.left - mEventPadding * 2 < 0) return;
+        if (rect.bottom - rect.top - mEventPadding * 2 < 0) return;
 
         SpannableStringBuilder bob = new SpannableStringBuilder();
         if (event.getName() != null) {
@@ -738,28 +739,31 @@ public class WeekView extends View {
             bob.append(event.getLocation());
         }
 
-        // Get text dimensions
-        StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
-
-        // Crop height
         int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
-        int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
-        if (lineHeight < availableHeight && textLayout.getHeight() > rect.height() - mEventPadding * 2) {
-            int lineCount = textLayout.getLineCount();
-            int availableLineCount = (int) Math.floor(lineCount * availableHeight / textLayout.getHeight());
-            float widthAvailable = (rect.right - originalLeft - mEventPadding * 2) * availableLineCount;
-            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, widthAvailable, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
-        }
-        else if (lineHeight >= availableHeight) {
-            int width = (int) (rect.right - originalLeft - mEventPadding * 2);
-            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, width, TextUtils.TruncateAt.END), mEventTextPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 1.0f, false);
-        }
+        int availableWidth = (int) (rect.right - originalLeft - mEventPadding * 2);
 
-        // Draw text
-        canvas.save();
-        canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
-        textLayout.draw(canvas);
-        canvas.restore();
+        // Get text dimensions
+        StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+
+        int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+
+        if (availableHeight >= lineHeight) {
+            // calculate available lines
+            int availableLineCount = availableHeight / lineHeight;
+            do {
+                // ellipsize text to fit into event rect
+                textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                // reduce line count
+                availableLineCount--;
+                // and repeat until text is short enough
+            } while (textLayout.getHeight() > availableHeight);
+
+            // Draw text
+            canvas.save();
+            canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
+            textLayout.draw(canvas);
+            canvas.restore();
+        }
     }
 
 
