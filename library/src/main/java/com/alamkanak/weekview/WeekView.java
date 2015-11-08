@@ -898,9 +898,6 @@ public class WeekView extends View {
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
-        // do not cache twice
-        if (alreadyCached(event)) return;
-
         if (!isSameDay(event.getStartTime(), event.getEndTime())) {
             // add first day
             Calendar endTime = (Calendar) event.getStartTime().clone();
@@ -945,15 +942,6 @@ public class WeekView extends View {
         for (WeekViewEvent event : events) {
             cacheEvent(event);
         }
-    }
-
-    private boolean alreadyCached(WeekViewEvent event) {
-        for (EventRect eventRect : mEventRects) {
-            if (eventRect.originalEvent.getId() == event.getId()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
