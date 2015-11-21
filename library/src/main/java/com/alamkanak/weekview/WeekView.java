@@ -144,8 +144,10 @@ public class WeekView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            if(mIsZooming)
+            if (mIsZooming)
                 return true;
+
+            // Calculate the direction to scroll.
             if (mCurrentScrollDirection == Direction.NONE) {
                 // allow scrolling only in one direction
                 if (Math.abs(distanceX) > Math.abs(distanceY)){
@@ -156,19 +158,17 @@ public class WeekView extends View {
                 }
             }
 
+            // Calculate the new origin after scroll.
             switch (mCurrentScrollDirection) {
                 case HORIZONTAL:
                     mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
-
                     break;
                 case VERTICAL:
                     mCurrentOrigin.y -= distanceY;
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
-
                     break;
             }
-
             return true;
         }
 
@@ -564,14 +564,14 @@ public class WeekView extends View {
 
             // Draw background color for each day.
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-            if (mWidthPerDay + startPixel - start> 0){
-                if(mUseNewColoring){
+            if (mWidthPerDay + startPixel - start > 0){
+                if (mUseNewColoring){
                     boolean isWeekend = (day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
                     Paint pastPaint = isWeekend ? mPastWeekendBackgroundPaint : mPastBackgroundPaint;
                     Paint futurePaint = isWeekend ? mFutureWeekendBackgroundPaint : mFutureBackgroundPaint;
                     float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
 
-                    if(sameDay){
+                    if (sameDay){
                         Calendar now = Calendar.getInstance();
                         float beforeNow = (now.get(Calendar.HOUR_OF_DAY)+now.get(Calendar.MINUTE)/60.0f)*mHourHeight;
                         canvas.drawRect(start, startY, startPixel + mWidthPerDay, startY+beforeNow, pastPaint);
@@ -582,7 +582,7 @@ public class WeekView extends View {
                         canvas.drawRect(start, startY, startPixel + mWidthPerDay, getHeight(), futurePaint);
                     }
                 }else{
-                    canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+                    canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
                 }
             }
 
@@ -1189,7 +1189,7 @@ public class WeekView extends View {
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter){
         this.mDateTimeInterpreter = dateTimeInterpreter;
 
-        // refresh time column width
+        // Refresh time column width.
         initTextTimeWidth();
     }
 
