@@ -44,5 +44,7 @@
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
+        <attr name="horizontalFlingEnabled" format="boolean"/>
+        <attr name="verticalFlingEnabled" format="boolean"/>
     </declare-styleable>
 </resources>
