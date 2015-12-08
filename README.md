@@ -117,6 +117,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
+- `typefacePathFromAssets`
 
 Interfaces
 ----------
