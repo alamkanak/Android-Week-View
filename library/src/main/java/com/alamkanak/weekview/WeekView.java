@@ -303,7 +303,7 @@ public class WeekView extends View {
 
             // create typface if path set in xml
             mTypefacePathFromAssets = a.getString(R.styleable.WeekView_typefacePathFromAssets);
-            if(TextUtils.isEmpty(mTypefacePathFromAssets)){
+            if(!TextUtils.isEmpty(mTypefacePathFromAssets)){
                 mTypefaceFromAssets = Typeface.createFromAsset(context.getAssets(), mTypefacePathFromAssets);
             }
 
