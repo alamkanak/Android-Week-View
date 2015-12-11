@@ -22,10 +22,6 @@
         <attr name="noOfVisibleDays" format="integer"/>
         <attr name="headerRowBackgroundColor" format="color"/>
         <attr name="dayBackgroundColor" format="color"/>
-        <attr name="futureBackgroundColor" format="color"/>
-        <attr name="pastBackgroundColor" format="color"/>
-        <attr name="futureWeekendBackgroundColor" format="color"/>
-        <attr name="pastWeekendBackgroundColor" format="color"/>
         <attr name="hourSeparatorColor" format="color"/>
         <attr name="todayBackgroundColor" format="color"/>
         <attr name="todayHeaderTextColor" format="color"/>
@@ -43,6 +39,10 @@
         <attr name="eventCornerRadius" format="dimension"/>
         <attr name="showDistinctPastFutureColor" format="boolean"/>
         <attr name="showDistinctWeekendColor" format="boolean"/>
+        <attr name="futureBackgroundColor" format="color"/>
+        <attr name="pastBackgroundColor" format="color"/>
+        <attr name="futureWeekendBackgroundColor" format="color"/>
+        <attr name="pastWeekendBackgroundColor" format="color"/>
         <attr name="showNowLine" format="boolean"/>
         <attr name="nowLineColor" format="color"/>
         <attr name="nowLineThickness" format="dimension"/>

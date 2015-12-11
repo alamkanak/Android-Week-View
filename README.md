@@ -117,6 +117,15 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
+- `showDistinctPastFutureColor`
+- `futureBackgroundColor`
+- `pastBackgroundColor`
+- `showDistinctWeekendColor`
+- `futureWeekendBackgroundColor`
+- `pastWeekendBackgroundColor`
+- `showNowLine`
+- `nowLineColor`
+- `nowLineThickness`
 
 Interfaces
 ----------

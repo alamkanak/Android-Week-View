@@ -123,8 +123,6 @@ public class WeekView extends View {
     private Calendar mScrollToDay = null;
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
-    private boolean mUseDifferentPastBackgroundColor = false;
-    private boolean mUseDifferentFutureWeekendBackgroundColor = false;
     private boolean mShowDistinctWeekendColor = false;
     private boolean mShowNowLine = false;
     private boolean mShowDistinctPastFutureColor = false;
@@ -1515,6 +1513,103 @@ public class WeekView extends View {
     public void setXScrollingSpeed(float xScrollingSpeed) {
         this.mXScrollingSpeed = xScrollingSpeed;
     }
+
+    /**
+     * Whether weekends should have a background color different from the normal day background
+     * color. The weekend background colors are defined by the attributes
+     * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
+     * @return True if weekends should have different background colors.
+     */
+    public boolean isShowDistinctWeekendColor() {
+        return mShowDistinctWeekendColor;
+    }
+
+    /**
+     * Set whether weekends should have a background color different from the normal day background
+     * color. The weekend background colors are defined by the attributes
+     * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
+     * @param showDistinctWeekendColor True if weekends should have different background colors.
+     */
+    public void setShowDistinctWeekendColor(boolean showDistinctWeekendColor) {
+        this.mShowDistinctWeekendColor = showDistinctWeekendColor;
+        invalidate();
+    }
+
+    /**
+     * Whether past and future days should have two different background colors. The past and
+     * future day colors are defined by the attributes `futureBackgroundColor` and
+     * `pastBackgroundColor`.
+     * @return True if past and future days should have two different background colors.
+     */
+    public boolean isShowDistinctPastFutureColor() {
+        return mShowDistinctPastFutureColor;
+    }
+
+    /**
+     * Set whether weekends should have a background color different from the normal day background
+     * color. The past and future day colors are defined by the attributes `futureBackgroundColor`
+     * and `pastBackgroundColor`.
+     * @param showDistinctPastFutureColor True if past and future should have two different
+     *                                    background colors.
+     */
+    public void setShowDistinctPastFutureColor(boolean showDistinctPastFutureColor) {
+        this.mShowDistinctPastFutureColor = showDistinctPastFutureColor;
+        invalidate();
+    }
+
+    /**
+     * Get whether "now" line should be displayed. "Now" line is defined by the attributes
+     * `nowLineColor` and `nowLineThickness`.
+     * @return True if "now" line should be displayed.
+     */
+    public boolean isShowNowLine() {
+        return mShowNowLine;
+    }
+
+    /**
+     * Set whether "now" line should be displayed. "Now" line is defined by the attributes
+     * `nowLineColor` and `nowLineThickness`.
+     * @param showNowLine True if "now" line should be displayed.
+     */
+    public void setShowNowLine(boolean showNowLine) {
+        this.mShowNowLine = showNowLine;
+        invalidate();
+    }
+
+    /**
+     * Get the "now" line color.
+     * @return The color of the "now" line.
+     */
+    public int getNowLineColor() {
+        return mNowLineColor;
+    }
+
+    /**
+     * Set the "now" line color.
+     * @param nowLineColor The color of the "now" line.
+     */
+    public void setNowLineColor(int nowLineColor) {
+        this.mNowLineColor = nowLineColor;
+        invalidate();
+    }
+
+    /**
+     * Get the "now" line thickness.
+     * @return The thickness of the "now" line.
+     */
+    public int getNowLineThickness() {
+        return mNowLineThickness;
+    }
+
+    /**
+     * Set the "now" line thickness.
+     * @param nowLineThickness The thickness of the "now" line.
+     */
+    public void setNowLineThickness(int nowLineThickness) {
+        this.mNowLineThickness = nowLineThickness;
+        invalidate();
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
