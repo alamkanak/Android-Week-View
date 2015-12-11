@@ -26,9 +26,6 @@
         <attr name="pastBackgroundColor" format="color"/>
         <attr name="futureWeekendBackgroundColor" format="color"/>
         <attr name="pastWeekendBackgroundColor" format="color"/>
-        <attr name="nowLineColor" format="color"/>
-        <attr name="nowLineThickness" format="dimension"/>
-        <attr name="useNewColoringStyle" format="boolean"/>
         <attr name="hourSeparatorColor" format="color"/>
         <attr name="todayBackgroundColor" format="color"/>
         <attr name="todayHeaderTextColor" format="color"/>
@@ -44,5 +41,19 @@
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
+        <attr name="showDistinctPastFutureColor" format="boolean"/>
+        <attr name="showDistinctWeekendColor" format="boolean"/>
+        <attr name="showNowLine" format="boolean"/>
+        <attr name="nowLineColor" format="color"/>
+        <attr name="nowLineThickness" format="dimension"/>
+        <attr name="weekends" format="enum">
+            <enum name="sunday" value="1"/>
+            <enum name="monday" value="2"/>
+            <enum name="tuesday" value="3"/>
+            <enum name="wednesday" value="4"/>
+            <enum name="thursday" value="5"/>
+            <enum name="friday" value="6"/>
+            <enum name="saturday" value="7"/>
+        </attr>
     </declare-styleable>
 </resources>
