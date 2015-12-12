@@ -157,6 +157,7 @@ Changelog
 
 **Version 1.2.4**
 
+* **NOTE:** If you are using `WeekView.MonthChangeListener`, make sure to change it into `MonthLoader.MonthChangeListener`
 * Add support to have loaders other than MonthViewLoader
 * Add pinch to zoom support
 * Add support for location
