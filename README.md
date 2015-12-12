@@ -132,7 +132,8 @@ Interfaces
 
 Use the following interfaces according to your need.
 
-- `mWeekView.setMonthChangeListener()` to provide events to the calendar
+- `mWeekView.setWeekViewLoader()` to provide events to the calendar
+- `mWeekView.setMonthChangeListener()` to provide events to the calendar by months
 - `mWeekView.setOnEventClickListener()` to get a callback when an event is clicked
 - `mWeekView.setEventLongPressListener()` to get a callback when an event is long pressed
 - `mWeekView.setEmptyViewClickListener()` to get a callback when any empty space is clicked

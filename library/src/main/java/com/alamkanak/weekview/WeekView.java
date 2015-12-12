@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.text.Layout;
@@ -1119,20 +1120,32 @@ public class WeekView extends View {
         return mEventClickListener;
     }
 
-    public MonthChangeListener getMonthChangeListener() {
+    public @Nullable MonthLoader.MonthChangeListener getMonthChangeListener() {
         if (mWeekViewLoader instanceof MonthLoader)
             return ((MonthLoader) mWeekViewLoader).getOnMonthChangeListener();
         return null;
     }
 
-    public void setMonthChangeListener(MonthChangeListener monthChangeListener) {
+    public void setMonthChangeListener(MonthLoader.MonthChangeListener monthChangeListener) {
         this.mWeekViewLoader = new MonthLoader(monthChangeListener);
     }
 
+    /**
+     * Get event loader in the week view. Event loaders define the  interval after which the events
+     * are loaded in week view. For a MonthLoader events are loaded for every month. You can define
+     * your custom event loader by extending WeekViewLoader.
+     * @return The event loader.
+     */
     public WeekViewLoader getWeekViewLoader(){
         return mWeekViewLoader;
     }
 
+    /**
+     * Set event loader in the week view. For example, a MonthLoader. Event loaders define the
+     * interval after which the events are loaded in week view. For a MonthLoader events are loaded
+     * for every month. You can define your custom event loader by extending WeekViewLoader.
+     * @param loader The event loader.
+     */
     public void setWeekViewLoader(WeekViewLoader loader){
         this.mWeekViewLoader = loader;
     }
@@ -1770,18 +1783,6 @@ public class WeekView extends View {
          * @param eventRect: view containing the clicked event.
          */
         void onEventClick(WeekViewEvent event, RectF eventRect);
-    }
-
-    public interface MonthChangeListener {
-        /**
-         * Very important interface, it's the base to load events in the calendar.
-         * This method is called three times: once to load the previous month, once to load the next month and once to load the current month.<br/>
-         * <strong>That's why you can have three times the same event at the same place if you mess up with the configuration</strong>
-         * @param newYear: year of the events required by the view.
-         * @param newMonth: month of the events required by the view <br/><strong>1 based (not like JAVA API) --> January = 1 and December = 12</strong>.
-         * @return a list of the events happening <strong>during the specified month</strong>.
-         */
-        List<WeekViewEvent> onMonthChange(int newYear, int newMonth);
     }
 
     public interface EventLongPressListener {
