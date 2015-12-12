@@ -11,6 +11,8 @@
             <enum name="saturday" value="7"/>
         </attr>
         <attr name="hourHeight" format="dimension"/>
+        <attr name="minHourHeight" format="dimension"/>
+        <attr name="maxHourHeight" format="dimension"/>
         <attr name="textSize" format="dimension"/>
         <attr name="eventTextSize" format="dimension"/>
         <attr name="headerColumnPadding" format="dimension"/>
@@ -34,5 +36,15 @@
         <attr name="overlappingEventGap" format="dimension"/>
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
+        <attr name="eventCornerRadius" format="dimension"/>
+        <attr name="showDistinctPastFutureColor" format="boolean"/>
+        <attr name="showDistinctWeekendColor" format="boolean"/>
+        <attr name="futureBackgroundColor" format="color"/>
+        <attr name="pastBackgroundColor" format="color"/>
+        <attr name="futureWeekendBackgroundColor" format="color"/>
+        <attr name="pastWeekendBackgroundColor" format="color"/>
+        <attr name="showNowLine" format="boolean"/>
+        <attr name="nowLineColor" format="color"/>
+        <attr name="nowLineThickness" format="dimension"/>
     </declare-styleable>
 </resources>

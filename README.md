@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.3'
+    compile 'com.github.alamkanak:android-week-view:1.2.4'
     ```
 2. Add WeekView in your xml layout.
 
@@ -117,13 +117,23 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
+- `showDistinctPastFutureColor`
+- `futureBackgroundColor`
+- `pastBackgroundColor`
+- `showDistinctWeekendColor`
+- `futureWeekendBackgroundColor`
+- `pastWeekendBackgroundColor`
+- `showNowLine`
+- `nowLineColor`
+- `nowLineThickness`
 
 Interfaces
 ----------
 
 Use the following interfaces according to your need.
 
-- `mWeekView.setMonthChangeListener()` to provide events to the calendar
+- `mWeekView.setWeekViewLoader()` to provide events to the calendar
+- `mWeekView.setMonthChangeListener()` to provide events to the calendar by months
 - `mWeekView.setOnEventClickListener()` to get a callback when an event is clicked
 - `mWeekView.setEventLongPressListener()` to get a callback when an event is long pressed
 - `mWeekView.setEmptyViewClickListener()` to get a callback when any empty space is clicked
@@ -144,6 +154,15 @@ To do
 
 Changelog
 ---------
+
+**Version 1.2.4**
+
+* **NOTE:** If you are using `WeekView.MonthChangeListener`, make sure to change it into `MonthLoader.MonthChangeListener`
+* Add support to have loaders other than MonthViewLoader
+* Add pinch to zoom support
+* Add support for location
+* Add ability to have different colors for past, future, weekend days
+* Add support for "now" line
 
 **Version 1.2.3**
 
