@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 
@@ -23,7 +24,7 @@ import java.util.Locale;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  */
-public class MainActivity extends ActionBarActivity implements WeekView.MonthChangeListener,
+public class MainActivity extends ActionBarActivity implements MonthLoader.MonthChangeListener,
         WeekView.EventClickListener, WeekView.EventLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;
