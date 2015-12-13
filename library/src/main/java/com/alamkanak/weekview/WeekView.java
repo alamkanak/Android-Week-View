@@ -134,6 +134,9 @@ public class WeekView extends View {
     private DateTimeInterpreter mDateTimeInterpreter;
     private ScrollListener mScrollListener;
 
+    private String mCustomTypefacePath;
+    private Typeface mCustomTypeface;
+
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -297,6 +300,14 @@ public class WeekView extends View {
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
+
+
+            // create typeface from assets folder e.g "fonts/....."
+            mCustomTypefacePath = a.getString(R.styleable.WeekView_customTypefacePath);
+            if(!TextUtils.isEmpty(mCustomTypefacePath)){
+                mCustomTypeface = Typeface.createFromAsset(getContext().getAssets(),mCustomTypefacePath);
+            }
+
         } finally {
             a.recycle();
         }
@@ -327,7 +338,6 @@ public class WeekView extends View {
         mHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextHeight = rect.height();
-        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // Prepare header background paint.
         mHeaderBackgroundPaint = new Paint();
@@ -364,7 +374,6 @@ public class WeekView extends View {
         mTodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTodayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mTodayHeaderTextPaint.setTextSize(mTextSize);
-        mTodayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
 
         // Prepare event background color.
@@ -383,6 +392,17 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+
+        // set typeface
+        if(mCustomTypeface != null){
+            mTimeTextPaint.setTypeface(mCustomTypeface);
+            mHeaderTextPaint.setTypeface(mCustomTypeface);
+            mTodayHeaderTextPaint.setTypeface(mCustomTypeface);
+            mEventTextPaint.setTypeface(mCustomTypeface);
+        }else {
+            mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            mTodayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        }
 
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override

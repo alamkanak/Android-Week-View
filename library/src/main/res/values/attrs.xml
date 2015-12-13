@@ -44,5 +44,7 @@
         <attr name="eventMarginVertical" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
+
+        <attr name="customTypefacePath" format="string"/>
     </declare-styleable>
 </resources>
