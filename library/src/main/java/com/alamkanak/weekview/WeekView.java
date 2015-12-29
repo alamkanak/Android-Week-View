@@ -90,7 +90,7 @@ public class WeekView extends View {
     private int mDefaultEventColor;
 
     // Attributes and their default values.
-    private int mHourHeight ;
+    private int mHourHeight = 50;
     private int mNewHourHeight = -1;
     private int mMinHourHeight = 0; //no minimum specified (will be dynamic, based on screen)
     private int mEffectiveMinHourHeight = mMinHourHeight; //compensates for the fact that you can't keep zooming out.
