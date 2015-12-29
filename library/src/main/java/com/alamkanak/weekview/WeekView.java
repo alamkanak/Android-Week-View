@@ -1,6 +1,7 @@
 package com.alamkanak.weekview;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
@@ -88,7 +90,7 @@ public class WeekView extends View {
     private int mDefaultEventColor;
 
     // Attributes and their default values.
-    private int mHourHeight = 50;
+    private int mHourHeight ;
     private int mNewHourHeight = -1;
     private int mMinHourHeight = 0; //no minimum specified (will be dynamic, based on screen)
     private int mEffectiveMinHourHeight = mMinHourHeight; //compensates for the fact that you can't keep zooming out.
@@ -137,6 +139,9 @@ public class WeekView extends View {
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
     private ScrollListener mScrollListener;
+
+    private SharedPreferences mPrefs;
+
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -265,6 +270,9 @@ public class WeekView extends View {
 
         // Hold references.
         mContext = context;
+
+        // Initialize SharedPreferences to save certain attributes
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Get the attribute values (if any).
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
@@ -509,6 +517,9 @@ public class WeekView extends View {
 
             mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
             mHourHeight = mNewHourHeight;
+            SharedPreferences.Editor editor = mPrefs.edit();
+            editor.putInt("key_mHourHeight", mNewHourHeight); // store the last zoom view
+            editor.commit();
             mNewHourHeight = -1;
         }
 
