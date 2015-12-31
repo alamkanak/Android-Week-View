@@ -1,7 +1,9 @@
 package com.alamkanak.weekview.sample;
 
+import android.content.SharedPreferences;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -32,6 +34,7 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
     private static final int TYPE_WEEK_VIEW = 3;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
     private WeekView mWeekView;
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,10 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
 
         // Set long press listener for events.
         mWeekView.setEventLongPressListener(this);
+
+        // Recover the zoomed view from last time
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mWeekView.setHourHeight(mPrefs.getInt("key_mHourHeight", 50));
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
