@@ -925,6 +925,8 @@ public class WeekView extends View {
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
+        if(event.getStartTime().compareTo(event.getEndTime()) >= 0)
+            return;
         if (!isSameDay(event.getStartTime(), event.getEndTime())) {
             // Add first day.
             Calendar endTime = (Calendar) event.getStartTime().clone();
