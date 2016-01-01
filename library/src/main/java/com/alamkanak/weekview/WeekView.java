@@ -73,9 +73,9 @@ public class WeekView extends View {
     private Paint mEventBackgroundPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
-    private List<WeekViewEvent> mPreviousPeriodEvents;
-    private List<WeekViewEvent> mCurrentPeriodEvents;
-    private List<WeekViewEvent> mNextPeriodEvents;
+    private List<? extends WeekViewEvent> mPreviousPeriodEvents;
+    private List<? extends WeekViewEvent> mCurrentPeriodEvents;
+    private List<? extends WeekViewEvent> mNextPeriodEvents;
     private TextPaint mEventTextPaint;
     private Paint mHeaderColumnBackgroundPaint;
     private int mFetchedPeriod = -1; // the middle period the calendar has fetched.
@@ -853,9 +853,9 @@ public class WeekView extends View {
         if (mWeekViewLoader != null){
             int periodToFetch = (int) mWeekViewLoader.toWeekViewPeriodIndex(day);
             if (!isInEditMode() && (mFetchedPeriod < 0 || mFetchedPeriod != periodToFetch || mRefreshEvents)) {
-                List<WeekViewEvent> previousPeriodEvents = null;
-                List<WeekViewEvent> currentPeriodEvents = null;
-                List<WeekViewEvent> nextPeriodEvents = null;
+                List<? extends WeekViewEvent> previousPeriodEvents = null;
+                List<? extends WeekViewEvent> currentPeriodEvents = null;
+                List<? extends WeekViewEvent> nextPeriodEvents = null;
 
                 if (mPreviousPeriodEvents != null && mCurrentPeriodEvents != null && mNextPeriodEvents != null){
                     if (periodToFetch == mFetchedPeriod-1){
@@ -971,7 +971,7 @@ public class WeekView extends View {
      * Sort and cache events.
      * @param events The events to be sorted and cached.
      */
-    private void sortAndCacheEvents(List<WeekViewEvent> events) {
+    private void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
         sortEvents(events);
         for (WeekViewEvent event : events) {
             cacheEvent(event);
@@ -982,7 +982,7 @@ public class WeekView extends View {
      * Sorts the events in ascending order.
      * @param events The events to be sorted.
      */
-    private void sortEvents(List<WeekViewEvent> events) {
+    private void sortEvents(List<? extends WeekViewEvent> events) {
         Collections.sort(events, new Comparator<WeekViewEvent>() {
             @Override
             public int compare(WeekViewEvent event1, WeekViewEvent event2) {
