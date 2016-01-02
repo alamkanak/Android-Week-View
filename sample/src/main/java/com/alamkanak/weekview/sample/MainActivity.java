@@ -25,7 +25,8 @@ import java.util.Locale;
  * Website: http://alamkanak.github.io/
  */
 public class MainActivity extends ActionBarActivity implements MonthLoader.MonthChangeListener,
-        WeekView.EventClickListener, WeekView.EventLongPressListener {
+        WeekView.EventClickListener, WeekView.EventLongPressListener,
+        WeekView.EmptyViewLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -50,6 +51,9 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
 
         // Set long press listener for events.
         mWeekView.setEventLongPressListener(this);
+
+        // Set long press listener for empty view
+        mWeekView.setEmptyViewLongPressListener(this);
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
@@ -259,5 +263,10 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
         Toast.makeText(MainActivity.this, "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEmptyViewLongPress(Calendar time) {
+        Toast.makeText(MainActivity.this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
     }
 }
