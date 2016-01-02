@@ -162,7 +162,7 @@ public class WeekView extends View {
 
             switch (mCurrentScrollDirection) {
                 case NONE: {
-                    // allow scrolling only in one direction
+                    // Allow scrolling only in one direction.
                     if (Math.abs(distanceX) > Math.abs(distanceY)) {
                         if (distanceX > 0) {
                             mCurrentScrollDirection = Direction.LEFT;
@@ -175,14 +175,14 @@ public class WeekView extends View {
                     break;
                 }
                 case LEFT: {
-                    // change direction if there was enough change
+                    // Change direction if there was enough change.
                     if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX < -mScaledTouchSlop)) {
                         mCurrentScrollDirection = Direction.RIGHT;
                     }
                     break;
                 }
                 case RIGHT: {
-                    // change direction if there was enough change
+                    // Change direction if there was enough change.
                     if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX > mScaledTouchSlop)) {
                         mCurrentScrollDirection = Direction.LEFT;
                     }
@@ -486,7 +486,7 @@ public class WeekView extends View {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
-        // Clip to paint in left column only
+        // Clip to paint in left column only.
         canvas.clipRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
@@ -578,7 +578,7 @@ public class WeekView extends View {
             }
         }
 
-        // Clip to paint events only
+        // Clip to paint events only.
         canvas.clipRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2, getWidth(), getHeight(), Region.Op.REPLACE);
 
         // Iterate through each day.
@@ -667,7 +667,7 @@ public class WeekView extends View {
         }
 
 
-        // Clip to paint header row only
+        // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
 
         // Draw the header background.
@@ -1740,8 +1740,8 @@ public class WeekView extends View {
     }
 
     /**
-     * check if scrolling should be stopped
-     * @return true if scrolling should be stopped before reaching the end of animation
+     * Check if scrolling should be stopped.
+     * @return true if scrolling should be stopped before reaching the end of animation.
      */
     private boolean forceFinishScroll() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
