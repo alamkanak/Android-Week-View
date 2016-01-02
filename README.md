@@ -155,6 +155,12 @@ To do
 Changelog
 ---------
 
+**Version 1.2.5**
+
+* Add support for subclasses of `WeekViewEvent`
+* Fix scroll animation
+* Add support for semi-transparent header colors
+
 **Version 1.2.4**
 
 * **NOTE:** If you are using `WeekView.MonthChangeListener`, make sure to change it into `MonthLoader.MonthChangeListener`
