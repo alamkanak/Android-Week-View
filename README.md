@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.5</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.4'
+    compile 'com.github.alamkanak:android-week-view:1.2.5'
     ```
 2. Add WeekView in your xml layout.
 
