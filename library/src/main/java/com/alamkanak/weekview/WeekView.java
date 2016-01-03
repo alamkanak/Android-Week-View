@@ -107,6 +107,7 @@ public class WeekView extends View {
     private int mHeaderColumnPadding = 10;
     private int mHeaderColumnTextColor = Color.BLACK;
     private int mNumberOfVisibleDays = 3;
+    private int mMinEventDurationMillis = 15*60*1000;
     private int mHeaderRowPadding = 10;
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.rgb(245, 245, 245);
@@ -739,6 +740,7 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
+            Rect rect = new Rect();
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
@@ -756,6 +758,13 @@ public class WeekView extends View {
                     float right = left + mEventRects.get(i).width * mWidthPerDay;
                     if (right < startFromPixel + mWidthPerDay)
                         right -= mOverlappingEventGap;
+
+                    mEventTextPaint.getTextBounds(mEventRects.get(i).event.getName(), 0, mEventRects.get(i).event.getName().length(), rect);
+
+                    float minTextHeight = rect.height() + 2*mEventPadding;
+                    if (bottom - top < minTextHeight) {
+                        bottom = top + minTextHeight;
+                    }
 
                     // Draw the event and the event name on top of it.
                     if (left < right &&
@@ -1134,9 +1143,9 @@ public class WeekView extends View {
      */
     private boolean isEventsCollide(WeekViewEvent event1, WeekViewEvent event2) {
         long start1 = event1.getStartTime().getTimeInMillis();
-        long end1 = event1.getEndTime().getTimeInMillis();
+        long end1 = event1.getEndTime().getTimeInMillis() + mMinEventDurationMillis;
         long start2 = event2.getStartTime().getTimeInMillis();
-        long end2 = event2.getEndTime().getTimeInMillis();
+        long end2 = event2.getEndTime().getTimeInMillis() + mMinEventDurationMillis;
         return !((start1 >= end2) || (end1 <= start2));
     }
 
@@ -1393,6 +1402,15 @@ public class WeekView extends View {
 
     public int getDayBackgroundColor() {
         return mDayBackgroundColor;
+    }
+
+    public void setMinEventDurationMillis(int minEventDuration) {
+        mMinEventDurationMillis = minEventDuration;
+        invalidate();
+    }
+
+    public int getMinEventDurationMillis() {
+        return mMinEventDurationMillis;
     }
 
     public void setDayBackgroundColor(int dayBackgroundColor) {

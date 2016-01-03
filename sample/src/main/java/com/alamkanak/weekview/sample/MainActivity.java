@@ -153,11 +153,11 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth - 1);
         startTime.set(Calendar.YEAR, newYear);
         Calendar endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR, 1);
-        endTime.set(Calendar.MONTH, newMonth-1);
+        endTime.set(Calendar.MONTH, newMonth - 1);
         WeekViewEvent event = new WeekViewEvent(1, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_01));
         events.add(event);
@@ -172,6 +172,24 @@ public class MainActivity extends ActionBarActivity implements MonthLoader.Month
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth-1);
         event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
+        event.setColor(getResources().getColor(R.color.event_color_02));
+        events.add(event);
+
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MINUTE, 30);
+        endTime = (Calendar) startTime.clone();
+        endTime.set(Calendar.MINUTE, 35);
+        event = new WeekViewEvent(1001, getEventTitle(startTime), startTime, endTime);
+        event.setColor(getResources().getColor(R.color.event_color_02));
+        events.add(event);
+
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MINUTE, 36);
+        endTime = (Calendar) startTime.clone();
+        endTime.set(Calendar.MINUTE, 40);
+        event = new WeekViewEvent(1002, getEventTitle(startTime), startTime, endTime);
         event.setColor(getResources().getColor(R.color.event_color_02));
         events.add(event);
 
