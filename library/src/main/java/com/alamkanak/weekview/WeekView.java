@@ -324,7 +324,7 @@ public class WeekView extends View {
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
-            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
+            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
@@ -748,15 +748,13 @@ public class WeekView extends View {
                         right -= mOverlappingEventGap;
 
                     // Draw the event and the event name on top of it.
-                    RectF eventRectF = new RectF(left, top, right, bottom);
-                    if (bottom > mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 && left < right &&
-                            eventRectF.right > mHeaderColumnWidth &&
-                            eventRectF.left < getWidth() &&
-                            eventRectF.bottom > mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom &&
-                            eventRectF.top < getHeight() &&
-                            left < right
+                    if (left < right &&
+                            left < getWidth() &&
+                            top < getHeight() &&
+                            right > mHeaderColumnWidth &&
+                            bottom > mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                             ) {
-                        mEventRects.get(i).rectF = eventRectF;
+                        mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
