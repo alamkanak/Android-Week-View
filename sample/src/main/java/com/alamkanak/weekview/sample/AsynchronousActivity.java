@@ -15,6 +15,10 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+/**
+ * Created by Raquib-ul-Alam Kanak on 1/3/2014.
+ * Website: http://alamkanak.github.io
+ */
 public class AsynchronousActivity extends BaseActivity implements Callback<List<Event>> {
 
     private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();

@@ -13,7 +13,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by Alam Kanak on 1/3/16.
+ * Created by Raquib-ul-Alam Kanak on 1/3/16.
+ * Website: http://alamkanak.github.io
  */
 public class Event {
 

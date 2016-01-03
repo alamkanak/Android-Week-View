@@ -7,7 +7,8 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * Created by alam on 1/3/16.
+ * Created by Raquib-ul-Alam Kanak on 1/3/2014.
+ * Website: http://alamkanak.github.io
  */
 public class BasicActivity extends BaseActivity {
 
