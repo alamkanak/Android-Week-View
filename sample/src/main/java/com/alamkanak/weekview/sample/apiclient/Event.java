@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * An event model that was built for automatic serialization from json to object.
  * Created by Raquib-ul-Alam Kanak on 1/3/16.
  * Website: http://alamkanak.github.io
  */

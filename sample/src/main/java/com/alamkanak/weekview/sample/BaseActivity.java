@@ -18,6 +18,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 /**
+ * This is a base activity which contains week view and all the codes necessary to initialize the
+ * week view.
  * Created by Raquib-ul-Alam Kanak on 1/3/2014.
  * Website: http://alamkanak.github.io
  */
