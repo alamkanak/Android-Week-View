@@ -2,8 +2,11 @@ package com.alamkanak.weekview.sample.apiclient;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.alamkanak.weekview.WeekViewEvent;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,14 +14,19 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Created by alam on 1/3/16.
+ * Created by Alam Kanak on 1/3/16.
  */
 public class Event {
 
+    @Expose @SerializedName("name")
     private String mName;
+    @Expose @SerializedName("dayOfMonth")
     private int mDayOfMonth;
+    @Expose @SerializedName("startTime")
     private String mStartTime;
+    @Expose @SerializedName("endTime")
     private String mEndTime;
+    @Expose @SerializedName("color")
     private String mColor;
 
     public String getName() {
@@ -88,9 +96,9 @@ public class Event {
         startTime.set(Calendar.DAY_OF_MONTH, getDayOfMonth());
         Calendar endTime = (Calendar) startTime.clone();
         endTime.setTimeInMillis(end.getTime());
-        startTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR));
-        startTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
-        startTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
+        endTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR));
+        endTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
+        endTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
 
         // Create an week view event.
         WeekViewEvent weekViewEvent = new WeekViewEvent();
@@ -98,6 +106,10 @@ public class Event {
         weekViewEvent.setStartTime(startTime);
         weekViewEvent.setEndTime(endTime);
         weekViewEvent.setColor(Color.parseColor(getColor()));
+
+        Log.d("EVENT", "Start time: " + String.format("%d/%d/%d %d:%d", startTime.get(Calendar.DAY_OF_MONTH), startTime.get(Calendar.MONTH) + 1, startTime.get(Calendar.YEAR), startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE)));
+        Log.d("EVENT", "End time: " + String.format("%d/%d/%d %d:%d", endTime.get(Calendar.DAY_OF_MONTH), endTime.get(Calendar.MONTH) + 1, endTime.get(Calendar.YEAR), endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE)));
+
         return weekViewEvent;
     }
 }
