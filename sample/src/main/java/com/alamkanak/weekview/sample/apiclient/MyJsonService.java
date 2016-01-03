@@ -10,7 +10,7 @@ import retrofit.http.GET;
  */
 public interface MyJsonService {
 
-    @GET("/4ccqb")
+    @GET("/3isor")
     void listEvents(Callback<List<Event>> eventsCallback);
 
 }
