@@ -23,4 +23,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':library')
     compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
 }

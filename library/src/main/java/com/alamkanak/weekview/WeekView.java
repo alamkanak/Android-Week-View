@@ -212,7 +212,7 @@ public class WeekView extends View {
             if (mIsZooming)
                 return true;
 
-            if ((mCurrentFlingDirection == Direction.HORIZONTAL && !mHorizontalFlingEnabled)
+            if (((mCurrentFlingDirection == Direction.LEFT || mCurrentFlingDirection == Direction.RIGHT) && !mHorizontalFlingEnabled)
                     || (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
                 return false;
             }
