@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#fff">
 
     <Button
         android:id="@+id/buttonBasic"
@@ -11,7 +12,6 @@
         android:layout_height="wrap_content"
         android:text="@string/title_activity_basic"
         style="@style/Button"/>
-
 
     <Button
         android:id="@+id/buttonAsynchronous"
