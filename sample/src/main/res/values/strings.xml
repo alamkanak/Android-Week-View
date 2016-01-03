@@ -8,4 +8,5 @@
     <string name="title_activity_basic">Basic Example</string>
     <string name="title_activity_asynchronous">Asynchronous Events</string>
     <string name="async_error">Could not download events from the internet</string>
+    <string name="title_activity_event_generator">Event Generator</string>
 </resources>

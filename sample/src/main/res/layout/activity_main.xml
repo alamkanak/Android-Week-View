@@ -20,4 +20,12 @@
         android:text="@string/title_activity_asynchronous"
         style="@style/Button"/>
 
+
+    <Button
+        android:id="@+id/buttonEventGenerator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_activity_event_generator"
+        style="@style/Button"/>
+
 </LinearLayout>

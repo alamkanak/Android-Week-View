@@ -25,6 +25,10 @@
             android:name=".AsynchronousActivity"
             android:label="@string/title_activity_asynchronous" >
         </activity>
+        <activity
+            android:name=".TestActivity"
+            android:label="@string/title_activity_event_generator" >
+        </activity>
     </application>
 
 </manifest>
