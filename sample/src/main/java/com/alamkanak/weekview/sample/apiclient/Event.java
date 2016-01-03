@@ -2,7 +2,6 @@ package com.alamkanak.weekview.sample.apiclient;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.alamkanak.weekview.WeekViewEvent;
 import com.google.gson.annotations.Expose;
@@ -106,9 +105,6 @@ public class Event {
         weekViewEvent.setStartTime(startTime);
         weekViewEvent.setEndTime(endTime);
         weekViewEvent.setColor(Color.parseColor(getColor()));
-
-        Log.d("EVENT", "Start time: " + String.format("%d/%d/%d %d:%d", startTime.get(Calendar.DAY_OF_MONTH), startTime.get(Calendar.MONTH) + 1, startTime.get(Calendar.YEAR), startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE)));
-        Log.d("EVENT", "End time: " + String.format("%d/%d/%d %d:%d", endTime.get(Calendar.DAY_OF_MONTH), endTime.get(Calendar.MONTH) + 1, endTime.get(Calendar.YEAR), endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE)));
 
         return weekViewEvent;
     }
