@@ -9,7 +9,7 @@
         android:id="@+id/buttonBasic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Basic Example"
+        android:text="@string/title_activity_basic"
         style="@style/Button"/>
 
 
@@ -17,7 +17,7 @@
         android:id="@+id/buttonAsynchronous"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Asynchronous Event Example"
+        android:text="@string/title_activity_asynchronous"
         style="@style/Button"/>
 
 </LinearLayout>
