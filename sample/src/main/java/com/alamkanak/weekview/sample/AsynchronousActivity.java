@@ -71,6 +71,7 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
 
     @Override
     public void failure(RetrofitError error) {
+        error.printStackTrace();
         Toast.makeText(this, R.string.async_error, Toast.LENGTH_SHORT).show();
     }
 }

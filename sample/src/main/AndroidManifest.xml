@@ -19,7 +19,7 @@
         </activity>
         <activity
             android:name=".BasicActivity"
-            android:label="@string/title_activity_asynchronous" >
+            android:label="@string/title_activity_basic" >
         </activity>
         <activity
             android:name=".AsynchronousActivity"

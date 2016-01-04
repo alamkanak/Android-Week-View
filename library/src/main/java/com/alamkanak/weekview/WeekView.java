@@ -339,11 +339,9 @@ public class WeekView extends View {
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
-
             mShowDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, mShowDistinctPastFutureColor);
             mShowDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, mShowDistinctWeekendColor);
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
-
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
         } finally {
@@ -1685,18 +1683,34 @@ public class WeekView extends View {
         invalidate();
     }
 
+    /**
+     * Get whether the week view should fling horizontally.
+     * @return True if the week view has horizontal fling enabled.
+     */
     public boolean isHorizontalFlingEnabled() {
         return mHorizontalFlingEnabled;
     }
 
+    /**
+     * Set whether the week view should fling horizontally.
+     * @return True if it should have horizontal fling enabled.
+     */
     public void setHorizontalFlingEnabled(boolean enabled) {
         mHorizontalFlingEnabled = enabled;
     }
 
+    /**
+     * Get whether the week view should fling vertically.
+     * @return True if the week view has vertical fling enabled.
+     */
     public boolean isVerticalFlingEnabled() {
         return mVerticalFlingEnabled;
     }
 
+    /**
+     * Set whether the week view should fling vertically.
+     * @return True if it should have vertical fling enabled.
+     */
     public void setVerticalFlingEnabled(boolean enabled) {
         mVerticalFlingEnabled = enabled;
     }
