@@ -31,14 +31,14 @@ Usage
     <dependency>
       <groupId>com.github.alamkanak</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.5</version>
+      <version>1.2.6</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.5'
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
     ```
 2. Add WeekView in your xml layout.
 
@@ -155,9 +155,17 @@ To do
 Changelog
 ---------
 
+**Version 1.2.6**
+
+* Add empty view click listener
+* Fix padding bug
+* Fix bug when setting colors of different components
+* Add ability to turn off fling gesture
+* Add example of how to load events asynchronously in the sample app
+
 **Version 1.2.5**
 
-* Add support for subclasses of `WeekViewEvent`
+* Add support for using subclasses of `WeekViewEvent`
 * Fix scroll animation
 * Add support for semi-transparent header colors
 
