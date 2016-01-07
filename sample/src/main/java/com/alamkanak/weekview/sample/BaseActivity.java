@@ -36,6 +36,9 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
+        // to show custom typeface use this layout
+        //setContentView(R.layout.activity_base_typeface);
+
         // Get a reference for the week view in the layout.
         mWeekView = (WeekView) findViewById(R.id.weekView);
 

@@ -48,5 +48,6 @@
         <attr name="nowLineThickness" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
+        <attr name="customTypefacePath" format="string"/>
     </declare-styleable>
 </resources>
