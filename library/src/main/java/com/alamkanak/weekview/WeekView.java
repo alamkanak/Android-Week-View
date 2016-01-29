@@ -92,6 +92,7 @@ public class WeekView extends View {
     private boolean mIsZooming;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private boolean mshowFirstDayOfWeekFirst = false;
     private int mDefaultEventColor;
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
@@ -536,8 +537,8 @@ public class WeekView extends View {
             mIsFirstDraw = false;
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
-            if(mNumberOfVisibleDays >= 7 && today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
-                int difference = 7 + (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
+            if(mNumberOfVisibleDays >= 7 && today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mshowFirstDayOfWeekFirst) {
+                int difference = (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
         }
@@ -1337,6 +1338,14 @@ public class WeekView extends View {
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         mFirstDayOfWeek = firstDayOfWeek;
         invalidate();
+    }
+
+    public boolean isShowFirstDayOfWeekFirst() {
+        return mshowFirstDayOfWeekFirst;
+    }
+
+    public void setShowFirstDayOfWeekFirst(boolean show) {
+        mshowFirstDayOfWeekFirst = show;
     }
 
     public int getTextSize() {
