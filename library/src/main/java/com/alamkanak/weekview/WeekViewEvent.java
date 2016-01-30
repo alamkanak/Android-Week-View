@@ -13,6 +13,8 @@ public class WeekViewEvent {
     private String mName;
     private String mLocation;
     private int mColor;
+    private int mIconId;
+    private int mIconColor;
 
     public WeekViewEvent(){
 
@@ -20,6 +22,7 @@ public class WeekViewEvent {
 
     /**
      * Initializes the event for week view.
+     *
      * @param id The id of the event.
      * @param name Name of the event.
      * @param startYear Year when the event starts.
@@ -32,8 +35,12 @@ public class WeekViewEvent {
      * @param endDay Day when the event ends.
      * @param endHour Hour (in 24-hour format) when the event ends.
      * @param endMinute Minute when the event ends.
+     * @param iconId Icon associated at the event.
+     * @param iconColor Color of the icon associated at the event.
      */
-    public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
+    public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay,
+                         int startHour, int startMinute, int endYear, int endMonth, int endDay,
+                         int endHour, int endMinute, int iconId, int iconColor) {
         this.mId = id;
 
         this.mStartTime = Calendar.getInstance();
@@ -51,10 +58,59 @@ public class WeekViewEvent {
         this.mEndTime.set(Calendar.MINUTE, endMinute);
 
         this.mName = name;
+
+        this.mIconId = iconId;
+        this.mIconColor = iconColor;
     }
 
     /**
      * Initializes the event for week view.
+     *
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param startYear Year when the event starts.
+     * @param startMonth Month when the event starts.
+     * @param startDay Day when the event starts.
+     * @param startHour Hour (in 24-hour format) when the event starts.
+     * @param startMinute Minute when the event starts.
+     * @param endYear Year when the event ends.
+     * @param endMonth Month when the event ends.
+     * @param endDay Day when the event ends.
+     * @param endHour Hour (in 24-hour format) when the event ends.
+     * @param endMinute Minute when the event ends.
+     */
+    public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay,
+                         int startHour, int startMinute, int endYear, int endMonth, int endDay,
+                         int endHour, int endMinute) {
+        this(id, name, startYear, startMonth, startDay, startHour, startMinute,
+                endYear, endMonth, endDay, endHour, endMinute, 0, 0);
+    }
+
+    /**
+     * Initializes the event for week view.
+     *
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     * @param iconId Icon associated at the event.
+     * @param iconColor Color of the icon associated at the event.
+     */
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime,
+                         int iconId, int iconColor) {
+        this.mId = id;
+        this.mName = name;
+        this.mLocation = location;
+        this.mStartTime = startTime;
+        this.mEndTime = endTime;
+        this.mIconId = iconId;
+        this.mIconColor = iconColor;
+    }
+
+    /**
+     * Initializes the event for week view.
+     *
      * @param id The id of the event.
      * @param name Name of the event.
      * @param location The location of the event.
@@ -62,24 +118,20 @@ public class WeekViewEvent {
      * @param endTime The time when the event ends.
      */
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
-        this.mId = id;
-        this.mName = name;
-        this.mLocation = location;
-        this.mStartTime = startTime;
-        this.mEndTime = endTime;
+        this(id, name, location, startTime, endTime, 0, 0);
     }
 
     /**
      * Initializes the event for week view.
+     *
      * @param id The id of the event.
      * @param name Name of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
     public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
-        this(id, name, null, startTime, endTime);
+        this(id, name, null, startTime, endTime, 0, 0);
     }
-
 
     public Calendar getStartTime() {
         return mStartTime;
@@ -127,6 +179,22 @@ public class WeekViewEvent {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public int getIconId() {
+        return mIconId;
+    }
+
+    public void setIconId(int iconId) {
+        this.mIconId = iconId;
+    }
+
+    public int getIconColor() {
+        return mIconColor;
+    }
+
+    public void setIconColor(int iconColor) {
+        this.mIconColor = iconColor;
     }
 
     @Override
