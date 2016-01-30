@@ -91,6 +91,17 @@ Usage
     };
     ```
 
+6. Add an icon at a WeekViewEvent with `WeekViewEvent.setIconId(int iconId)` and change its color with `WeekViewEvent.setIconColor(int iconColor)`.
+
+    ```java
+    WeekViewEvent event = new WeekViewEvent(1, "My title", startTime, endTime);
+
+    // Add a vector asset
+    event.setIconId(R.drawable.ic_my_vector);
+    // Change the color of the asset (by default, it's the same that the title color)
+    event.setIconColor(R.color.myColor);
+    ```
+
 Customization
 -------------------
 
@@ -126,6 +137,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `eventIconSize`
 
 Interfaces
 ----------
