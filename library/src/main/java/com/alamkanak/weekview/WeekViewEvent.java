@@ -1,6 +1,7 @@
 package com.alamkanak.weekview;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -34,16 +35,23 @@ public class WeekViewEvent {
      * @param endMinute Minute when the event ends.
      */
     public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
+        this(id, name, startYear, startMonth, startDay, startHour, startMinute, null, endYear, endMonth, endDay, endHour, endMinute, null);
+    }
+
+
+    public WeekViewEvent(long id, String name,
+                         int startYear, int startMonth, int startDay, int startHour, int startMinute, TimeZone startTimezone,
+                         int endYear, int endMonth, int endDay, int endHour, int endMinute, TimeZone endTimezone) {
         this.mId = id;
 
-        this.mStartTime = Calendar.getInstance();
+        this.mStartTime = startTimezone == null? Calendar.getInstance() : Calendar.getInstance(startTimezone);
         this.mStartTime.set(Calendar.YEAR, startYear);
         this.mStartTime.set(Calendar.MONTH, startMonth-1);
         this.mStartTime.set(Calendar.DAY_OF_MONTH, startDay);
         this.mStartTime.set(Calendar.HOUR_OF_DAY, startHour);
         this.mStartTime.set(Calendar.MINUTE, startMinute);
 
-        this.mEndTime = Calendar.getInstance();
+        this.mEndTime = endTimezone == null ? Calendar.getInstance() : Calendar.getInstance(endTimezone);
         this.mEndTime.set(Calendar.YEAR, endYear);
         this.mEndTime.set(Calendar.MONTH, endMonth-1);
         this.mEndTime.set(Calendar.DAY_OF_MONTH, endDay);

@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -138,6 +139,7 @@ public class WeekView extends View {
     private boolean mShowDistinctPastFutureColor = false;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
+    private TimeZone mTimeZone = null;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -627,7 +629,7 @@ public class WeekView extends View {
                     float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
 
                     if (sameDay){
-                        Calendar now = Calendar.getInstance();
+                        Calendar now = getInstance();
                         float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
                         canvas.drawRect(start, startY, startPixel + mWidthPerDay, startY+beforeNow, pastPaint);
                         canvas.drawRect(start, startY+beforeNow, startPixel + mWidthPerDay, getHeight(), futurePaint);
@@ -666,7 +668,7 @@ public class WeekView extends View {
             // Draw the line at the current time.
             if (mShowNowLine && sameDay){
                 float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
-                Calendar now = Calendar.getInstance();
+                Calendar now = getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
                 canvas.drawLine(start, startY + beforeNow, startPixel + mWidthPerDay, startY + beforeNow, mNowLinePaint);
             }
@@ -698,6 +700,13 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+    }
+
+    private Calendar getInstance() {
+        if(mTimeZone != null)
+            return Calendar.getInstance(mTimeZone);
+        else
+            return Calendar.getInstance();
     }
 
     /**
@@ -1252,7 +1261,7 @@ public class WeekView extends View {
 
                 @Override
                 public String interpretTime(int hour) {
-                    Calendar calendar = Calendar.getInstance();
+                    Calendar calendar = getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, hour);
                     calendar.set(Calendar.MINUTE, 0);
 
@@ -1513,6 +1522,24 @@ public class WeekView extends View {
             throw new IllegalArgumentException("length parameter must be either LENGTH_LONG or LENGTH_SHORT");
         }
         this.mDayNameLength = length;
+    }
+
+
+    /**
+     * Get the timeZone this calendar will display in
+     * @return
+     */
+    public TimeZone getTimeZone() {
+        return mTimeZone;
+    }
+
+    /**
+     * Set the timezone that this calendar will dispaly in
+     * @param timeZone
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        this.mTimeZone = timeZone;
+        invalidate();
     }
 
     public int getOverlappingEventGap() {
@@ -1812,7 +1839,7 @@ public class WeekView extends View {
      * Show today on the week view.
      */
     public void goToToday() {
-        Calendar today = Calendar.getInstance();
+        Calendar today = getInstance();
         goToDate(today);
     }
 
@@ -1836,7 +1863,7 @@ public class WeekView extends View {
 
         mRefreshEvents = true;
 
-        Calendar today = Calendar.getInstance();
+        Calendar today = getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
@@ -1964,7 +1991,7 @@ public class WeekView extends View {
      * @return the calendar instance
      */
     private Calendar today(){
-        Calendar today = Calendar.getInstance();
+        Calendar today = getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
