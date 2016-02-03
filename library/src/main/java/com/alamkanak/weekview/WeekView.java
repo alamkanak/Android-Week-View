@@ -534,7 +534,7 @@ public class WeekView extends View {
                 maxAmountOfAllDayEventsInOneDay = Math.max(maxAmountOfAllDayEventsInOneDay, amountOfAllDayEvents);
             }
         }
-        mHeaderHeight = mHeaderTextHeight + mAllDayEventHeight*maxAmountOfAllDayEventsInOneDay;
+        mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom) * Math.min(1, maxAmountOfAllDayEventsInOneDay);
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
