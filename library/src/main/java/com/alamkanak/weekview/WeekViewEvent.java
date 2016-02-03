@@ -136,6 +136,10 @@ public class WeekViewEvent {
         this.mColor = color;
     }
 
+    public boolean isAllDay() { return mAllDay;}
+
+    public void setAllDay(boolean allDay) { this.mAllDay = allDay;}
+
     public long getId() {
         return mId;
     }
