@@ -128,6 +128,7 @@ public class BasicActivity extends BaseActivity {
         event = new WeekViewEvent(5, getEventTitle(startTime),null, startTime, endTime, true);
         event.setColor(getResources().getColor(R.color.event_color_02));
         events.add(event);
+        events.add(event);
 
         return events;
     }
