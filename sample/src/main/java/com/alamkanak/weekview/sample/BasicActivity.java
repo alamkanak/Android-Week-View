@@ -116,6 +116,19 @@ public class BasicActivity extends BaseActivity {
         event.setColor(getResources().getColor(R.color.event_color_02));
         events.add(event);
 
+        //AllDay event
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.DAY_OF_MONTH, 6);
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.YEAR, newYear);
+        endTime = (Calendar) startTime.clone();
+        endTime.add(Calendar.HOUR_OF_DAY, 23);
+        event = new WeekViewEvent(5, getEventTitle(startTime),null, startTime, endTime, true);
+        event.setColor(getResources().getColor(R.color.event_color_02));
+        events.add(event);
+
         return events;
     }
 
