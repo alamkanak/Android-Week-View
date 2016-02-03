@@ -364,7 +364,7 @@ public class WeekView extends View {
 
         // Measure settings for time column.
         mTimeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTimeTextPaint.setTextAlign(Paint.Align.CENTER);
+        mTimeTextPaint.setTextAlign(Paint.Align.RIGHT);
         mTimeTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
