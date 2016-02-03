@@ -1037,7 +1037,7 @@ public class WeekView extends View {
             Calendar endTime = (Calendar) event.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime);
+            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime, event.isAllDay());
             event1.setColor(event.getColor());
             mEventRects.add(new EventRect(event1, event, null));
 
@@ -1051,7 +1051,7 @@ public class WeekView extends View {
                 Calendar endOfOverDay = (Calendar) overDay.clone();
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
-                WeekViewEvent eventMore = new WeekViewEvent(event.getId(), event.getName(), overDay, endOfOverDay);
+                WeekViewEvent eventMore = new WeekViewEvent(event.getId(), event.getName(),null, overDay, endOfOverDay, event.isAllDay());
                 eventMore.setColor(event.getColor());
                 mEventRects.add(new EventRect(eventMore, event, null));
 
@@ -1063,7 +1063,7 @@ public class WeekView extends View {
             Calendar startTime = (Calendar) event.getEndTime().clone();
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime());
+            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime(), event.isAllDay());
             event2.setColor(event.getColor());
             mEventRects.add(new EventRect(event2, event, null));
         }
