@@ -1786,6 +1786,18 @@ public class WeekView extends View {
         mVerticalFlingEnabled = enabled;
     }
 
+    /**
+     * Get the height of AllDay-events
+     * @return Height of AllDay-events
+     */
+    public int getAllDayEventHeight(){ return mAllDayEventHeight; }
+
+    /**
+     * Set the height of AllDay-events
+     * @param height
+     */
+    public void setAllDayEventHeight(int height){ mAllDayEventHeight = height; }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
