@@ -13,6 +13,7 @@ public class WeekViewEvent {
     private String mName;
     private String mLocation;
     private int mColor;
+    private boolean mAllDay;
 
     public WeekViewEvent(){
 
@@ -60,13 +61,27 @@ public class WeekViewEvent {
      * @param location The location of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
+     * @param allDay Is the event an all day event
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
+        this.mAllDay = allDay;
+    }
+
+    /**
+     * Initializes the event for week view.
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     */
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
+        this(id, name, location, startTime, endTime, false);
     }
 
     /**
