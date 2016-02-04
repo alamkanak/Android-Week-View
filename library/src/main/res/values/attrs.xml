@@ -20,6 +20,7 @@
         <attr name="columnGap" format="dimension"/>
         <attr name="headerColumnTextColor" format="color"/>
         <attr name="noOfVisibleDays" format="integer"/>
+        <attr name="showFirstDayOfWeekFirst" format="boolean"/>
         <attr name="headerRowBackgroundColor" format="color"/>
         <attr name="dayBackgroundColor" format="color"/>
         <attr name="hourSeparatorColor" format="color"/>
