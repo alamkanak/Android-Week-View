@@ -545,10 +545,7 @@ public class WeekView extends View {
         }
         if(newHeaderHeight!=mHeaderHeight){
             mHeaderHeight = newHeaderHeight;
-            invalidate();
-        }
-        else{
-            mHeaderHeight = newHeaderHeight;
+            postInvalidate();
         }
 
         Calendar today = today();
