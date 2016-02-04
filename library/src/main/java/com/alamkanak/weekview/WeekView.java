@@ -524,7 +524,6 @@ public class WeekView extends View {
                  dayNumber++) {
                 Calendar day = (Calendar) getFirstVisibleDay().clone();
                 day.add(Calendar.DATE, dayNumber);
-                int amountOfAllDayEvents=0;
                 for (int i = 0; i < mEventRects.size(); i++) {
 
                     if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
@@ -537,12 +536,21 @@ public class WeekView extends View {
                 }
             }
         }
+        float newHeaderHeight;
         if(containsAllDayEvent) {
-            mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
+            newHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
         }
         else{
-            mHeaderHeight = mHeaderTextHeight;
+            newHeaderHeight = mHeaderTextHeight;
         }
+        if(newHeaderHeight!=mHeaderHeight){
+            mHeaderHeight = newHeaderHeight;
+            invalidate();
+        }
+        else{
+            mHeaderHeight = newHeaderHeight;
+        }
+
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
