@@ -494,6 +494,35 @@ public class WeekView extends View {
         drawTimeColumnAndAxes(canvas);
     }
 
+    private void calculateHeaderHeight(){
+        //Make sure the header is the right size (depends on AllDay events)
+        boolean containsAllDayEvent = false;
+        if (mEventRects != null && mEventRects.size() > 0) {
+            for (int dayNumber = 0;
+                 dayNumber < mNumberOfVisibleDays;
+                 dayNumber++) {
+                Calendar day = (Calendar) getFirstVisibleDay().clone();
+                day.add(Calendar.DATE, dayNumber);
+                for (int i = 0; i < mEventRects.size(); i++) {
+
+                    if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
+                        containsAllDayEvent = true;
+                        break;
+                    }
+                }
+                if(containsAllDayEvent){
+                    break;
+                }
+            }
+        }
+        if(containsAllDayEvent) {
+            mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
+        }
+        else{
+            mHeaderHeight = mHeaderTextHeight;
+        }
+    }
+
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
@@ -517,36 +546,8 @@ public class WeekView extends View {
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
-        boolean containsAllDayEvent = false;
-        if (mEventRects != null && mEventRects.size() > 0) {
-            for (int dayNumber = 0;
-                 dayNumber < mNumberOfVisibleDays;
-                 dayNumber++) {
-                Calendar day = (Calendar) getFirstVisibleDay().clone();
-                day.add(Calendar.DATE, dayNumber);
-                for (int i = 0; i < mEventRects.size(); i++) {
 
-                    if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
-                        containsAllDayEvent = true;
-                        break;
-                    }
-                }
-                if(containsAllDayEvent){
-                    break;
-                }
-            }
-        }
-        float newHeaderHeight;
-        if(containsAllDayEvent) {
-            newHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
-        }
-        else{
-            newHeaderHeight = mHeaderTextHeight;
-        }
-        if(newHeaderHeight!=mHeaderHeight){
-            mHeaderHeight = newHeaderHeight;
-            postInvalidate();
-        }
+        calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
         Calendar today = today();
 
@@ -1003,6 +1004,7 @@ public class WeekView extends View {
                 sortAndCacheEvents(previousPeriodEvents);
                 sortAndCacheEvents(currentPeriodEvents);
                 sortAndCacheEvents(nextPeriodEvents);
+                calculateHeaderHeight();
 
                 mPreviousPeriodEvents = previousPeriodEvents;
                 mCurrentPeriodEvents = currentPeriodEvents;
