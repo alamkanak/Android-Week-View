@@ -496,6 +496,35 @@ public class WeekView extends View {
         drawTimeColumnAndAxes(canvas);
     }
 
+    private void calculateHeaderHeight(){
+        //Make sure the header is the right size (depends on AllDay events)
+        boolean containsAllDayEvent = false;
+        if (mEventRects != null && mEventRects.size() > 0) {
+            for (int dayNumber = 0;
+                 dayNumber < mNumberOfVisibleDays;
+                 dayNumber++) {
+                Calendar day = (Calendar) getFirstVisibleDay().clone();
+                day.add(Calendar.DATE, dayNumber);
+                for (int i = 0; i < mEventRects.size(); i++) {
+
+                    if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
+                        containsAllDayEvent = true;
+                        break;
+                    }
+                }
+                if(containsAllDayEvent){
+                    break;
+                }
+            }
+        }
+        if(containsAllDayEvent) {
+            mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
+        }
+        else{
+            mHeaderHeight = mHeaderTextHeight;
+        }
+    }
+
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
@@ -519,32 +548,9 @@ public class WeekView extends View {
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
-        boolean containsAllDayEvent = false;
-        if (mEventRects != null && mEventRects.size() > 0) {
-            for (int dayNumber = 0;
-                 dayNumber < mNumberOfVisibleDays;
-                 dayNumber++) {
-                Calendar day = (Calendar) getFirstVisibleDay().clone();
-                day.add(Calendar.DATE, dayNumber);
-                int amountOfAllDayEvents=0;
-                for (int i = 0; i < mEventRects.size(); i++) {
 
-                    if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
-                        containsAllDayEvent = true;
-                        break;
-                    }
-                }
-                if(containsAllDayEvent){
-                    break;
-                }
-            }
-        }
-        if(containsAllDayEvent) {
-            mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
-        }
-        else{
-            mHeaderHeight = mHeaderTextHeight;
-        }
+        calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
+
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
@@ -1000,6 +1006,7 @@ public class WeekView extends View {
                 sortAndCacheEvents(previousPeriodEvents);
                 sortAndCacheEvents(currentPeriodEvents);
                 sortAndCacheEvents(nextPeriodEvents);
+                calculateHeaderHeight();
 
                 mPreviousPeriodEvents = previousPeriodEvents;
                 mCurrentPeriodEvents = currentPeriodEvents;
@@ -1124,16 +1131,18 @@ public class WeekView extends View {
         List<List<EventRect>> collisionGroups = new ArrayList<List<EventRect>>();
         for (EventRect eventRect : eventRects) {
             boolean isPlaced = false;
+
             outerLoop:
             for (List<EventRect> collisionGroup : collisionGroups) {
                 for (EventRect groupEvent : collisionGroup) {
-                    if (isEventsCollide(groupEvent.event, eventRect.event)) {
+                    if (isEventsCollide(groupEvent.event, eventRect.event) && groupEvent.event.isAllDay() == eventRect.event.isAllDay()) {
                         collisionGroup.add(eventRect);
                         isPlaced = true;
                         break outerLoop;
                     }
                 }
             }
+
             if (!isPlaced) {
                 List<EventRect> newGroup = new ArrayList<EventRect>();
                 newGroup.add(eventRect);
