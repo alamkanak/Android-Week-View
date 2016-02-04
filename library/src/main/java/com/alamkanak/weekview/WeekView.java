@@ -517,7 +517,7 @@ public class WeekView extends View {
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
-        int maxAmountOfAllDayEventsInOneDay = 0;
+        boolean containsAllDayEvent = false;
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int dayNumber = 0;
                  dayNumber < mNumberOfVisibleDays;
@@ -528,13 +528,21 @@ public class WeekView extends View {
                 for (int i = 0; i < mEventRects.size(); i++) {
 
                     if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
-                        amountOfAllDayEvents++;
+                        containsAllDayEvent = true;
+                        break;
                     }
                 }
-                maxAmountOfAllDayEventsInOneDay = Math.max(maxAmountOfAllDayEventsInOneDay, amountOfAllDayEvents);
+                if(containsAllDayEvent){
+                    break;
+                }
             }
         }
-        mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom) * Math.min(1, maxAmountOfAllDayEventsInOneDay);
+        if(containsAllDayEvent) {
+            mHeaderHeight = mHeaderTextHeight + (mAllDayEventHeight + mHeaderMarginBottom);
+        }
+        else{
+            mHeaderHeight = mHeaderTextHeight;
+        }
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
