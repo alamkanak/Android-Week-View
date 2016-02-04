@@ -61,7 +61,7 @@ public class WeekViewEvent {
      * @param location The location of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
-     * @param allDay Is the event an all day event
+     * @param allDay Is the event an all day event.
      */
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
         this.mId = id;
@@ -136,9 +136,13 @@ public class WeekViewEvent {
         this.mColor = color;
     }
 
-    public boolean isAllDay() { return mAllDay;}
+    public boolean isAllDay() {
+        return mAllDay;
+    }
 
-    public void setAllDay(boolean allDay) { this.mAllDay = allDay;}
+    public void setAllDay(boolean allDay) {
+        this.mAllDay = allDay;
+    }
 
     public long getId() {
         return mId;

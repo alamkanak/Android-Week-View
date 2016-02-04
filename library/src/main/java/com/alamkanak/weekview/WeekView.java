@@ -1795,16 +1795,19 @@ public class WeekView extends View {
     }
 
     /**
-     * Get the height of AllDay-events
-     * @return Height of AllDay-events
+     * Get the height of AllDay-events.
+     * @return Height of AllDay-events.
      */
-    public int getAllDayEventHeight(){ return mAllDayEventHeight; }
+    public int getAllDayEventHeight() {
+        return mAllDayEventHeight;
+    }
 
     /**
-     * Set the height of AllDay-events
-     * @param height
+     * Set the height of AllDay-events.
      */
-    public void setAllDayEventHeight(int height){ mAllDayEventHeight = height; }
+    public void setAllDayEventHeight(int height) {
+        mAllDayEventHeight = height;
+    }
 
     /////////////////////////////////////////////////////////////////
     //
