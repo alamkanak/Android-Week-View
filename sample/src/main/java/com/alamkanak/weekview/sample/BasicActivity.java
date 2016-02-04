@@ -118,7 +118,6 @@ public class BasicActivity extends BaseActivity {
 
         //AllDay event
         startTime = Calendar.getInstance();
-        startTime.set(Calendar.DAY_OF_MONTH, 4);
         startTime.set(Calendar.HOUR_OF_DAY, 0);
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.MONTH, newMonth-1);
