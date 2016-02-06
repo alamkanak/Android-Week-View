@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static com.alamkanak.weekview.WeekViewUtil.*;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
@@ -169,7 +171,7 @@ public class WeekViewEvent {
     public List<WeekViewEvent> splitWeekViewEvents(){
         //This function splits the WeekViewEvent in WeekViewEvents by day
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
-        if (!WeekViewUtil.isSameDay(this.getStartTime(), this.getEndTime())) {
+        if (!isSameDay(this.getStartTime(), this.getEndTime())) {
             Calendar endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
@@ -180,7 +182,7 @@ public class WeekViewEvent {
             // Add other days.
             Calendar otherDay = (Calendar) this.getStartTime().clone();
             otherDay.add(Calendar.DATE, 1);
-            while (!WeekViewUtil.isSameDay(otherDay, this.getEndTime())) {
+            while (!isSameDay(otherDay, this.getEndTime())) {
                 Calendar overDay = (Calendar) otherDay.clone();
                 overDay.set(Calendar.HOUR_OF_DAY, 0);
                 overDay.set(Calendar.MINUTE, 0);

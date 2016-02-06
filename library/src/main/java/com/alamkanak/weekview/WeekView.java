@@ -41,6 +41,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import static com.alamkanak.weekview.WeekViewUtil.*;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
@@ -505,7 +507,7 @@ public class WeekView extends View {
                 day.add(Calendar.DATE, dayNumber);
                 for (int i = 0; i < mEventRects.size(); i++) {
 
-                    if (WeekViewUtil.isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
+                    if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
                         containsAllDayEvent = true;
                         break;
                     }
@@ -549,7 +551,7 @@ public class WeekView extends View {
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
-        Calendar today = WeekViewUtil.today();
+        Calendar today = today();
 
         if (mAreDimensionsInvalid) {
             mEffectiveMinHourHeight= Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / 24));
@@ -640,7 +642,7 @@ public class WeekView extends View {
             mLastVisibleDay = (Calendar) day.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
-            boolean sameDay = WeekViewUtil.isSameDay(day, today);
+            boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
@@ -722,7 +724,7 @@ public class WeekView extends View {
             // Check if the day is today.
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            boolean sameDay = WeekViewUtil.isSameDay(day, today);
+            boolean sameDay = isSameDay(day, today);
 
             // Draw the day labels.
             String dayLabel = getDateTimeInterpreter().interpretDate(day);
@@ -750,7 +752,7 @@ public class WeekView extends View {
              dayNumber++) {
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
             if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay){
-                Calendar day = WeekViewUtil.today();
+                Calendar day = today();
                 day.add(Calendar.DATE, dayNumber - 1);
                 float pixelsFromZero = y - mCurrentOrigin.y - mHeaderHeight
                         - mHeaderRowPadding * 2 - mTimeTextHeight/2 - mHeaderMarginBottom;
@@ -774,7 +776,7 @@ public class WeekView extends View {
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
-                if (WeekViewUtil.isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()){
+                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()){
 
                     // Calculate top.
                     float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
@@ -819,7 +821,7 @@ public class WeekView extends View {
     private void drawAllDayEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
-                if (WeekViewUtil.isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()){
+                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()){
 
                     // Calculate top.
                     float top = mHeaderRowPadding * 2 + mHeaderMarginBottom +  + mTimeTextHeight/2 + mEventMarginVertical;
@@ -1029,7 +1031,7 @@ public class WeekView extends View {
             while (i < tempEvents.size()) {
                 // Collect all other events for same day.
                 EventRect eventRect2 = tempEvents.get(i);
-                if (WeekViewUtil.isSameDay(eventRect1.event.getStartTime(), eventRect2.event.getStartTime())) {
+                if (isSameDay(eventRect1.event.getStartTime(), eventRect2.event.getStartTime())) {
                     tempEvents.remove(i);
                     eventRects.add(eventRect2);
                 } else {
