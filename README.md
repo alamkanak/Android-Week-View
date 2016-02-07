@@ -96,6 +96,7 @@ Customization
 
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
+- `allDayEventHeight`
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
@@ -103,7 +104,10 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
+- `focusPoint`
 - `firstDayOfWeek`
+- `fixedFocusPointEnabled` The focused point (time) while zooming the week view. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
+- `fixedFocusPointFraction` If you disable the fixed focus point the center of your zoom gesture is used.
 - `headerColumnBackground`
 - `headerColumnPadding`
 - `headerColumnTextColor`
@@ -126,6 +130,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `scrollDuration`
 
 Interfaces
 ----------

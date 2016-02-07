@@ -41,6 +41,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import static com.alamkanak.weekview.WeekViewUtil.*;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
@@ -141,6 +143,9 @@ public class WeekView extends View {
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight= 100;
+    private float mFixedFocusPointFraction = 0;
+    private boolean mFixedFocusPointEnabled = true;
+    private int mScrollDuration = 250;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -348,7 +353,10 @@ public class WeekView extends View {
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
-            mAllDayEventHeight = a.getInt(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mFixedFocusPointFraction = a.getFraction(R.styleable.WeekView_fixedFocusPointFraction, 1, 1, mFixedFocusPointFraction);
+            mFixedFocusPointEnabled = a.getBoolean(R.styleable.WeekView_fixedFocusPointEnabled, mFixedFocusPointEnabled);
+            mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
             a.recycle();
         }
@@ -439,26 +447,7 @@ public class WeekView extends View {
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
 
-        mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
-            @Override
-            public void onScaleEnd(ScaleGestureDetector detector) {
-                mIsZooming = false;
-            }
-
-            @Override
-            public boolean onScaleBegin(ScaleGestureDetector detector) {
-                mIsZooming = true;
-                goToNearestOrigin();
-                return true;
-            }
-
-            @Override
-            public boolean onScale(ScaleGestureDetector detector) {
-                mNewHourHeight = Math.round(mHourHeight * detector.getScaleFactor());
-                invalidate();
-                return true;
-            }
-        });
+        mScaleDetector = new ScaleGestureDetector(mContext, new WeekViewGestureListener());
     }
 
     // fix rotation changes
@@ -485,9 +474,6 @@ public class WeekView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        // Hide everything in the first cell (top left corner).
-        canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Draw the header row.
         drawHeaderRowAndEvents(canvas);
@@ -585,7 +571,6 @@ public class WeekView extends View {
             else if (mNewHourHeight > mMaxHourHeight)
                 mNewHourHeight = mMaxHourHeight;
 
-            mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
             mHourHeight = mNewHourHeight;
             mNewHourHeight = -1;
         }
@@ -711,6 +696,9 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+        // Hide everything in the first cell (top left corner).
+        canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
+        canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
@@ -1049,43 +1037,9 @@ public class WeekView extends View {
     private void cacheEvent(WeekViewEvent event) {
         if(event.getStartTime().compareTo(event.getEndTime()) >= 0)
             return;
-        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
-            // Add first day.
-            Calendar endTime = (Calendar) event.getStartTime().clone();
-            endTime.set(Calendar.HOUR_OF_DAY, 23);
-            endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime, event.isAllDay());
-            event1.setColor(event.getColor());
-            mEventRects.add(new EventRect(event1, event, null));
-
-            // Add other days.
-            Calendar otherDay = (Calendar) event.getStartTime().clone();
-            otherDay.add(Calendar.DATE, 1);
-            while (!isSameDay(otherDay, event.getEndTime())) {
-                Calendar overDay = (Calendar) otherDay.clone();
-                overDay.set(Calendar.HOUR_OF_DAY, 0);
-                overDay.set(Calendar.MINUTE, 0);
-                Calendar endOfOverDay = (Calendar) overDay.clone();
-                endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
-                endOfOverDay.set(Calendar.MINUTE, 59);
-                WeekViewEvent eventMore = new WeekViewEvent(event.getId(), event.getName(),null, overDay, endOfOverDay, event.isAllDay());
-                eventMore.setColor(event.getColor());
-                mEventRects.add(new EventRect(eventMore, event, null));
-
-                // Add next day.
-                otherDay.add(Calendar.DATE, 1);
-            }
-
-            // Add last day.
-            Calendar startTime = (Calendar) event.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime(), event.isAllDay());
-            event2.setColor(event.getColor());
-            mEventRects.add(new EventRect(event2, event, null));
-        }
-        else {
-            mEventRects.add(new EventRect(event, event, null));
+        List<WeekViewEvent> splitedEvents = event.splitWeekViewEvents();
+        for(WeekViewEvent splitedEvent: splitedEvents){
+            mEventRects.add(new EventRect(splitedEvent, event, null));
         }
     }
 
@@ -1828,6 +1782,52 @@ public class WeekView extends View {
         mAllDayEventHeight = height;
     }
 
+    /**
+     * Enable fixed zoom focus point
+     */
+    public void setFixedFocusPointEnabled(boolean fixedFocusPointEnabled) {
+        mFixedFocusPointEnabled = fixedFocusPointEnabled;
+    }
+
+    /*
+     * is fixed focus point enabled
+     * @return fixed focus point enabled?
+     */
+    public boolean isFixedFocusPointEnabled() {
+        return mFixedFocusPointEnabled;
+    }
+
+    /*
+     * Get fractional focus point, 0 = 0% of height, 1 = 100% of height
+     * @return fixed focus point
+     */
+    public float getFixedFocusPointFraction() {
+        return mFixedFocusPointFraction;
+    }
+
+    /**
+     * Set fractional focus point, 0 = 0% of height, 1 = 100% of height
+     */
+    public void setFixedFocusPointFraction(int fixedFocusPointFraction) {
+        mFixedFocusPointFraction = fixedFocusPointFraction;
+    }
+
+
+    /**
+     * Get scroll duration
+     * @return scroll duration
+     */
+    public int getScrollDuration() {
+        return mScrollDuration;
+    }
+
+    /**
+     * Set the scroll duration
+     */
+    public void setScrollDuration(int scrollDuration) {
+        mScrollDuration = scrollDuration;
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
@@ -1873,7 +1873,7 @@ public class WeekView extends View {
             // Stop current animation.
             mScroller.forceFinished(true);
             // Snap to date.
-            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * 500));
+            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
             ViewCompat.postInvalidateOnAnimation(WeekView.this);
         }
         // Reset scrolling and fling direction.
@@ -2055,34 +2055,51 @@ public class WeekView extends View {
         void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
 
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Helper methods.
-    //
-    /////////////////////////////////////////////////////////////////
-
     /**
-     * Checks if two times are on the same day.
-     * @param dayOne The first day.
-     * @param dayTwo The second day.
-     * @return Whether the times are on the same day.
+     * A simple GestureListener that holds the focused hour while scaling.
      */
-    private boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
-    }
+    private class WeekViewGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 
-    /**
-     * Returns a calendar instance at the start of this day
-     * @return the calendar instance
-     */
-    private Calendar today(){
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-        return today;
-    }
+        float mFocusedPointY;
 
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            mIsZooming = false;
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            mIsZooming = true;
+            goToNearestOrigin();
+
+            // Calculate focused point for scale action
+            if (mFixedFocusPointEnabled) {
+                // Use fractional focus, percentage of height
+                mFocusedPointY = (getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) * mFixedFocusPointFraction;
+            } else {
+                // Grab focus
+                mFocusedPointY = detector.getFocusY();
+            }
+
+            return true;
+        }
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            final float scale = detector.getScaleFactor();
+
+            mNewHourHeight = Math.round(mHourHeight * scale);
+
+            // Calculating difference
+            float diffY = mFocusedPointY - mCurrentOrigin.y;
+            // Scaling difference
+            diffY = diffY * scale - diffY;
+            // Updating week view origin
+            mCurrentOrigin.y -= diffY;
+
+            invalidate();
+            return true;
+        }
+
+    }
 }

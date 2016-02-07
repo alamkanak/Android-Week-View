@@ -49,6 +49,9 @@
         <attr name="nowLineThickness" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
-        <attr name="allDayEventHeight" format="integer"/>
+        <attr name="allDayEventHeight" format="dimension"/>
+        <attr name="fixedFocusPointFraction" format="fraction"/>
+        <attr name="fixedFocusPointEnabled" format="boolean"/>
+        <attr name="scrollDuration" format="integer"/>
     </declare-styleable>
 </resources>
