@@ -49,6 +49,6 @@
         <attr name="nowLineThickness" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
-        <attr name="allDayEventHeight" format="integer"/>
+        <attr name="allDayEventHeight" format="dimension"/>
     </declare-styleable>
 </resources>
