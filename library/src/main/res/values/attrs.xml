@@ -50,5 +50,6 @@
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
         <attr name="allDayEventHeight" format="dimension"/>
+        <attr name="scrollDuration" format="integer"/>
     </declare-styleable>
 </resources>

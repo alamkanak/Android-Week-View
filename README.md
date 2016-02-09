@@ -127,6 +127,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `scrollDuration`
 
 Interfaces
 ----------

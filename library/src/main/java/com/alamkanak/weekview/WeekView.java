@@ -141,6 +141,7 @@ public class WeekView extends View {
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
+    private int mScrollDuration = 250;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -349,6 +350,7 @@ public class WeekView extends View {
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
             a.recycle();
         }
@@ -1828,6 +1830,21 @@ public class WeekView extends View {
         mAllDayEventHeight = height;
     }
 
+    /**
+     * Get scroll duration
+     * @return scroll duration
+     */
+    public int getScrollDuration() {
+        return mScrollDuration;
+    }
+
+    /**
+     * Set the scroll duration
+     */
+    public void setScrollDuration(int scrollDuration) {
+        mScrollDuration = scrollDuration;
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
@@ -1873,7 +1890,7 @@ public class WeekView extends View {
             // Stop current animation.
             mScroller.forceFinished(true);
             // Snap to date.
-            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * 500));
+            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
             ViewCompat.postInvalidateOnAnimation(WeekView.this);
         }
         // Reset scrolling and fling direction.
