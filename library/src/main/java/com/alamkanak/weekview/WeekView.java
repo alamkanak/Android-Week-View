@@ -41,6 +41,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import static com.alamkanak.weekview.WeekViewUtil.*;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
@@ -1051,43 +1053,9 @@ public class WeekView extends View {
     private void cacheEvent(WeekViewEvent event) {
         if(event.getStartTime().compareTo(event.getEndTime()) >= 0)
             return;
-        if (!isSameDay(event.getStartTime(), event.getEndTime())) {
-            // Add first day.
-            Calendar endTime = (Calendar) event.getStartTime().clone();
-            endTime.set(Calendar.HOUR_OF_DAY, 23);
-            endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), event.getStartTime(), endTime, event.isAllDay());
-            event1.setColor(event.getColor());
-            mEventRects.add(new EventRect(event1, event, null));
-
-            // Add other days.
-            Calendar otherDay = (Calendar) event.getStartTime().clone();
-            otherDay.add(Calendar.DATE, 1);
-            while (!isSameDay(otherDay, event.getEndTime())) {
-                Calendar overDay = (Calendar) otherDay.clone();
-                overDay.set(Calendar.HOUR_OF_DAY, 0);
-                overDay.set(Calendar.MINUTE, 0);
-                Calendar endOfOverDay = (Calendar) overDay.clone();
-                endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
-                endOfOverDay.set(Calendar.MINUTE, 59);
-                WeekViewEvent eventMore = new WeekViewEvent(event.getId(), event.getName(),null, overDay, endOfOverDay, event.isAllDay());
-                eventMore.setColor(event.getColor());
-                mEventRects.add(new EventRect(eventMore, event, null));
-
-                // Add next day.
-                otherDay.add(Calendar.DATE, 1);
-            }
-
-            // Add last day.
-            Calendar startTime = (Calendar) event.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(event.getId(), event.getName(), event.getLocation(), startTime, event.getEndTime(), event.isAllDay());
-            event2.setColor(event.getColor());
-            mEventRects.add(new EventRect(event2, event, null));
-        }
-        else {
-            mEventRects.add(new EventRect(event, event, null));
+        List<WeekViewEvent> splitedEvents = event.splitWeekViewEvents();
+        for(WeekViewEvent splitedEvent: splitedEvents){
+            mEventRects.add(new EventRect(splitedEvent, event, null));
         }
     }
 
@@ -2071,35 +2039,4 @@ public class WeekView extends View {
          */
         void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
-
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Helper methods.
-    //
-    /////////////////////////////////////////////////////////////////
-
-    /**
-     * Checks if two times are on the same day.
-     * @param dayOne The first day.
-     * @param dayTwo The second day.
-     * @return Whether the times are on the same day.
-     */
-    private boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
-    }
-
-    /**
-     * Returns a calendar instance at the start of this day
-     * @return the calendar instance
-     */
-    private Calendar today(){
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-        return today;
-    }
-
 }
