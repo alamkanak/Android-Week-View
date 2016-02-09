@@ -175,8 +175,11 @@ public class WeekViewEvent {
     public List<WeekViewEvent> splitWeekViewEvents(){
         //This function splits the WeekViewEvent in WeekViewEvents by day
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
-        if (!isSameDay(this.getStartTime(), this.getEndTime())) {
-            Calendar endTime = (Calendar) this.getStartTime().clone();
+        // The first millisecond of the next day is still the same day. (no need to split events for this).
+        Calendar endTime = (Calendar) this.getEndTime().clone();
+        endTime.add(Calendar.MILLISECOND, -1);
+        if (!isSameDay(this.getStartTime(), endTime)) {
+            endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
             WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
