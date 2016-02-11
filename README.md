@@ -96,6 +96,7 @@ Customization
 
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
+- `allDayEventHeight`
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
@@ -126,6 +127,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `scrollDuration`
 
 Interfaces
 ----------
