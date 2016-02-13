@@ -23,6 +23,8 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -31,6 +33,7 @@ import android.view.ScaleGestureDetector;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.widget.OverScroller;
 
 import java.text.SimpleDateFormat;
@@ -81,12 +84,14 @@ public class WeekView extends View {
     private Paint mNowLinePaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
+    private Paint mEmptyEventBackgroundPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
     private List<? extends WeekViewEvent> mPreviousPeriodEvents;
     private List<? extends WeekViewEvent> mCurrentPeriodEvents;
     private List<? extends WeekViewEvent> mNextPeriodEvents;
     private TextPaint mEventTextPaint;
+    private TextPaint mEmptyEventTextPaint;
     private Paint mHeaderColumnBackgroundPaint;
     private int mFetchedPeriod = -1; // the middle period the calendar has fetched.
     private boolean mRefreshEvents = false;
@@ -95,9 +100,10 @@ public class WeekView extends View {
     private boolean mIsZooming;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
-    private int mDefaultEventColor;
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
+    float mEmptyEventX;
+
     // Attributes and their default values.
     private int mHourHeight = 50;
     private int mNewHourHeight = -1;
@@ -125,15 +131,21 @@ public class WeekView extends View {
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
+    private int mEmptyEventTextColor = Color.WHITE;
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
+    private int mDefaultEventColor;
+    private int mDefaultEmptyEventColor;
+
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
-    @Deprecated private int mDayNameLength = LENGTH_LONG;
+    @Deprecated
+    private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
     private float mXScrollingSpeed = 1f;
     private Calendar mScrollToDay = null;
+    private Calendar mCacheEmptyEventDay;
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
     private boolean mShowDistinctWeekendColor = false;
@@ -260,7 +272,10 @@ public class WeekView extends View {
                 Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                 if (selectedTime != null) {
                     playSoundEffect(SoundEffectConstants.CLICK);
-                    mEmptyViewClickListener.onEmptyViewClicked(selectedTime);
+                    mEmptyEventX = e.getX();
+                    mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
+                    mCacheEmptyEventDay = selectedTime;
+                    invalidate();
                 }
             }
 
@@ -336,7 +351,8 @@ public class WeekView extends View {
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
-            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
+            mEmptyEventTextColor = a.getColor(R.styleable.WeekView_emptyEventTextColor, mEmptyEventTextColor);
+            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
@@ -425,6 +441,9 @@ public class WeekView extends View {
         // Prepare event background color.
         mEventBackgroundPaint = new Paint();
         mEventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
+        // Prepare empty event background color.
+        mEmptyEventBackgroundPaint = new Paint();
+        mEmptyEventBackgroundPaint.setColor(Color.rgb(60, 147, 217));
 
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
@@ -435,6 +454,19 @@ public class WeekView extends View {
         mEventTextPaint.setStyle(Paint.Style.FILL);
         mEventTextPaint.setColor(mEventTextColor);
         mEventTextPaint.setTextSize(mEventTextSize);
+
+
+        // Prepare empty event text size and color.
+        mEmptyEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        mEmptyEventTextPaint.setStyle(Paint.Style.FILL);
+        mEmptyEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
+        //mStartDate = (Calendar) mFirstVisibleDay.clone();
+
+        // Set default event color.
+        mDefaultEventColor = Color.parseColor("#9fc6e7");
+        // Set default empty event color.
+        mDefaultEmptyEventColor = Color.parseColor("#3c93d9");
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
@@ -494,6 +526,11 @@ public class WeekView extends View {
 
         // Draw the time column and all the axes/separators.
         drawTimeColumnAndAxes(canvas);
+
+        //Draw empty event
+        //if (mCurrentScrollDirection != Direction.LEFT && mCurrentScrollDirection != Direction.RIGHT) {
+        //if (mCacheEmptyEventDay != null) drawEmptyEvent(mCacheEmptyEventDay, canvas);
+        //} else mCacheEmptyEventDay = null;
     }
 
     private void calculateHeaderHeight(){
@@ -696,6 +733,7 @@ public class WeekView extends View {
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
 
+            drawEmptyEvent(day, startPixel, canvas);
             // Draw the events.
             drawEvents(day, startPixel, canvas);
 
@@ -856,6 +894,95 @@ public class WeekView extends View {
         }
     }
 
+    /**
+     * Draw empty event
+     *
+     * //@param mCacheEmptyEventDay           The day.
+     * @param canvas         The canvas to draw upon.
+     */
+    private void drawEmptyEvent(Calendar date, float startFromPixel, Canvas canvas) {
+        Log.d("event", "");
+        // Prepare to iterate for each day.
+        /*Calendar day = (Calendar) today().clone();
+        day.add(Calendar.HOUR, 6);
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+        //iterate thru days
+        for (int dayNumber = leftDaysWithGaps + 1;
+             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber++) {
+            // Check if the day is today.
+            day = (Calendar) mFirstVisibleDay.clone();
+            day.add(Calendar.DATE, dayNumber - 1);
+            boolean sameDay = isSameDay(day, mCacheEmptyEventDay);
+            if (sameDay) {*/
+        //calculate bottom and top
+                /*float cal_bottom = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) + 1) * 60;
+                float bottom = mHourHeight * 24 * cal_bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
+                float originalBottom = bottom - mTimeTextHeight - mHeaderHeight;
+                float cal_top = mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) * 60;
+                float top = mHourHeight * 24 * cal_top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
+                mEmptyEventBackgroundPaint.setColor(mDefaultEmptyEventColor);
+                // Calculate left and right.
+                float left = 0;
+                for (int i = 0; i < mNumberOfVisibleDays + 1; i++) {
+                    int j = i + 1;
+                    float h_wpd = mHeaderColumnWidth + (mWidthPerDay * j);
+                    if (i != 0) h_wpd += (mColumnGap * j);
+                    if (mEmptyEventX <= h_wpd) {
+                        left = mHeaderColumnWidth;
+                        if (i != 0) left += (mWidthPerDay * i) + (mColumnGap * i);
+                        break;
+                    }
+                }
+                float right = left + mWidthPerDay;
+
+                // Draw the empty event and the text on top of it.
+                RectF dayRectF = new RectF(left, top, right, bottom);
+                canvas.drawRect(dayRectF, mEmptyEventBackgroundPaint);
+                drawEmptyText("+", canvas, (((originalBottom - top) / 2) + top), left, (int) dayRectF.width());
+                break;*/
+        if (mCacheEmptyEventDay != null && isSameDay(mCacheEmptyEventDay, date)) {
+            Log.d("event", "ok");
+            Log.d("event", mCacheEmptyEventDay.toString());
+            // Calculate top.
+            float top = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY)) * 60;
+            top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
+
+            // Calculate bottom.
+            float bottom = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) + 1) * 60;// mEventRects.get(i).bottom;
+            bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 - mEventMarginVertical;
+
+
+            // Calculate left and right.
+            float left = startFromPixel;
+            //if (left < startFromPixel)
+            //left += mOverlappingEventGap;
+            float right = left + mWidthPerDay;
+
+
+            // Draw the event and the event name on top of it.
+            if (left < right &&
+                    left < getWidth() &&
+                    top < getHeight() &&
+                    right > mHeaderColumnWidth &&
+                    bottom > 0
+                    ) {
+                //mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+                //mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+
+                //drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                RectF dayRectF = new RectF(left, top, right, bottom);
+                canvas.drawRoundRect(dayRectF, mEventCornerRadius, mEventCornerRadius, mEmptyEventBackgroundPaint);
+                drawEmptyText("+", canvas, bottom, left, (int) dayRectF.width());
+            }
+        /*else
+            //mEventRects.get(i).rectF = null;
+
+            }*/
+
+        }
+    }
+
 
     /**
      * Draw the name of the event on top of the event rectangle.
@@ -911,6 +1038,48 @@ public class WeekView extends View {
         }
     }
 
+    /**
+     * Draw the text on top of the rectangle in the empty event.
+     *
+     * @param text         The empty text to draw.
+     * @param canvas       The canvas to draw upon.
+     * @param originalTop  The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
+     * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
+     */
+    private void drawEmptyText(String text, Canvas canvas, float originalTop, float originalLeft, int textWidth) {
+
+        // Get text dimensions
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(metrics);
+        float textSize = 18f;
+        switch (metrics.densityDpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                textSize = textSize * 0.75f;
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                textSize = textSize * 1f;
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                textSize = textSize * 1.5f;
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                textSize = textSize * 2.0f;
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                textSize = textSize * 2.5f;
+                break;
+        }
+
+        mEmptyEventTextPaint.setTextSize(textSize);
+        mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
+        StaticLayout textLayout = new StaticLayout(text, mEmptyEventTextPaint, textWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+        // Draw text
+        canvas.save();
+        canvas.translate(originalLeft, originalTop);
+        textLayout.draw(canvas);
+        canvas.restore();
+    }
 
     /**
      * A class to hold reference to the events and their visual representation. An EventRect is
@@ -1516,6 +1685,15 @@ public class WeekView extends View {
         invalidate();
     }
 
+    public int getEmptyEventTextColor() {
+        return mEmptyEventTextColor;
+    }
+
+    public void setEmptyEventTextColor(int emptyEventTextColor) {
+        mEmptyEventTextColor = emptyEventTextColor;
+        invalidate();
+    }
+
     public int getEventPadding() {
         return mEventPadding;
     }
@@ -1541,6 +1719,15 @@ public class WeekView extends View {
 
     public void setDefaultEventColor(int defaultEventColor) {
         mDefaultEventColor = defaultEventColor;
+        invalidate();
+    }
+
+    public int getDefaultEmptyEventColor() {
+        return mDefaultEmptyEventColor;
+    }
+
+    public void setDefaultEmptyEventColor(int DefaultEmptyEventColor) {
+        mDefaultEmptyEventColor = DefaultEmptyEventColor;
         invalidate();
     }
 
@@ -1882,6 +2069,7 @@ public class WeekView extends View {
     public void goToToday() {
         Calendar today = Calendar.getInstance();
         goToDate(today);
+        mCacheEmptyEventDay = null;
     }
 
     /**
@@ -1988,7 +2176,9 @@ public class WeekView extends View {
          * Triggered when the users clicks on a empty space of the calendar.
          * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
          */
-        void onEmptyViewClicked(Calendar time);
+        //void onEmptyViewClicked(Calendar time);
+        void onEmptyViewClicked(Calendar time, Calendar tempTime, boolean clickedTwice);
+
     }
 
     public interface EmptyViewLongPressListener {
