@@ -290,7 +290,7 @@ public class WeekView extends View {
                     }
 
                     playSoundEffect(SoundEffectConstants.CLICK);
-                    if(mEventClickListener != null)
+                    if(mEmptyViewClickListener != null)
                         mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
 
                     if(mAddEventClickListener != null) {
