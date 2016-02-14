@@ -27,7 +27,11 @@
         <attr name="todayHeaderTextColor" format="color"/>
         <attr name="hourSeparatorHeight" format="dimension"/>
         <attr name="eventTextColor" format="color"/>
-        <attr name="emptyEventTextColor" format="color"/>
+        <attr name="newEventId" format="integer"/>
+        <attr name="newEventTextColor" format="color"/>
+        <attr name="newEventText" format="string"/>
+        <attr name="newEventLengthInMinutes" format="integer"/>
+        <attr name="newEventTimeResolutionInMinutes" format="integer"/>
         <attr name="eventPadding" format="dimension"/>
         <attr name="headerColumnBackground" format="color"/>
         <attr name="dayNameLength" format="enum">

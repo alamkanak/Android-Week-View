@@ -24,7 +24,7 @@ import java.util.Locale;
  * Created by Raquib-ul-Alam Kanak on 1/3/2014.
  * Website: http://alamkanak.github.io
  */
-public abstract class BaseActivity extends AppCompatActivity implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener, WeekView.EmptyViewClickListener {
+public abstract class BaseActivity extends AppCompatActivity implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener, WeekView.EmptyViewClickListener, WeekView.AddEventClickListener {
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
@@ -53,7 +53,11 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         // Set long press listener for empty view
         mWeekView.setEmptyViewLongPressListener(this);
 
+        // Set EmptyView Click Listener
         mWeekView.setEmptyViewClickListener(this);
+
+        // Set AddEvent Click Listener
+        mWeekView.setAddEventClickListener(this);
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
@@ -175,5 +179,10 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         return null;
+    }
+
+    @Override
+    public void onAddEventClicked(Calendar startTime, Calendar endTime) {
+        Toast.makeText(this, "Add event clicked.", Toast.LENGTH_SHORT).show();
     }
 }

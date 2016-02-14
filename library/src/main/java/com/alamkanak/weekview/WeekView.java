@@ -24,7 +24,6 @@ import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -102,7 +101,7 @@ public class WeekView extends View {
     private Calendar mLastVisibleDay;
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
-    private EventRect mEmptyEventRect;
+    private EventRect mNewEventRect;
 
     // Attributes and their default values.
     private int mHourHeight = 50;
@@ -131,13 +130,15 @@ public class WeekView extends View {
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
-    private int mEmptyEventTextColor = Color.WHITE;
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
-    private int mDefaultEmptyEventColor;
-    //TODO: add to attributes
-    private int mEmptyEventId = -100;
+    private int mDefaultNewEventColor;
+    private int mNewEventId = -100;
+    private int mNewEventTextColor = Color.WHITE;
+    private String mNewEventText = "+";
+    private int mNewEventLengthInMinutes = 60;
+    private int mNewEventTimeResolutionInMinutes = 15;
 
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
@@ -165,6 +166,7 @@ public class WeekView extends View {
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
     private ScrollListener mScrollListener;
+    private AddEventClickListener mAddEventClickListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -261,61 +263,70 @@ public class WeekView extends View {
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
-                for (EventRect event : reversedEventRects) {
-                    //TODO: Check if is new event & add eventAddClickListener
-                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                        mEventClickListener.onEventClick(event.originalEvent, event.rectF);
+                for (EventRect eventRect : reversedEventRects) {
+                    if (eventRect.event.getId() != mNewEventId &&eventRect.rectF != null && e.getX() > eventRect.rectF.left && e.getX() < eventRect.rectF.right && e.getY() > eventRect.rectF.top && e.getY() < eventRect.rectF.bottom) {
+                        mEventClickListener.onEventClick(eventRect.originalEvent, eventRect.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         return super.onSingleTapConfirmed(e);
                     }
                 }
             }
 
-            // If the tap was on in an empty space, then trigger the callback.
-            if (mEmptyViewClickListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
+            // If the tap was on add new Event space, then trigger the callback
+            if (mAddEventClickListener != null && mNewEventRect != null && mNewEventRect.rectF != null && e.getX() > mNewEventRect.rectF.left && e.getX() < mNewEventRect.rectF.right && e.getY() > mNewEventRect.rectF.top && e.getY() < mNewEventRect.rectF.bottom) {
+                mAddEventClickListener.onAddEventClicked(mNewEventRect.event.getStartTime(), mNewEventRect.event.getEndTime());
+                return super.onSingleTapConfirmed(e);
+            }
+
+            // If the tap was on an empty space, then trigger the callback.
+            if ((mEmptyViewClickListener != null || mAddEventClickListener != null) && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
                 Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                 List<EventRect> tempEventRects = mEventRects;
                 mEventRects = new ArrayList<EventRect>();
                 if (selectedTime != null) {
-                    if(mEmptyEventRect!= null) {
-                        tempEventRects.remove(mEmptyEventRect);
-                        mEmptyEventRect = null;
+                    if(mNewEventRect != null) {
+                        tempEventRects.remove(mNewEventRect);
+                        mNewEventRect = null;
                     }
 
-                    //Todo and make setting for it
-                    int unroundedMinutes = selectedTime.get(Calendar.MINUTE);
-                    int mod = unroundedMinutes % 30;
-                    selectedTime.add(Calendar.MINUTE, mod < Math.ceil(30 / 2) ? -mod : (30 - mod));
                     playSoundEffect(SoundEffectConstants.CLICK);
-                    mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
-                    //TODO: Check if is enabled and make setting for it
-                    Calendar endTime = (Calendar) selectedTime.clone();
-                    endTime.add(Calendar.HOUR, 2);
-                    WeekViewEvent emptyEvent = new WeekViewEvent(mEmptyEventId, "+", null, selectedTime, endTime);
+                    if(mEventClickListener != null)
+                        mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
 
-                    float top = selectedTime.get(Calendar.HOUR_OF_DAY) * 60;
-                    top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
-                    float bottom = endTime.get(Calendar.HOUR_OF_DAY) * 60;
-                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
+                    if(mAddEventClickListener != null) {
+                        //round selectedTime to resolution
+                        int unroundedMinutes = selectedTime.get(Calendar.MINUTE);
+                        int mod = unroundedMinutes % mNewEventTimeResolutionInMinutes;
+                        selectedTime.add(Calendar.MINUTE, mod < Math.ceil(mNewEventTimeResolutionInMinutes / 2) ? -mod : (mNewEventTimeResolutionInMinutes - mod));
 
-                    // Calculate left and right.
-                    float left = 0;
-                    float right = left + mWidthPerDay;
-                    // Draw the event and the event name on top of it.
-                    if (left < right &&
-                            left < getWidth() &&
-                            top < getHeight() &&
-                            right > mHeaderColumnWidth &&
-                            bottom > 0
-                            ) {
-                        RectF dayRectF = new RectF(left, top, right, bottom);
-                        emptyEvent.setColor(mDefaultEmptyEventColor);
-                        mEmptyEventRect = new EventRect(emptyEvent, emptyEvent, dayRectF);
-                        tempEventRects.add(mEmptyEventRect);
+                        Calendar endTime = (Calendar) selectedTime.clone();
+                        endTime.add(Calendar.MINUTE, mNewEventLengthInMinutes);
+                        WeekViewEvent newEvent = new WeekViewEvent(mNewEventId, mNewEventText, null, selectedTime, endTime);
+
+                        float top = selectedTime.get(Calendar.HOUR_OF_DAY) * 60;
+                        top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
+                        float bottom = endTime.get(Calendar.HOUR_OF_DAY) * 60;
+                        bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
+
+                        // Calculate left and right.
+                        float left = 0;
+                        float right = left + mWidthPerDay;
+                        // Draw the event and the event name on top of it.
+                        if (left < right &&
+                                left < getWidth() &&
+                                top < getHeight() &&
+                                right > mHeaderColumnWidth &&
+                                bottom > 0
+                                ) {
+                            RectF dayRectF = new RectF(left, top, right, bottom);
+                            newEvent.setColor(mDefaultNewEventColor);
+                            mNewEventRect = new EventRect(newEvent, newEvent, dayRectF);
+                            tempEventRects.add(mNewEventRect);
+                        }
+
+                        invalidate();
+                        computePositionOfEvents(tempEventRects);
                     }
-
-                    invalidate();
-                    computePositionOfEvents(tempEventRects);
                 }
             }
             return super.onSingleTapConfirmed(e);
@@ -390,7 +401,11 @@ public class WeekView extends View {
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
-            mEmptyEventTextColor = a.getColor(R.styleable.WeekView_emptyEventTextColor, mEmptyEventTextColor);
+            mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
+            mNewEventText = a.getString(R.styleable.WeekView_newEventText);
+            mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
+            mNewEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, mNewEventLengthInMinutes);
+            mNewEventTimeResolutionInMinutes = a.getInt(R.styleable.WeekView_newEventTimeResolutionInMinutes, mNewEventTimeResolutionInMinutes);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
@@ -499,13 +514,13 @@ public class WeekView extends View {
         mEmptyEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         mEmptyEventTextPaint.setStyle(Paint.Style.FILL);
         mEmptyEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
+        mEmptyEventTextPaint.setColor(mNewEventTextColor);
         //mStartDate = (Calendar) mFirstVisibleDay.clone();
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
         // Set default empty event color.
-        mDefaultEmptyEventColor = Color.parseColor("#3c93d9");
+        mDefaultNewEventColor = Color.parseColor("#3c93d9");
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
@@ -874,7 +889,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        if(mEventRects.get(i).event.getId() != mEmptyEventId)
+                        if(mEventRects.get(i).event.getId() != mNewEventId)
                             drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                         else
                             drawEmptyText(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
@@ -967,7 +982,7 @@ public class WeekView extends View {
             int availableLineCount = availableHeight / lineHeight;
             do {
                 // Ellipsize text to fit into event rect.
-                if(event.getId() != mEmptyEventId)
+                if(event.getId() != mNewEventId)
                     textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
@@ -1015,7 +1030,9 @@ public class WeekView extends View {
         }
 
         mEmptyEventTextPaint.setTextSize(textSize);
-        mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
+        mEmptyEventTextPaint.setColor(mNewEventTextColor);
+        if(event.getName() == null)
+            event.setName("+");
         StaticLayout textLayout = new StaticLayout(event.getName(), mEmptyEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
         // Draw text
         canvas.save();
@@ -1400,6 +1417,14 @@ public class WeekView extends View {
         return mScrollListener;
     }
 
+    public void setAddEventClickListener(AddEventClickListener addEventClickListener){
+        this.mAddEventClickListener = addEventClickListener;
+    }
+
+    public AddEventClickListener getAddEventClickListener(){
+        return mAddEventClickListener;
+    }
+
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
      * @return The date, time interpreter.
@@ -1629,11 +1654,11 @@ public class WeekView extends View {
     }
 
     public int getEmptyEventTextColor() {
-        return mEmptyEventTextColor;
+        return mNewEventTextColor;
     }
 
     public void setEmptyEventTextColor(int emptyEventTextColor) {
-        mEmptyEventTextColor = emptyEventTextColor;
+        mNewEventTextColor = emptyEventTextColor;
         invalidate();
     }
 
@@ -1666,11 +1691,11 @@ public class WeekView extends View {
     }
 
     public int getDefaultEmptyEventColor() {
-        return mDefaultEmptyEventColor;
+        return mDefaultNewEventColor;
     }
 
     public void setDefaultEmptyEventColor(int DefaultEmptyEventColor) {
-        mDefaultEmptyEventColor = DefaultEmptyEventColor;
+        mDefaultNewEventColor = DefaultEmptyEventColor;
         invalidate();
     }
 
@@ -2141,5 +2166,15 @@ public class WeekView extends View {
          * @param oldFirstVisibleDay The old first visible day (is null on the first call).
          */
         void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
+    }
+
+    public interface AddEventClickListener {
+        /**
+         * Triggered when the users clicks to create a new event.
+         * @param startTime The startTime of a new event
+         * @param endTime The endTime of a new event
+         */
+        void onAddEventClicked(Calendar startTime, Calendar endTime);
+
     }
 }
