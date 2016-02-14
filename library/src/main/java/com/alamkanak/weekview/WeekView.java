@@ -133,7 +133,7 @@ public class WeekView extends View {
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
-    private int mDefaultNewEventColor;
+    private int mNewEventColor;
     private int mNewEventId = -100;
     private int mNewEventTextColor = Color.WHITE;
     private String mNewEventText = "+";
@@ -319,7 +319,7 @@ public class WeekView extends View {
                                 bottom > 0
                                 ) {
                             RectF dayRectF = new RectF(left, top, right, bottom);
-                            newEvent.setColor(mDefaultNewEventColor);
+                            newEvent.setColor(mNewEventColor);
                             mNewEventRect = new EventRect(newEvent, newEvent, dayRectF);
                             tempEventRects.add(mNewEventRect);
                         }
@@ -401,6 +401,7 @@ public class WeekView extends View {
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
+            mNewEventColor = a.getColor(R.styleable.WeekView_newEventColor, mNewEventColor);
             mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
             mNewEventText = a.getString(R.styleable.WeekView_newEventText);
             mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
@@ -520,7 +521,7 @@ public class WeekView extends View {
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
         // Set default empty event color.
-        mDefaultNewEventColor = Color.parseColor("#3c93d9");
+        mNewEventColor = Color.parseColor("#3c93d9");
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
@@ -1690,13 +1691,53 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getDefaultEmptyEventColor() {
-        return mDefaultNewEventColor;
+    public int getNewEventColor() {
+        return mNewEventColor;
     }
 
-    public void setDefaultEmptyEventColor(int DefaultEmptyEventColor) {
-        mDefaultNewEventColor = DefaultEmptyEventColor;
+    public void setNewEventColor(int DefaultEmptyEventColor) {
+        mNewEventColor = DefaultEmptyEventColor;
         invalidate();
+    }
+
+    public int getNewEventId(){
+        return mNewEventId;
+    }
+
+    public void setNewEventId(int newEventId){
+        this.mNewEventId = newEventId;
+    }
+
+    public int getNewEventTextColor() {
+        return mNewEventTextColor;
+    }
+
+    public void setNewEventTextColor(int newEventTextColor) {
+        this.mNewEventTextColor = newEventTextColor;
+    }
+
+    public String getNewEventText() {
+        return mNewEventText;
+    }
+
+    public void setNewEventText(String newEventText) {
+        this.mNewEventText = newEventText;
+    }
+
+    public int getNewEventLengthInMinutes(){
+        return mNewEventLengthInMinutes;
+    }
+
+    public void setNewEventLengthInMinutes(int newEventLengthInMinutes) {
+        this.mNewEventLengthInMinutes = newEventLengthInMinutes;
+    }
+
+    public int getNewEventTimeResolutionInMinutes(){
+        return mNewEventTimeResolutionInMinutes;
+    }
+
+    public void setNewEventTimeResolutionInMinutes(int newEventTimeResolutionInMinutes){
+        this.mNewEventTimeResolutionInMinutes = newEventTimeResolutionInMinutes;
     }
 
     /**
