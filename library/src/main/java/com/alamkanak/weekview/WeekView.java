@@ -102,7 +102,7 @@ public class WeekView extends View {
     private Calendar mLastVisibleDay;
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
-    float mEmptyEventX;
+    private EventRect mEmptyEventRect;
 
     // Attributes and their default values.
     private int mHourHeight = 50;
@@ -136,6 +136,8 @@ public class WeekView extends View {
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
     private int mDefaultEmptyEventColor;
+    //TODO: add to attributes
+    private int mEmptyEventId = -100;
 
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
@@ -254,11 +256,13 @@ public class WeekView extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+
             // If the tap was on an event then trigger the callback.
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
+                    //TODO: Check if is new event & add eventAddClickListener
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
@@ -270,15 +274,50 @@ public class WeekView extends View {
             // If the tap was on in an empty space, then trigger the callback.
             if (mEmptyViewClickListener != null && e.getX() > mHeaderColumnWidth && e.getY() > (mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) {
                 Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                List<EventRect> tempEventRects = mEventRects;
+                mEventRects = new ArrayList<EventRect>();
                 if (selectedTime != null) {
+                    if(mEmptyEventRect!= null) {
+                        tempEventRects.remove(mEmptyEventRect);
+                        mEmptyEventRect = null;
+                    }
+
+                    //Todo and make setting for it
+                    int unroundedMinutes = selectedTime.get(Calendar.MINUTE);
+                    int mod = unroundedMinutes % 30;
+                    selectedTime.add(Calendar.MINUTE, mod < Math.ceil(30 / 2) ? -mod : (30 - mod));
                     playSoundEffect(SoundEffectConstants.CLICK);
-                    mEmptyEventX = e.getX();
                     mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
-                    mCacheEmptyEventDay = selectedTime;
+                    //TODO: Check if is enabled and make setting for it
+                    Calendar endTime = (Calendar) selectedTime.clone();
+                    endTime.add(Calendar.HOUR, 2);
+                    WeekViewEvent emptyEvent = new WeekViewEvent(mEmptyEventId, "+", null, selectedTime, endTime);
+
+                    float top = selectedTime.get(Calendar.HOUR_OF_DAY) * 60;
+                    top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
+                    float bottom = endTime.get(Calendar.HOUR_OF_DAY) * 60;
+                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
+
+                    // Calculate left and right.
+                    float left = 0;
+                    float right = left + mWidthPerDay;
+                    // Draw the event and the event name on top of it.
+                    if (left < right &&
+                            left < getWidth() &&
+                            top < getHeight() &&
+                            right > mHeaderColumnWidth &&
+                            bottom > 0
+                            ) {
+                        RectF dayRectF = new RectF(left, top, right, bottom);
+                        emptyEvent.setColor(mDefaultEmptyEventColor);
+                        mEmptyEventRect = new EventRect(emptyEvent, emptyEvent, dayRectF);
+                        tempEventRects.add(mEmptyEventRect);
+                    }
+
                     invalidate();
+                    computePositionOfEvents(tempEventRects);
                 }
             }
-
             return super.onSingleTapConfirmed(e);
         }
 
@@ -526,11 +565,6 @@ public class WeekView extends View {
 
         // Draw the time column and all the axes/separators.
         drawTimeColumnAndAxes(canvas);
-
-        //Draw empty event
-        //if (mCurrentScrollDirection != Direction.LEFT && mCurrentScrollDirection != Direction.RIGHT) {
-        //if (mCacheEmptyEventDay != null) drawEmptyEvent(mCacheEmptyEventDay, canvas);
-        //} else mCacheEmptyEventDay = null;
     }
 
     private void calculateHeaderHeight(){
@@ -733,7 +767,6 @@ public class WeekView extends View {
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
 
-            drawEmptyEvent(day, startPixel, canvas);
             // Draw the events.
             drawEvents(day, startPixel, canvas);
 
@@ -841,7 +874,10 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                        if(mEventRects.get(i).event.getId() != mEmptyEventId)
+                            drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                        else
+                            drawEmptyText(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -895,96 +931,6 @@ public class WeekView extends View {
     }
 
     /**
-     * Draw empty event
-     *
-     * //@param mCacheEmptyEventDay           The day.
-     * @param canvas         The canvas to draw upon.
-     */
-    private void drawEmptyEvent(Calendar date, float startFromPixel, Canvas canvas) {
-        Log.d("event", "");
-        // Prepare to iterate for each day.
-        /*Calendar day = (Calendar) today().clone();
-        day.add(Calendar.HOUR, 6);
-        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
-        //iterate thru days
-        for (int dayNumber = leftDaysWithGaps + 1;
-             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
-             dayNumber++) {
-            // Check if the day is today.
-            day = (Calendar) mFirstVisibleDay.clone();
-            day.add(Calendar.DATE, dayNumber - 1);
-            boolean sameDay = isSameDay(day, mCacheEmptyEventDay);
-            if (sameDay) {*/
-        //calculate bottom and top
-                /*float cal_bottom = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) + 1) * 60;
-                float bottom = mHourHeight * 24 * cal_bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
-                float originalBottom = bottom - mTimeTextHeight - mHeaderHeight;
-                float cal_top = mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) * 60;
-                float top = mHourHeight * 24 * cal_top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
-                mEmptyEventBackgroundPaint.setColor(mDefaultEmptyEventColor);
-                // Calculate left and right.
-                float left = 0;
-                for (int i = 0; i < mNumberOfVisibleDays + 1; i++) {
-                    int j = i + 1;
-                    float h_wpd = mHeaderColumnWidth + (mWidthPerDay * j);
-                    if (i != 0) h_wpd += (mColumnGap * j);
-                    if (mEmptyEventX <= h_wpd) {
-                        left = mHeaderColumnWidth;
-                        if (i != 0) left += (mWidthPerDay * i) + (mColumnGap * i);
-                        break;
-                    }
-                }
-                float right = left + mWidthPerDay;
-
-                // Draw the empty event and the text on top of it.
-                RectF dayRectF = new RectF(left, top, right, bottom);
-                canvas.drawRect(dayRectF, mEmptyEventBackgroundPaint);
-                drawEmptyText("+", canvas, (((originalBottom - top) / 2) + top), left, (int) dayRectF.width());
-                break;*/
-        if (mCacheEmptyEventDay != null && isSameDay(mCacheEmptyEventDay, date)) {
-            Log.d("event", "ok");
-            Log.d("event", mCacheEmptyEventDay.toString());
-            // Calculate top.
-            float top = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY)) * 60;
-            top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
-
-            // Calculate bottom.
-            float bottom = (mCacheEmptyEventDay.get(Calendar.HOUR_OF_DAY) + 1) * 60;// mEventRects.get(i).bottom;
-            bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 - mEventMarginVertical;
-
-
-            // Calculate left and right.
-            float left = startFromPixel;
-            //if (left < startFromPixel)
-            //left += mOverlappingEventGap;
-            float right = left + mWidthPerDay;
-
-
-            // Draw the event and the event name on top of it.
-            if (left < right &&
-                    left < getWidth() &&
-                    top < getHeight() &&
-                    right > mHeaderColumnWidth &&
-                    bottom > 0
-                    ) {
-                //mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                //mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
-
-                //drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
-                RectF dayRectF = new RectF(left, top, right, bottom);
-                canvas.drawRoundRect(dayRectF, mEventCornerRadius, mEventCornerRadius, mEmptyEventBackgroundPaint);
-                drawEmptyText("+", canvas, bottom, left, (int) dayRectF.width());
-            }
-        /*else
-            //mEventRects.get(i).rectF = null;
-
-            }*/
-
-        }
-    }
-
-
-    /**
      * Draw the name of the event on top of the event rectangle.
      * @param event The event of which the title (and location) should be drawn.
      * @param rect The rectangle on which the text is to be drawn.
@@ -1014,7 +960,6 @@ public class WeekView extends View {
 
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
-
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
@@ -1022,7 +967,8 @@ public class WeekView extends View {
             int availableLineCount = availableHeight / lineHeight;
             do {
                 // Ellipsize text to fit into event rect.
-                textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                if(event.getId() != mEmptyEventId)
+                    textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
@@ -1041,18 +987,15 @@ public class WeekView extends View {
     /**
      * Draw the text on top of the rectangle in the empty event.
      *
-     * @param text         The empty text to draw.
-     * @param canvas       The canvas to draw upon.
-     * @param originalTop  The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
-     * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
+     *
      */
-    private void drawEmptyText(String text, Canvas canvas, float originalTop, float originalLeft, int textWidth) {
+    private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
 
         // Get text dimensions
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getMetrics(metrics);
-        float textSize = 18f;
+        float textSize = 18f * rect.height()/22;
         switch (metrics.densityDpi) {
             case DisplayMetrics.DENSITY_LOW:
                 textSize = textSize * 0.75f;
@@ -1073,7 +1016,7 @@ public class WeekView extends View {
 
         mEmptyEventTextPaint.setTextSize(textSize);
         mEmptyEventTextPaint.setColor(mEmptyEventTextColor);
-        StaticLayout textLayout = new StaticLayout(text, mEmptyEventTextPaint, textWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+        StaticLayout textLayout = new StaticLayout(event.getName(), mEmptyEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
         // Draw text
         canvas.save();
         canvas.translate(originalLeft, originalTop);
