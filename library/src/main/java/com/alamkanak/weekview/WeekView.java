@@ -976,27 +976,29 @@ public class WeekView extends View {
 
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
-        int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+        if(textLayout.getLineCount() > 0) {
+            int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
-        if (availableHeight >= lineHeight) {
-            // Calculate available number of line counts.
-            int availableLineCount = availableHeight / lineHeight;
-            do {
-                // Ellipsize text to fit into event rect.
-                if(event.getId() != mNewEventId)
-                    textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+            if (availableHeight >= lineHeight) {
+                // Calculate available number of line counts.
+                int availableLineCount = availableHeight / lineHeight;
+                do {
+                    // Ellipsize text to fit into event rect.
+                    if (event.getId() != mNewEventId)
+                        textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-                // Reduce line count.
-                availableLineCount--;
+                    // Reduce line count.
+                    availableLineCount--;
 
-                // Repeat until text is short enough.
-            } while (textLayout.getHeight() > availableHeight);
+                    // Repeat until text is short enough.
+                } while (textLayout.getHeight() > availableHeight);
 
-            // Draw text.
-            canvas.save();
-            canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
-            textLayout.draw(canvas);
-            canvas.restore();
+                // Draw text.
+                canvas.save();
+                canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
+                textLayout.draw(canvas);
+                canvas.restore();
+            }
         }
     }
 
