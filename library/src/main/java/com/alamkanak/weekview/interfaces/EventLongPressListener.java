@@ -7,7 +7,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 /**
  * Created by Thomas on 01/02/2016.
  */
-public interface EventLongPressListener {
+public interface EventLongPressListener{
     /**
      * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
      * @param event: event clicked.

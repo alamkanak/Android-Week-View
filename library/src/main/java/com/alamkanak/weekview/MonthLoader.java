@@ -7,9 +7,9 @@ import java.util.List;
 
 public class MonthLoader implements WeekViewLoader {
 
-    private MonthChangeListener mOnMonthChangeListener;
+    private com.alamkanak.weekview.interfaces.MonthChangeListener mOnMonthChangeListener;
 
-    public MonthLoader(MonthChangeListener listener){
+    public MonthLoader(com.alamkanak.weekview.interfaces.MonthChangeListener listener){
         this.mOnMonthChangeListener = listener;
     }
 
@@ -23,23 +23,21 @@ public class MonthLoader implements WeekViewLoader {
         return mOnMonthChangeListener.onMonthChange(periodIndex / 12, periodIndex % 12 + 1);
     }
 
-    public MonthChangeListener getOnMonthChangeListener() {
+    public com.alamkanak.weekview.interfaces.MonthChangeListener getOnMonthChangeListener() {
         return mOnMonthChangeListener;
     }
 
-    public void setOnMonthChangeListener(MonthChangeListener onMonthChangeListener) {
+    public void setOnMonthChangeListener(com.alamkanak.weekview.interfaces.MonthChangeListener onMonthChangeListener) {
         this.mOnMonthChangeListener = onMonthChangeListener;
     }
 
-    public interface MonthChangeListener {
-        /**
-         * Very important interface, it's the base to load events in the calendar.
-         * This method is called three times: once to load the previous month, once to load the next month and once to load the current month.<br/>
-         * <strong>That's why you can have three times the same event at the same place if you mess up with the configuration</strong>
-         * @param newYear : year of the events required by the view.
-         * @param newMonth : month of the events required by the view <br/><strong>1 based (not like JAVA API) --> January = 1 and December = 12</strong>.
-         * @return a list of the events happening <strong>during the specified month</strong>.
-         */
-        List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth);
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.MonthChangeListener}  instead.
+     */
+    @Deprecated
+    public interface MonthChangeListener extends com.alamkanak.weekview.interfaces.MonthChangeListener{
+
     }
 }

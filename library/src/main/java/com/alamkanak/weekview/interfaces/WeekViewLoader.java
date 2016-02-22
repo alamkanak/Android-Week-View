@@ -5,7 +5,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 import java.util.Calendar;
 import java.util.List;
 
-public interface WeekViewLoader {
+public interface WeekViewLoader{
     /**
      * Convert a date into a double that will be used to reference when you're loading data.
      *

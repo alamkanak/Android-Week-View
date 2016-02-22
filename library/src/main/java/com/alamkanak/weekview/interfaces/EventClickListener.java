@@ -7,7 +7,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 /**
  * Created by Thomas on 01/02/2016.
  */
-public interface EventClickListener {
+public interface EventClickListener{
     /**
      * Triggered when clicked on one existing event
      * @param event: event clicked.
