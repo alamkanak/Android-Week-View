@@ -143,8 +143,8 @@ public class WeekView extends View {
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight= 100;
-    private float mFixedFocusPointFraction = 0;
-    private boolean mFixedFocusPointEnabled = true;
+    private float mZoomFocusPoint = 0;
+    private boolean mZoomFocusPointEnabled = true;
     private int mScrollDuration = 250;
 
     // Listeners.
@@ -354,8 +354,8 @@ public class WeekView extends View {
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
-            mFixedFocusPointFraction = a.getFraction(R.styleable.WeekView_fixedFocusPointFraction, 1, 1, mFixedFocusPointFraction);
-            mFixedFocusPointEnabled = a.getBoolean(R.styleable.WeekView_fixedFocusPointEnabled, mFixedFocusPointEnabled);
+            mZoomFocusPoint = a.getFraction(R.styleable.WeekView_zoomFocusPoint, 1, 1, mZoomFocusPoint);
+            mZoomFocusPointEnabled = a.getBoolean(R.styleable.WeekView_zoomFocusPointEnabled, mZoomFocusPointEnabled);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
             a.recycle();
@@ -1783,33 +1783,41 @@ public class WeekView extends View {
     }
 
     /**
-     * Enable fixed zoom focus point
+     * Enable zoom focus point
+     * If you set this to false the `zoomFocusPoint` won't take effect any more while zooming.
+     * The zoom will always be focused at the center of your gesture.
      */
-    public void setFixedFocusPointEnabled(boolean fixedFocusPointEnabled) {
-        mFixedFocusPointEnabled = fixedFocusPointEnabled;
+    public void setZoomFocusPointEnabled(boolean zoomFocusPointEnabled) {
+        mZoomFocusPointEnabled = zoomFocusPointEnabled;
     }
 
     /*
-     * is fixed focus point enabled
+     * Is focus point enabled
      * @return fixed focus point enabled?
      */
-    public boolean isFixedFocusPointEnabled() {
-        return mFixedFocusPointEnabled;
+    public boolean isZoomFocusPointEnabled() {
+        return mZoomFocusPointEnabled;
     }
 
     /*
-     * Get fractional focus point, 0 = 0% of height, 1 = 100% of height
-     * @return fixed focus point
+     * Get focus point
+     * 0 = top of view, 1 = bottom of view
+     * The focused point (multiplier of the view height) where the week view is zoomed around.
+     * This point will not move while zooming.
+     * @return focus point
      */
-    public float getFixedFocusPointFraction() {
-        return mFixedFocusPointFraction;
+    public float getZoomFocusPoint() {
+        return mZoomFocusPoint;
     }
 
     /**
-     * Set fractional focus point, 0 = 0% of height, 1 = 100% of height
+     * Set focus point
+     * 0 = top of view, 1 = bottom of view
+     * The focused point (multiplier of the view height) where the week view is zoomed around.
+     * This point will not move while zooming.
      */
-    public void setFixedFocusPointFraction(int fixedFocusPointFraction) {
-        mFixedFocusPointFraction = fixedFocusPointFraction;
+    public void setZoomFocusPoint(int zoomFocusPoint) {
+        mZoomFocusPoint = zoomFocusPoint;
     }
 
 
@@ -2073,9 +2081,9 @@ public class WeekView extends View {
             goToNearestOrigin();
 
             // Calculate focused point for scale action
-            if (mFixedFocusPointEnabled) {
+            if (mZoomFocusPointEnabled) {
                 // Use fractional focus, percentage of height
-                mFocusedPointY = (getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) * mFixedFocusPointFraction;
+                mFocusedPointY = (getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) * mZoomFocusPoint;
             } else {
                 // Grab focus
                 mFocusedPointY = detector.getFocusY();

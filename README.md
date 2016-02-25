@@ -104,10 +104,9 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
-- `focusPoint`
 - `firstDayOfWeek`
-- `fixedFocusPointEnabled` The focused point (time) while zooming the week view. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
-- `fixedFocusPointFraction` If you disable the fixed focus point the center of your zoom gesture is used.
+- `zoomFocusPoint` The focused point (percentage of the view height) where the week view is zoomed around. This point will not move while zooming. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
+- `zoomFocusPointEnabled` If you set this to ``false`` the zoomFocusPoint won't take effect any more while zooming. The zoom will always be focused at the center of your gesture.
 - `headerColumnBackground`
 - `headerColumnPadding`
 - `headerColumnTextColor`
