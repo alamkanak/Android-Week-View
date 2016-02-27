@@ -2,6 +2,8 @@ package com.alamkanak.weekview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -136,7 +138,8 @@ public class WeekView extends View {
     private int mNewEventColor;
     private int mNewEventId = -100;
     private int mNewEventTextColor = Color.WHITE;
-    private String mNewEventText = "+";
+    private String mNewEventText = "";
+    private int mNewEventIconResource = android.R.drawable.ic_input_add;
     private int mNewEventLengthInMinutes = 60;
     private int mNewEventTimeResolutionInMinutes = 15;
 
@@ -402,8 +405,9 @@ public class WeekView extends View {
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mNewEventColor = a.getColor(R.styleable.WeekView_newEventColor, mNewEventColor);
-            mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
-            mNewEventText = a.getString(R.styleable.WeekView_newEventText);
+            //mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
+            //mNewEventText = a.getString(R.styleable.WeekView_newEventText);
+            mNewEventIconResource = a.getInt(R.styleable.WeekView_newEventIconResource, mNewEventIconResource);
             mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
             mNewEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, mNewEventLengthInMinutes);
             mNewEventTimeResolutionInMinutes = a.getInt(R.styleable.WeekView_newEventTimeResolutionInMinutes, mNewEventTimeResolutionInMinutes);
@@ -1008,7 +1012,12 @@ public class WeekView extends View {
      *
      */
     private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
-
+        int size = (int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width()));
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_input_add);
+        icon = Bitmap.createScaledBitmap(icon, size, size, false);
+        canvas.drawBitmap(icon, originalLeft + (rect.width() - icon.getWidth())/ 2, originalTop + (rect.height() - icon.getHeight()) / 2, new Paint());
+        return;
+        /*
         // Get text dimensions
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -1042,6 +1051,7 @@ public class WeekView extends View {
         canvas.translate(originalLeft, originalTop);
         textLayout.draw(canvas);
         canvas.restore();
+        */
     }
 
     /**
