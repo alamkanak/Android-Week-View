@@ -1011,7 +1011,7 @@ public class WeekView extends View {
      */
     private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         int size = (int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width()));
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_input_add);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), mNewEventIconResource);
         icon = Bitmap.createScaledBitmap(icon, size, size, false);
         canvas.drawBitmap(icon, originalLeft + (rect.width() - icon.getWidth())/ 2, originalTop + (rect.height() - icon.getHeight()) / 2, new Paint());
         return;
