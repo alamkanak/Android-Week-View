@@ -25,7 +25,6 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -34,7 +33,6 @@ import android.view.ScaleGestureDetector;
 import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.WindowManager;
 import android.widget.OverScroller;
 
 import java.text.SimpleDateFormat;
@@ -85,14 +83,14 @@ public class WeekView extends View {
     private Paint mNowLinePaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
-    private Paint mEmptyEventBackgroundPaint;
+    private Paint mNewEventBackgroundPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
     private List<? extends WeekViewEvent> mPreviousPeriodEvents;
     private List<? extends WeekViewEvent> mCurrentPeriodEvents;
     private List<? extends WeekViewEvent> mNextPeriodEvents;
     private TextPaint mEventTextPaint;
-    private TextPaint mEmptyEventTextPaint;
+    private TextPaint mNewEventTextPaint;
     private Paint mHeaderColumnBackgroundPaint;
     private int mFetchedPeriod = -1; // the middle period the calendar has fetched.
     private boolean mRefreshEvents = false;
@@ -501,8 +499,8 @@ public class WeekView extends View {
         mEventBackgroundPaint = new Paint();
         mEventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
         // Prepare empty event background color.
-        mEmptyEventBackgroundPaint = new Paint();
-        mEmptyEventBackgroundPaint.setColor(Color.rgb(60, 147, 217));
+        mNewEventBackgroundPaint = new Paint();
+        mNewEventBackgroundPaint.setColor(Color.rgb(60, 147, 217));
 
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
@@ -516,10 +514,10 @@ public class WeekView extends View {
 
 
         // Prepare empty event text size and color.
-        mEmptyEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
-        mEmptyEventTextPaint.setStyle(Paint.Style.FILL);
-        mEmptyEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        mEmptyEventTextPaint.setColor(mNewEventTextColor);
+        mNewEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        mNewEventTextPaint.setStyle(Paint.Style.FILL);
+        mNewEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        mNewEventTextPaint.setColor(mNewEventTextColor);
         //mStartDate = (Calendar) mFirstVisibleDay.clone();
 
         // Set default event color.
@@ -1041,11 +1039,11 @@ public class WeekView extends View {
                 break;
         }
 
-        mEmptyEventTextPaint.setTextSize(textSize);
-        mEmptyEventTextPaint.setColor(mNewEventTextColor);
+        mNewEventTextPaint.setTextSize(textSize);
+        mNewEventTextPaint.setColor(mNewEventTextColor);
         if(event.getName() == null)
             event.setName("+");
-        StaticLayout textLayout = new StaticLayout(event.getName(), mEmptyEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+        StaticLayout textLayout = new StaticLayout(event.getName(), mNewEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
         // Draw text
         canvas.save();
         canvas.translate(originalLeft, originalTop);
