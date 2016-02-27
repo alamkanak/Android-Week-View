@@ -12,6 +12,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
@@ -137,7 +139,7 @@ public class WeekView extends View {
     private int mNewEventId = -100;
     private int mNewEventTextColor = Color.WHITE;
     private String mNewEventText = "";
-    private int mNewEventIconResource = android.R.drawable.ic_input_add;
+    private Drawable mNewEventIconDrawable;
     private int mNewEventLengthInMinutes = 60;
     private int mNewEventTimeResolutionInMinutes = 15;
 
@@ -405,7 +407,7 @@ public class WeekView extends View {
             mNewEventColor = a.getColor(R.styleable.WeekView_newEventColor, mNewEventColor);
             //mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
             //mNewEventText = a.getString(R.styleable.WeekView_newEventText);
-            mNewEventIconResource = a.getInt(R.styleable.WeekView_newEventIconResource, mNewEventIconResource);
+            mNewEventIconDrawable = a.getDrawable(R.styleable.WeekView_newEventIconResource);
             mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
             mNewEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, mNewEventLengthInMinutes);
             mNewEventTimeResolutionInMinutes = a.getInt(R.styleable.WeekView_newEventTimeResolutionInMinutes, mNewEventTimeResolutionInMinutes);
@@ -1011,7 +1013,9 @@ public class WeekView extends View {
      */
     private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         int size = (int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width()));
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), mNewEventIconResource);
+        if(mNewEventIconDrawable == null)
+            mNewEventIconDrawable = getResources().getDrawable(android.R.drawable.ic_input_add);
+        Bitmap icon = ((BitmapDrawable) mNewEventIconDrawable).getBitmap();
         icon = Bitmap.createScaledBitmap(icon, size, size, false);
         canvas.drawBitmap(icon, originalLeft + (rect.width() - icon.getWidth())/ 2, originalTop + (rect.height() - icon.getHeight()) / 2, new Paint());
         return;
