@@ -325,10 +325,9 @@ public class WeekView extends View {
                             newEvent.setColor(mNewEventColor);
                             mNewEventRect = new EventRect(newEvent, newEvent, dayRectF);
                             tempEventRects.add(mNewEventRect);
+                            invalidate();
+                            computePositionOfEvents(tempEventRects);
                         }
-
-                        invalidate();
-                        computePositionOfEvents(tempEventRects);
                     }
                 }
             }
