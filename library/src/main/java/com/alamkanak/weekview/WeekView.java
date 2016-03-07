@@ -303,7 +303,7 @@ public class WeekView extends View {
                         selectedTime.add(Calendar.MINUTE, mod < Math.ceil(mNewEventTimeResolutionInMinutes / 2) ? -mod : (mNewEventTimeResolutionInMinutes - mod));
 
                         Calendar endTime = (Calendar) selectedTime.clone();
-                        endTime.add(Calendar.MINUTE, mNewEventLengthInMinutes);
+                        endTime.add(Calendar.MINUTE, Math.min(mNewEventLengthInMinutes, (24-selectedTime.get(Calendar.HOUR_OF_DAY))*60 - selectedTime.get(Calendar.MINUTE)));
                         WeekViewEvent newEvent = new WeekViewEvent(mNewEventId, mNewEventText, null, selectedTime, endTime);
 
                         float top = selectedTime.get(Calendar.HOUR_OF_DAY) * 60;
@@ -1012,7 +1012,7 @@ public class WeekView extends View {
      *
      */
     private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
-        int size = (int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width()));
+        int size = Math.max(1,(int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width())));
         if(mNewEventIconDrawable == null)
             mNewEventIconDrawable = getResources().getDrawable(android.R.drawable.ic_input_add);
         Bitmap icon = ((BitmapDrawable) mNewEventIconDrawable).getBitmap();
