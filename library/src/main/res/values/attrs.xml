@@ -29,8 +29,6 @@
         <attr name="eventTextColor" format="color"/>
         <attr name="newEventColor" format="color"/>
         <attr name="newEventId" format="integer"/>
-    <!--    <attr name="newEventTextColor" format="color"/>
-        <attr name="newEventText" format="string"/> -->
         <attr name="newEventIconResource" format="integer"/>
         <attr name="newEventLengthInMinutes" format="integer"/>
         <attr name="newEventTimeResolutionInMinutes" format="integer"/>
