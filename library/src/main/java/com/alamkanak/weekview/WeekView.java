@@ -516,9 +516,6 @@ public class WeekView extends View {
         // Set default empty event color.
         mNewEventColor = Color.parseColor("#3c93d9");
 
-        // Set default event color.
-        mDefaultEventColor = Color.parseColor("#9fc6e7");
-
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
