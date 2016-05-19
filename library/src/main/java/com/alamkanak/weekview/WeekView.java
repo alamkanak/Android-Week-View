@@ -1017,42 +1017,7 @@ public class WeekView extends View {
         Bitmap icon = ((BitmapDrawable) mNewEventIconDrawable).getBitmap();
         icon = Bitmap.createScaledBitmap(icon, size, size, false);
         canvas.drawBitmap(icon, originalLeft + (rect.width() - icon.getWidth())/ 2, originalTop + (rect.height() - icon.getHeight()) / 2, new Paint());
-        return;
-        /*
-        // Get text dimensions
-        DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(metrics);
-        float textSize = 18f * rect.height()/22;
-        switch (metrics.densityDpi) {
-            case DisplayMetrics.DENSITY_LOW:
-                textSize = textSize * 0.75f;
-                break;
-            case DisplayMetrics.DENSITY_MEDIUM:
-                textSize = textSize * 1f;
-                break;
-            case DisplayMetrics.DENSITY_HIGH:
-                textSize = textSize * 1.5f;
-                break;
-            case DisplayMetrics.DENSITY_XHIGH:
-                textSize = textSize * 2.0f;
-                break;
-            case DisplayMetrics.DENSITY_XXHIGH:
-                textSize = textSize * 2.5f;
-                break;
-        }
 
-        mNewEventTextPaint.setTextSize(textSize);
-        mNewEventTextPaint.setColor(mNewEventTextColor);
-        if(event.getName() == null)
-            event.setName("+");
-        StaticLayout textLayout = new StaticLayout(event.getName(), mNewEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-        // Draw text
-        canvas.save();
-        canvas.translate(originalLeft, originalTop);
-        textLayout.draw(canvas);
-        canvas.restore();
-        */
     }
 
     /**
