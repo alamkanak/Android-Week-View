@@ -144,6 +144,7 @@ public class WeekView extends View {
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
+    private Typeface mTypeface = Typeface.DEFAULT_BOLD;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -386,7 +387,8 @@ public class WeekView extends View {
         mHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextHeight = rect.height();
-        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        mHeaderTextPaint.setTypeface(mTypeface);
+
 
         // Prepare header background paint.
         mHeaderBackgroundPaint = new Paint();
@@ -423,7 +425,8 @@ public class WeekView extends View {
         mTodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTodayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mTodayHeaderTextPaint.setTextSize(mTextSize);
-        mTodayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        mTodayHeaderTextPaint.setTypeface(mTypeface);
+
         mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
 
         // Prepare event background color.
@@ -548,7 +551,7 @@ public class WeekView extends View {
         // Calculate the available width for each day.
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
-        mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
+        mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays - mEventPadding;
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
@@ -1444,6 +1447,8 @@ public class WeekView extends View {
             mEventTextPaint.setTypeface(typeface);
             mTodayHeaderTextPaint.setTypeface(typeface);
             mTimeTextPaint.setTypeface(typeface);
+            mTypeface = typeface;
+            init();
         }
     }
 
