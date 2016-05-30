@@ -1439,6 +1439,14 @@ public class WeekView extends View {
         invalidate();
     }
 
+    public void setTypeface(Typeface typeface){
+        if(typeface!=null){
+            mEventTextPaint.setTypeface(typeface);
+            mTodayHeaderTextPaint.setTypeface(typeface);
+            mTimeTextPaint.setTypeface(typeface);
+        }
+    }
+
     public int getHeaderRowPadding() {
         return mHeaderRowPadding;
     }
