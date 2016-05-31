@@ -551,7 +551,7 @@ public class WeekView extends View {
         // Calculate the available width for each day.
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
-        mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays - mEventPadding;
+        mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
