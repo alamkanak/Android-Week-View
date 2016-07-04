@@ -537,7 +537,7 @@ public class WeekView extends View {
         // Clip to paint in left column only.
         canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
-        for (int i = 0; i < 24; i++) {
+        for (int i = mStartTime; i < mEndTime; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * (i-mStartTime) + mHeaderMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
@@ -613,7 +613,7 @@ public class WeekView extends View {
 
         // Prepare to iterate for each day.
         Calendar day = (Calendar) today.clone();
-        day.add(Calendar.HOUR, 6);
+        day.add(Calendar.HOUR_OF_DAY, 6);
 
         // Prepare to iterate for each hour to draw the hour lines.
         int lineCount = (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 -
@@ -687,7 +687,7 @@ public class WeekView extends View {
 
             // Prepare the separator lines for hours.
             int i = 0;
-            for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
+            for (int hourNumber = mStartTime; hourNumber < mEndTime; hourNumber++) {
                 float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * (hourNumber-mStartTime) + mTimeTextHeight/2 + mHeaderMarginBottom;
                 if (top > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom - mHourSeparatorHeight && top < getHeight() && startPixel + mWidthPerDay - start > 0){
                     hourLines[i * 4] = start;
@@ -714,8 +714,9 @@ public class WeekView extends View {
             if (mShowNowLine && sameDay){
                 float startY = mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
-                float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
-                canvas.drawLine(start, startY + beforeNow, startPixel + mWidthPerDay, startY + beforeNow, mNowLinePaint);
+                float beforeNow = (now.get(Calendar.HOUR_OF_DAY) - mStartTime + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
+                float top = startY + beforeNow;
+                canvas.drawLine(start, top, startPixel + mWidthPerDay, top, mNowLinePaint);
             }
 
             // In the next iteration, start from the next day.
@@ -772,7 +773,7 @@ public class WeekView extends View {
                         - mHeaderRowPadding * 2 - mTimeTextHeight/2 - mHeaderMarginBottom;
                 int hour = (int)(pixelsFromZero / mHourHeight);
                 int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
-                day.add(Calendar.HOUR, hour);
+                day.add(Calendar.HOUR_OF_DAY, hour + mStartTime);
                 day.set(Calendar.MINUTE, minute);
                 return day;
             }
@@ -805,7 +806,7 @@ public class WeekView extends View {
 
             if(startTime!=null && endTime !=null && startTime.before(endTime)) {
                 mStartTime = Math.max(0,startTime.get(Calendar.HOUR_OF_DAY));
-                mEndTime = Math.min(24,endTime.get(Calendar.HOUR_OF_DAY));
+                mEndTime = Math.min(24,endTime.get(Calendar.HOUR_OF_DAY)+1);
                 return;
             }
         }
