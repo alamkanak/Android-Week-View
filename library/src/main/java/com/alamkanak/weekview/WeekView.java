@@ -892,6 +892,7 @@ public class WeekView extends View {
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         if(mEventRects.get(i).event.getId() != mNewEventId)
                             drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
@@ -939,6 +940,7 @@ public class WeekView extends View {
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }

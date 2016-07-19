@@ -1,5 +1,8 @@
 package com.alamkanak.weekview;
 
+import android.graphics.Shader;
+import android.widget.ShareActionProvider;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -18,6 +21,7 @@ public class WeekViewEvent {
     private String mLocation;
     private int mColor;
     private boolean mAllDay;
+    private Shader mShader;
 
     public WeekViewEvent(){
 
@@ -67,13 +71,27 @@ public class WeekViewEvent {
      * @param endTime The time when the event ends.
      * @param allDay Is the event an all day event
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay, Shader shader) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
         this.mAllDay = allDay;
+        this.mShader = shader;
+    }
+
+    /**
+     * Initializes the event for week view.
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     * @param allDay Is the event an all day event
+     */
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
+        this(id, name, location, startTime, endTime, allDay, null);
     }
 
     /**
@@ -143,6 +161,14 @@ public class WeekViewEvent {
     public boolean isAllDay() { return mAllDay;}
 
     public void setAllDay(boolean allDay) { this.mAllDay = allDay;}
+
+    public Shader getShader(){
+        return mShader;
+    }
+
+    public void setShader(Shader shader){
+        mShader = shader;
+    }
 
     public long getId() {
         return mId;
