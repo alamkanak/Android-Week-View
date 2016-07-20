@@ -3,7 +3,6 @@ package com.alamkanak.weekview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -137,8 +136,6 @@ public class WeekView extends View {
     private int mDefaultEventColor;
     private int mNewEventColor;
     private int mNewEventId = -100;
-    private int mNewEventTextColor = Color.WHITE;
-    private String mNewEventText = "";
     private Drawable mNewEventIconDrawable;
     private int mNewEventLengthInMinutes = 60;
     private int mNewEventTimeResolutionInMinutes = 15;
@@ -304,7 +301,7 @@ public class WeekView extends View {
 
                         Calendar endTime = (Calendar) selectedTime.clone();
                         endTime.add(Calendar.MINUTE, Math.min(mNewEventLengthInMinutes, (24-selectedTime.get(Calendar.HOUR_OF_DAY))*60 - selectedTime.get(Calendar.MINUTE)));
-                        WeekViewEvent newEvent = new WeekViewEvent(mNewEventId, mNewEventText, null, selectedTime, endTime);
+                        WeekViewEvent newEvent = new WeekViewEvent(mNewEventId, "", null, selectedTime, endTime);
 
                         float top = selectedTime.get(Calendar.HOUR_OF_DAY) * 60;
                         top = mHourHeight * 24 * top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
@@ -404,8 +401,6 @@ public class WeekView extends View {
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mNewEventColor = a.getColor(R.styleable.WeekView_newEventColor, mNewEventColor);
-            //mNewEventTextColor = a.getColor(R.styleable.WeekView_newEventTextColor, mNewEventTextColor);
-            //mNewEventText = a.getString(R.styleable.WeekView_newEventText);
             mNewEventIconDrawable = a.getDrawable(R.styleable.WeekView_newEventIconResource);
             mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
             mNewEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, mNewEventLengthInMinutes);
@@ -514,20 +509,12 @@ public class WeekView extends View {
         mEventTextPaint.setTextSize(mEventTextSize);
 
 
-        // Prepare empty event text size and color.
-        mNewEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
-        mNewEventTextPaint.setStyle(Paint.Style.FILL);
-        mNewEventTextPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        mNewEventTextPaint.setColor(mNewEventTextColor);
-        //mStartDate = (Calendar) mFirstVisibleDay.clone();
+         //mStartDate = (Calendar) mFirstVisibleDay.clone();
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
         // Set default empty event color.
         mNewEventColor = Color.parseColor("#3c93d9");
-
-        // Set default event color.
-        mDefaultEventColor = Color.parseColor("#9fc6e7");
 
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
@@ -897,7 +884,7 @@ public class WeekView extends View {
                         if(mEventRects.get(i).event.getId() != mNewEventId)
                             drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                         else
-                            drawEmptyText(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                            drawEmptyImage(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -1012,49 +999,14 @@ public class WeekView extends View {
      *
      *
      */
-    private void drawEmptyText(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
+    private void drawEmptyImage(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         int size = Math.max(1,(int)Math.floor(Math.min(0.8 * rect.height(), 0.8 * rect.width())));
         if(mNewEventIconDrawable == null)
             mNewEventIconDrawable = getResources().getDrawable(android.R.drawable.ic_input_add);
         Bitmap icon = ((BitmapDrawable) mNewEventIconDrawable).getBitmap();
         icon = Bitmap.createScaledBitmap(icon, size, size, false);
         canvas.drawBitmap(icon, originalLeft + (rect.width() - icon.getWidth())/ 2, originalTop + (rect.height() - icon.getHeight()) / 2, new Paint());
-        return;
-        /*
-        // Get text dimensions
-        DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(metrics);
-        float textSize = 18f * rect.height()/22;
-        switch (metrics.densityDpi) {
-            case DisplayMetrics.DENSITY_LOW:
-                textSize = textSize * 0.75f;
-                break;
-            case DisplayMetrics.DENSITY_MEDIUM:
-                textSize = textSize * 1f;
-                break;
-            case DisplayMetrics.DENSITY_HIGH:
-                textSize = textSize * 1.5f;
-                break;
-            case DisplayMetrics.DENSITY_XHIGH:
-                textSize = textSize * 2.0f;
-                break;
-            case DisplayMetrics.DENSITY_XXHIGH:
-                textSize = textSize * 2.5f;
-                break;
-        }
 
-        mNewEventTextPaint.setTextSize(textSize);
-        mNewEventTextPaint.setColor(mNewEventTextColor);
-        if(event.getName() == null)
-            event.setName("+");
-        StaticLayout textLayout = new StaticLayout(event.getName(), mNewEventTextPaint, (int) rect.width(), Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-        // Draw text
-        canvas.save();
-        canvas.translate(originalLeft, originalTop);
-        textLayout.draw(canvas);
-        canvas.restore();
-        */
     }
 
     /**
@@ -1669,15 +1621,6 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getEmptyEventTextColor() {
-        return mNewEventTextColor;
-    }
-
-    public void setEmptyEventTextColor(int emptyEventTextColor) {
-        mNewEventTextColor = emptyEventTextColor;
-        invalidate();
-    }
-
     public int getEventPadding() {
         return mEventPadding;
     }
@@ -1710,8 +1653,8 @@ public class WeekView extends View {
         return mNewEventColor;
     }
 
-    public void setNewEventColor(int DefaultEmptyEventColor) {
-        mNewEventColor = DefaultEmptyEventColor;
+    public void setNewEventColor(int defaultNewEventColor) {
+        mNewEventColor = defaultNewEventColor;
         invalidate();
     }
 
@@ -1721,22 +1664,6 @@ public class WeekView extends View {
 
     public void setNewEventId(int newEventId){
         this.mNewEventId = newEventId;
-    }
-
-    public int getNewEventTextColor() {
-        return mNewEventTextColor;
-    }
-
-    public void setNewEventTextColor(int newEventTextColor) {
-        this.mNewEventTextColor = newEventTextColor;
-    }
-
-    public String getNewEventText() {
-        return mNewEventText;
-    }
-
-    public void setNewEventText(String newEventText) {
-        this.mNewEventText = newEventText;
     }
 
     public int getNewEventLengthInMinutes(){
