@@ -6,7 +6,7 @@
     tools:context=".BaseActivity"
     android:background="#fff">
 
-    <com.sauray.agenda.WeekView
+    <com.sauray.agenda.StaticWeekView
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

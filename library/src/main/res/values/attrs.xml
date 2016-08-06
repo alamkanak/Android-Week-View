@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="WeekView">
+    <declare-styleable name="StaticWeekView">
         <attr name="firstDayOfWeek" format="enum">
             <enum name="sunday" value="1"/>
             <enum name="monday" value="2"/>
