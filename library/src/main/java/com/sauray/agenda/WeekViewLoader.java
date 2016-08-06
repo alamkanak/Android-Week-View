@@ -1,4 +1,4 @@
-package com.alamkanak.weekview;
+package com.sauray.agenda;
 
 import java.util.Calendar;
 import java.util.List;

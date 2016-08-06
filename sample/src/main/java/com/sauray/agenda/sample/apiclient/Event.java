@@ -1,9 +1,9 @@
-package com.alamkanak.weekview.sample.apiclient;
+package com.sauray.agenda.sample.apiclient;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 
-import com.alamkanak.weekview.WeekViewEvent;
+import com.sauray.agenda.WeekViewEvent;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

@@ -1,7 +1,11 @@
 Android Week View
 =================
 
+
 **Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
+
+Projected was forked to create a static agenda that could be added in a ViewPager to created a more enjoyable scrolling experience for the user.
+Now works the same way as Google Agenda.
 
 ![](images/screen-shot.png)
 
@@ -96,6 +100,7 @@ Customization
 
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
+- `allDayEventHeight`
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
@@ -126,6 +131,7 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `scrollDuration`
 
 Interfaces
 ----------

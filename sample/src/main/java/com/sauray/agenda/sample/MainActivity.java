@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample;
+package com.sauray.agenda.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
