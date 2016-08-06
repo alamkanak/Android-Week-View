@@ -1,6 +1,6 @@
-package com.alamkanak.weekview.sample;
+package com.sauray.agenda.sample;
 
-import com.alamkanak.weekview.WeekViewEvent;
+import com.sauray.agenda.WeekViewEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

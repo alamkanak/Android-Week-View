@@ -1,4 +1,4 @@
-package com.alamkanak.weekview;
+package com.sauray.agenda;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -33,6 +33,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
+import com.alamkanak.weekview.R;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +43,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import static com.alamkanak.weekview.WeekViewUtil.*;
+import static com.sauray.agenda.WeekViewUtil.*;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -133,7 +135,6 @@ public class WeekView extends View {
     @Deprecated private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
-    private float mXScrollingSpeed = 1f;
     private Calendar mScrollToDay = null;
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
@@ -153,6 +154,8 @@ public class WeekView extends View {
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private DateTimeInterpreter mDateTimeInterpreter;
     private ScrollListener mScrollListener;
+
+
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -182,6 +185,7 @@ public class WeekView extends View {
                     }
                     break;
                 }
+/*
                 case LEFT: {
                     // Change direction if there was enough change.
                     if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX < -mScaledTouchSlop)) {
@@ -196,15 +200,18 @@ public class WeekView extends View {
                     }
                     break;
                 }
+                */
             }
 
             // Calculate the new origin after scroll.
             switch (mCurrentScrollDirection) {
+                /*
                 case LEFT:
                 case RIGHT:
                     mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
                     break;
+                   */
                 case VERTICAL:
                     mCurrentOrigin.y -= distanceY;
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
@@ -228,10 +235,12 @@ public class WeekView extends View {
 
             mCurrentFlingDirection = mCurrentScrollDirection;
             switch (mCurrentFlingDirection) {
+                /*
                 case LEFT:
                 case RIGHT:
                     mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * 24 + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - getHeight()), 0);
                     break;
+                */
                 case VERTICAL:
                     mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * 24 + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight/2 - getHeight()), 0);
                     break;
@@ -344,7 +353,6 @@ public class WeekView extends View {
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
-            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
             mShowDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, mShowDistinctPastFutureColor);
             mShowDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, mShowDistinctWeekendColor);
@@ -1572,8 +1580,8 @@ public class WeekView extends View {
      * <p>
      *     <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
      * </p>
-     * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
-     * {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
+     * @param length Supported values are {@link com.sauray.agenda.WeekView#LENGTH_SHORT} and
+     * {@link com.sauray.agenda.WeekView#LENGTH_LONG}.
      */
     @Deprecated
     public void setDayNameLength(int length) {
@@ -1637,22 +1645,6 @@ public class WeekView extends View {
      */
     public Calendar getLastVisibleDay() {
         return mLastVisibleDay;
-    }
-
-    /**
-     * Get the scrolling speed factor in horizontal direction.
-     * @return The speed factor in horizontal direction.
-     */
-    public float getXScrollingSpeed() {
-        return mXScrollingSpeed;
-    }
-
-    /**
-     * Sets the speed for horizontal scrolling.
-     * @param xScrollingSpeed The new horizontal scrolling speed.
-     */
-    public void setXScrollingSpeed(float xScrollingSpeed) {
-        this.mXScrollingSpeed = xScrollingSpeed;
     }
 
     /**
@@ -2006,7 +1998,7 @@ public class WeekView extends View {
 
     public interface EventLongPressListener {
         /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
+         * Similar to {@link com.sauray.agenda.WeekView.EventClickListener} but with a long press.
          * @param event: event clicked.
          * @param eventRect: view containing the clicked event.
          */
@@ -2023,7 +2015,7 @@ public class WeekView extends View {
 
     public interface EmptyViewLongPressListener {
         /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
+         * Similar to {@link com.sauray.agenda.WeekView.EmptyViewClickListener} but with long press.
          * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
          */
         void onEmptyViewLongPress(Calendar time);

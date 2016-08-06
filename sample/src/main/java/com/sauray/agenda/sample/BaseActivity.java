@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample;
+package com.sauray.agenda.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -8,10 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.DateTimeInterpreter;
-import com.alamkanak.weekview.MonthLoader;
-import com.alamkanak.weekview.WeekView;
-import com.alamkanak.weekview.WeekViewEvent;
+import com.sauray.agenda.DateTimeInterpreter;
+import com.sauray.agenda.MonthLoader;
+import com.sauray.agenda.WeekView;
+import com.sauray.agenda.WeekViewEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

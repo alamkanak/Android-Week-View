@@ -1,10 +1,10 @@
-package com.alamkanak.weekview;
+package com.sauray.agenda;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.alamkanak.weekview.WeekViewUtil.*;
+import static com.sauray.agenda.WeekViewUtil.*;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
