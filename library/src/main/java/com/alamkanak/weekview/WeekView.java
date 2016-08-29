@@ -580,7 +580,7 @@ public class WeekView extends View {
 
         if (mMaxDate != null) {
             Calendar date = (Calendar) mMaxDate.clone();
-            date.add(Calendar.DATE, 1-mNumberOfVisibleDays);
+            date.add(Calendar.DATE, 1- getRealNumberOfVisibleDays());
             while(date.before(mMinDate)) {
                 date.add(Calendar.DATE, 1);
             }
@@ -616,7 +616,7 @@ public class WeekView extends View {
         }
         else {
             Calendar date = (Calendar) mMaxDate.clone();
-            date.add(Calendar.DATE, 1-mNumberOfVisibleDays);
+            date.add(Calendar.DATE, 1- getRealNumberOfVisibleDays());
             while(date.before(mMinDate)) {
                 date.add(Calendar.DATE, 1);
             }
@@ -671,7 +671,7 @@ public class WeekView extends View {
         boolean containsAllDayEvent = false;
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int dayNumber = 0;
-                 dayNumber < mNumberOfVisibleDays;
+                 dayNumber < getRealNumberOfVisibleDays();
                  dayNumber++) {
                 Calendar day = (Calendar) getFirstVisibleDay().clone();
                 day.add(Calendar.DATE, dayNumber);
@@ -716,8 +716,8 @@ public class WeekView extends View {
     private void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
-        mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
-        mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
+        mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (getRealNumberOfVisibleDays() - 1);
+        mWidthPerDay = mWidthPerDay/ getRealNumberOfVisibleDays();
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
@@ -742,7 +742,7 @@ public class WeekView extends View {
             mIsFirstDraw = false;
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
-            if(mNumberOfVisibleDays >= 7 && mHomeDate.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mShowFirstDayOfWeekFirst) {
+            if(getRealNumberOfVisibleDays() >= 7 && mHomeDate.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mShowFirstDayOfWeekFirst) {
                 int difference = (mHomeDate.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
@@ -783,7 +783,7 @@ public class WeekView extends View {
         // Prepare to iterate for each hour to draw the hour lines.
         int lineCount = (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 -
                 mHeaderMarginBottom) / mHourHeight) + 1;
-        lineCount = (lineCount) * (mNumberOfVisibleDays+1);
+        lineCount = (lineCount) * (getRealNumberOfVisibleDays()+1);
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for event rectangles.
@@ -804,7 +804,7 @@ public class WeekView extends View {
             mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
         }
         for (int dayNumber = leftDaysWithGaps + 1;
-             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber <= leftDaysWithGaps + getRealNumberOfVisibleDays() + 1;
              dayNumber++) {
 
             // Check if the day is today.
@@ -899,7 +899,7 @@ public class WeekView extends View {
 
         // Draw the header row texts.
         startPixel = startFromPixel;
-        for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
+        for (int dayNumber = leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + getRealNumberOfVisibleDays() + 1; dayNumber++) {
             // Check if the day is today.
             day = (Calendar) mHomeDate.clone();
             day.add(Calendar.DATE, dayNumber - 1);
@@ -931,7 +931,7 @@ public class WeekView extends View {
         float startPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
                 mHeaderColumnWidth;
         for (int dayNumber = leftDaysWithGaps + 1;
-             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber <= leftDaysWithGaps + getRealNumberOfVisibleDays() + 1;
              dayNumber++) {
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
             if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay){
@@ -1549,11 +1549,25 @@ public class WeekView extends View {
 
 
     /**
-     * Get the number of visible days in a week.
-     * @return The number of visible days in a week.
+     * Get the real number of visible days
+     * If the amount of days between max date and min date is smaller, that value is returned
+     *
+     * @return The real number of visible days
+     */
+    public int getRealNumberOfVisibleDays() {
+        if(mMinDate == null || mMaxDate == null)
+            return getNumberOfVisibleDays();
+
+        return Math.min(mNumberOfVisibleDays, daysBetween(mMinDate, mMaxDate) + 1);
+    }
+
+    /**
+     * Get the number of visible days
+     *
+     * @return The set number of visible days.
      */
     public int getNumberOfVisibleDays() {
-        return mNumberOfVisibleDays;
+            return mNumberOfVisibleDays;
     }
 
     /**
