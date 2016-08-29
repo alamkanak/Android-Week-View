@@ -69,7 +69,7 @@ public class WeekViewEvent {
      * @param location The location of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
-     * @param allDay Is the event an all day event
+     * @param allDay Is the event an all day event.
      */
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay, Shader shader) {
         this.mId = id;
@@ -158,9 +158,13 @@ public class WeekViewEvent {
         this.mColor = color;
     }
 
-    public boolean isAllDay() { return mAllDay;}
+    public boolean isAllDay() {
+        return mAllDay;
+    }
 
-    public void setAllDay(boolean allDay) { this.mAllDay = allDay;}
+    public void setAllDay(boolean allDay) {
+        this.mAllDay = allDay;
+    }
 
     public Shader getShader(){
         return mShader;
@@ -197,8 +201,11 @@ public class WeekViewEvent {
     public List<WeekViewEvent> splitWeekViewEvents(){
         //This function splits the WeekViewEvent in WeekViewEvents by day
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
-        if (!isSameDay(this.getStartTime(), this.getEndTime())) {
-            Calendar endTime = (Calendar) this.getStartTime().clone();
+        // The first millisecond of the next day is still the same day. (no need to split events for this).
+        Calendar endTime = (Calendar) this.getEndTime().clone();
+        endTime.add(Calendar.MILLISECOND, -1);
+        if (!isSameDay(this.getStartTime(), endTime)) {
+            endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
             WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
