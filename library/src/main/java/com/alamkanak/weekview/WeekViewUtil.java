@@ -15,17 +15,19 @@ public class WeekViewUtil {
     /////////////////////////////////////////////////////////////////
 
     /**
-     * Checks if two times are on the same day.
-     * @param dayOne The first day.
-     * @param dayTwo The second day.
-     * @return Whether the times are on the same day.
+     * Checks if two dates are on the same day.
+     *
+     * @param dateOne The first date.
+     * @param dateTwo The second date.     *
+     * @return Whether the dates are on the same day.
      */
-    public static boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
+    public static boolean isSameDay(Calendar dateOne, Calendar dateTwo) {
+        return dateOne.get(Calendar.YEAR) == dateTwo.get(Calendar.YEAR) && dateOne.get(Calendar.DAY_OF_YEAR) == dateTwo.get(Calendar.DAY_OF_YEAR);
     }
 
     /**
-     * Returns a calendar instance at the start of this day
+     * Returns a calendar instance at the start of today
+     *
      * @return the calendar instance
      */
     public static Calendar today(){
@@ -38,17 +40,31 @@ public class WeekViewUtil {
     }
 
     /**
-     * Checks if two times are on the same day and hour.
+     * Checks if two dates are on the same day and hour.
      *
-     * @param dayOne The first day.
-     * @param dayTwo The second day.
-     * @return Whether the times are on the same day and hour.
+     * @param dateOne The first day.
+     * @param dateTwo The second day.
+     * @return Whether the dates are on the same day and hour.
      */
-    public static boolean isSameDayAndHour(Calendar dayOne, Calendar dayTwo) {
+    public static boolean isSameDayAndHour(Calendar dateOne, Calendar dateTwo) {
 
-        if (dayTwo != null) {
-            return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR) && dayOne.get(Calendar.HOUR_OF_DAY) == dayTwo.get(Calendar.HOUR_OF_DAY);
+        if (dateTwo != null) {
+            return isSameDay(dateOne, dateTwo) && dateOne.get(Calendar.HOUR_OF_DAY) == dateTwo.get(Calendar.HOUR_OF_DAY);
         }
         return false;
+    }
+
+    /**
+     * Returns the amount of days between the second date and the first date
+     *
+     * @param dateOne the first date
+     * @param dateTwo the second date
+     * @return the amount of days between dateTwo and dateOne
+     */
+    public static int daysBetween(Calendar dateOne, Calendar dateTwo){
+        return (int) (
+                (dateTwo.getTimeInMillis() + dateTwo.getTimeZone().getOffset(dateTwo.getTimeInMillis()) -
+                (dateOne.getTimeInMillis() + dateOne.getTimeZone().getOffset(dateOne.getTimeInMillis())))
+                        / (1000 * 60 * 60 * 24f));
     }
 }
