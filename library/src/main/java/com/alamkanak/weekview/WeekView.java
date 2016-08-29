@@ -594,8 +594,7 @@ public class WeekView extends View {
     }
 
     private float getXOriginForDate(Calendar date) {
-        int dateDifference = (int) (date.getTimeInMillis() - mHomeDate.getTimeInMillis()) / (1000 * 60 * 60 * 24);
-        return - dateDifference * (mWidthPerDay + mColumnGap);
+        return - daysBetween(mHomeDate, date)  * (mWidthPerDay + mColumnGap);
     }
 
     private float getYMinLimit() {
@@ -1947,7 +1946,7 @@ public class WeekView extends View {
             maxDate.set(Calendar.SECOND, 0);
             maxDate.set(Calendar.MILLISECOND, 0);
             if(mMinDate != null && maxDate.before(mMinDate)) {
-                throw new IllegalArgumentException("maxDate cannot be later than minDate");
+                throw new IllegalArgumentException("maxDate has to be after minDate");
             }
         }
 
@@ -2155,15 +2154,15 @@ public class WeekView extends View {
         }
 
         int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
+        boolean mayScroll = mCurrentOrigin.x - nearestOrigin < getXMaxLimit()
+                && mCurrentOrigin.x - nearestOrigin > getXMinLimit();
 
-        if (mCurrentOrigin.x - nearestOrigin < getXMaxLimit()
-                && mCurrentOrigin.x - nearestOrigin > getXMinLimit()) {
+        if (mayScroll) {
             mScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
             ViewCompat.postInvalidateOnAnimation(WeekView.this);
         }
 
-        if (nearestOrigin != 0 && (mCurrentOrigin.x - nearestOrigin < getXMaxLimit()
-                && mCurrentOrigin.x - nearestOrigin > getXMinLimit())) {
+        if (nearestOrigin != 0 && mayScroll) {
             // Stop current animation.
             mScroller.forceFinished(true);
             // Snap to date.
@@ -2250,11 +2249,7 @@ public class WeekView extends View {
         today.set(Calendar.SECOND, 0);
         today.set(Calendar.MILLISECOND, 0);
 
-        long day = 1000L * 60L * 60L * 24L;
-        long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
-        long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
-        long dateDifference = (dateInMillis/day) - (todayInMillis/day);
-        mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
+        mCurrentOrigin.x = - daysBetween(today, date) * (mWidthPerDay + mColumnGap);
         invalidate();
     }
 
