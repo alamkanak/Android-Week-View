@@ -59,6 +59,16 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         // Set AddEvent Click Listener
         mWeekView.setAddEventClickListener(this);
 
+        // Set minDate
+        /*Calendar minDate = Calendar.getInstance();
+        minDate.set(Calendar.DAY_OF_MONTH, 1);
+        mWeekView.setMinDate(minDate);*/
+
+        // Set maxDate
+        /*Calendar maxDate = Calendar.getInstance();
+        maxDate.add(Calendar.MONTH, 1);
+        mWeekView.setMaxDate(maxDate);*/
+
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
         setupDateTimeInterpreter(false);
