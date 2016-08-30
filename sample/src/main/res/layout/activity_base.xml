@@ -23,6 +23,7 @@
         app:todayBackgroundColor="#1848adff"
         app:headerColumnBackground="#ffffffff"
         app:todayHeaderTextColor="@color/accent"
-        app:newEventTimeResolutionInMinutes="15"/>
+        app:newEventTimeResolutionInMinutes="15"
+        app:showHalfHours="false" />
 
 </RelativeLayout>

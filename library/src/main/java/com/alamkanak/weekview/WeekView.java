@@ -162,6 +162,7 @@ public class WeekView extends View {
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
+    private boolean mShowHalfHours = false;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -445,6 +446,7 @@ public class WeekView extends View {
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
+            mShowHalfHours = a.getBoolean(R.styleable.WeekView_showHalfHours, mShowHalfHours);
         } finally {
             a.recycle();
         }
@@ -468,7 +470,9 @@ public class WeekView extends View {
         mTimeTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
         Rect rect = new Rect();
-        mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
+        final String exampleTime = mShowHalfHours ? "00:00 PM" : "00 PM";
+        mTimeTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
+        mTimeTextWidth = mTimeTextPaint.measureText(exampleTime);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
         initTextTimeWidth();
@@ -478,7 +482,7 @@ public class WeekView extends View {
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
+        mHeaderTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
         mHeaderTextHeight = rect.height();
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
@@ -597,6 +601,10 @@ public class WeekView extends View {
         return - daysBetween(mHomeDate, date)  * (mWidthPerDay + mColumnGap);
     }
 
+    private int getNumberOfPeriods(){
+        return mShowHalfHours ? 48 : 24;
+    }
+
     private float getYMinLimit() {
         return -(mHourHeight * 24
                 + mHeaderTextHeight
@@ -646,9 +654,9 @@ public class WeekView extends View {
      */
     private void initTextTimeWidth() {
         mTimeTextWidth = 0;
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < getNumberOfPeriods(); i++) {
             // Measure time string and get max width.
-            String time = getDateTimeInterpreter().interpretTime(i);
+            String time = getDateTimeInterpreter().interpretTime(i, (i%2) * 30);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             mTimeTextWidth = Math.max(mTimeTextWidth, mTimeTextPaint.measureText(time));
@@ -702,11 +710,29 @@ public class WeekView extends View {
         // Clip to paint in left column only.
         canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
-        for (int i = 0; i < 24; i++) {
-            float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
+        for (int i = 0; i < getNumberOfPeriods(); i++) {
+            // If we are showing half hours (eg. 5:30am), space the times out by half the hour height
+            // and need to provide 30 minutes on each odd period, otherwise, minutes is always 0.
+            float timeSpacing;
+            int minutes;
+            int hour;
+            if (mShowHalfHours) {
+                timeSpacing = mHourHeight / 2f;
+                hour = i / 2;
+                minutes = i%2 * 30;
+            } else {
+                timeSpacing = mHourHeight;
+                hour = i;
+                minutes = 0;
+            }
+
+            // Calculate the top of the rectangle where the time text will go
+            float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + timeSpacing * i + mHeaderMarginBottom;
+
+            // Get the time to be displayed, as a String.
+            String time = getDateTimeInterpreter().interpretTime(hour, minutes);
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
-            String time = getDateTimeInterpreter().interpretTime(i);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
@@ -1491,6 +1517,14 @@ public class WeekView extends View {
         return mScrollListener;
     }
 
+    public void setShowHalfHours(boolean showHalfHours){
+        mShowHalfHours = showHalfHours;
+    }
+
+    public boolean isShowHalfHours(){
+        return mShowHalfHours;
+    }
+
     public void setAddEventClickListener(AddEventClickListener addEventClickListener){
         this.mAddEventClickListener = addEventClickListener;
     }
@@ -1518,13 +1552,22 @@ public class WeekView extends View {
                 }
 
                 @Override
-                public String interpretTime(int hour) {
+                public String interpretTime(int hour, int minutes) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, hour);
-                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.MINUTE, minutes);
 
                     try {
-                        SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        SimpleDateFormat sdf;
+                        if (DateFormat.is24HourFormat(getContext())) {
+                            sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        } else {
+                            if (mShowHalfHours) {
+                                sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                            } else {
+                                sdf = new SimpleDateFormat("hh a", Locale.getDefault());
+                            }
+                        }
                         return sdf.format(calendar.getTime());
                     } catch (Exception e) {
                         e.printStackTrace();
