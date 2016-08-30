@@ -160,7 +160,9 @@ public class WeekView extends View {
     private boolean mShowDistinctPastFutureColor = false;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
-    private int mAllDayEventHeight = 100;
+    private int mAllDayEventHeight= 100;
+    private float mZoomFocusPoint = 0;
+    private boolean mZoomFocusPointEnabled = true;
     private int mScrollDuration = 250;
     private boolean mShowHalfHours = false;
 
@@ -445,6 +447,8 @@ public class WeekView extends View {
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mZoomFocusPoint = a.getFraction(R.styleable.WeekView_zoomFocusPoint, 1, 1, mZoomFocusPoint);
+            mZoomFocusPointEnabled = a.getBoolean(R.styleable.WeekView_zoomFocusPointEnabled, mZoomFocusPointEnabled);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
             mShowHalfHours = a.getBoolean(R.styleable.WeekView_showHalfHours, mShowHalfHours);
         } finally {
@@ -549,26 +553,7 @@ public class WeekView extends View {
         // Set default empty event color.
         mNewEventColor = Color.parseColor("#3c93d9");
 
-        mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
-            @Override
-            public void onScaleEnd(ScaleGestureDetector detector) {
-                mIsZooming = false;
-            }
-
-            @Override
-            public boolean onScaleBegin(ScaleGestureDetector detector) {
-                mIsZooming = true;
-                goToNearestOrigin();
-                return true;
-            }
-
-            @Override
-            public boolean onScale(ScaleGestureDetector detector) {
-                mNewHourHeight = Math.round(mHourHeight * detector.getScaleFactor());
-                invalidate();
-                return true;
-            }
-        });
+        mScaleDetector = new ScaleGestureDetector(mContext, new WeekViewGestureListener());
     }
 
     private void resetHomeDate()
@@ -781,7 +766,6 @@ public class WeekView extends View {
             else if (mNewHourHeight > mMaxHourHeight)
                 mNewHourHeight = mMaxHourHeight;
 
-            mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
             mHourHeight = mNewHourHeight;
             mNewHourHeight = -1;
         }
@@ -2157,6 +2141,47 @@ public class WeekView extends View {
     }
 
     /**
+     * Enable zoom focus point
+     * If you set this to false the `zoomFocusPoint` won't take effect any more while zooming.
+     * The zoom will always be focused at the center of your gesture.
+     */
+    public void setZoomFocusPointEnabled(boolean zoomFocusPointEnabled) {
+        mZoomFocusPointEnabled = zoomFocusPointEnabled;
+    }
+
+    /*
+     * Is focus point enabled
+     * @return fixed focus point enabled?
+     */
+    public boolean isZoomFocusPointEnabled() {
+        return mZoomFocusPointEnabled;
+    }
+
+    /*
+     * Get focus point
+     * 0 = top of view, 1 = bottom of view
+     * The focused point (multiplier of the view height) where the week view is zoomed around.
+     * This point will not move while zooming.
+     * @return focus point
+     */
+    public float getZoomFocusPoint() {
+        return mZoomFocusPoint;
+    }
+
+    /**
+     * Set focus point
+     * 0 = top of view, 1 = bottom of view
+     * The focused point (multiplier of the view height) where the week view is zoomed around.
+     * This point will not move while zooming.
+     */
+    public void setZoomFocusPoint(float zoomFocusPoint) {
+        if(0 > zoomFocusPoint || zoomFocusPoint > 1)
+            throw new IllegalStateException("The zoom focus point percentage has to be between 0 and 1");
+        mZoomFocusPoint = zoomFocusPoint;
+    }
+
+
+    /**
      * Get scroll duration
      * @return scroll duration
      */
@@ -2422,10 +2447,57 @@ public class WeekView extends View {
     public interface AddEventClickListener {
         /**
          * Triggered when the users clicks to create a new event.
+         *
          * @param startTime The startTime of a new event
-         * @param endTime The endTime of a new event
+         * @param endTime   The endTime of a new event
          */
         void onAddEventClicked(Calendar startTime, Calendar endTime);
+    }
+
+    /**
+     * A simple GestureListener that holds the focused hour while scaling.
+     */
+    private class WeekViewGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+        float mFocusedPointY;
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            mIsZooming = false;
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            mIsZooming = true;
+            goToNearestOrigin();
+
+            // Calculate focused point for scale action
+            if (mZoomFocusPointEnabled) {
+                // Use fractional focus, percentage of height
+                mFocusedPointY = (getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) * mZoomFocusPoint;
+            } else {
+                // Grab focus
+                mFocusedPointY = detector.getFocusY();
+            }
+
+            return true;
+        }
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            final float scale = detector.getScaleFactor();
+
+            mNewHourHeight = Math.round(mHourHeight * scale);
+
+            // Calculating difference
+            float diffY = mFocusedPointY - mCurrentOrigin.y;
+            // Scaling difference
+            diffY = diffY * scale - diffY;
+            // Updating week view origin
+            mCurrentOrigin.y -= diffY;
+
+            invalidate();
+            return true;
+        }
 
     }
 }
