@@ -2168,15 +2168,15 @@ public class WeekView extends View {
         }
 
         int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
-        boolean mayScroll = mCurrentOrigin.x - nearestOrigin < getXMaxLimit()
+        boolean mayScrollHorizontal = mCurrentOrigin.x - nearestOrigin < getXMaxLimit()
                 && mCurrentOrigin.x - nearestOrigin > getXMinLimit();
 
-        if (mayScroll) {
-            mScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
+        if (mayScrollHorizontal) {
+            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, - nearestOrigin, 0);
             ViewCompat.postInvalidateOnAnimation(WeekView.this);
         }
 
-        if (nearestOrigin != 0 && mayScroll) {
+        if (nearestOrigin != 0 && mayScrollHorizontal) {
             // Stop current animation.
             mScroller.forceFinished(true);
             // Snap to date.
