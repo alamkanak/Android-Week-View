@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
@@ -29,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
-    private WeekView mWeekView;
+    protected WeekView mWeekView;
 
 
     @Override
