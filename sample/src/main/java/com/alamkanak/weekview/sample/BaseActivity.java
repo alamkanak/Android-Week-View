@@ -62,12 +62,18 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         // Set minDate
         /*Calendar minDate = Calendar.getInstance();
         minDate.set(Calendar.DAY_OF_MONTH, 1);
-        mWeekView.setMinDate(minDate);*/
+        minDate.add(Calendar.MONTH, 1);
+        mWeekView.setMinDate(minDate);
 
         // Set maxDate
-        /*Calendar maxDate = Calendar.getInstance();
+        Calendar maxDate = Calendar.getInstance();
         maxDate.add(Calendar.MONTH, 1);
-        mWeekView.setMaxDate(maxDate);*/
+        maxDate.set(Calendar.DAY_OF_MONTH, 10);
+        mWeekView.setMaxDate(maxDate);
+
+        Calendar calendar = (Calendar) maxDate.clone();
+        calendar.add(Calendar.DATE, -2);
+        mWeekView.goToDate(calendar);*/
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
