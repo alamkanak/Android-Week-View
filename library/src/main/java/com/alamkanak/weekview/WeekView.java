@@ -240,10 +240,10 @@ public class WeekView extends View {
                 case VERTICAL:
                     float minY = getYMinLimit();
                     float maxY = getYMaxLimit();
-                    if((mCurrentOrigin.y - (distanceY * mXScrollingSpeed)) > maxY) {
+                    if((mCurrentOrigin.y - (distanceY)) > maxY) {
                         mCurrentOrigin.y = maxY;
                     }
-                    else if((mCurrentOrigin.y - (distanceY * mXScrollingSpeed)) < minY) {
+                    else if((mCurrentOrigin.y - (distanceY)) < minY) {
                         mCurrentOrigin.y = minY;
                     }
                     else {
