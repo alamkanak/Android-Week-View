@@ -1,3 +1,6 @@
+Still in beta, migrate.md is coming soon.
+=================
+
 Android Week View
 =================
 
@@ -29,16 +32,16 @@ Usage
   
     ```xml
     <dependency>
-      <groupId>com.github.alamkanak</groupId>
+      <groupId>com.github.quivr</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.6</version>
+      <version>0.0.1-SNAPSHOT</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.6'
+    compile 'com.github.quivr:android-week-view:0.0.1-SNAPSHOT'
     ```
 2. Add WeekView in your xml layout.
 
