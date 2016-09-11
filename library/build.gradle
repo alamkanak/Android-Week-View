@@ -14,8 +14,13 @@ android {
     }
 }
 
+configurations {
+    javadocDeps
+}
 dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
+    javadocDeps 'com.android.support:appcompat-v7:23.1.1'
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'gradle-mvn-push.gradle'
