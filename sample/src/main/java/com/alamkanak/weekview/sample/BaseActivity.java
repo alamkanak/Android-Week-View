@@ -198,8 +198,8 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
     }
 
     @Override
-    public void onEmptyViewClicked(Calendar time, Calendar tempTime, boolean clickedTwice) {
-        Toast.makeText(this, "Empty view clicked: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+    public void onEmptyViewClicked(Calendar date) {
+        Toast.makeText(this, "Empty view" + " clicked: " + getEventTitle(date) , Toast.LENGTH_SHORT).show();
     }
 
     @Override

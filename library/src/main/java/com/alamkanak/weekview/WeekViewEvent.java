@@ -70,6 +70,7 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      * @param allDay Is the event an all day event.
+     * @param shader the Shader of the event rectangle
      */
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay, Shader shader) {
         this.mId = id;

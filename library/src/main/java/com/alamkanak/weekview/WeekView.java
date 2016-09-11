@@ -152,7 +152,6 @@ public class WeekView extends View {
     private int mEventMarginVertical = 0;
     private float mXScrollingSpeed = 1f;
     private Calendar mScrollToDay = null;
-    private Calendar mCacheEmptyEventDay;
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
     private boolean mShowDistinctWeekendColor = false;
@@ -320,7 +319,7 @@ public class WeekView extends View {
 
                     playSoundEffect(SoundEffectConstants.CLICK);
                     if(mEmptyViewClickListener != null)
-                        mEmptyViewClickListener.onEmptyViewClicked(selectedTime, mCacheEmptyEventDay, isSameDayAndHour(selectedTime, mCacheEmptyEventDay));
+                        mEmptyViewClickListener.onEmptyViewClicked(selectedTime);
 
                     if(mAddEventClickListener != null) {
                         //round selectedTime to resolution
@@ -1952,6 +1951,8 @@ public class WeekView extends View {
 
     /**
      * Get the earliest day that can be displayed. Will return null if no minimum date is set.
+     *
+     * @return the earliest day that can be displayed, null if no minimum date set
      */
     public Calendar getMinDate() {
         return mMinDate;
@@ -1982,6 +1983,8 @@ public class WeekView extends View {
 
     /**
      * Get the latest day that can be displayed. Will return null if no maximum date is set.
+     *
+     * @return the latest day the can be displayed, null if no max date set
      */
     public Calendar getMaxDate() {
         return mMaxDate;
@@ -2108,6 +2111,7 @@ public class WeekView extends View {
 
     /**
      * Get whether the week view should fling horizontally.
+     *
      * @return True if the week view has horizontal fling enabled.
      */
     public boolean isHorizontalFlingEnabled() {
@@ -2116,7 +2120,8 @@ public class WeekView extends View {
 
     /**
      * Set whether the week view should fling horizontally.
-     * @return True if it should have horizontal fling enabled.
+     *
+     * @param enabled whether the week view should fling horizontally
      */
     public void setHorizontalFlingEnabled(boolean enabled) {
         mHorizontalFlingEnabled = enabled;
@@ -2132,7 +2137,7 @@ public class WeekView extends View {
 
     /**
      * Set whether the week view should fling vertically.
-     * @return True if it should have vertical fling enabled.
+     * @param enabled whether the week view should fling vertically
      */
     public void setVerticalFlingEnabled(boolean enabled) {
         mVerticalFlingEnabled = enabled;
@@ -2148,6 +2153,7 @@ public class WeekView extends View {
 
     /**
      * Set the height of AllDay-events.
+     * @param height the new height of AllDay-events
      */
     public void setAllDayEventHeight(int height) {
         mAllDayEventHeight = height;
@@ -2157,6 +2163,7 @@ public class WeekView extends View {
      * Enable zoom focus point
      * If you set this to false the `zoomFocusPoint` won't take effect any more while zooming.
      * The zoom will always be focused at the center of your gesture.
+     * @param zoomFocusPointEnabled whether the zoomFocusPoint is enabled
      */
     public void setZoomFocusPointEnabled(boolean zoomFocusPointEnabled) {
         mZoomFocusPointEnabled = zoomFocusPointEnabled;
@@ -2186,6 +2193,7 @@ public class WeekView extends View {
      * 0 = top of view, 1 = bottom of view
      * The focused point (multiplier of the view height) where the week view is zoomed around.
      * This point will not move while zooming.
+     * @param zoomFocusPoint the new zoomFocusPoint
      */
     public void setZoomFocusPoint(float zoomFocusPoint) {
         if(0 > zoomFocusPoint || zoomFocusPoint > 1)
@@ -2204,6 +2212,7 @@ public class WeekView extends View {
 
     /**
      * Set the scroll duration
+     * @param scrollDuration the new scrollDuraction
      */
     public void setScrollDuration(int scrollDuration) {
         mScrollDuration = scrollDuration;
@@ -2315,7 +2324,6 @@ public class WeekView extends View {
     public void goToToday() {
         Calendar today = Calendar.getInstance();
         goToDate(today);
-        mCacheEmptyEventDay = null;
     }
 
     /**
@@ -2386,6 +2394,7 @@ public class WeekView extends View {
      * Determine whether a given calendar day falls within the scroll limits set for this view.
      * @see #setMinDate(Calendar)
      * @see #setMaxDate(Calendar)
+     * @param day the day to check
      * @return True if there are no limit or the date is within the limits.
      */
     public boolean dateIsValid(Calendar day) {
@@ -2425,10 +2434,9 @@ public class WeekView extends View {
     public interface EmptyViewClickListener {
         /**
          * Triggered when the users clicks on a empty space of the calendar.
-         * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
+         * @param date: {@link Calendar} object set with the date and time of the clicked position on the view.
          */
-        //void onEmptyViewClicked(Calendar time);
-        void onEmptyViewClicked(Calendar time, Calendar tempTime, boolean clickedTwice);
+        void onEmptyViewClicked(Calendar date);
 
     }
 
