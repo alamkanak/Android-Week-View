@@ -21,8 +21,9 @@ Features
 Who uses it
 ---------------
 
+* [Quivr] (https://quivr.be/en/)
 * [Series Addict](https://play.google.com/store/apps/details?id=com.alamkanak.seriesaddict)
-* Using the library? Just [tweet me](https://twitter.com/alamkanak) or [send me an email](mailto:alam.kanak@gmail.com).
+* Using the library? Just make an issue
 
 Usage
 ---------
@@ -34,14 +35,14 @@ Usage
     <dependency>
       <groupId>com.github.quivr</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>2.0.0</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.quivr:android-week-view:0.0.1-SNAPSHOT'
+    compile 'com.github.quivr:android-week-view:2.0.0'
     ```
 2. Add WeekView in your xml layout.
 
@@ -151,7 +152,7 @@ Use the following interfaces according to your need.
 Sample
 ----------
 
-There is also a [sample app](https://github.com/alamkanak/Android-Week-View/tree/master/sample) to get you started.
+There is also a [sample app](https://github.com/quivr/Android-Week-View/tree/master/sample) to get you started.
 
 To do
 -------
@@ -161,6 +162,12 @@ To do
 
 Changelog
 ---------
+**Version 2.0.0**
+* This fork is first released
+* Possibility to set minDate and maxDate
+* Allday events are supported
+* Events can be add by clicking on empty space
+
 
 **Version 1.2.6**
 
