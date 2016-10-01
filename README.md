@@ -35,14 +35,14 @@ Usage
     <dependency>
       <groupId>com.github.quivr</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>2.0.0</version>
+      <version>2.0.2</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.quivr:android-week-view:2.0.0'
+    compile 'com.github.quivr:android-week-view:2.0.2'
     ```
 2. Add WeekView in your xml layout.
 
