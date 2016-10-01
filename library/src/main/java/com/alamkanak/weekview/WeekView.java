@@ -594,7 +594,7 @@ public class WeekView extends View {
 
     private float getYMinLimit() {
         return -(mHourHeight * 24
-                + mHeaderTextHeight
+                + mHeaderHeight
                 + mHeaderRowPadding *2
                 + mHeaderMarginBottom
                 + mTimeTextHeight/2
