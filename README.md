@@ -1,6 +1,30 @@
 Android Week View
 =================
 
+## Use Quivr/Android-Week-View!
+This repository has been forked under the [Quivr-account](https://github.com/Quivr/Android-Week-View/). Please use that repository from now on. This repository is no longer maintained!
+
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+---
+
+
 **Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
 
 [Why this fork? (features + community & contributing)](https://github.com/Quivr/Android-Week-View/issues/45)
