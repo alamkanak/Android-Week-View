@@ -60,5 +60,7 @@
         <attr name="scrollDuration" format="integer"/>
         <attr name="showHalfHours" format="boolean" />
         <attr name="autoLimitTime" format="boolean"/>
+        <attr name="minTime" format="integer"/>
+        <attr name="maxTime" format="integer"/>
     </declare-styleable>
 </resources>
