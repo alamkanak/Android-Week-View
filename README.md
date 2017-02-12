@@ -140,9 +140,9 @@ You can customize the look of the `WeekView` in xml. Use the following attribute
 - `showDistinctPastFutureColor`
 - `showDistinctWeekendColor`
 - `showFirstDayOfWeekFirst`
-- `showHalfHours`
 - `showNowLine`
 - `textSize`
+- `timeColumnResolution`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
 - `verticalFlingEnabled`

@@ -53,9 +53,9 @@
         <attr name="showDistinctPastFutureColor" format="boolean"/>
         <attr name="showDistinctWeekendColor" format="boolean"/>
         <attr name="showFirstDayOfWeekFirst" format="boolean"/>
-        <attr name="showHalfHours" format="boolean" />
         <attr name="showNowLine" format="boolean"/>
         <attr name="textSize" format="dimension"/>
+        <attr name="timeColumnResolution" format="integer" />
         <attr name="todayBackgroundColor" format="color"/>
         <attr name="todayHeaderTextColor" format="color"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
