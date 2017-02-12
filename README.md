@@ -1,6 +1,4 @@
-Still in beta, migrate.md is coming soon.
 =================
-
 Android Week View
 =================
 
@@ -102,39 +100,55 @@ Customization
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
 - `allDayEventHeight`
+- `autoLimitTime`
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
+- `eventCornerRadius`
 - `eventMarginVertical`
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
 - `firstDayOfWeek`
-- `zoomFocusPoint` The focused point (percentage of the view height) where the week view is zoomed around. This point will not move while zooming. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
-- `zoomFocusPointEnabled` If you set this to ``false`` the zoomFocusPoint won't take effect any more while zooming. The zoom will always be focused at the center of your gesture.
+- `futureBackgroundColor`
+- `futureWeekendBackgroundColor`
 - `headerColumnBackground`
 - `headerColumnPadding`
 - `headerColumnTextColor`
 - `headerRowBackgroundColor`
 - `headerRowPadding`
+- `horizontalFlingEnabled`
 - `hourHeight`
 - `hourSeparatorColor`
 - `hourSeparatorHeight`
+- `maxHourHeight`
+- `maxTime`
+- `minHourHeight`
+- `minTime`
+- `newEventColor`
+- `newEventId`
+- `newEventIconResource`
+- `newEventLengthInMinutes`
+- `newEventTimeResolutionInMinutes`
 - `noOfVisibleDays`
+- `nowLineColor`
+- `nowLineThickness`
 - `overlappingEventGap`
+- `pastBackgroundColor`
+- `pastWeekendBackgroundColor`
+- `scrollDuration`
+- `showDistinctPastFutureColor`
+- `showDistinctWeekendColor`
+- `showFirstDayOfWeekFirst`
+- `showHalfHours`
+- `showNowLine`
 - `textSize`
 - `todayBackgroundColor`
 - `todayHeaderTextColor`
-- `showDistinctPastFutureColor`
-- `futureBackgroundColor`
-- `pastBackgroundColor`
-- `showDistinctWeekendColor`
-- `futureWeekendBackgroundColor`
-- `pastWeekendBackgroundColor`
-- `showNowLine`
-- `nowLineColor`
-- `nowLineThickness`
-- `scrollDuration`
+- `verticalFlingEnabled`
+- `xScrollingSpeed`
+- `zoomFocusPoint` The focused point (percentage of the view height) where the week view is zoomed around. This point will not move while zooming. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
+- `zoomFocusPointEnabled` If you set this to ``false`` the zoomFocusPoint won't take effect any more while zooming. The zoom will always be focused at the center of your gesture.
 
 Interfaces
 ----------
@@ -149,7 +163,7 @@ Use the following interfaces according to your need.
 - `mWeekView.setEmptyViewLongPressListener()` to get a callback when any empty space is long pressed
 - `mWeekView.setDateTimeInterpreter()` to set your own labels for the calendar header row and header column
 - `mWeekView.setScrollListener()` to get an event every time the first visible day has changed
-
+- `mWeekView.setAddEventClickListener()` to get the start and end time of an event to add
 Sample
 ----------
 
@@ -159,7 +173,6 @@ To do
 -------
 
 * Add event touch feedback selector
-* Show events that expand multiple days properly
 
 Changelog
 ---------
