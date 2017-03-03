@@ -1,5 +1,9 @@
 package com.alamkanak.weekview;
 
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.StaticLayout;
+import android.text.style.StyleSpan;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -11,12 +15,21 @@ import static com.alamkanak.weekview.WeekViewUtil.*;
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
+
+    private static final Calendar sStartCalendar = Calendar.getInstance();
+    private static final Calendar sEndCalendar = Calendar.getInstance();
+
     private long mId;
-    private Calendar mStartTime;
-    private Calendar mEndTime;
+    private long mStartTime;
+    private long mEndTime;
     private String mName;
     private String mLocation;
     private int mColor;
+    private int mAvailableHeight;
+    private int mAvailableWidth;
+    private StaticLayout mTextLayout;
+    private SpannableStringBuilder mStringBuilder = new SpannableStringBuilder();
+
     private boolean mAllDay;
 
     public WeekViewEvent(){
@@ -41,19 +54,21 @@ public class WeekViewEvent {
     public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
         this.mId = id;
 
-        this.mStartTime = Calendar.getInstance();
-        this.mStartTime.set(Calendar.YEAR, startYear);
-        this.mStartTime.set(Calendar.MONTH, startMonth-1);
-        this.mStartTime.set(Calendar.DAY_OF_MONTH, startDay);
-        this.mStartTime.set(Calendar.HOUR_OF_DAY, startHour);
-        this.mStartTime.set(Calendar.MINUTE, startMinute);
+        sStartCalendar.set(Calendar.YEAR, startYear);
+        sStartCalendar.set(Calendar.MONTH, startMonth-1);
+        sStartCalendar.set(Calendar.DAY_OF_MONTH, startDay);
+        sStartCalendar.set(Calendar.HOUR_OF_DAY, startHour);
+        sStartCalendar.set(Calendar.MINUTE, startMinute);
 
-        this.mEndTime = Calendar.getInstance();
-        this.mEndTime.set(Calendar.YEAR, endYear);
-        this.mEndTime.set(Calendar.MONTH, endMonth-1);
-        this.mEndTime.set(Calendar.DAY_OF_MONTH, endDay);
-        this.mEndTime.set(Calendar.HOUR_OF_DAY, endHour);
-        this.mEndTime.set(Calendar.MINUTE, endMinute);
+        mStartTime = sStartCalendar.getTimeInMillis();
+
+        sEndCalendar.set(Calendar.YEAR, endYear);
+        sEndCalendar.set(Calendar.MONTH, endMonth-1);
+        sEndCalendar.set(Calendar.DAY_OF_MONTH, endDay);
+        sEndCalendar.set(Calendar.HOUR_OF_DAY, endHour);
+        sEndCalendar.set(Calendar.MINUTE, endMinute);
+
+        mEndTime = sEndCalendar.getTimeInMillis();
 
         this.mName = name;
     }
@@ -71,10 +86,29 @@ public class WeekViewEvent {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
+        this.mStartTime = startTime.getTimeInMillis();
+        this.mEndTime = endTime.getTimeInMillis();
+        this.mAllDay = allDay;
+    }
+
+    /**
+     * Initializes the event for week view.
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     * @param allDay Is the event an all day event.
+     */
+    public WeekViewEvent(long id, String name, String location, long startTime, long endTime, boolean allDay) {
+        this.mId = id;
+        this.mName = name;
+        this.mLocation = location;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
         this.mAllDay = allDay;
     }
+
 
     /**
      * Initializes the event for week view.
@@ -100,20 +134,28 @@ public class WeekViewEvent {
     }
 
 
-    public Calendar getStartTime() {
+    public long getStartTime() {
         return mStartTime;
     }
 
     public void setStartTime(Calendar startTime) {
-        this.mStartTime = startTime;
+        this.mStartTime = startTime.getTimeInMillis();
     }
 
-    public Calendar getEndTime() {
+    public void setStartTime(long startTime) {
+        mStartTime = startTime;
+    }
+
+    public long getEndTime() {
         return mEndTime;
     }
 
     public void setEndTime(Calendar endTime) {
-        this.mEndTime = endTime;
+        this.mEndTime = endTime.getTimeInMillis();
+    }
+
+    public void setEndTime(long endTime) {
+        mEndTime = endTime;
     }
 
     public String getName() {
@@ -122,6 +164,7 @@ public class WeekViewEvent {
 
     public void setName(String name) {
         this.mName = name;
+        refreshStringBuilder();
     }
 
     public String getLocation() {
@@ -130,6 +173,8 @@ public class WeekViewEvent {
 
     public void setLocation(String location) {
         this.mLocation = location;
+        // Prepare the location of the event.
+        refreshStringBuilder();
     }
 
     public int getColor() {
@@ -156,6 +201,35 @@ public class WeekViewEvent {
         this.mId = id;
     }
 
+    public int getmAvailableHeight() {
+        return mAvailableHeight;
+    }
+
+    public void setmAvailableHeight(int mAvailableHeight) {
+        this.mAvailableHeight = mAvailableHeight;
+    }
+
+    public int getmAvailableWidth() {
+        return mAvailableWidth;
+    }
+
+    public void setmAvailableWidth(int mAvailableWidth) {
+        this.mAvailableWidth = mAvailableWidth;
+    }
+
+    public StaticLayout getTextLayout() {
+        return mTextLayout;
+    }
+
+    public void setTextLayout(StaticLayout mTextLayout) {
+        this.mTextLayout = mTextLayout;
+    }
+
+    public SpannableStringBuilder getStringBuilder() {
+        return mStringBuilder;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -172,50 +246,63 @@ public class WeekViewEvent {
         return (int) (mId ^ (mId >>> 32));
     }
 
+    private static Calendar sEndTimeCalendar = Calendar.getInstance();
+    private static Calendar sOverDayCalendar = Calendar.getInstance();
     public List<WeekViewEvent> splitWeekViewEvents(){
         //This function splits the WeekViewEvent in WeekViewEvents by day
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
         // The first millisecond of the next day is still the same day. (no need to split events for this).
-        Calendar endTime = (Calendar) this.getEndTime().clone();
-        endTime.add(Calendar.MILLISECOND, -1);
-        if (!isSameDay(this.getStartTime(), endTime)) {
-            endTime = (Calendar) this.getStartTime().clone();
-            endTime.set(Calendar.HOUR_OF_DAY, 23);
-            endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
+        if (!isSameDay(mStartTime, mEndTime - 1)) {
+            sEndTimeCalendar.setTimeInMillis(mStartTime);
+            sEndTimeCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            sEndTimeCalendar.set(Calendar.MINUTE, 59);
+            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), sEndCalendar.getTimeInMillis(), this.isAllDay());
             event1.setColor(this.getColor());
             events.add(event1);
 
             // Add other days.
-            Calendar otherDay = (Calendar) this.getStartTime().clone();
-            otherDay.add(Calendar.DATE, 1);
-            while (!isSameDay(otherDay, this.getEndTime())) {
-                Calendar overDay = (Calendar) otherDay.clone();
-                overDay.set(Calendar.HOUR_OF_DAY, 0);
-                overDay.set(Calendar.MINUTE, 0);
-                Calendar endOfOverDay = (Calendar) overDay.clone();
-                endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
-                endOfOverDay.set(Calendar.MINUTE, 59);
-                WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay());
-                eventMore.setColor(this.getColor());
+            sEndTimeCalendar.add(Calendar.DATE, 1);
+            while (!isSameDay(sEndTimeCalendar.getTimeInMillis(), mEndTime)) {
+                sOverDayCalendar.setTimeInMillis(sEndTimeCalendar.getTimeInMillis());
+                sOverDayCalendar.set(Calendar.HOUR_OF_DAY, 0);
+                sOverDayCalendar.set(Calendar.MINUTE, 0);
+                long startOfOverDay = sOverDayCalendar.getTimeInMillis();
+                sOverDayCalendar.set(Calendar.HOUR_OF_DAY, 23);
+                sOverDayCalendar.set(Calendar.MINUTE, 59);
+                long endOfOverDay = sOverDayCalendar.getTimeInMillis();
+                WeekViewEvent eventMore = new WeekViewEvent(mId, mName, null,
+                    startOfOverDay, endOfOverDay, mAllDay);
+                eventMore.setColor(mColor);
                 events.add(eventMore);
 
                 // Add next day.
-                otherDay.add(Calendar.DATE, 1);
+                sEndTimeCalendar.add(Calendar.DATE, 1);
             }
 
             // Add last day.
-            Calendar startTime = (Calendar) this.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
-            event2.setColor(this.getColor());
+            sEndTimeCalendar.setTimeInMillis(mEndTime);
+            sEndTimeCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            sEndTimeCalendar.set(Calendar.MINUTE, 0);
+            WeekViewEvent event2 = new WeekViewEvent(mId, mName, mLocation,
+                sEndTimeCalendar.getTimeInMillis(), mEndTime, mAllDay);
+            event2.setColor(mColor);
             events.add(event2);
-        }
-        else{
+        } else {
             events.add(this);
         }
 
         return events;
+    }
+
+    private void refreshStringBuilder() {
+        mStringBuilder.clear();
+        if (mName != null) {
+            mStringBuilder.append(mName);
+            mStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, mStringBuilder.length(), 0);
+            mStringBuilder.append(' ');
+        }
+        if (mLocation != null) {
+            mStringBuilder.append(mLocation);
+        }
     }
 }
