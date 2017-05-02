@@ -78,7 +78,7 @@ Usage
     ```
 4. Implement `WeekView.MonthChangeListener`, `WeekView.EventClickListener`, `WeekView.EventLongPressListener` according to your need.
 
-5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. Please remember that the calendar pre-loads events of three consecutive months to enable lag-free scrolling.
+5. Provide the events for the `WeekView` in `WeekView.MonthChangeListener.onMonthChange()` callback. **(!) Please remember that the calendar pre-loads events of three consecutive months to enable lag-free scrolling**.
 
     ```java
     MonthLoader.MonthChangeListener mMonthChangeListener = new MonthLoader.MonthChangeListener() {
