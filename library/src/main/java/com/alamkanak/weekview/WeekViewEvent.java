@@ -1,6 +1,9 @@
 package com.alamkanak.weekview;
 
 import java.util.ArrayList;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -10,7 +13,7 @@ import static com.alamkanak.weekview.WeekViewUtil.*;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
-public class WeekViewEvent {
+public class WeekViewEvent implements Parcelable {
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
@@ -218,4 +221,43 @@ public class WeekViewEvent {
 
         return events;
     }
+
+    //FOR PARCELABLE
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.mId);
+        dest.writeSerializable(this.mStartTime);
+        dest.writeSerializable(this.mEndTime);
+        dest.writeString(this.mName);
+        dest.writeString(this.mLocation);
+        dest.writeInt(this.mColor);
+    }
+
+    private WeekViewEvent(Parcel in) {
+        this.mId = in.readLong();
+        this.mStartTime = (Calendar) in.readSerializable();
+        this.mEndTime = (Calendar) in.readSerializable();
+        this.mName = in.readString();
+        this.mLocation = in.readString();
+        this.mColor = in.readInt();
+    }
+
+    public static final Parcelable.Creator<WeekViewEvent> CREATOR = new Parcelable.Creator<WeekViewEvent>() {
+        @Override
+        public WeekViewEvent createFromParcel(Parcel source) {
+            return new WeekViewEvent(source);
+        }
+
+        @Override
+        public WeekViewEvent[] newArray(int size) {
+            return new WeekViewEvent[size];
+        }
+    };
+    //FOR PARCELABLE
+    
 }
