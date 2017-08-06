@@ -93,9 +93,6 @@ public class WeekView extends View {
     private Paint mNewEventBackgroundPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
-    private List<? extends WeekViewEvent> mPreviousPeriodEvents;
-    private List<? extends WeekViewEvent> mCurrentPeriodEvents;
-    private List<? extends WeekViewEvent> mNextPeriodEvents;
     private TextPaint mEventTextPaint;
     private TextPaint mNewEventTextPaint;
     private Paint mHeaderColumnBackgroundPaint;
@@ -1246,52 +1243,19 @@ public class WeekView extends View {
         // If a refresh was requested then reset some variables.
         if (mRefreshEvents) {
             mEventRects.clear();
-            mPreviousPeriodEvents = null;
-            mCurrentPeriodEvents = null;
-            mNextPeriodEvents = null;
             mFetchedPeriod = -1;
         }
 
         if (mWeekViewLoader != null){
             int periodToFetch = (int) mWeekViewLoader.toWeekViewPeriodIndex(day);
             if (!isInEditMode() && (mFetchedPeriod < 0 || mFetchedPeriod != periodToFetch || mRefreshEvents)) {
-                List<? extends WeekViewEvent> previousPeriodEvents = null;
-                List<? extends WeekViewEvent> currentPeriodEvents = null;
-                List<? extends WeekViewEvent> nextPeriodEvents = null;
-
-                if (mPreviousPeriodEvents != null && mCurrentPeriodEvents != null && mNextPeriodEvents != null){
-                    if (periodToFetch == mFetchedPeriod-1){
-                        currentPeriodEvents = mPreviousPeriodEvents;
-                        nextPeriodEvents = mCurrentPeriodEvents;
-                    }
-                    else if (periodToFetch == mFetchedPeriod){
-                        previousPeriodEvents = mPreviousPeriodEvents;
-                        currentPeriodEvents = mCurrentPeriodEvents;
-                        nextPeriodEvents = mNextPeriodEvents;
-                    }
-                    else if (periodToFetch == mFetchedPeriod+1){
-                        previousPeriodEvents = mCurrentPeriodEvents;
-                        currentPeriodEvents = mNextPeriodEvents;
-                    }
-                }
-                if (currentPeriodEvents == null)
-                    currentPeriodEvents = mWeekViewLoader.onLoad(periodToFetch);
-                if (previousPeriodEvents == null)
-                    previousPeriodEvents = mWeekViewLoader.onLoad(periodToFetch-1);
-                if (nextPeriodEvents == null)
-                    nextPeriodEvents = mWeekViewLoader.onLoad(periodToFetch+1);
-
+                List<? extends WeekViewEvent> newEvents = mWeekViewLoader.onLoad(periodToFetch);
 
                 // Clear events.
                 mEventRects.clear();
-                sortAndCacheEvents(previousPeriodEvents);
-                sortAndCacheEvents(currentPeriodEvents);
-                sortAndCacheEvents(nextPeriodEvents);
+                sortAndCacheEvents(newEvents);
                 calculateHeaderHeight();
 
-                mPreviousPeriodEvents = previousPeriodEvents;
-                mCurrentPeriodEvents = currentPeriodEvents;
-                mNextPeriodEvents = nextPeriodEvents;
                 mFetchedPeriod = periodToFetch;
             }
         }
