@@ -76,6 +76,10 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         calendar.add(Calendar.DATE, -2);
         mWeekView.goToDate(calendar);*/
 
+        //mWeekView.setAutoLimitTime(true);
+        //mWeekView.setLimitTime(4, 16);
+
+
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
         setupDateTimeInterpreter(false);
