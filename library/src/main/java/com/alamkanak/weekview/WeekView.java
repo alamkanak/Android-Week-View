@@ -1788,6 +1788,36 @@ public class WeekView extends View {
     }
 
     /**
+     * Get whether the week view should scroll horizontally.
+     * @return True if the week view has horizontal scroll enabled.
+     */
+    public boolean isHorizontalScrollEnabled() {
+        return mHorizontalScrollEnabled;
+    }
+
+    /**
+     * Set whether the week view should scroll horizontally.
+     */
+    public void setHorizontalScrollEnabled(boolean enabled) {
+        mHorizontalScrollEnabled = enabled;
+    }
+
+    /**
+     * Get whether the week view should scroll vertically.
+     * @return True if the week view has vertical scroll enabled.
+     */
+    public boolean isVerticalScrollEnabled() {
+        return mVerticalScrollEnabled;
+    }
+
+    /**
+     * Set whether the week view should scroll vertically.
+     */
+    public void setVerticalScrollEnabled(boolean enabled) {
+        mVerticalScrollEnabled = enabled;
+    }
+
+    /**
      * Get the height of AllDay-events.
      * @return Height of AllDay-events.
      */
