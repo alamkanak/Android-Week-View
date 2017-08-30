@@ -204,12 +204,16 @@ public class WeekView extends View {
             switch (mCurrentScrollDirection) {
                 case LEFT:
                 case RIGHT:
-                    mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    if (mHorizontalScrollEnabled) {
+                        mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    }
                     break;
                 case VERTICAL:
-                    mCurrentOrigin.y -= distanceY;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    if (mVerticalScrollEnabled) {
+                        mCurrentOrigin.y -= distanceY;
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    }
                     break;
             }
             return true;
@@ -230,7 +234,6 @@ public class WeekView extends View {
 
             mScroller.forceFinished(true);
 
-            mCurrentFlingDirection = mCurrentScrollDirection;
             switch (mCurrentFlingDirection) {
                 case LEFT:
                 case RIGHT:
