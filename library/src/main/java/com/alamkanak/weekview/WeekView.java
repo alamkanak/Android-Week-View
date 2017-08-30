@@ -142,6 +142,8 @@ public class WeekView extends View {
     private boolean mShowDistinctPastFutureColor = false;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
+    private boolean mHorizontalScrollEnabled = true;
+    private boolean mVerticalScrollEnabled = true;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
 
@@ -351,6 +353,8 @@ public class WeekView extends View {
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
+            mHorizontalScrollEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollEnabled, mHorizontalScrollEnabled);
+            mVerticalScrollEnabled = a.getBoolean(R.styleable.WeekView_verticalScrollEnabled, mVerticalScrollEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
