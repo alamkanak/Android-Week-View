@@ -62,10 +62,8 @@ public class WeekViewUtil {
      * @return the amount of days between dateTwo and dateOne
      */
     public static int daysBetween(Calendar dateOne, Calendar dateTwo) {
-        return (int) (
-                (dateTwo.getTimeInMillis() + dateTwo.getTimeZone().getOffset(dateTwo.getTimeInMillis()) -
-                        (dateOne.getTimeInMillis() + dateOne.getTimeZone().getOffset(dateOne.getTimeInMillis())))
-                        / (1000 * 60 * 60 * 24f));
+        return (int) (((dateTwo.getTimeInMillis() + dateTwo.getTimeZone().getOffset(dateTwo.getTimeInMillis())) / (1000 * 60 * 60 * 24)) -
+                ((dateOne.getTimeInMillis() + dateOne.getTimeZone().getOffset(dateOne.getTimeInMillis())) / (1000 * 60 * 60 * 24)));
     }
 
      /*
