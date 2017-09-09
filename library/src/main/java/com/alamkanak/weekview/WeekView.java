@@ -2070,23 +2070,66 @@ public class WeekView extends View {
         invalidate();
     }
 
-    /**
-     * set fix visible time.
-     * @param startHour limit time display on top (between 0~24)
-     * @param endHour limit time display at bottom (between 0~24 and > startHour)
-     * */
-    public void setLimitTime(int startHour, int endHour){
-        if(endHour <= startHour || startHour < 0 || endHour > 24){
-            throw new IllegalArgumentException("endHour must larger startHour");
-        }
-        this.mMinTime = startHour;
-        this.mMaxTime = endHour;
+    private void recalculateHourHeight(){
         int height = (int) ((getHeight() - (mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom)) / (this.mMaxTime - this.mMinTime));
         if(height > mHourHeight){
             if(height > mMaxHourHeight)
                 mMaxHourHeight = height;
             mNewHourHeight = height;
         }
+    }
+
+    /**
+     * Set visible time span.
+     * @param startHour limit time display on top (between 0~24)
+     * @param endHour limit time display at bottom (between 0~24 and larger than startHour)
+     * */
+    public void setLimitTime(int startHour, int endHour){
+        if(endHour <= startHour){
+            throw new IllegalArgumentException("endHour must larger startHour.");
+        }
+        else if(startHour < 0){
+            throw new IllegalArgumentException("startHour must be at least 0.");
+        }
+        else if(endHour > 24){
+            throw new IllegalArgumentException("endHour can't be higher than 24.");
+        }
+        this.mMinTime = startHour;
+        this.mMaxTime = endHour;
+        recalculateHourHeight();
+        invalidate();
+    }
+
+    /**
+     * Set minimal shown time
+     *
+     * @param startHour limit time display on top (between 0~24) and smaller than endHour
+     * */
+    public void setMinTime(int startHour){
+        if(mMaxTime <= startHour){
+            throw new IllegalArgumentException("startHour must smaller than endHour");
+        }
+        else if(startHour < 0){
+            throw new IllegalArgumentException("startHour must be at least 0.");
+        }
+        this.mMinTime = startHour;
+        recalculateHourHeight();
+    }
+
+    /**
+     * Set highest shown time
+     *
+     * @param endHour limit time display at bottom (between 0~24 and larger than startHour)
+     * */
+    public void setMaxTime(int endHour){
+        if(endHour <= mMinTime){
+            throw new IllegalArgumentException("endHour must larger startHour.");
+        }
+        else if(endHour > 24){
+            throw new IllegalArgumentException("endHour can't be higher than 24.");
+        }
+        this.mMaxTime = endHour;
+        recalculateHourHeight();
         invalidate();
     }
 
@@ -2272,6 +2315,66 @@ public class WeekView extends View {
      */
     public void setScrollDuration(int scrollDuration) {
         mScrollDuration = scrollDuration;
+    }
+
+    public int getMaxHourHeight() {
+        return mMaxHourHeight;
+    }
+
+    public void setMaxHourHeight(int maxHourHeight) {
+        mMaxHourHeight = maxHourHeight;
+    }
+
+    public int getMinHourHeight() {
+        return mMinHourHeight;
+    }
+
+    public void setMinHourHeight(int minHourHeight) {
+        this.mMinHourHeight = minHourHeight;
+    }
+
+    public int getPastBackgroundColor() {
+        return mPastBackgroundColor;
+    }
+
+    public void setPastBackgroundColor(int pastBackgroundColor) {
+        this.mPastBackgroundColor = pastBackgroundColor;
+        mPastBackgroundPaint.setColor(mPastBackgroundColor);
+    }
+
+    public int getFutureBackgroundColor() {
+        return mFutureBackgroundColor;
+    }
+
+    public void setFutureBackgroundColor(int futureBackgroundColor) {
+        this.mFutureBackgroundColor = futureBackgroundColor;
+        mFutureBackgroundPaint.setColor(mFutureBackgroundColor);
+    }
+
+    public int getPastWeekendBackgroundColor() {
+        return mPastWeekendBackgroundColor;
+    }
+
+    public void setPastWeekendBackgroundColor(int pastWeekendBackgroundColor) {
+        this.mPastWeekendBackgroundColor = pastWeekendBackgroundColor;
+        this.mPastWeekendBackgroundPaint.setColor(mPastWeekendBackgroundColor);
+    }
+
+    public int getFutureWeekendBackgroundColor() {
+        return mFutureWeekendBackgroundColor;
+    }
+
+    public void setFutureWeekendBackgroundColor(int futureWeekendBackgroundColor) {
+        this.mFutureWeekendBackgroundColor = futureWeekendBackgroundColor;
+        this.mFutureWeekendBackgroundPaint.setColor(mFutureWeekendBackgroundColor);
+    }
+
+    public Drawable getNewEventIconDrawable() {
+        return mNewEventIconDrawable;
+    }
+
+    public void setNewEventIconDrawable(Drawable newEventIconDrawable) {
+        this.mNewEventIconDrawable = newEventIconDrawable;
     }
 
     /////////////////////////////////////////////////////////////////

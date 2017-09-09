@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.sample;
 
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -79,12 +80,25 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         //mWeekView.setAutoLimitTime(true);
         //mWeekView.setLimitTime(4, 16);
 
+        //mWeekView.setMinTime(10);
+        //mWeekView.setMaxTime(20);
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
         setupDateTimeInterpreter(false);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*mWeekView.setShowDistinctPastFutureColor(true);
+        mWeekView.setShowDistinctWeekendColor(true);
+        mWeekView.setFutureBackgroundColor(Color.rgb(24,85,96));
+        mWeekView.setFutureWeekendBackgroundColor(Color.rgb(255,0,0));
+        mWeekView.setPastBackgroundColor(Color.rgb(85,189,200));
+        mWeekView.setPastWeekendBackgroundColor(Color.argb(50, 0,255,0));
+        */
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
