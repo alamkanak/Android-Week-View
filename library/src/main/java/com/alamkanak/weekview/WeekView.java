@@ -1253,7 +1253,7 @@ public class WeekView extends View {
 
                 // Clear events.
                 mEventRects.clear();
-                sortAndCacheEvents(newEvents);
+                cacheAndSortEvents(newEvents);
                 calculateHeaderHeight();
 
                 mFetchedPeriod = periodToFetch;
@@ -1301,30 +1301,30 @@ public class WeekView extends View {
     }
 
     /**
-     * Sort and cache events.
-     * @param events The events to be sorted and cached.
+     * Cache and sort events.
+     * @param events The events to be cached and sorted.
      */
-    private void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
-        sortEvents(events);
+    private void cacheAndSortEvents(List<? extends WeekViewEvent> events) {
         for (WeekViewEvent event : events) {
             cacheEvent(event);
         }
+        sortEventRects(mEventRects);
     }
 
     /**
      * Sorts the events in ascending order.
-     * @param events The events to be sorted.
+     * @param eventRects The events to be sorted.
      */
-    private void sortEvents(List<? extends WeekViewEvent> events) {
-        Collections.sort(events, new Comparator<WeekViewEvent>() {
+    private void sortEventRects(List<EventRect> eventRects) {
+        Collections.sort(eventRects, new Comparator<EventRect>() {
             @Override
-            public int compare(WeekViewEvent event1, WeekViewEvent event2) {
-                long start1 = event1.getStartTime().getTimeInMillis();
-                long start2 = event2.getStartTime().getTimeInMillis();
+            public int compare(EventRect left, EventRect right) {
+                long start1 = left.event.getStartTime().getTimeInMillis();
+                long start2 = right.event.getStartTime().getTimeInMillis();
                 int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
                 if (comparator == 0) {
-                    long end1 = event1.getEndTime().getTimeInMillis();
-                    long end2 = event2.getEndTime().getTimeInMillis();
+                    long end1 = left.event.getEndTime().getTimeInMillis();
+                    long end2 = right.event.getEndTime().getTimeInMillis();
                     comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
                 }
                 return comparator;
