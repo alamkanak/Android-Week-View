@@ -221,6 +221,8 @@ public class WeekView extends View {
                     }
                     break;
                 }
+                default:
+                    break;
             }
 
             // Calculate the new origin after scroll.
@@ -254,6 +256,8 @@ public class WeekView extends View {
                     }
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
                     break;
+                default:
+                    break;
             }
             return true;
         }
@@ -279,6 +283,8 @@ public class WeekView extends View {
                     break;
                 case VERTICAL:
                     mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, (int) getXMinLimit(), (int) getXMaxLimit(), (int) getYMinLimit(), (int) getYMaxLimit());
+                    break;
+                default:
                     break;
             }
 
