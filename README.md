@@ -1,8 +1,9 @@
-=================
 Android Week View
 =================
 
 **Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
+
+[Why this fork? (features + community & contributing)](https://github.com/Quivr/Android-Week-View/issues/45)
 
 ![](images/screen-shot.png)
 
@@ -12,8 +13,11 @@ Features
 * Week view calendar
 * Day view calendar
 * Custom styling
-* Horizontal and vertical scrolling
+* Vertical scrolling and zooming
 * Infinite horizontal scrolling
+* Possibility to set min and max date
+* Possibility to set range of visible hours
+* All day events at the top
 * Live preview of custom styling in xml preview window
 
 Who uses it
