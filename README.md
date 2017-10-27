@@ -19,7 +19,7 @@ Features
 Who uses it
 ---------------
 
-* [Quivr] (https://quivr.be/en/)
+* [Quivr](https://quivr.be/en/)
 * [Series Addict](https://play.google.com/store/apps/details?id=com.alamkanak.seriesaddict)
 * [Unicaen Timetable](https://play.google.com/store/apps/details?id=fr.skyost.timetable)
 * Using the library? Just make an issue
