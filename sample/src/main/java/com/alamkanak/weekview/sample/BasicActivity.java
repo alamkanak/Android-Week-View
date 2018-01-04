@@ -1,5 +1,8 @@
 package com.alamkanak.weekview.sample;
 
+import android.graphics.Typeface;
+import android.os.Bundle;
+
 import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.ArrayList;
@@ -12,6 +15,14 @@ import java.util.List;
  * Website: http://alamkanak.github.io
  */
 public class BasicActivity extends BaseActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Typeface customTypeface = Typeface.createFromAsset(this.getAssets(), "fonts/Raleway/Raleway-Medium.ttf");
+        mWeekView.setTypeface(customTypeface);
+    }
 
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
@@ -155,9 +166,20 @@ public class BasicActivity extends BaseActivity {
         endTime.set(Calendar.DAY_OF_MONTH, 11);
         event = new WeekViewEvent(8, getEventTitle(startTime), null, startTime, endTime, true);
         event.setColor(getResources().getColor(R.color.event_color_01));
+
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY, 18);
+        startTime.set(Calendar.MINUTE, 30);
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.YEAR, newYear);
+        endTime = (Calendar) startTime.clone();
+        endTime.set(Calendar.HOUR_OF_DAY, 19);
+        endTime.set(Calendar.MINUTE, 30);
+        endTime.set(Calendar.MONTH, newMonth-1);
+        event = new WeekViewEvent(22, getEventTitle(startTime), startTime, endTime);
+        event.setColor(getResources().getColor(R.color.event_color_02));
         events.add(event);
 
         return events;
     }
-
 }

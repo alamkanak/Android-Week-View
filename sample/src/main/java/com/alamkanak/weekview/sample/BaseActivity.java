@@ -1,6 +1,8 @@
 package com.alamkanak.weekview.sample;
 
+import android.graphics.Color;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
@@ -15,6 +17,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -23,12 +26,12 @@ import java.util.Locale;
  * Created by Raquib-ul-Alam Kanak on 1/3/2014.
  * Website: http://alamkanak.github.io
  */
-public abstract class BaseActivity extends AppCompatActivity implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
+public abstract class BaseActivity extends AppCompatActivity implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener, WeekView.EmptyViewClickListener, WeekView.AddEventClickListener {
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
-    private WeekView mWeekView;
+    protected WeekView mWeekView;
 
 
     @Override
@@ -52,11 +55,50 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         // Set long press listener for empty view
         mWeekView.setEmptyViewLongPressListener(this);
 
+        // Set EmptyView Click Listener
+        mWeekView.setEmptyViewClickListener(this);
+
+        // Set AddEvent Click Listener
+        mWeekView.setAddEventClickListener(this);
+
+        // Set minDate
+        /*Calendar minDate = Calendar.getInstance();
+        minDate.set(Calendar.DAY_OF_MONTH, 1);
+        minDate.add(Calendar.MONTH, 1);
+        mWeekView.setMinDate(minDate);
+
+        // Set maxDate
+        Calendar maxDate = Calendar.getInstance();
+        maxDate.add(Calendar.MONTH, 1);
+        maxDate.set(Calendar.DAY_OF_MONTH, 10);
+        mWeekView.setMaxDate(maxDate);
+
+        Calendar calendar = (Calendar) maxDate.clone();
+        calendar.add(Calendar.DATE, -2);
+        mWeekView.goToDate(calendar);*/
+
+        //mWeekView.setAutoLimitTime(true);
+        //mWeekView.setLimitTime(4, 16);
+
+        //mWeekView.setMinTime(10);
+        //mWeekView.setMaxTime(20);
+
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
         setupDateTimeInterpreter(false);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*mWeekView.setShowDistinctPastFutureColor(true);
+        mWeekView.setShowDistinctWeekendColor(true);
+        mWeekView.setFutureBackgroundColor(Color.rgb(24,85,96));
+        mWeekView.setFutureWeekendBackgroundColor(Color.rgb(255,0,0));
+        mWeekView.setPastBackgroundColor(Color.rgb(85,189,200));
+        mWeekView.setPastWeekendBackgroundColor(Color.argb(50, 0,255,0));
+        */
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -135,8 +177,17 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
             }
 
             @Override
-            public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+            public String interpretTime(int hour, int minutes) {
+                String strMinutes = String.format("%02d", minutes);
+                if (hour > 11) {
+                    return (hour - 12) + ":" + strMinutes + " PM";
+                } else {
+                    if (hour == 0) {
+                        return "12:" + strMinutes + " AM";
+                    } else {
+                        return hour + ":" + strMinutes + " AM";
+                    }
+                }
             }
         });
     }
@@ -162,5 +213,20 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
 
     public WeekView getWeekView() {
         return mWeekView;
+    }
+
+    @Override
+    public void onEmptyViewClicked(Calendar date) {
+        Toast.makeText(this, "Empty view" + " clicked: " + getEventTitle(date) , Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+        return null;
+    }
+
+    @Override
+    public void onAddEventClicked(Calendar startTime, Calendar endTime) {
+        Toast.makeText(this, "Add event clicked.", Toast.LENGTH_SHORT).show();
     }
 }

@@ -18,10 +18,15 @@
         app:headerRowPadding="12dp"
         app:columnGap="8dp"
         app:noOfVisibleDays="3"
+        app:minTime="4"
+        app:maxTime="16"
+        app:autoLimitTime="false"
         app:headerRowBackgroundColor="@color/toolbar"
         app:dayBackgroundColor="#05000000"
         app:todayBackgroundColor="#1848adff"
         app:headerColumnBackground="#ffffffff"
-        app:todayHeaderTextColor="@color/accent" />
+        app:todayHeaderTextColor="@color/accent"
+        app:newEventTimeResolutionInMinutes="15"
+        app:timeColumnResolution="60" />
 
 </RelativeLayout>

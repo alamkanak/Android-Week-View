@@ -5,6 +5,8 @@ Android Week View
 
 **Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
 
+[Why this fork? (features + community & contributing)](https://github.com/Quivr/Android-Week-View/issues/45)
+
 ![](images/screen-shot.png)
 
 Features
@@ -13,15 +15,20 @@ Features
 * Week view calendar
 * Day view calendar
 * Custom styling
-* Horizontal and vertical scrolling
+* Vertical scrolling and zooming
 * Infinite horizontal scrolling
+* Possibility to set min and max date
+* Possibility to set range of visible hours
+* All day events at the top
 * Live preview of custom styling in xml preview window
 
 Who uses it
 ---------------
 
+* [Quivr](https://quivr.be/en/)
 * [Series Addict](https://play.google.com/store/apps/details?id=com.alamkanak.seriesaddict)
-* Using the library? Just [tweet me](https://twitter.com/alamkanak) or [send me an email](mailto:alam.kanak@gmail.com).
+* [Unicaen Timetable](https://play.google.com/store/apps/details?id=fr.skyost.timetable)
+* Using the library? Just make an issue
 
 Usage
 ---------
@@ -31,16 +38,16 @@ Usage
   
     ```xml
     <dependency>
-      <groupId>com.github.alamkanak</groupId>
+      <groupId>com.github.quivr</groupId>
       <artifactId>android-week-view</artifactId>
-      <version>1.2.6</version>
+      <version>2.0.2</version>
       <type>aar</type>
     </dependency>
     ```
   * Grab via gradle
   
     ```groovy
-    compile 'com.github.alamkanak:android-week-view:1.2.6'
+    compile 'com.github.quivr:android-week-view:2.0.2'
     ```
 2. Add WeekView in your xml layout.
 
@@ -99,37 +106,55 @@ Customization
 You can customize the look of the `WeekView` in xml. Use the following attributes in xml. All these attributes also have getters and setters to enable you to change the style dynamically.
 
 - `allDayEventHeight`
+- `autoLimitTime`
 - `columnGap`
 - `dayBackgroundColor`
 - `dayNameLength`
+- `eventCornerRadius`
 - `eventMarginVertical`
 - `eventPadding`
 - `eventTextColor`
 - `eventTextSize`
 - `firstDayOfWeek`
+- `futureBackgroundColor`
+- `futureWeekendBackgroundColor`
 - `headerColumnBackground`
 - `headerColumnPadding`
 - `headerColumnTextColor`
 - `headerRowBackgroundColor`
 - `headerRowPadding`
+- `horizontalFlingEnabled`
 - `hourHeight`
 - `hourSeparatorColor`
 - `hourSeparatorHeight`
+- `maxHourHeight`
+- `maxTime`
+- `minHourHeight`
+- `minTime`
+- `newEventColor`
+- `newEventId`
+- `newEventIconResource`
+- `newEventLengthInMinutes`
+- `newEventTimeResolutionInMinutes`
 - `noOfVisibleDays`
-- `overlappingEventGap`
-- `textSize`
-- `todayBackgroundColor`
-- `todayHeaderTextColor`
-- `showDistinctPastFutureColor`
-- `futureBackgroundColor`
-- `pastBackgroundColor`
-- `showDistinctWeekendColor`
-- `futureWeekendBackgroundColor`
-- `pastWeekendBackgroundColor`
-- `showNowLine`
 - `nowLineColor`
 - `nowLineThickness`
+- `overlappingEventGap`
+- `pastBackgroundColor`
+- `pastWeekendBackgroundColor`
 - `scrollDuration`
+- `showDistinctPastFutureColor`
+- `showDistinctWeekendColor`
+- `showFirstDayOfWeekFirst`
+- `showNowLine`
+- `textSize`
+- `timeColumnResolution`
+- `todayBackgroundColor`
+- `todayHeaderTextColor`
+- `verticalFlingEnabled`
+- `xScrollingSpeed`
+- `zoomFocusPoint` The focused point (percentage of the view height) where the week view is zoomed around. This point will not move while zooming. You can declare it as a fraction `app:focusPoint="30%"` and if is not declared the top of the view is used.
+- `zoomFocusPointEnabled` If you set this to ``false`` the zoomFocusPoint won't take effect any more while zooming. The zoom will always be focused at the center of your gesture.
 
 Interfaces
 ----------
@@ -144,20 +169,25 @@ Use the following interfaces according to your need.
 - `mWeekView.setEmptyViewLongPressListener()` to get a callback when any empty space is long pressed
 - `mWeekView.setDateTimeInterpreter()` to set your own labels for the calendar header row and header column
 - `mWeekView.setScrollListener()` to get an event every time the first visible day has changed
-
+- `mWeekView.setAddEventClickListener()` to get the start and end time of an event to add
 Sample
 ----------
 
-There is also a [sample app](https://github.com/alamkanak/Android-Week-View/tree/master/sample) to get you started.
+There is also a [sample app](https://github.com/quivr/Android-Week-View/tree/master/sample) to get you started.
 
 To do
 -------
 
 * Add event touch feedback selector
-* Show events that expand multiple days properly
 
 Changelog
 ---------
+**Version 2.0.0**
+* This fork is first released
+* Possibility to set minDate and maxDate
+* Allday events are supported
+* Events can be add by clicking on empty space
+
 
 **Version 1.2.6**
 
