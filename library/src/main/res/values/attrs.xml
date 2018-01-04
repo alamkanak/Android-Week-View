@@ -39,7 +39,7 @@
         <attr name="minHourHeight" format="dimension"/>
         <attr name="minTime" format="integer"/>
         <attr name="newEventColor" format="color"/>
-        <attr name="newEventId" format="integer"/>
+        <attr name="newEventId" format="string"/>
         <attr name="newEventIconResource" format="integer"/>
         <attr name="newEventLengthInMinutes" format="integer"/>
         <attr name="newEventTimeResolutionInMinutes" format="integer"/>

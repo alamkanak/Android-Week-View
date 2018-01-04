@@ -182,5 +182,4 @@ public class BasicActivity extends BaseActivity {
 
         return events;
     }
-
 }

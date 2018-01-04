@@ -138,7 +138,7 @@ public class WeekView extends View {
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private int mDefaultEventColor;
     private int mNewEventColor;
-    private int mNewEventId = -100;
+    private String mNewEventId = "";
     private Drawable mNewEventIconDrawable;
     private int mNewEventLengthInMinutes = 60;
     private int mNewEventTimeResolutionInMinutes = 15;
@@ -301,7 +301,7 @@ public class WeekView extends View {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect eventRect : reversedEventRects) {
-                    if (eventRect.event.getId() != mNewEventId &&eventRect.rectF != null && e.getX() > eventRect.rectF.left && e.getX() < eventRect.rectF.right && e.getY() > eventRect.rectF.top && e.getY() < eventRect.rectF.bottom) {
+                    if (!eventRect.event.getId().equals(mNewEventId) && eventRect.rectF != null && e.getX() > eventRect.rectF.left && e.getX() < eventRect.rectF.right && e.getY() > eventRect.rectF.top && e.getY() < eventRect.rectF.bottom) {
                         mEventClickListener.onEventClick(eventRect.originalEvent, eventRect.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         return super.onSingleTapConfirmed(e);
@@ -441,7 +441,7 @@ public class WeekView extends View {
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mNewEventColor = a.getColor(R.styleable.WeekView_newEventColor, mNewEventColor);
             mNewEventIconDrawable = a.getDrawable(R.styleable.WeekView_newEventIconResource);
-            mNewEventId = a.getInt(R.styleable.WeekView_newEventId, mNewEventId);
+            mNewEventId =  (a.getString(R.styleable.WeekView_newEventId) != null)? a.getString(R.styleable.WeekView_newEventId) : mNewEventId;
             mNewEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, mNewEventLengthInMinutes);
             mNewEventTimeResolutionInMinutes = a.getInt(R.styleable.WeekView_newEventTimeResolutionInMinutes, mNewEventTimeResolutionInMinutes);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
@@ -1860,11 +1860,11 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getNewEventId(){
+    public String getNewEventId(){
         return mNewEventId;
     }
 
-    public void setNewEventId(int newEventId){
+    public void setNewEventId(String newEventId){
         this.mNewEventId = newEventId;
     }
 
