@@ -3,6 +3,8 @@ package com.alamkanak.weekview.sample
 import android.graphics.RectF
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.format.DateFormat
+import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
@@ -66,41 +68,23 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
                 return true
             }
             R.id.action_day_view -> {
-                if (mWeekViewType != TYPE_DAY_VIEW) {
-                    item.isChecked = !item.isChecked
-                    mWeekViewType = TYPE_DAY_VIEW
-                    weekView.numberOfVisibleDays = 1
-
-                    // Lets change some dimensions to best fit the view.
-                    weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
-                    weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
-                    weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+                if (!item.isChecked) {
+                    item.isChecked = true
+                    setDayViewType(TYPE_DAY_VIEW)
                 }
                 return true
             }
             R.id.action_three_day_view -> {
-                if (mWeekViewType != TYPE_THREE_DAY_VIEW) {
-                    item.isChecked = !item.isChecked
-                    mWeekViewType = TYPE_THREE_DAY_VIEW
-                    weekView.numberOfVisibleDays = 3
-
-                    // Lets change some dimensions to best fit the view.
-                    weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
-                    weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
-                    weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+                if (!item.isChecked) {
+                    item.isChecked = true
+                    setDayViewType(TYPE_THREE_DAY_VIEW)
                 }
                 return true
             }
             R.id.action_week_view -> {
-                if (mWeekViewType != TYPE_WEEK_VIEW) {
-                    item.isChecked = !item.isChecked
-                    mWeekViewType = TYPE_WEEK_VIEW
-                    weekView.numberOfVisibleDays = 7
-
-                    // Lets change some dimensions to best fit the view.
-                    weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, resources.displayMetrics).toInt()
-                    weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt()
-                    weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt()
+                if (!item.isChecked) {
+                    item.isChecked = true
+                    setDayViewType(TYPE_WEEK_VIEW)
                 }
                 return true
             }
@@ -109,28 +93,62 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
         return super.onOptionsItemSelected(item)
     }
 
+    fun setDayViewType(dayViewType: Int) {
+        when (dayViewType) {
+            TYPE_DAY_VIEW -> {
+                mWeekViewType = TYPE_DAY_VIEW
+                weekView.numberOfVisibleDays = 1
+                // Lets change some dimensions to best fit the view.
+                weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+                weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+                weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+            }
+            TYPE_THREE_DAY_VIEW -> {
+                mWeekViewType = TYPE_THREE_DAY_VIEW
+                weekView.numberOfVisibleDays = 3
+                // Lets change some dimensions to best fit the view.
+                weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+                weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+                weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
+            }
+            TYPE_WEEK_VIEW -> {
+                mWeekViewType = TYPE_WEEK_VIEW
+                weekView.numberOfVisibleDays = 7
+                // Lets change some dimensions to best fit the view.
+                weekView.columnGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0f, resources.displayMetrics).toInt()
+                weekView.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt()
+                weekView.eventTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt()
+            }
+        }
+    }
+
     /**
      * Set up a date time interpreter which will show short date values when in week view and long
      * date values otherwise.
      * @param shortDate True if the date values should be short.
      */
     private fun setupDateTimeInterpreter(shortDate: Boolean) {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val dateFormat = DateFormat.getTimeFormat(this@BaseActivity)
+                ?: SimpleDateFormat("HH:mm", Locale.getDefault())
+        val format = SimpleDateFormat(" M/d", Locale.getDefault())
         weekView.dateTimeInterpreter = object : DateTimeInterpreter {
-            override fun interpretDate(date: Calendar): String {
-                val weekdayNameFormat = SimpleDateFormat("EEE", Locale.getDefault())
-                var weekday = weekdayNameFormat.format(date.time)
-                val format = SimpleDateFormat(" M/d", Locale.getDefault())
 
-                // All android api level do not have a standard way of getting the first letter of
-                // the week day name. Hence we get the first char programmatically.
-                // Details: http://stackoverflow.com/questions/16959502/get-one-letter-abbreviation-of-week-day-of-a-date-in-java#answer-16959657
-                if (shortDate)
-                    weekday = weekday[0].toString()
-                return weekday.toUpperCase() + format.format(date.time)
+            override fun interpretDate(date: Calendar): String {
+                var weekday =DateUtils.getDayOfWeekString(date.get(Calendar.DAY_OF_WEEK), DateUtils.LENGTH_SHORT)
+                if (shortDate) {
+                    val dayOfWeekString = DateUtils.getDayOfWeekString(date.get(Calendar.DAY_OF_WEEK), DateUtils.LENGTH_SHORTEST)
+                    weekday = dayOfWeekString
+                }
+                return weekday + format.format(date.time)
             }
 
             override fun interpretTime(hour: Int): String {
-                return if (hour > 11) (hour - 12).toString() + " PM" else if (hour == 0) "12 AM" else hour.toString() + " AM"
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                return dateFormat.format(calendar.time)
             }
         }
     }
@@ -152,8 +170,8 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
     }
 
     companion object {
-        private val TYPE_DAY_VIEW = 1
-        private val TYPE_THREE_DAY_VIEW = 2
-        private val TYPE_WEEK_VIEW = 3
+        val TYPE_DAY_VIEW = 1
+        val TYPE_THREE_DAY_VIEW = 2
+        val TYPE_WEEK_VIEW = 3
     }
 }
