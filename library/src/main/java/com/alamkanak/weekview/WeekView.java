@@ -1304,7 +1304,7 @@ public class WeekView extends View {
                 public String interpretDate(Calendar date) {
                     try {
                         int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NO_YEAR | DateUtils.FORMAT_NUMERIC_DATE;
-                        String localizedDate = DateUtils.formatDateTime(getContext(), date.getTime(), flags);
+                        String localizedDate = DateUtils.formatDateTime(getContext(), date.getTime().getTime(), flags);
                         SimpleDateFormat sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE", Locale.getDefault()) : new SimpleDateFormat("EEE", Locale.getDefault());
                         return String.format("%s %s", sdf.format(date.getTime()).toUpperCase(), localizedDate);
                     } catch (Exception e) {
