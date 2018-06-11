@@ -701,7 +701,9 @@ public class WeekView extends View {
             drawEvents(day, startPixel, canvas);
 
             // Draw the line at the current time.
-            if (mShowNowLine && sameDay){
+            //if (mShowNowLine && sameDay){
+            // draw now line over entire calendar instead of just today
+            if (mShowNowLine){
                 float startY = mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
@@ -1064,9 +1066,11 @@ public class WeekView extends View {
      * @param events The events to be sorted and cached.
      */
     private void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
-        sortEvents(events);
-        for (WeekViewEvent event : events) {
-            cacheEvent(event);
+        if (events != null && events.size() > 0) {
+            sortEvents(events);
+            for (WeekViewEvent event : events) {
+                cacheEvent(event);
+            }
         }
     }
 
@@ -1075,20 +1079,22 @@ public class WeekView extends View {
      * @param events The events to be sorted.
      */
     private void sortEvents(List<? extends WeekViewEvent> events) {
-        Collections.sort(events, new Comparator<WeekViewEvent>() {
-            @Override
-            public int compare(WeekViewEvent event1, WeekViewEvent event2) {
-                long start1 = event1.getStartTime().getTimeInMillis();
-                long start2 = event2.getStartTime().getTimeInMillis();
-                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
-                if (comparator == 0) {
-                    long end1 = event1.getEndTime().getTimeInMillis();
-                    long end2 = event2.getEndTime().getTimeInMillis();
-                    comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+        if (events != null && events.size() > 0) {
+            Collections.sort(events, new Comparator<WeekViewEvent>() {
+                @Override
+                public int compare(WeekViewEvent event1, WeekViewEvent event2) {
+                    long start1 = event1.getStartTime().getTimeInMillis();
+                    long start2 = event2.getStartTime().getTimeInMillis();
+                    int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
+                    if (comparator == 0) {
+                        long end1 = event1.getEndTime().getTimeInMillis();
+                        long end2 = event2.getEndTime().getTimeInMillis();
+                        comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+                    }
+                    return comparator;
                 }
-                return comparator;
-            }
-        });
+            });
+        }
     }
 
     /**

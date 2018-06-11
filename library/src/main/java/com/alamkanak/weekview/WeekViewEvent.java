@@ -11,7 +11,7 @@ import static com.alamkanak.weekview.WeekViewUtil.*;
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
-    private long mId;
+    private String mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
     private String mName;
@@ -38,7 +38,7 @@ public class WeekViewEvent {
      * @param endHour Hour (in 24-hour format) when the event ends.
      * @param endMinute Minute when the event ends.
      */
-    public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
+    public WeekViewEvent(String id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
         this.mId = id;
 
         this.mStartTime = Calendar.getInstance();
@@ -67,7 +67,7 @@ public class WeekViewEvent {
      * @param endTime The time when the event ends.
      * @param allDay Is the event an all day event.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
+    public WeekViewEvent(String id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
@@ -84,7 +84,7 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
+    public WeekViewEvent(String id, String name, String location, Calendar startTime, Calendar endTime) {
         this(id, name, location, startTime, endTime, false);
     }
 
@@ -95,7 +95,7 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
+    public WeekViewEvent(String id, String name, Calendar startTime, Calendar endTime) {
         this(id, name, null, startTime, endTime);
     }
 
@@ -148,11 +148,11 @@ public class WeekViewEvent {
         this.mAllDay = allDay;
     }
 
-    public long getId() {
+    public String getId() {
         return mId;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.mId = id;
     }
 
@@ -160,16 +160,8 @@ public class WeekViewEvent {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         WeekViewEvent that = (WeekViewEvent) o;
-
-        return mId == that.mId;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (mId ^ (mId >>> 32));
+        return mId.equals(that.mId);
     }
 
     public List<WeekViewEvent> splitWeekViewEvents(){
