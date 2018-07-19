@@ -25,6 +25,17 @@ public class WeekViewUtil {
     }
 
     /**
+     * Checks if date is weekend day
+     * @param day the date to check.
+     * @return Whether the date is a weekend day.
+     */
+    public static boolean isWeekendDay(Calendar day) {
+        return (day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+                day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+
+    }
+
+    /**
      * Returns a calendar instance at the start of this day
      * @return the calendar instance
      */

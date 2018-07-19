@@ -15,10 +15,12 @@
         <attr name="maxHourHeight" format="dimension"/>
         <attr name="textSize" format="dimension"/>
         <attr name="eventTextSize" format="dimension"/>
+        <attr name="headerTextSize" format="dimension"/>
         <attr name="headerColumnPadding" format="dimension"/>
         <attr name="headerRowPadding" format="dimension"/>
         <attr name="columnGap" format="dimension"/>
         <attr name="headerColumnTextColor" format="color"/>
+        <attr name="headerColumnWeekendTextColor" format="color"/>
         <attr name="noOfVisibleDays" format="integer"/>
         <attr name="showFirstDayOfWeekFirst" format="boolean"/>
         <attr name="headerRowBackgroundColor" format="color"/>
@@ -44,8 +46,11 @@
         <attr name="pastBackgroundColor" format="color"/>
         <attr name="futureWeekendBackgroundColor" format="color"/>
         <attr name="pastWeekendBackgroundColor" format="color"/>
+        <attr name="splitHeaderIntoTwoLines" format="boolean"/>
         <attr name="showNowLine" format="boolean"/>
+        <attr name="showNowHeaderMarker" format="boolean"/>
         <attr name="nowLineColor" format="color"/>
+        <attr name="nowHeaderMarkerColor" format="color"/>
         <attr name="nowLineThickness" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>

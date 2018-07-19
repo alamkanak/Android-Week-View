@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -20,7 +21,6 @@ import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -62,6 +62,8 @@ public class WeekView extends View {
     private float mTimeTextWidth;
     private float mTimeTextHeight;
     private Paint mHeaderTextPaint;
+    private Paint mHeaderTodayTextPaint;
+    private Paint mHeaderWeekendTextPaint;
     private float mHeaderTextHeight;
     private float mHeaderHeight;
     private GestureDetectorCompat mGestureDetector;
@@ -79,6 +81,7 @@ public class WeekView extends View {
     private Paint mFutureWeekendBackgroundPaint;
     private Paint mPastWeekendBackgroundPaint;
     private Paint mNowLinePaint;
+    private Paint mNowHeaderMarkerPaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
     private float mHeaderColumnWidth;
@@ -110,6 +113,8 @@ public class WeekView extends View {
     private int mTextSize = 12;
     private int mHeaderColumnPadding = 10;
     private int mHeaderColumnTextColor = Color.BLACK;
+    private int mHeaderColumnTodayTextColor = Color.WHITE;
+    private int mHeaderColumnWeekendTextColor = Color.parseColor("#cdcdcd");
     private int mNumberOfVisibleDays = 3;
     private int mHeaderRowPadding = 10;
     private int mHeaderRowBackgroundColor = Color.WHITE;
@@ -119,12 +124,14 @@ public class WeekView extends View {
     private int mPastWeekendBackgroundColor = 0;
     private int mFutureWeekendBackgroundColor = 0;
     private int mNowLineColor = Color.rgb(102, 102, 102);
+    private int mNowHeaderMarkerColor = Color.rgb(78, 116, 13);
     private int mNowLineThickness = 5;
     private int mHourSeparatorColor = Color.rgb(230, 230, 230);
     private int mTodayBackgroundColor = Color.rgb(239, 247, 254);
     private int mHourSeparatorHeight = 2;
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
     private int mEventTextSize = 12;
+    private int mHeaderTextSize = 12;
     private int mEventTextColor = Color.BLACK;
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
@@ -138,7 +145,9 @@ public class WeekView extends View {
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
     private boolean mShowDistinctWeekendColor = false;
-    private boolean mShowNowLine = false;
+    private boolean mShowNowLine = true;
+    private boolean  mShowNowHeaderMarker = true;
+    private boolean mSplitHeaderIntoTwoLines = true;
     private boolean mShowDistinctPastFutureColor = false;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
@@ -322,6 +331,7 @@ public class WeekView extends View {
             mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
             mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
             mHeaderColumnTextColor = a.getColor(R.styleable.WeekView_headerColumnTextColor, mHeaderColumnTextColor);
+            mHeaderColumnWeekendTextColor = a.getColor(R.styleable.WeekView_headerColumnWeekendTextColor, mHeaderColumnWeekendTextColor);
             mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
             mShowFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, mShowFirstDayOfWeekFirst);
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
@@ -332,12 +342,14 @@ public class WeekView extends View {
             mFutureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, mFutureBackgroundColor); // If not set, use the same color as in the week
             mPastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, mPastBackgroundColor);
             mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
+            mNowHeaderMarkerColor = a.getColor(R.styleable.WeekView_nowHeaderMarkerColor, mNowHeaderMarkerColor);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
             mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
             mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
             mHourSeparatorHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mHourSeparatorHeight);
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
+            mHeaderTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mHeaderTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
@@ -349,6 +361,8 @@ public class WeekView extends View {
             mShowDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, mShowDistinctPastFutureColor);
             mShowDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, mShowDistinctWeekendColor);
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
+            mSplitHeaderIntoTwoLines = a.getBoolean(R.styleable.WeekView_splitHeaderIntoTwoLines, mSplitHeaderIntoTwoLines);
+            mShowNowHeaderMarker = a.getBoolean(R.styleable.WeekView_showNowHeaderMarker, mShowNowHeaderMarker);
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
@@ -383,10 +397,22 @@ public class WeekView extends View {
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        mHeaderTextPaint.setTextSize(mTextSize);
+        mHeaderTextPaint.setTextSize(mHeaderTextSize);
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextHeight = rect.height();
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        mHeaderTodayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHeaderTodayTextPaint.setColor(mHeaderColumnTodayTextColor);
+        mHeaderTodayTextPaint.setTextAlign(Paint.Align.CENTER);
+        mHeaderTodayTextPaint.setTextSize(mHeaderTextSize);
+        mHeaderTodayTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        mHeaderWeekendTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHeaderWeekendTextPaint.setColor(mHeaderColumnWeekendTextColor);
+        mHeaderWeekendTextPaint.setTextAlign(Paint.Align.CENTER);
+        mHeaderWeekendTextPaint.setTextSize(mHeaderTextSize);
+        mHeaderWeekendTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // Prepare header background paint.
         mHeaderBackgroundPaint = new Paint();
@@ -414,6 +440,14 @@ public class WeekView extends View {
         mNowLinePaint = new Paint();
         mNowLinePaint.setStrokeWidth(mNowLineThickness);
         mNowLinePaint.setColor(mNowLineColor);
+        mNowLinePaint.setStyle(Paint.Style.STROKE);
+        mNowLinePaint.setPathEffect(new DashPathEffect(new float[]{16.0f, 8.0f}, 0));
+
+        // Prepare the "now" header marker paint
+        mNowHeaderMarkerPaint = new Paint();
+        mNowHeaderMarkerPaint.setStrokeWidth(mNowLineThickness);
+        mNowHeaderMarkerPaint.setColor(mNowHeaderMarkerColor);
+        mNowHeaderMarkerPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         // Prepare today background color paint.
         mTodayBackgroundPaint = new Paint();
@@ -422,13 +456,13 @@ public class WeekView extends View {
         // Prepare today header text color paint.
         mTodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTodayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTodayHeaderTextPaint.setTextSize(mTextSize);
+        mTodayHeaderTextPaint.setTextSize(mHeaderTextSize);
         mTodayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
 
         // Prepare event background color.
         mEventBackgroundPaint = new Paint();
-        mEventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
+        mEventBackgroundPaint.setColor(Color.rgb(241, 253, 237));
 
         // Prepare header column background color.
         mHeaderColumnBackgroundPaint = new Paint();
@@ -524,17 +558,33 @@ public class WeekView extends View {
         else{
             mHeaderHeight = mHeaderTextHeight;
         }
+
+        if (mSplitHeaderIntoTwoLines) {
+            mHeaderHeight = mHeaderHeight * 2;
+        }
+
     }
+
+    private int timeAxisYTopPadding = 40;
 
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
-        canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
+        canvas.clipRect(0, 0, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
+
+            // draw the hour separator ALSO in hour Y axis
+            canvas.drawLine(0, top+mHeaderMarginBottom,  mHeaderColumnWidth,top+mHeaderMarginBottom, mHourSeparatorPaint);
+
+            // draw the hour separator ALSO in hour Y axis
+            canvas.drawLine(mHeaderColumnWidth, top+mHeaderMarginBottom,  mHeaderColumnWidth,top+mHeaderMarginBottom + getHeight(), mHourSeparatorPaint);
+
+            // add additional top padding
+            top = top + timeAxisYTopPadding;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
             String time = getDateTimeInterpreter().interpretTime(i);
@@ -701,7 +751,9 @@ public class WeekView extends View {
             drawEvents(day, startPixel, canvas);
 
             // Draw the line at the current time.
-            if (mShowNowLine && sameDay){
+            //if (mShowNowLine && sameDay){
+            // draw now line over entire calendar instead of just today
+            if (mShowNowLine){
                 float startY = mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
@@ -722,6 +774,9 @@ public class WeekView extends View {
         // Draw the header background.
         canvas.drawRect(0, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
+        // Draw the header bottom line separator
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2,  getWidth(),mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+
         // Draw the header row texts.
         startPixel = startFromPixel;
         for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
@@ -729,16 +784,92 @@ public class WeekView extends View {
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             boolean sameDay = isSameDay(day, today);
+            boolean isWeekend = isWeekendDay(day);
 
             // Draw the day labels.
-            String dayLabel = getDateTimeInterpreter().interpretDate(day);
-            if (dayLabel == null)
-                throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+
+            if (!mSplitHeaderIntoTwoLines) {
+
+                // original 1 text line only
+                String weekDayLabel = getDateTimeInterpreter().interpretDate(day);
+
+                if (weekDayLabel == null)
+                    throw new IllegalStateException("A DateTimeInterpreter must not return null date");
+
+                if (sameDay && mShowNowHeaderMarker) {
+
+                    int circleSize = 80;
+                    int circlePadding = -6; // pixel fighting to satisfy multiple densities
+                    // draw now header column marker (circle behind day date)
+                    canvas.drawCircle(startPixel + mWidthPerDay / 2,
+                            mHeaderTextHeight + mHeaderRowPadding + circlePadding,
+                            circleSize / 2, mNowHeaderMarkerPaint);
+
+                    canvas.drawText(weekDayLabel,
+                            startPixel + mWidthPerDay / 2,
+                            mHeaderTextHeight + mHeaderRowPadding,
+                            isWeekend ? mHeaderWeekendTextPaint : mHeaderTodayTextPaint);
+
+                } else {
+
+                    canvas.drawText(weekDayLabel,
+                            startPixel + mWidthPerDay / 2,
+                            mHeaderTextHeight + mHeaderRowPadding,
+                            sameDay ? mTodayHeaderTextPaint : isWeekend ? mHeaderWeekendTextPaint : mHeaderTextPaint);
+                }
+
+
+            } else {
+
+                String weekDayLabel = getDateTimeInterpreter().interpretWeekDay(day);
+                String dateLabel = getDateTimeInterpreter().interpretDay(day);
+
+                if (weekDayLabel == null || dateLabel == null)
+                    throw new IllegalStateException("A DateTimeInterpreter must not return null date");
+
+                // draw day of week text (single letter)
+                canvas.drawText(weekDayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight, mHeaderTextPaint);
+
+                // draw second line of header
+                if (sameDay) {
+
+                    // highlight today (second line in header only)
+                    if (mShowNowHeaderMarker) {
+                        int circleSize = 50;
+                        int circlePadding = -6; // pixel fighting to satisfy multiple densities
+                        // draw now header column marker (circle behind day date)
+                        canvas.drawCircle(startPixel + mWidthPerDay / 2,
+                                mHeaderTextHeight + mHeaderRowPadding + circlePadding,
+                                circleSize / 2, mNowHeaderMarkerPaint);
+
+                        // draw date on second line
+                        canvas.drawText(dateLabel,
+                                startPixel + mWidthPerDay / 2,
+                                mHeaderTextHeight + mHeaderRowPadding,
+                                isWeekend ? mHeaderWeekendTextPaint : mHeaderTodayTextPaint);
+                    } else {
+
+                        // draw date on second line
+                        canvas.drawText(dateLabel,
+                                startPixel + mWidthPerDay / 2,
+                                mHeaderTextHeight + mHeaderRowPadding,
+                                isWeekend ? mHeaderWeekendTextPaint : mHeaderTextPaint);
+                    }
+
+                } else {
+                    // draw date on second line
+                    canvas.drawText(dateLabel,
+                            startPixel + mWidthPerDay / 2,
+                            mHeaderTextHeight + mHeaderRowPadding,
+                            isWeekend ? mHeaderWeekendTextPaint : mHeaderTextPaint);
+                }
+                // draw second line of header - END
+
+            }
+
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay + mColumnGap;
         }
-
     }
 
     /**
@@ -807,7 +938,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top + timeAxisYTopPadding, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -851,7 +982,7 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top + timeAxisYTopPadding, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -1064,9 +1195,11 @@ public class WeekView extends View {
      * @param events The events to be sorted and cached.
      */
     private void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
-        sortEvents(events);
-        for (WeekViewEvent event : events) {
-            cacheEvent(event);
+        if (events != null && events.size() > 0) {
+            sortEvents(events);
+            for (WeekViewEvent event : events) {
+                cacheEvent(event);
+            }
         }
     }
 
@@ -1075,20 +1208,22 @@ public class WeekView extends View {
      * @param events The events to be sorted.
      */
     private void sortEvents(List<? extends WeekViewEvent> events) {
-        Collections.sort(events, new Comparator<WeekViewEvent>() {
-            @Override
-            public int compare(WeekViewEvent event1, WeekViewEvent event2) {
-                long start1 = event1.getStartTime().getTimeInMillis();
-                long start2 = event2.getStartTime().getTimeInMillis();
-                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
-                if (comparator == 0) {
-                    long end1 = event1.getEndTime().getTimeInMillis();
-                    long end2 = event2.getEndTime().getTimeInMillis();
-                    comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+        if (events != null && events.size() > 0) {
+            Collections.sort(events, new Comparator<WeekViewEvent>() {
+                @Override
+                public int compare(WeekViewEvent event1, WeekViewEvent event2) {
+                    long start1 = event1.getStartTime().getTimeInMillis();
+                    long start2 = event2.getStartTime().getTimeInMillis();
+                    int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
+                    if (comparator == 0) {
+                        long end1 = event1.getEndTime().getTimeInMillis();
+                        long end2 = event2.getEndTime().getTimeInMillis();
+                        comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+                    }
+                    return comparator;
                 }
-                return comparator;
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -1300,9 +1435,30 @@ public class WeekView extends View {
         if (mDateTimeInterpreter == null) {
             mDateTimeInterpreter = new DateTimeInterpreter() {
                 @Override
+                public String interpretDay(Calendar date) {
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd", Locale.getDefault());
+                        return sdf.format(date.getTime());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                }
+                @Override
+                public String interpretWeekDay(Calendar date) {
+                    try {
+                        //show only first letter of week day
+                        SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.getDefault());
+                        return sdf.format(date.getTime()).toUpperCase().substring(0,1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return "";
+                    }
+                }
+                @Override
                 public String interpretDate(Calendar date) {
                     try {
-                        SimpleDateFormat sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) : new SimpleDateFormat("EEE M/dd", Locale.getDefault());
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEE dd", Locale.getDefault());
                         return sdf.format(date.getTime()).toUpperCase();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1317,7 +1473,8 @@ public class WeekView extends View {
                     calendar.set(Calendar.MINUTE, 0);
 
                     try {
-                        SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        //SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH", Locale.getDefault());
                         return sdf.format(calendar.getTime());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -1413,8 +1570,6 @@ public class WeekView extends View {
 
     public void setTextSize(int textSize) {
         mTextSize = textSize;
-        mTodayHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.setTextSize(mTextSize);
         mTimeTextPaint.setTextSize(mTextSize);
         invalidate();
     }
@@ -1436,6 +1591,16 @@ public class WeekView extends View {
         mHeaderColumnTextColor = headerColumnTextColor;
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         mTimeTextPaint.setColor(mHeaderColumnTextColor);
+        invalidate();
+    }
+
+    public int getHeaderColumnWeekendTextColor() {
+        return mHeaderColumnWeekendTextColor;
+    }
+
+    public void setHeaderColumnWeekendTextColor(int headerColumnWeekendTextColor) {
+        mHeaderColumnWeekendTextColor = headerColumnWeekendTextColor;
+        mHeaderWeekendTextPaint.setColor(mHeaderColumnWeekendTextColor);
         invalidate();
     }
 
@@ -1515,6 +1680,19 @@ public class WeekView extends View {
     public void setEventTextSize(int eventTextSize) {
         mEventTextSize = eventTextSize;
         mEventTextPaint.setTextSize(mEventTextSize);
+        invalidate();
+    }
+
+
+    public int getHeaderTextSize() {
+        return mHeaderTextSize;
+    }
+
+    public void setHeaderTextSize(int headerTextSize) {
+        mHeaderTextSize = headerTextSize;
+        mHeaderTextPaint.setTextSize(mHeaderTextSize);
+        mTodayHeaderTextPaint.setTextSize(mHeaderTextSize);
+        mHeaderWeekendTextPaint.setTextSize(mHeaderTextSize);
         invalidate();
     }
 
@@ -1699,6 +1877,23 @@ public class WeekView extends View {
     }
 
     /**
+     * Get whether the header date text is split into two lines.
+     * @return True if text should be split.
+     */
+    public boolean isSplitHeaderText() {
+        return mSplitHeaderIntoTwoLines;
+    }
+
+    /**
+     * Set whether the header date text is split into two lines.
+     * @param splitHeaderIntoTwoLines True if text should be split
+     */
+    public void setSplitHeaderText(boolean splitHeaderIntoTwoLines) {
+        this.mSplitHeaderIntoTwoLines = splitHeaderIntoTwoLines;
+        invalidate();
+    }
+
+    /**
      * Get whether "now" line should be displayed. "Now" line is defined by the attributes
      * `nowLineColor` and `nowLineThickness`.
      * @return True if "now" line should be displayed.
@@ -1714,6 +1909,25 @@ public class WeekView extends View {
      */
     public void setShowNowLine(boolean showNowLine) {
         this.mShowNowLine = showNowLine;
+        invalidate();
+    }
+
+    /**
+     * Get whether "now/today" header marker should be displayed. "Now" marker is defined by the attributes
+     * `nowHeaderMarkerColor`.
+     * @return True if "now/today" header marker should be displayed.
+     */
+    public boolean isShowNowHeaderMarker() {
+        return mShowNowHeaderMarker;
+    }
+
+    /**
+     * Set whether "now/today" header marker should be displayed. "Now" marker is defined by the attributes
+     * `nowHeaderMarkerColor`.
+     * @param showNowHeaderMarker True if "now/today" header marker should be displayed.
+     */
+    public void setShowHeaderMarker(boolean showNowHeaderMarker) {
+        this.mShowNowHeaderMarker = showNowHeaderMarker;
         invalidate();
     }
 
