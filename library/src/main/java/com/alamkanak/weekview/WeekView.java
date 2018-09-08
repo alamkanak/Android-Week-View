@@ -12,8 +12,6 @@ import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -64,7 +62,7 @@ public class WeekView extends View {
     private Paint mHeaderTextPaint;
     private float mHeaderTextHeight;
     private float mHeaderHeight;
-    private GestureDetectorCompat mGestureDetector;
+    private GestureDetector mGestureDetector;
     private OverScroller mScroller;
     private PointF mCurrentOrigin = new PointF(0f, 0f);
     private Direction mCurrentScrollDirection = Direction.NONE;
@@ -203,11 +201,11 @@ public class WeekView extends View {
                 case LEFT:
                 case RIGHT:
                     mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    postInvalidateOnAnimation();
                     break;
                 case VERTICAL:
                     mCurrentOrigin.y -= distanceY;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    postInvalidateOnAnimation();
                     break;
             }
             return true;
@@ -237,7 +235,7 @@ public class WeekView extends View {
                     break;
             }
 
-            ViewCompat.postInvalidateOnAnimation(WeekView.this);
+            postInvalidateOnAnimation();
             return true;
         }
 
@@ -362,7 +360,7 @@ public class WeekView extends View {
 
     private void init() {
         // Scrolling initialization.
-        mGestureDetector = new GestureDetectorCompat(mContext, mGestureListener);
+        mGestureDetector = new GestureDetector(mContext, mGestureListener);
         mScroller = new OverScroller(mContext, new FastOutLinearInInterpolator());
 
         mMinimumFlingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
@@ -1859,7 +1857,7 @@ public class WeekView extends View {
             mScroller.forceFinished(true);
             // Snap to date.
             mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
-            ViewCompat.postInvalidateOnAnimation(WeekView.this);
+            postInvalidateOnAnimation();
         }
         // Reset scrolling and fling direction.
         mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
@@ -1881,7 +1879,7 @@ public class WeekView extends View {
             } else if (mScroller.computeScrollOffset()) {
                 mCurrentOrigin.y = mScroller.getCurrY();
                 mCurrentOrigin.x = mScroller.getCurrX();
-                ViewCompat.postInvalidateOnAnimation(this);
+                postInvalidateOnAnimation();
             }
         }
     }
