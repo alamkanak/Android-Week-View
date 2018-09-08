@@ -21,7 +21,8 @@ public class WeekViewUtil {
      * @return Whether the times are on the same day.
      */
     public static boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
+        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR)
+                && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
     }
 
     /**
