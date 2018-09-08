@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.sample;
 
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.ArrayList;
@@ -14,9 +15,9 @@ import java.util.List;
 public class BasicActivity extends BaseActivity {
 
     @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+    public List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth) {
         // Populate the week view with some events.
-        List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+        List<WeekViewDisplayable> events = new ArrayList<>();
 
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);

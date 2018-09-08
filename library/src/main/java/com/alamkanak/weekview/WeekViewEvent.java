@@ -12,7 +12,7 @@ import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
-public class WeekViewEvent implements Comparable<WeekViewEvent> {
+public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEvent> {
 
     private long mId;
     private Calendar mStartTime;
@@ -193,9 +193,9 @@ public class WeekViewEvent implements Comparable<WeekViewEvent> {
         return (int) (mId ^ (mId >>> 32));
     }
 
-    public List<WeekViewEvent> splitWeekViewEvents(){
+    public List<WeekViewEvent> splitWeekViewEvents() {
         //This function splits the WeekViewEvent in WeekViewEvents by day
-        List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+        List<WeekViewEvent> events = new ArrayList<>();
 
         // The first millisecond of the next day is still the same day. (no need to split events for this).
         Calendar endTime = (Calendar) this.getEndTime().clone();
@@ -245,4 +245,8 @@ public class WeekViewEvent implements Comparable<WeekViewEvent> {
         return events;
     }
 
+    @Override
+    public WeekViewEvent toWeekViewEvent() {
+        return this;
+    }
 }

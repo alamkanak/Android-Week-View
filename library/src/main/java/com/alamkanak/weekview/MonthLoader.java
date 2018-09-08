@@ -1,8 +1,15 @@
 package com.alamkanak.weekview;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * This class is responsible for loading {@link WeekViewEvent}s into {@link WeekView}. It can handle
+ * both concrete {@link WeekViewEvent} objects and {@link WeekViewDisplayable} objects. The latter is
+ * an interface that can be implemented in one's actual data class and handles the conversion to a
+ * {@link WeekViewEvent}.
+ */
 public class MonthLoader implements WeekViewLoader {
 
     private MonthChangeListener mOnMonthChangeListener;
@@ -22,7 +29,16 @@ public class MonthLoader implements WeekViewLoader {
     public List<? extends WeekViewEvent> onLoad(int periodIndex) {
         int newYear = periodIndex / 12;
         int newMonth = periodIndex % 12 + 1;
-        return mOnMonthChangeListener.onMonthChange(newYear, newMonth);
+
+        List<WeekViewDisplayable> displayableItems =
+                mOnMonthChangeListener.onMonthChange(newYear, newMonth);
+
+        List<WeekViewEvent> events = new ArrayList<>();
+        for (WeekViewDisplayable displayableItem : displayableItems) {
+            events.add(displayableItem.toWeekViewEvent());
+        }
+
+        return events;
     }
 
     public MonthChangeListener getOnMonthChangeListener() {
@@ -34,17 +50,14 @@ public class MonthLoader implements WeekViewLoader {
     }
 
     public interface MonthChangeListener {
+
         /**
-         * Very important interface, it's the base to load events in the calendar.
-         * This method is called three times: once to load the previous month, once to load the
-         * next month and once to load the current month.<br/>
-         * <strong>That's why you can have three times the same event at the same place if you mess
-         * up with the configuration</strong>
-         * @param newYear : year of the events required by the view.
-         * @param newMonth : month of the events required by the view <br/><strong>1 based (not
-         *                 like JAVA API) --> January = 1 and December = 12</strong>.
-         * @return a list of the events happening <strong>during the specified month</strong>.
+         * Called when the month displayed in the {@link WeekView} changes.
+         * @param newYear The year that is now being displayed
+         * @param newMonth The month that is now being displayed
+         * @return The list of {@link WeekViewDisplayable} of the provided month
          */
-        List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth);
+        List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth);
+
     }
 }

@@ -1237,13 +1237,15 @@ public class WeekView extends View {
         return mEventClickListener;
     }
 
-    public @Nullable MonthLoader.MonthChangeListener getMonthChangeListener() {
-        if (mWeekViewLoader instanceof MonthLoader)
+    @Nullable
+    public MonthLoader.MonthChangeListener getMonthChangeListener() {
+        if (mWeekViewLoader instanceof MonthLoader) {
             return ((MonthLoader) mWeekViewLoader).getOnMonthChangeListener();
+        }
         return null;
     }
 
-    public void setMonthChangeListener(MonthLoader.MonthChangeListener monthChangeListener) {
+    public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
         this.mWeekViewLoader = new MonthLoader(monthChangeListener);
     }
 

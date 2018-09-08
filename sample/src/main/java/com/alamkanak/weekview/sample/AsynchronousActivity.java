@@ -2,6 +2,7 @@ package com.alamkanak.weekview.sample;
 
 import android.widget.Toast;
 
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.apiclient.MyJsonService;
@@ -26,7 +27,7 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
     boolean calledNetwork = false;
 
     @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+    public List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth) {
 
         // Download events from network if it hasn't been done already. To understand how events are
         // downloaded using retrofit, visit http://square.github.io/retrofit
@@ -40,7 +41,7 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
         }
 
         // Return only the events that matches newYear and newMonth.
-        List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
+        List<WeekViewDisplayable> matchedEvents = new ArrayList<>();
         for (WeekViewEvent event : events) {
             if (eventMatches(event, newYear, newMonth)) {
                 matchedEvents.add(event);
