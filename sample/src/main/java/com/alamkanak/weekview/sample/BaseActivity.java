@@ -120,29 +120,39 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
      */
     private void setupDateTimeInterpreter(final boolean shortDate) {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
+
+            SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+            SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
+
             @Override
             public String interpretDate(Calendar date) {
-                SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = weekdayNameFormat.format(date.getTime());
-                SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
                 // All android api level do not have a standard way of getting the first letter of
                 // the week day name. Hence we get the first char programmatically.
                 // Details: http://stackoverflow.com/questions/16959502/get-one-letter-abbreviation-of-week-day-of-a-date-in-java#answer-16959657
-                if (shortDate)
+                if (shortDate) {
                     weekday = String.valueOf(weekday.charAt(0));
-                return weekday.toUpperCase() + format.format(date.getTime());
+                }
+
+                String result = weekday.toUpperCase() + format.format(date.getTime());
+                return result;
             }
 
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                String result = hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                return result;
             }
         });
     }
 
     protected String getEventTitle(Calendar time) {
-        return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH)+1, time.get(Calendar.DAY_OF_MONTH));
+        int hour = time.get(Calendar.HOUR_OF_DAY);
+        int minute = time.get(Calendar.MINUTE);
+        int month = time.get(Calendar.MONTH) + 1;
+        int dayOfMonth = time.get(Calendar.DAY_OF_MONTH);
+        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth);
     }
 
     @Override
