@@ -1,9 +1,36 @@
 Android Week View
 =================
 
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/Android-Week-View/Lobby)
+**Android Week View** is an Android library to display calendar views within an app. It was developed by [Raquib-ul Alam](https://github.com/alamkanak). Because it is not currently maintained and does not work when using Support Library 28, I’m providing this fork.
 
-**Android Week View** is an android library to display calendars (week view or day view) within the app. It supports custom styling.
+Usage
+---------
+1. Add JitPack repository to your build file.
+```groovy
+allprojects {
+ repositories {
+ ...
+ maven { url 'https://jitpack.io' }
+ }
+}
+```
+
+2. Add the dependency.
+```groovy
+// For the bugfix-only version
+implementation 'com.github.thellmund:Android-Week-View:1.3'
+
+// For the version with an updated API
+implementation 'com.github.thellmund:Android-Week-View:2.0'
+```
+More info about version 2.0 here: [Release 2.0](https://github.com/thellmund/Android-Week-View/releases/tag/2.0)
+
+Below, you find the original README by [Raquib-ul Alam](https://github.com/alamkanak).
+
+---
+
+Android Week View
+=================
 
 ![](images/screen-shot.png)
 
