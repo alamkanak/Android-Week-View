@@ -1,7 +1,7 @@
 Android Week View
 =================
 
-**Android Week View** is an Android library to display calendar views within an app. It was developed by [Raquib-ul Alam](https://github.com/alamkanak). Because it is not currently maintained and does not work when using Support Library 28, I’m providing this fork.
+**Android Week View** is an Android library to display calendar views within an app. It was developed by [Raquib-ul Alam](https://github.com/alamkanak). Because it is not currently maintained and does not work when using API level 28, I’m providing this fork.
 
 Usage
 ---------
