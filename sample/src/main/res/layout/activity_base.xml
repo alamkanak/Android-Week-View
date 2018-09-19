@@ -1,27 +1,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BaseActivity"
-    android:background="#fff">
+    android:background="#fff"
+    tools:context=".BaseActivity">
 
     <com.alamkanak.weekview.WeekView
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:columnGap="8dp"
+        app:dayBackgroundColor="#05000000"
+        app:eventCornerRadius="4dp"
         app:eventTextColor="@android:color/white"
-        app:textSize="12sp"
-        app:hourHeight="60dp"
+        app:headerColumnBackground="#ffffffff"
         app:headerColumnPadding="8dp"
         app:headerColumnTextColor="@color/toolbar_text"
-        app:headerRowPadding="12dp"
-        app:columnGap="8dp"
-        app:noOfVisibleDays="3"
         app:headerRowBackgroundColor="@color/toolbar"
-        app:dayBackgroundColor="#05000000"
+        app:headerRowPadding="12dp"
+        app:hourHeight="60dp"
+        app:noOfVisibleDays="3"
+        app:overlappingEventGap="8dp"
+        app:singleDayHorizontalMargin="8dp"
+        app:textSize="12sp"
         app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"
         app:todayHeaderTextColor="@color/accent" />
 
 </RelativeLayout>
