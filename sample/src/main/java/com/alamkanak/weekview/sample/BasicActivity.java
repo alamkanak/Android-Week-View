@@ -1,7 +1,7 @@
 package com.alamkanak.weekview.sample;
 
-import com.alamkanak.weekview.WeekViewDisplayable;
-import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.model.WeekViewEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

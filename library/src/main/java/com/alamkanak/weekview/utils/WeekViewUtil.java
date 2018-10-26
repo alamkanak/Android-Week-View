@@ -1,4 +1,4 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.utils;
 
 import java.util.Calendar;
 
@@ -6,13 +6,6 @@ import java.util.Calendar;
  * Created by jesse on 6/02/2016.
  */
 public class WeekViewUtil {
-
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Helper methods.
-    //
-    /////////////////////////////////////////////////////////////////
 
     /**
      * Checks if two times are on the same day.

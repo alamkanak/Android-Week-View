@@ -2,8 +2,8 @@ package com.alamkanak.weekview.sample;
 
 import android.widget.Toast;
 
-import com.alamkanak.weekview.WeekViewDisplayable;
-import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.apiclient.MyJsonService;
 
@@ -67,7 +67,7 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
         for (Event event : events) {
             this.events.add(event.toWeekViewEvent());
         }
-        getWeekView().notifyDatasetChanged();
+        getWeekView().notifyDataSetChanged();
     }
 
     @Override

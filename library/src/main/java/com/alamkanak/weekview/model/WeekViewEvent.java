@@ -1,4 +1,4 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.model;
 
 import android.support.annotation.NonNull;
 
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
+import static com.alamkanak.weekview.utils.WeekViewUtil.isSameDay;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.

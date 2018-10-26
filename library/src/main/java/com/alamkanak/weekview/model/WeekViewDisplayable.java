@@ -1,4 +1,6 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.model;
+
+import com.alamkanak.weekview.WeekView;
 
 /**
  * This interface can be implemented by classes that should be displayed in {@link WeekView}.
