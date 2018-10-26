@@ -4,17 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Nullable;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.ViewConfiguration;
-import android.widget.OverScroller;
 
-import com.alamkanak.weekview.drawing.EventRect;
 import com.alamkanak.weekview.drawing.EventsDrawer;
 import com.alamkanak.weekview.drawing.HeaderRowDrawer;
 import com.alamkanak.weekview.drawing.TimeColumnDrawer;
@@ -27,44 +21,19 @@ import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
+import com.alamkanak.weekview.scrolling.WeekViewScrollHandler;
 
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-
-import static com.alamkanak.weekview.utils.WeekViewUtil.today;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  */
-public class WeekView extends View {
+public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     public enum Direction {
         NONE, LEFT, RIGHT, VERTICAL
     }
-
-    private final Context context;
-
-    private GestureDetector gestureDetector;
-    private OverScroller scroller;
-
-    private Direction currentScrollDirection = Direction.NONE;
-    private Direction currentFlingDirection = Direction.NONE;
-
-    private ScaleGestureDetector scaleDetector;
-    private boolean isZooming;
-
-    private int minimumFlingVelocity = 0;
-    private int scaledTouchSlop = 0;
-
-    // Listeners
-    private EventClickListener eventClickListener;
-    private EventLongPressListener eventLongPressListener;
-    private WeekViewLoader weekViewLoader;
-    private EmptyViewClickListener emptyViewClickListener;
-    private EmptyViewLongPressListener emptyViewLongPressListener;
-    private ScrollListener scrollListener;
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
@@ -72,149 +41,10 @@ public class WeekView extends View {
     private WeekViewData data;
     private WeekViewViewState viewState;
 
+    private WeekViewScrollHandler scrollHandler;
+
     private HeaderRowDrawer headerRowDrawer;
     private TimeColumnDrawer timeColumnDrawer;
-
-    private final GestureDetector.SimpleOnGestureListener gestureListener =
-            new GestureDetector.SimpleOnGestureListener() {
-
-                @Override
-                public boolean onDown(MotionEvent e) {
-                    goToNearestOrigin();
-                    return true;
-                }
-
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    // Check if view is zoomed.
-                    if (isZooming)
-                        return true;
-
-                    switch (currentScrollDirection) {
-                        case NONE: {
-                            // Allow scrolling only in one direction.
-                            if (Math.abs(distanceX) > Math.abs(distanceY)) {
-                                if (distanceX > 0) {
-                                    currentScrollDirection = Direction.LEFT;
-                                } else {
-                                    currentScrollDirection = Direction.RIGHT;
-                                }
-                            } else {
-                                currentScrollDirection = Direction.VERTICAL;
-                            }
-                            break;
-                        }
-                        case LEFT: {
-                            // Change direction if there was enough change.
-                            if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX < -scaledTouchSlop)) {
-                                currentScrollDirection = Direction.RIGHT;
-                            }
-                            break;
-                        }
-                        case RIGHT: {
-                            // Change direction if there was enough change.
-                            if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX > scaledTouchSlop)) {
-                                currentScrollDirection = Direction.LEFT;
-                            }
-                            break;
-                        }
-                    }
-
-                    // Calculate the new origin after scroll.
-                    switch (currentScrollDirection) {
-                        case LEFT:
-                        case RIGHT:
-                            drawingConfig.mCurrentOrigin.x -= distanceX * config.mXScrollingSpeed;
-                            postInvalidateOnAnimation();
-                            break;
-                        case VERTICAL:
-                            drawingConfig.mCurrentOrigin.y -= distanceY;
-                            postInvalidateOnAnimation();
-                            break;
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    if (isZooming)
-                        return true;
-
-                    if ((currentFlingDirection == Direction.LEFT && !config.mHorizontalFlingEnabled) ||
-                            (currentFlingDirection == Direction.RIGHT && !config.mHorizontalFlingEnabled) ||
-                            (currentFlingDirection == Direction.VERTICAL && !config.mVerticalFlingEnabled)) {
-                        return true;
-                    }
-
-                    scroller.forceFinished(true);
-
-                    currentFlingDirection = currentScrollDirection;
-                    switch (currentFlingDirection) {
-                        case LEFT:
-                        case RIGHT:
-                            scroller.fling((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, (int) (velocityX * config.mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.mHourHeight * 24 + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 - getHeight()), 0);
-                            break;
-                        case VERTICAL:
-                            scroller.fling((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.mHourHeight * 24 + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 - getHeight()), 0);
-                            break;
-                    }
-
-                    postInvalidateOnAnimation();
-                    return true;
-                }
-
-
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    // If the tap was on an event then trigger the callback.
-                    if (data.eventRects != null && eventClickListener != null) {
-                        List<EventRect> reversedEventRects = data.eventRects;
-                        Collections.reverse(reversedEventRects);
-                        for (EventRect event : reversedEventRects) {
-                            if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                                eventClickListener.onEventClick(event.originalEvent, event.rectF);
-                                return super.onSingleTapConfirmed(e);
-                            }
-                        }
-                    }
-
-                    // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewClickListener != null && e.getX() > drawingConfig.mHeaderColumnWidth && e.getY() > (drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom)) {
-                        Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
-                        if (selectedTime != null) {
-                            emptyViewClickListener.onEmptyViewClicked(selectedTime);
-                        }
-                    }
-
-                    return super.onSingleTapConfirmed(e);
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    super.onLongPress(e);
-
-                    if (eventLongPressListener != null && data.eventRects != null) {
-                        List<EventRect> reversedEventRects = data.eventRects;
-                        Collections.reverse(reversedEventRects);
-                        for (EventRect event : reversedEventRects) {
-                            if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                                eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
-                                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                                return;
-                            }
-                        }
-                    }
-
-                    // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewLongPressListener != null && e.getX() > drawingConfig.mHeaderColumnWidth && e.getY() > (drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom)) {
-                        Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
-                        if (selectedTime != null) {
-                            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                            emptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
-                        }
-                    }
-                }
-            };
 
     public WeekView(Context context) {
         this(context, null);
@@ -226,10 +56,7 @@ public class WeekView extends View {
 
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.context = context;
         config = new WeekViewConfig(context, attrs);
-
-        init();
 
         HeaderRowDrawer.Listener listener = new HeaderRowDrawer.Listener() {
             @Override
@@ -247,6 +74,7 @@ public class WeekView extends View {
         viewState = new WeekViewViewState();
 
         drawingConfig = new WeekViewDrawingConfig(context, config);
+        scrollHandler = new WeekViewScrollHandler(context, this, config, drawingConfig, data);
 
         EventsDrawer eventsDrawer = new EventsDrawer(config, drawingConfig);
         timeColumnDrawer = new TimeColumnDrawer(config, drawingConfig);
@@ -255,86 +83,38 @@ public class WeekView extends View {
 
     }
 
-    private void init() {
-        gestureDetector = new GestureDetector(context, gestureListener);
-        scroller = new OverScroller(context, new FastOutLinearInInterpolator());
-
-        minimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
-        scaledTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-
-        scaleDetector = new ScaleGestureDetector(context, new ScaleGestureDetector.OnScaleGestureListener() {
-            @Override
-            public void onScaleEnd(ScaleGestureDetector detector) {
-                isZooming = false;
-            }
-
-            @Override
-            public boolean onScaleBegin(ScaleGestureDetector detector) {
-                isZooming = true;
-                goToNearestOrigin();
-                return true;
-            }
-
-            @Override
-            public boolean onScale(ScaleGestureDetector detector) {
-                drawingConfig.mNewHourHeight = Math.round(config.mHourHeight * detector.getScaleFactor());
-                invalidate();
-                return true;
-            }
-        });
-    }
-
     // fix rotation changes
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
         viewState.areDimensionsInvalid = true;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawHeaderRowAndEvents(canvas);
-        drawTimeColumnAndAxes(canvas);
-    }
-
-    private void drawTimeColumnAndAxes(Canvas canvas) {
+        headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
         timeColumnDrawer.draw(canvas, getHeight());
     }
 
-    private void drawHeaderRowAndEvents(Canvas canvas) {
-        headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
+    @Override
+    public void onScaled() {
+        invalidate();
     }
 
-    /**
-     * Get the time and date where the user clicked on.
-     *
-     * @param x The x position of the touch event.
-     * @param y The y position of the touch event.
-     * @return The time and date at the clicked position.
-     */
-    private Calendar getTimeFromPoint(float x, float y) {
-        int leftDaysWithGaps = (int) -(Math.ceil(drawingConfig.mCurrentOrigin.x / (drawingConfig.mWidthPerDay + config.mColumnGap)));
-        float startPixel = drawingConfig.mCurrentOrigin.x + (drawingConfig.mWidthPerDay + config.mColumnGap) * leftDaysWithGaps +
-                drawingConfig.mHeaderColumnWidth;
-        for (int dayNumber = leftDaysWithGaps + 1;
-             dayNumber <= leftDaysWithGaps + config.mNumberOfVisibleDays + 1;
-             dayNumber++) {
-            float start = (startPixel < drawingConfig.mHeaderColumnWidth ? drawingConfig.mHeaderColumnWidth : startPixel);
-            if (drawingConfig.mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + drawingConfig.mWidthPerDay) {
-                Calendar day = today();
-                day.add(Calendar.DATE, dayNumber - 1);
-                float pixelsFromZero = y - drawingConfig.mCurrentOrigin.y - drawingConfig.mHeaderHeight
-                        - config.mHeaderRowPadding * 2 - drawingConfig.mTimeTextHeight / 2 - drawingConfig.mHeaderMarginBottom;
-                int hour = (int) (pixelsFromZero / config.mHourHeight);
-                int minute = (int) (60 * (pixelsFromZero - hour * config.mHourHeight) / config.mHourHeight);
-                day.add(Calendar.HOUR, hour);
-                day.set(Calendar.MINUTE, minute);
-                return day;
-            }
-            startPixel += drawingConfig.mWidthPerDay + config.mColumnGap;
-        }
-        return null;
+    @Override
+    public void onScrolled() {
+        postInvalidateOnAnimation();
+    }
+
+    @Override
+    public int getViewHeight() {
+        return getHeight();
+    }
+
+    @Override
+    public void performHapticFeedback() {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
     }
 
     @Override
@@ -350,24 +130,24 @@ public class WeekView extends View {
     /////////////////////////////////////////////////////////////////
 
     public void setOnEventClickListener(EventClickListener listener) {
-        this.eventClickListener = listener;
+        scrollHandler.eventClickListener = listener;
     }
 
     public EventClickListener getEventClickListener() {
-        return eventClickListener;
+        return scrollHandler.eventClickListener;
     }
 
     @Nullable
     public MonthLoader.MonthChangeListener getMonthChangeListener() {
-        if (weekViewLoader instanceof MonthLoader) {
-            return ((MonthLoader) weekViewLoader).getOnMonthChangeListener();
+        if (scrollHandler.weekViewLoader instanceof MonthLoader) {
+            return ((MonthLoader) scrollHandler.weekViewLoader).getOnMonthChangeListener();
         }
         return null;
     }
 
     public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
-        this.weekViewLoader = new MonthLoader(monthChangeListener);
-        headerRowDrawer.setWeekViewLoader(weekViewLoader);
+        scrollHandler.weekViewLoader = new MonthLoader(monthChangeListener);
+        headerRowDrawer.setWeekViewLoader(scrollHandler.weekViewLoader);
     }
 
     /**
@@ -378,7 +158,7 @@ public class WeekView extends View {
      * @return The event loader.
      */
     public WeekViewLoader getWeekViewLoader() {
-        return weekViewLoader;
+        return scrollHandler.weekViewLoader;
     }
 
     /**
@@ -389,41 +169,41 @@ public class WeekView extends View {
      * @param weekViewLoader The event loader.
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
-        this.weekViewLoader = weekViewLoader;
+        scrollHandler.weekViewLoader = weekViewLoader;
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     public EventLongPressListener getEventLongPressListener() {
-        return eventLongPressListener;
+        return scrollHandler.eventLongPressListener;
     }
 
     public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
-        this.eventLongPressListener = eventLongPressListener;
+        scrollHandler.eventLongPressListener = eventLongPressListener;
     }
 
     public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener) {
-        this.emptyViewClickListener = emptyViewClickListener;
+        scrollHandler.emptyViewClickListener = emptyViewClickListener;
     }
 
     public EmptyViewClickListener getEmptyViewClickListener() {
-        return emptyViewClickListener;
+        return scrollHandler.emptyViewClickListener;
     }
 
     public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener) {
-        this.emptyViewLongPressListener = emptyViewLongPressListener;
+        scrollHandler.emptyViewLongPressListener = emptyViewLongPressListener;
     }
 
     public EmptyViewLongPressListener getEmptyViewLongPressListener() {
-        return emptyViewLongPressListener;
+        return scrollHandler.emptyViewLongPressListener;
     }
 
     public void setScrollListener(ScrollListener scrolledListener) {
-        scrollListener = scrolledListener;
+        scrollHandler.scrollListener = scrolledListener;
         headerRowDrawer.setScrollListener(scrolledListener);
     }
 
     public ScrollListener getScrollListener() {
-        return scrollListener;
+        return scrollHandler.scrollListener;
     }
 
     /**
@@ -938,78 +718,14 @@ public class WeekView extends View {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleDetector.onTouchEvent(event);
-        boolean val = gestureDetector.onTouchEvent(event);
-
-        // Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection are set.
-        if (event.getAction() == MotionEvent.ACTION_UP && !isZooming && currentFlingDirection == Direction.NONE) {
-            if (currentScrollDirection == Direction.RIGHT || currentScrollDirection == Direction.LEFT) {
-                goToNearestOrigin();
-            }
-            currentScrollDirection = Direction.NONE;
-        }
-
-        return val;
-    }
-
-    private void goToNearestOrigin() {
-        double leftDays = drawingConfig.mCurrentOrigin.x / (drawingConfig.mWidthPerDay + config.mColumnGap);
-
-        if (currentFlingDirection != Direction.NONE) {
-            // snap to nearest day
-            leftDays = Math.round(leftDays);
-        } else if (currentScrollDirection == Direction.LEFT) {
-            // snap to last day
-            leftDays = Math.floor(leftDays);
-        } else if (currentScrollDirection == Direction.RIGHT) {
-            // snap to next day
-            leftDays = Math.ceil(leftDays);
-        } else {
-            // snap to nearest day
-            leftDays = Math.round(leftDays);
-        }
-
-        int nearestOrigin = (int) (drawingConfig.mCurrentOrigin.x - leftDays * (drawingConfig.mWidthPerDay + config.mColumnGap));
-
-        if (nearestOrigin != 0) {
-            // Stop current animation.
-            scroller.forceFinished(true);
-            // Snap to date.
-            scroller.startScroll((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / drawingConfig.mWidthPerDay * config.mScrollDuration));
-            postInvalidateOnAnimation();
-        }
-        // Reset scrolling and fling direction.
-        currentScrollDirection = currentFlingDirection = Direction.NONE;
+        return scrollHandler.onTouchEvent(event);
     }
 
 
     @Override
     public void computeScroll() {
         super.computeScroll();
-
-        if (scroller.isFinished()) {
-            if (currentFlingDirection != Direction.NONE) {
-                // Snap to day after fling is finished.
-                goToNearestOrigin();
-            }
-        } else {
-            if (currentFlingDirection != Direction.NONE && forceFinishScroll()) {
-                goToNearestOrigin();
-            } else if (scroller.computeScrollOffset()) {
-                drawingConfig.mCurrentOrigin.y = scroller.getCurrY();
-                drawingConfig.mCurrentOrigin.x = scroller.getCurrX();
-                postInvalidateOnAnimation();
-            }
-        }
-    }
-
-    /**
-     * Check if scrolling should be stopped.
-     *
-     * @return true if scrolling should be stopped before reaching the end of animation.
-     */
-    private boolean forceFinishScroll() {
-        return scroller.getCurrVelocity() <= minimumFlingVelocity;
+        scrollHandler.computeScroll();
     }
 
 
@@ -1033,8 +749,8 @@ public class WeekView extends View {
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
-        scroller.forceFinished(true);
-        currentScrollDirection = currentFlingDirection = Direction.NONE;
+        scrollHandler.scroller.forceFinished(true);
+        scrollHandler.currentScrollDirection = scrollHandler.currentFlingDirection = Direction.NONE;
 
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -1082,13 +798,15 @@ public class WeekView extends View {
         }
 
         int verticalOffset = 0;
-        if (hour > 24)
+        if (hour > 24) {
             verticalOffset = config.mHourHeight * 24;
-        else if (hour > 0)
+        } else if (hour > 0) {
             verticalOffset = (int) (config.mHourHeight * hour);
+        }
 
-        if (verticalOffset > config.mHourHeight * 24 - getHeight() + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom)
+        if (verticalOffset > config.mHourHeight * 24 - getHeight() + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom) {
             verticalOffset = (int) (config.mHourHeight * 24 - getHeight() + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom);
+        }
 
         drawingConfig.mCurrentOrigin.y = -verticalOffset;
         invalidate();

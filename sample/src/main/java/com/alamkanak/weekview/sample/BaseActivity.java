@@ -11,6 +11,9 @@ import android.widget.Toast;
 import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
+import com.alamkanak.weekview.listeners.EventClickListener;
+import com.alamkanak.weekview.listeners.EventLongPressListener;
 import com.alamkanak.weekview.model.WeekViewEvent;
 
 import java.text.SimpleDateFormat;
@@ -24,8 +27,8 @@ import java.util.Locale;
  * Website: http://alamkanak.github.io
  */
 public abstract class BaseActivity extends AppCompatActivity
-        implements WeekView.EventClickListener, MonthLoader.MonthChangeListener,
-        WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
+        implements EventClickListener, MonthLoader.MonthChangeListener,
+        EventLongPressListener, EmptyViewLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
