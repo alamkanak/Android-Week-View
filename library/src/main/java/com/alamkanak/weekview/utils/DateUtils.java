@@ -1,11 +1,16 @@
 package com.alamkanak.weekview.utils;
 
+import android.content.Context;
+import android.text.format.DateFormat;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by jesse on 6/02/2016.
  */
-public class WeekViewUtil {
+public class DateUtils {
 
     /**
      * Checks if two times are on the same day.
@@ -30,4 +35,15 @@ public class WeekViewUtil {
         today.set(Calendar.MILLISECOND, 0);
         return today;
     }
+
+    public static SimpleDateFormat getDateFormat() {
+        return new SimpleDateFormat("EEEEE M/dd", Locale.getDefault());
+    }
+
+    public static SimpleDateFormat getTimeFormat(Context context) {
+        return DateFormat.is24HourFormat(context)
+                ? new SimpleDateFormat("HH:mm", Locale.getDefault())
+                : new SimpleDateFormat("hh a", Locale.getDefault());
+    }
+
 }

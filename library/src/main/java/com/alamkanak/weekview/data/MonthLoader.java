@@ -1,5 +1,6 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.data;
 
+import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
 

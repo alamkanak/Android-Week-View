@@ -10,7 +10,7 @@ import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
 import com.alamkanak.weekview.WeekView;
-import com.alamkanak.weekview.WeekViewLoader;
+import com.alamkanak.weekview.data.WeekViewLoader;
 import com.alamkanak.weekview.drawing.EventRect;
 import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
 import com.alamkanak.weekview.listeners.EmptyViewClickListener;
@@ -25,7 +25,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-import static com.alamkanak.weekview.utils.WeekViewUtil.today;
+import static com.alamkanak.weekview.utils.DateUtils.today;
 
 public class WeekViewScrollHandler {
 
@@ -65,7 +65,7 @@ public class WeekViewScrollHandler {
 
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                drawingConfig.mNewHourHeight = Math.round(config.mHourHeight * detector.getScaleFactor());
+                drawingConfig.newHourHeight = Math.round(config.hourHeight * detector.getScaleFactor());
                 listener.onScaled();
                 return true;
             }
@@ -141,11 +141,11 @@ public class WeekViewScrollHandler {
                     switch (currentScrollDirection) {
                         case LEFT:
                         case RIGHT:
-                            drawingConfig.mCurrentOrigin.x -= distanceX * config.mXScrollingSpeed;
+                            drawingConfig.currentOrigin.x -= distanceX * config.xScrollingSpeed;
                             listener.onScrolled();
                             break;
                         case VERTICAL:
-                            drawingConfig.mCurrentOrigin.y -= distanceY;
+                            drawingConfig.currentOrigin.y -= distanceY;
                             listener.onScrolled();
                             break;
                     }
@@ -157,9 +157,9 @@ public class WeekViewScrollHandler {
                     if (isZooming)
                         return true;
 
-                    if ((currentFlingDirection == WeekView.Direction.LEFT && !config.mHorizontalFlingEnabled) ||
-                            (currentFlingDirection == WeekView.Direction.RIGHT && !config.mHorizontalFlingEnabled) ||
-                            (currentFlingDirection == WeekView.Direction.VERTICAL && !config.mVerticalFlingEnabled)) {
+                    if ((currentFlingDirection == WeekView.Direction.LEFT && !config.horizontalFlingEnabled) ||
+                            (currentFlingDirection == WeekView.Direction.RIGHT && !config.horizontalFlingEnabled) ||
+                            (currentFlingDirection == WeekView.Direction.VERTICAL && !config.verticalFlingEnabled)) {
                         return true;
                     }
 
@@ -169,10 +169,10 @@ public class WeekViewScrollHandler {
                     switch (currentFlingDirection) {
                         case LEFT:
                         case RIGHT:
-                            scroller.fling((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, (int) (velocityX * config.mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.mHourHeight * 24 + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 - listener.getViewHeight()), 0);
+                            scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, (int) (velocityX * config.xScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
                             break;
                         case VERTICAL:
-                            scroller.fling((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.mHourHeight * 24 + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 - listener.getViewHeight()), 0);
+                            scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
                             break;
                     }
 
@@ -196,7 +196,7 @@ public class WeekViewScrollHandler {
                     }
 
                     // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewClickListener != null && e.getX() > drawingConfig.mHeaderColumnWidth && e.getY() > (drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom)) {
+                    if (emptyViewClickListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
                         Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                         if (selectedTime != null) {
                             emptyViewClickListener.onEmptyViewClicked(selectedTime);
@@ -223,7 +223,7 @@ public class WeekViewScrollHandler {
                     }
 
                     // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewLongPressListener != null && e.getX() > drawingConfig.mHeaderColumnWidth && e.getY() > (drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom)) {
+                    if (emptyViewLongPressListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
                         Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                         if (selectedTime != null) {
                             listener.performHapticFeedback();
@@ -234,7 +234,7 @@ public class WeekViewScrollHandler {
             };
 
     private void goToNearestOrigin() {
-        double leftDays = drawingConfig.mCurrentOrigin.x / (drawingConfig.mWidthPerDay + config.mColumnGap);
+        double leftDays = drawingConfig.currentOrigin.x / (drawingConfig.widthPerDay + config.columnGap);
 
         if (currentFlingDirection != WeekView.Direction.NONE) {
             // snap to nearest day
@@ -250,13 +250,13 @@ public class WeekViewScrollHandler {
             leftDays = Math.round(leftDays);
         }
 
-        int nearestOrigin = (int) (drawingConfig.mCurrentOrigin.x - leftDays * (drawingConfig.mWidthPerDay + config.mColumnGap));
+        int nearestOrigin = (int) (drawingConfig.currentOrigin.x - leftDays * (drawingConfig.widthPerDay + config.columnGap));
 
         if (nearestOrigin != 0) {
             // Stop current animation.
             scroller.forceFinished(true);
             // Snap to date.
-            scroller.startScroll((int) drawingConfig.mCurrentOrigin.x, (int) drawingConfig.mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / drawingConfig.mWidthPerDay * config.mScrollDuration));
+            scroller.startScroll((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / drawingConfig.widthPerDay * config.scrollDuration));
             listener.onScrolled();
         }
         // Reset scrolling and fling direction.
@@ -271,25 +271,25 @@ public class WeekViewScrollHandler {
      * @return The time and date at the clicked position.
      */
     private Calendar getTimeFromPoint(float x, float y) {
-        int leftDaysWithGaps = (int) -(Math.ceil(drawingConfig.mCurrentOrigin.x / (drawingConfig.mWidthPerDay + config.mColumnGap)));
-        float startPixel = drawingConfig.mCurrentOrigin.x + (drawingConfig.mWidthPerDay + config.mColumnGap) * leftDaysWithGaps +
-                drawingConfig.mHeaderColumnWidth;
+        int leftDaysWithGaps = (int) -(Math.ceil(drawingConfig.currentOrigin.x / (drawingConfig.widthPerDay + config.columnGap)));
+        float startPixel = drawingConfig.currentOrigin.x + (drawingConfig.widthPerDay + config.columnGap) * leftDaysWithGaps +
+                drawingConfig.headerColumnWidth;
         for (int dayNumber = leftDaysWithGaps + 1;
-             dayNumber <= leftDaysWithGaps + config.mNumberOfVisibleDays + 1;
+             dayNumber <= leftDaysWithGaps + config.numberOfVisibleDays + 1;
              dayNumber++) {
-            float start = (startPixel < drawingConfig.mHeaderColumnWidth ? drawingConfig.mHeaderColumnWidth : startPixel);
-            if (drawingConfig.mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + drawingConfig.mWidthPerDay) {
+            float start = (startPixel < drawingConfig.headerColumnWidth ? drawingConfig.headerColumnWidth : startPixel);
+            if (drawingConfig.widthPerDay + startPixel - start > 0 && x > start && x < startPixel + drawingConfig.widthPerDay) {
                 Calendar day = today();
                 day.add(Calendar.DATE, dayNumber - 1);
-                float pixelsFromZero = y - drawingConfig.mCurrentOrigin.y - drawingConfig.mHeaderHeight
-                        - config.mHeaderRowPadding * 2 - drawingConfig.mTimeTextHeight / 2 - drawingConfig.mHeaderMarginBottom;
-                int hour = (int) (pixelsFromZero / config.mHourHeight);
-                int minute = (int) (60 * (pixelsFromZero - hour * config.mHourHeight) / config.mHourHeight);
+                float pixelsFromZero = y - drawingConfig.currentOrigin.y - drawingConfig.headerHeight
+                        - config.headerRowPadding * 2 - drawingConfig.timeTextHeight / 2 - drawingConfig.headerMarginBottom;
+                int hour = (int) (pixelsFromZero / config.hourHeight);
+                int minute = (int) (60 * (pixelsFromZero - hour * config.hourHeight) / config.hourHeight);
                 day.add(Calendar.HOUR, hour);
                 day.set(Calendar.MINUTE, minute);
                 return day;
             }
-            startPixel += drawingConfig.mWidthPerDay + config.mColumnGap;
+            startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
         return null;
     }
@@ -319,8 +319,8 @@ public class WeekViewScrollHandler {
             if (currentFlingDirection != WeekView.Direction.NONE && shouldForceFinishScroll()) {
                 goToNearestOrigin();
             } else if (scroller.computeScrollOffset()) {
-                drawingConfig.mCurrentOrigin.y = scroller.getCurrY();
-                drawingConfig.mCurrentOrigin.x = scroller.getCurrX();
+                drawingConfig.currentOrigin.y = scroller.getCurrY();
+                drawingConfig.currentOrigin.x = scroller.getCurrX();
                 listener.onScrolled();
             }
         }

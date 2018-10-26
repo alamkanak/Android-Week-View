@@ -15,6 +15,14 @@ public class WeekViewData {
 
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
+    public void clear() {
+        eventRects.clear();
+        previousPeriodEvents = null;
+        currentPeriodEvents = null;
+        nextPeriodEvents = null;
+        fetchedPeriod = -1;
+    }
+
     /**
      * Sort and cache events.
      *

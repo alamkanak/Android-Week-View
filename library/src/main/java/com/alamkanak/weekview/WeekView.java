@@ -9,6 +9,8 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.alamkanak.weekview.data.MonthLoader;
+import com.alamkanak.weekview.data.WeekViewLoader;
 import com.alamkanak.weekview.drawing.EventsDrawer;
 import com.alamkanak.weekview.drawing.HeaderRowDrawer;
 import com.alamkanak.weekview.drawing.TimeColumnDrawer;
@@ -38,9 +40,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
 
-    private WeekViewData data;
     private WeekViewViewState viewState;
-
     private WeekViewScrollHandler scrollHandler;
 
     private HeaderRowDrawer headerRowDrawer;
@@ -70,7 +70,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
             }
         };
 
-        data = new WeekViewData();
+        WeekViewData data = new WeekViewData();
         viewState = new WeekViewViewState();
 
         drawingConfig = new WeekViewDrawingConfig(context, config);
@@ -221,7 +221,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param dateTimeInterpreter The date, time interpreter.
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
-        drawingConfig.mDateTimeInterpreter = dateTimeInterpreter;
+        drawingConfig.dateTimeInterpreter = dateTimeInterpreter;
 
         // Refresh time column width
         drawingConfig.initTextTimeWidth(getContext());
@@ -234,7 +234,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The number of visible days in a week.
      */
     public int getNumberOfVisibleDays() {
-        return config.mNumberOfVisibleDays;
+        return config.numberOfVisibleDays;
     }
 
     /**
@@ -243,32 +243,31 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
-        config.mNumberOfVisibleDays = numberOfVisibleDays;
-        drawingConfig.mCurrentOrigin.x = 0;
-        drawingConfig.mCurrentOrigin.y = 0;
+        config.numberOfVisibleDays = numberOfVisibleDays;
+        drawingConfig.resetOrigin();
         invalidate();
     }
 
     public int getHourHeight() {
-        return config.mHourHeight;
+        return config.hourHeight;
     }
 
     public void setHourHeight(int hourHeight) {
-        drawingConfig.mNewHourHeight = hourHeight;
+        drawingConfig.newHourHeight = hourHeight;
         invalidate();
     }
 
     public int getColumnGap() {
-        return config.mColumnGap;
+        return config.columnGap;
     }
 
     public void setColumnGap(int columnGap) {
-        config.mColumnGap = columnGap;
+        config.columnGap = columnGap;
         invalidate();
     }
 
     public int getFirstDayOfWeek() {
-        return config.mFirstDayOfWeek;
+        return config.firstDayOfWeek;
     }
 
     /**
@@ -285,169 +284,169 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      *                       {@link java.util.Calendar#FRIDAY}.
      */
     public void setFirstDayOfWeek(int firstDayOfWeek) {
-        config.mFirstDayOfWeek = firstDayOfWeek;
+        config.firstDayOfWeek = firstDayOfWeek;
         invalidate();
     }
 
     public boolean isShowFirstDayOfWeekFirst() {
-        return config.mShowFirstDayOfWeekFirst;
+        return config.showFirstDayOfWeekFirst;
     }
 
     public void setShowFirstDayOfWeekFirst(boolean show) {
-        config.mShowFirstDayOfWeekFirst = show;
+        config.showFirstDayOfWeekFirst = show;
     }
 
     public int getTextSize() {
-        return config.mTextSize;
+        return config.textSize;
     }
 
     public void setTextSize(int textSize) {
-        config.mTextSize = textSize;
-        drawingConfig.mTodayHeaderTextPaint.setTextSize(textSize);
-        drawingConfig.mHeaderTextPaint.setTextSize(textSize);
-        drawingConfig.mTimeTextPaint.setTextSize(textSize);
+        config.textSize = textSize;
+        drawingConfig.todayHeaderTextPaint.setTextSize(textSize);
+        drawingConfig.headerTextPaint.setTextSize(textSize);
+        drawingConfig.timeTextPaint.setTextSize(textSize);
         invalidate();
     }
 
     public int getHeaderColumnPadding() {
-        return config.mHeaderColumnPadding;
+        return config.headerColumnPadding;
     }
 
     public void setHeaderColumnPadding(int headerColumnPadding) {
-        config.mHeaderColumnPadding = headerColumnPadding;
+        config.headerColumnPadding = headerColumnPadding;
         invalidate();
     }
 
     public int getHeaderColumnTextColor() {
-        return config.mHeaderColumnTextColor;
+        return config.headerColumnTextColor;
     }
 
     public void setHeaderColumnTextColor(int headerColumnTextColor) {
-        config.mHeaderColumnTextColor = headerColumnTextColor;
-        drawingConfig.mHeaderTextPaint.setColor(headerColumnTextColor);
-        drawingConfig.mTimeTextPaint.setColor(headerColumnTextColor);
+        config.headerColumnTextColor = headerColumnTextColor;
+        drawingConfig.headerTextPaint.setColor(headerColumnTextColor);
+        drawingConfig.timeTextPaint.setColor(headerColumnTextColor);
         invalidate();
     }
 
     public int getHeaderRowPadding() {
-        return config.mHeaderRowPadding;
+        return config.headerRowPadding;
     }
 
     public void setHeaderRowPadding(int headerRowPadding) {
-        config.mHeaderRowPadding = headerRowPadding;
+        config.headerRowPadding = headerRowPadding;
         invalidate();
     }
 
     public int getHeaderRowBackgroundColor() {
-        return config.mHeaderRowBackgroundColor;
+        return config.headerRowBackgroundColor;
     }
 
     public void setHeaderRowBackgroundColor(int headerRowBackgroundColor) {
-        config.mHeaderRowBackgroundColor = headerRowBackgroundColor;
-        drawingConfig.mHeaderBackgroundPaint.setColor(headerRowBackgroundColor);
+        config.headerRowBackgroundColor = headerRowBackgroundColor;
+        drawingConfig.headerBackgroundPaint.setColor(headerRowBackgroundColor);
         invalidate();
     }
 
     public int getDayBackgroundColor() {
-        return config.mDayBackgroundColor;
+        return config.dayBackgroundColor;
     }
 
     public void setDayBackgroundColor(int dayBackgroundColor) {
-        config.mDayBackgroundColor = dayBackgroundColor;
-        drawingConfig.mDayBackgroundPaint.setColor(dayBackgroundColor);
+        config.dayBackgroundColor = dayBackgroundColor;
+        drawingConfig.dayBackgroundPaint.setColor(dayBackgroundColor);
         invalidate();
     }
 
     public int getHourSeparatorColor() {
-        return config.mHourSeparatorColor;
+        return config.hourSeparatorColor;
     }
 
     public void setHourSeparatorColor(int hourSeparatorColor) {
-        config.mHourSeparatorColor = hourSeparatorColor;
-        drawingConfig.mHourSeparatorPaint.setColor(hourSeparatorColor);
+        config.hourSeparatorColor = hourSeparatorColor;
+        drawingConfig.hourSeparatorPaint.setColor(hourSeparatorColor);
         invalidate();
     }
 
     public int getTodayBackgroundColor() {
-        return config.mTodayBackgroundColor;
+        return config.todayBackgroundColor;
     }
 
     public void setTodayBackgroundColor(int todayBackgroundColor) {
-        config.mTodayBackgroundColor = todayBackgroundColor;
-        drawingConfig.mTodayBackgroundPaint.setColor(todayBackgroundColor);
+        config.todayBackgroundColor = todayBackgroundColor;
+        drawingConfig.todayBackgroundPaint.setColor(todayBackgroundColor);
         invalidate();
     }
 
     public int getHourSeparatorStrokeWidth() {
-        return config.mHourSeparatorStrokeWidth;
+        return config.hourSeparatorStrokeWidth;
     }
 
     public void setHourSeparatorStrokeWidth(int hourSeparatorWidth) {
-        config.mHourSeparatorStrokeWidth = hourSeparatorWidth;
-        drawingConfig.mHourSeparatorPaint.setStrokeWidth(hourSeparatorWidth);
+        config.hourSeparatorStrokeWidth = hourSeparatorWidth;
+        drawingConfig.hourSeparatorPaint.setStrokeWidth(hourSeparatorWidth);
         invalidate();
     }
 
     public int getTodayHeaderTextColor() {
-        return config.mTodayHeaderTextColor;
+        return config.todayHeaderTextColor;
     }
 
     public void setTodayHeaderTextColor(int todayHeaderTextColor) {
-        config.mTodayHeaderTextColor = todayHeaderTextColor;
-        drawingConfig.mTodayHeaderTextPaint.setColor(todayHeaderTextColor);
+        config.todayHeaderTextColor = todayHeaderTextColor;
+        drawingConfig.todayHeaderTextPaint.setColor(todayHeaderTextColor);
         invalidate();
     }
 
     public int getEventTextSize() {
-        return config.mEventTextSize;
+        return config.eventTextSize;
     }
 
     public void setEventTextSize(int eventTextSize) {
-        config.mEventTextSize = eventTextSize;
-        drawingConfig.mEventTextPaint.setTextSize(eventTextSize);
+        config.eventTextSize = eventTextSize;
+        drawingConfig.eventTextPaint.setTextSize(eventTextSize);
         invalidate();
     }
 
     public int getEventTextColor() {
-        return config.mEventTextColor;
+        return config.eventTextColor;
     }
 
     public void setEventTextColor(int eventTextColor) {
-        config.mEventTextColor = eventTextColor;
-        drawingConfig.mEventTextPaint.setColor(eventTextColor);
+        config.eventTextColor = eventTextColor;
+        drawingConfig.eventTextPaint.setColor(eventTextColor);
         invalidate();
     }
 
     public int getEventPadding() {
-        return config.mEventPadding;
+        return config.eventPadding;
     }
 
     public void setEventPadding(int eventPadding) {
-        config.mEventPadding = eventPadding;
+        config.eventPadding = eventPadding;
         invalidate();
     }
 
     public int getHeaderColumnBackgroundColor() {
-        return config.mHeaderColumnBackgroundColor;
+        return config.headerColumnBackgroundColor;
     }
 
     public void setHeaderColumnBackgroundColor(int headerColumnBackgroundColor) {
-        config.mHeaderColumnBackgroundColor = headerColumnBackgroundColor;
-        drawingConfig.mHeaderColumnBackgroundPaint.setColor(headerColumnBackgroundColor);
+        config.headerColumnBackgroundColor = headerColumnBackgroundColor;
+        drawingConfig.headerColumnBackgroundPaint.setColor(headerColumnBackgroundColor);
         invalidate();
     }
 
     public int getDefaultEventColor() {
-        return drawingConfig.mDefaultEventColor;
+        return drawingConfig.defaultEventColor;
     }
 
     public void setDefaultEventColor(int defaultEventColor) {
-        drawingConfig.mDefaultEventColor = defaultEventColor;
+        drawingConfig.defaultEventColor = defaultEventColor;
         invalidate();
     }
 
     public int getOverlappingEventGap() {
-        return config.mOverlappingEventGap;
+        return config.overlappingEventGap;
     }
 
     /**
@@ -456,12 +455,12 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param overlappingEventGap The gap between overlapping events.
      */
     public void setOverlappingEventGap(int overlappingEventGap) {
-        config.mOverlappingEventGap = overlappingEventGap;
+        config.overlappingEventGap = overlappingEventGap;
         invalidate();
     }
 
     public int getEventCornerRadius() {
-        return config.mEventCornerRadius;
+        return config.eventCornerRadius;
     }
 
     /**
@@ -470,11 +469,11 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param eventCornerRadius the radius in px.
      */
     public void setEventCornerRadius(int eventCornerRadius) {
-        config.mEventCornerRadius = eventCornerRadius;
+        config.eventCornerRadius = eventCornerRadius;
     }
 
     public int getEventMarginVertical() {
-        return config.mEventMarginVertical;
+        return config.eventMarginVertical;
     }
 
     /**
@@ -484,7 +483,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param eventMarginVertical The top and bottom margin.
      */
     public void setEventMarginVertical(int eventMarginVertical) {
-        config.mEventMarginVertical = eventMarginVertical;
+        config.eventMarginVertical = eventMarginVertical;
         invalidate();
     }
 
@@ -495,12 +494,12 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param eventMarginHorizontal The start and end margin.
      */
     public void setEventMarginHorizontal(int eventMarginHorizontal) {
-        config.mEventMarginHorizontal = eventMarginHorizontal;
+        config.eventMarginHorizontal = eventMarginHorizontal;
         invalidate();
     }
 
     public int getEventMarginHorizontal() {
-        return config.mEventMarginHorizontal;
+        return config.eventMarginHorizontal;
     }
 
     /**
@@ -527,7 +526,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The speed factor in horizontal direction.
      */
     public float getXScrollingSpeed() {
-        return config.mXScrollingSpeed;
+        return config.xScrollingSpeed;
     }
 
     /**
@@ -536,7 +535,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param xScrollingSpeed The new horizontal scrolling speed.
      */
     public void setXScrollingSpeed(float xScrollingSpeed) {
-        config.mXScrollingSpeed = xScrollingSpeed;
+        config.xScrollingSpeed = xScrollingSpeed;
     }
 
     /**
@@ -547,7 +546,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return True if weekends should have different background colors.
      */
     public boolean isShowDistinctWeekendColor() {
-        return config.mShowDistinctWeekendColor;
+        return config.showDistinctWeekendColor;
     }
 
     /**
@@ -558,7 +557,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param showDistinctWeekendColor True if weekends should have different background colors.
      */
     public void setShowDistinctWeekendColor(boolean showDistinctWeekendColor) {
-        config.mShowDistinctWeekendColor = showDistinctWeekendColor;
+        config.showDistinctWeekendColor = showDistinctWeekendColor;
         invalidate();
     }
 
@@ -570,7 +569,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return True if past and future days should have two different background colors.
      */
     public boolean isShowDistinctPastFutureColor() {
-        return config.mShowDistinctPastFutureColor;
+        return config.showDistinctPastFutureColor;
     }
 
     /**
@@ -582,7 +581,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      *                                    background colors.
      */
     public void setShowDistinctPastFutureColor(boolean showDistinctPastFutureColor) {
-        config.mShowDistinctPastFutureColor = showDistinctPastFutureColor;
+        config.showDistinctPastFutureColor = showDistinctPastFutureColor;
         invalidate();
     }
 
@@ -593,7 +592,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return True if "now" line should be displayed.
      */
     public boolean isShowNowLine() {
-        return config.mShowNowLine;
+        return config.showNowLine;
     }
 
     /**
@@ -603,7 +602,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param showNowLine True if "now" line should be displayed.
      */
     public void setShowNowLine(boolean showNowLine) {
-        config.mShowNowLine = showNowLine;
+        config.showNowLine = showNowLine;
         invalidate();
     }
 
@@ -613,7 +612,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The color of the "now" line.
      */
     public int getNowLineColor() {
-        return config.mNowLineColor;
+        return config.nowLineColor;
     }
 
     /**
@@ -622,7 +621,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param nowLineColor The color of the "now" line.
      */
     public void setNowLineColor(int nowLineColor) {
-        config.mNowLineColor = nowLineColor;
+        config.nowLineColor = nowLineColor;
         invalidate();
     }
 
@@ -632,7 +631,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The thickness of the "now" line.
      */
     public int getNowLineThickness() {
-        return config.mNowLineThickness;
+        return config.nowLineThickness;
     }
 
     /**
@@ -641,7 +640,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param nowLineThickness The thickness of the "now" line.
      */
     public void setNowLineThickness(int nowLineThickness) {
-        config.mNowLineThickness = nowLineThickness;
+        config.nowLineThickness = nowLineThickness;
         invalidate();
     }
 
@@ -651,14 +650,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return True if the week view has horizontal fling enabled.
      */
     public boolean isHorizontalFlingEnabled() {
-        return config.mHorizontalFlingEnabled;
+        return config.horizontalFlingEnabled;
     }
 
     /**
      * Set whether the week view should fling horizontally.
      */
     public void setHorizontalFlingEnabled(boolean enabled) {
-        config.mHorizontalFlingEnabled = enabled;
+        config.horizontalFlingEnabled = enabled;
     }
 
     /**
@@ -667,14 +666,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return True if the week view has vertical fling enabled.
      */
     public boolean isVerticalFlingEnabled() {
-        return config.mVerticalFlingEnabled;
+        return config.verticalFlingEnabled;
     }
 
     /**
      * Set whether the week view should fling vertically.
      */
     public void setVerticalFlingEnabled(boolean enabled) {
-        config.mVerticalFlingEnabled = enabled;
+        config.verticalFlingEnabled = enabled;
     }
 
     /**
@@ -683,14 +682,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return Height of AllDay-events.
      */
     public int getAllDayEventHeight() {
-        return config.mAllDayEventHeight;
+        return config.allDayEventHeight;
     }
 
     /**
      * Set the height of AllDay-events.
      */
     public void setAllDayEventHeight(int height) {
-        config.mAllDayEventHeight = height;
+        config.allDayEventHeight = height;
     }
 
     /**
@@ -699,14 +698,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return scroll duration
      */
     public int getScrollDuration() {
-        return config.mScrollDuration;
+        return config.scrollDuration;
     }
 
     /**
      * Set the scroll duration
      */
     public void setScrollDuration(int scrollDuration) {
-        config.mScrollDuration = scrollDuration;
+        config.scrollDuration = scrollDuration;
     }
 
     /////////////////////////////////////////////////////////////////
@@ -774,7 +773,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
         long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
         long dateDifference = (dateInMillis / day) - (todayInMillis / day);
-        drawingConfig.mCurrentOrigin.x = -dateDifference * (drawingConfig.mWidthPerDay + config.mColumnGap);
+        drawingConfig.currentOrigin.x = -dateDifference * (drawingConfig.widthPerDay + config.columnGap);
         invalidate();
     }
 
@@ -799,16 +798,16 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
         int verticalOffset = 0;
         if (hour > 24) {
-            verticalOffset = config.mHourHeight * 24;
+            verticalOffset = config.hourHeight * 24;
         } else if (hour > 0) {
-            verticalOffset = (int) (config.mHourHeight * hour);
+            verticalOffset = (int) (config.hourHeight * hour);
         }
 
-        if (verticalOffset > config.mHourHeight * 24 - getHeight() + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom) {
-            verticalOffset = (int) (config.mHourHeight * 24 - getHeight() + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom);
+        if (verticalOffset > config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom) {
+            verticalOffset = (int) (config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom);
         }
 
-        drawingConfig.mCurrentOrigin.y = -verticalOffset;
+        drawingConfig.currentOrigin.y = -verticalOffset;
         invalidate();
     }
 
@@ -818,7 +817,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The first hour that is visible.
      */
     public double getFirstVisibleHour() {
-        return (drawingConfig.mCurrentOrigin.y * -1) / config.mHourHeight;
+        return (drawingConfig.currentOrigin.y * -1) / config.hourHeight;
     }
 
 }

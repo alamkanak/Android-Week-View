@@ -15,28 +15,28 @@ public class TimeColumnDrawer {
     }
 
     public void draw(Canvas canvas, int bottom) {
-        float top = drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2;
+        float top = drawingConfig.headerHeight + config.headerRowPadding * 2;
 
         // Draw the background color for the header column.
-        canvas.drawRect(0, top, drawingConfig.mHeaderColumnWidth, bottom, drawingConfig.mHeaderColumnBackgroundPaint);
+        canvas.drawRect(0, top, drawingConfig.headerColumnWidth, bottom, drawingConfig.headerColumnBackgroundPaint);
 
         canvas.restore();
         canvas.save();
 
-        canvas.clipRect(0, drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2, drawingConfig.mHeaderColumnWidth, bottom);
+        canvas.clipRect(0, drawingConfig.headerHeight + config.headerRowPadding * 2, drawingConfig.headerColumnWidth, bottom);
 
         for (int i = 0; i < 24; i++) {
-            top = drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mCurrentOrigin.y + config.mHourHeight * i + drawingConfig.mHeaderMarginBottom;
+            top = drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.currentOrigin.y + config.hourHeight * i + drawingConfig.headerMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
-            String time = drawingConfig.mDateTimeInterpreter.interpretTime(i);
+            String time = drawingConfig.dateTimeInterpreter.interpretTime(i);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             if (top < bottom) {
-                float x = drawingConfig.mTimeTextWidth + config.mHeaderColumnPadding;
-                float y = top + drawingConfig.mTimeTextHeight;
-                canvas.drawText(time, x, y, drawingConfig.mTimeTextPaint);
+                float x = drawingConfig.timeTextWidth + config.headerColumnPadding;
+                float y = top + drawingConfig.timeTextHeight;
+                canvas.drawText(time, x, y, drawingConfig.timeTextPaint);
             }
         }
 

@@ -2,11 +2,11 @@ package com.alamkanak.weekview.model;
 
 import android.support.annotation.NonNull;
 
+import com.alamkanak.weekview.utils.DateUtils;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import static com.alamkanak.weekview.utils.WeekViewUtil.isSameDay;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -14,16 +14,16 @@ import static com.alamkanak.weekview.utils.WeekViewUtil.isSameDay;
  */
 public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEvent> {
 
-    private long mId;
-    private Calendar mStartTime;
-    private Calendar mEndTime;
-    private String mName;
-    private String mLocation;
-    private int mColor;
-    private boolean mAllDay;
+    private long id;
+    private Calendar startTime;
+    private Calendar endTime;
+    private String name;
+    private String location;
+    private int color;
+    private boolean isAllDay;
 
     public WeekViewEvent() {
-
+        // Free ad space
     }
 
     /**
@@ -44,23 +44,23 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
     public WeekViewEvent(long id, String name, int startYear, int startMonth,
                          int startDay, int startHour, int startMinute, int endYear,
                          int endMonth, int endDay, int endHour, int endMinute) {
-        this.mId = id;
+        this.id = id;
 
-        this.mStartTime = Calendar.getInstance();
-        this.mStartTime.set(Calendar.YEAR, startYear);
-        this.mStartTime.set(Calendar.MONTH, startMonth-1);
-        this.mStartTime.set(Calendar.DAY_OF_MONTH, startDay);
-        this.mStartTime.set(Calendar.HOUR_OF_DAY, startHour);
-        this.mStartTime.set(Calendar.MINUTE, startMinute);
+        this.startTime = Calendar.getInstance();
+        this.startTime.set(Calendar.YEAR, startYear);
+        this.startTime.set(Calendar.MONTH, startMonth-1);
+        this.startTime.set(Calendar.DAY_OF_MONTH, startDay);
+        this.startTime.set(Calendar.HOUR_OF_DAY, startHour);
+        this.startTime.set(Calendar.MINUTE, startMinute);
 
-        this.mEndTime = Calendar.getInstance();
-        this.mEndTime.set(Calendar.YEAR, endYear);
-        this.mEndTime.set(Calendar.MONTH, endMonth-1);
-        this.mEndTime.set(Calendar.DAY_OF_MONTH, endDay);
-        this.mEndTime.set(Calendar.HOUR_OF_DAY, endHour);
-        this.mEndTime.set(Calendar.MINUTE, endMinute);
+        this.endTime = Calendar.getInstance();
+        this.endTime.set(Calendar.YEAR, endYear);
+        this.endTime.set(Calendar.MONTH, endMonth-1);
+        this.endTime.set(Calendar.DAY_OF_MONTH, endDay);
+        this.endTime.set(Calendar.HOUR_OF_DAY, endHour);
+        this.endTime.set(Calendar.MINUTE, endMinute);
 
-        this.mName = name;
+        this.name = name;
     }
 
     /**
@@ -74,12 +74,12 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
      */
     public WeekViewEvent(long id, String name, String location,
                          Calendar startTime, Calendar endTime, boolean allDay) {
-        this.mId = id;
-        this.mName = name;
-        this.mLocation = location;
-        this.mStartTime = startTime;
-        this.mEndTime = endTime;
-        this.mAllDay = allDay;
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isAllDay = allDay;
     }
 
     /**
@@ -107,59 +107,75 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
 
 
     public Calendar getStartTime() {
-        return mStartTime;
+        return startTime;
     }
 
     public void setStartTime(Calendar startTime) {
-        this.mStartTime = startTime;
+        this.startTime = startTime;
     }
 
     public Calendar getEndTime() {
-        return mEndTime;
+        return endTime;
     }
 
     public void setEndTime(Calendar endTime) {
-        this.mEndTime = endTime;
+        this.endTime = endTime;
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
     public void setName(String name) {
-        this.mName = name;
+        this.name = name;
     }
 
     public String getLocation() {
-        return mLocation;
+        return location;
     }
 
     public void setLocation(String location) {
-        this.mLocation = location;
+        this.location = location;
     }
 
     public int getColor() {
-        return mColor;
+        return color;
     }
 
     public void setColor(int color) {
-        this.mColor = color;
+        this.color = color;
     }
 
     public boolean isAllDay() {
-        return mAllDay;
+        return isAllDay;
     }
 
     public void setAllDay(boolean allDay) {
-        this.mAllDay = allDay;
+        this.isAllDay = allDay;
     }
 
     public long getId() {
-        return mId;
+        return id;
     }
 
     public void setId(long id) {
-        this.mId = id;
+        this.id = id;
+    }
+
+    public boolean isSameDay(Calendar other) {
+        return DateUtils.isSameDay(startTime, other);
+    }
+
+    public boolean isSameDay(WeekViewEvent other) {
+        return DateUtils.isSameDay(startTime, other.startTime);
+    }
+
+    public boolean collidesWith(WeekViewEvent other) {
+        long thisStart = startTime.getTimeInMillis();
+        long thisEnd = endTime.getTimeInMillis();
+        long otherStart = other.getStartTime().getTimeInMillis();
+        long otherEnd = other.getEndTime().getTimeInMillis();
+        return !((thisStart >= otherEnd) || (thisEnd <= otherStart));
     }
 
     @Override
@@ -184,13 +200,13 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
 
         WeekViewEvent that = (WeekViewEvent) o;
 
-        return mId == that.mId;
+        return id == that.id;
 
     }
 
     @Override
     public int hashCode() {
-        return (int) (mId ^ (mId >>> 32));
+        return (int) (id ^ (id >>> 32));
     }
 
     public List<WeekViewEvent> splitWeekViewEvents() {
@@ -201,7 +217,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         Calendar endTime = (Calendar) this.getEndTime().clone();
         endTime.add(Calendar.MILLISECOND, -1);
 
-        if (!isSameDay(this.getStartTime(), endTime)) {
+        if (!isSameDay(endTime)) {
             endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
@@ -213,7 +229,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             // Add other days.
             Calendar otherDay = (Calendar) this.getStartTime().clone();
             otherDay.add(Calendar.DATE, 1);
-            while (!isSameDay(otherDay, this.getEndTime())) {
+            while (!DateUtils.isSameDay(otherDay, this.getEndTime())) {
                 Calendar overDay = (Calendar) otherDay.clone();
                 overDay.set(Calendar.HOUR_OF_DAY, 0);
                 overDay.set(Calendar.MINUTE, 0);
@@ -237,8 +253,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
                     this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
             event2.setColor(this.getColor());
             events.add(event2);
-        }
-        else{
+        } else {
             events.add(this);
         }
 

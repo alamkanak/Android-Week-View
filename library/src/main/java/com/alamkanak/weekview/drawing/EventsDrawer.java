@@ -14,8 +14,6 @@ import com.alamkanak.weekview.model.WeekViewEvent;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.alamkanak.weekview.utils.WeekViewUtil.isSameDay;
-
 public class EventsDrawer {
 
     private WeekViewConfig config;
@@ -30,100 +28,108 @@ public class EventsDrawer {
                      int width, int height,
                      Calendar date, float startFromPixel, Canvas canvas) {
         for (int i = 0; i < eventRects.size(); i++) {
-            if (isSameDay(eventRects.get(i).event.getStartTime(), date) && !eventRects.get(i).event.isAllDay()) {
-                // Calculate top.
-                float top = config.mHourHeight * 24 * eventRects.get(i).top / 1440 + drawingConfig.mCurrentOrigin.y + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 + config.mEventMarginVertical;
+            EventRect eventRect = eventRects.get(i);
+            WeekViewEvent event = eventRect.event;
+            if (!event.isSameDay(date) || event.isAllDay()) {
+                continue;
+            }
 
-                // Calculate bottom.
-                float bottom = eventRects.get(i).bottom;
-                bottom = config.mHourHeight * 24 * bottom / 1440 + drawingConfig.mCurrentOrigin.y + drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + drawingConfig.mTimeTextHeight / 2 - config.mEventMarginVertical;
+            // Calculate top.
+            float top = config.hourHeight * 24 * eventRect.top / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
-                // Calculate left and right.
-                float left = startFromPixel + eventRects.get(i).left * drawingConfig.mWidthPerDay;
-                if (left < startFromPixel) {
-                    left += config.mOverlappingEventGap;
-                }
+            // Calculate bottom.
+            float bottom = eventRect.bottom;
+            bottom = config.hourHeight * 24 * bottom / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - config.eventMarginVertical;
 
-                float right = left + eventRects.get(i).width * drawingConfig.mWidthPerDay;
-                if (right < startFromPixel + drawingConfig.mWidthPerDay) {
-                    right -= config.mOverlappingEventGap;
-                }
+            // Calculate left and right.
+            float left = startFromPixel + eventRect.left * drawingConfig.widthPerDay;
+            if (left < startFromPixel) {
+                left += config.overlappingEventGap;
+            }
 
-                boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.mWidthPerDay);
-                if (config.mNumberOfVisibleDays == 1 && hasNoOverlaps) {
-                    right -= config.mEventMarginHorizontal * 2;
-                } else if (config.mNumberOfVisibleDays == 1) {
-                    right -= config.mEventMarginHorizontal * 2;
-                }
+            float right = left + eventRect.width * drawingConfig.widthPerDay;
+            if (right < startFromPixel + drawingConfig.widthPerDay) {
+                right -= config.overlappingEventGap;
+            }
 
-                // Draw the event and the event name on top of it.
-                if (left < right
-                        && left < width
-                        && top < height
-                        && right > drawingConfig.mHeaderColumnWidth
-                        && bottom > drawingConfig.mHeaderHeight + config.mHeaderRowPadding * 2 + drawingConfig.mTimeTextHeight / 2 + drawingConfig.mHeaderMarginBottom) {
-                    eventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                    drawingConfig.mEventBackgroundPaint.setColor(eventRects.get(i).event.getColor() == 0 ? drawingConfig.mDefaultEventColor : eventRects.get(i).event.getColor());
-                    canvas.drawRoundRect(eventRects.get(i).rectF, config.mEventCornerRadius, config.mEventCornerRadius, drawingConfig.mEventBackgroundPaint);
-                    drawEventTitle(eventRects.get(i).event, eventRects.get(i).rectF, canvas, top, left);
-                } else {
-                    eventRects.get(i).rectF = null;
-                }
+            boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
+            if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
+                right -= config.eventMarginHorizontal * 2;
+            } else if (config.numberOfVisibleDays == 1) {
+                right -= config.eventMarginHorizontal * 2;
+            }
+
+            // Draw the event and the event name on top of it.
+            if (left < right
+                    && left < width
+                    && top < height
+                    && right > drawingConfig.headerColumnWidth
+                    && bottom > drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.timeTextHeight / 2 + drawingConfig.headerMarginBottom) {
+                eventRect.rectF = new RectF(left, top, right, bottom);
+                drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
+                canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
+                drawEventTitle(event, eventRects.get(i).rectF, canvas, top, left);
+            } else {
+                eventRect.rectF = null;
             }
         }
     }
 
     /**
-     * Draw all the Allday-events of a particular day.
+     * Draw all the all-day events of a particular day.
      *
      * @param date           The day.
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to draw upon.
      */
     public void drawAllDayEvents(List<EventRect> eventRects,
-                                  int width, int height,
-                                  Calendar date, float startFromPixel, Canvas canvas) {
-        if (eventRects != null && eventRects.size() > 0) {
-            for (int i = 0; i < eventRects.size(); i++) {
-                WeekViewEvent event = eventRects.get(i).event;
-                if (isSameDay(event.getStartTime(), date) && event.isAllDay()) {
-                    EventRect eventRect = eventRects.get(i);
+                                 int width, int height,
+                                 Calendar date, float startFromPixel, Canvas canvas) {
+        if (eventRects == null) {
+            return;
+        }
 
-                    // Calculate top.
-                    float top = config.mHeaderRowPadding * 2 + drawingConfig.mHeaderMarginBottom + +drawingConfig.mTimeTextHeight / 2 + config.mEventMarginVertical;
+        for (int i = 0; i < eventRects.size(); i++) {
+            WeekViewEvent event = eventRects.get(i).event;
+            if (!event.isSameDay(date) || !event.isAllDay()) {
+                continue;
+            }
 
-                    // Calculate bottom.
-                    float bottom = top + eventRect.bottom;
+            EventRect eventRect = eventRects.get(i);
 
-                    // Calculate left and right.
-                    float left = startFromPixel + eventRect.left * drawingConfig.mWidthPerDay;
-                    if (left < startFromPixel) {
-                        left += config.mOverlappingEventGap;
-                    }
-                    float right = left + eventRect.width * drawingConfig.mWidthPerDay;
-                    if (right < startFromPixel + drawingConfig.mWidthPerDay) {
-                        right -= config.mOverlappingEventGap;
-                    }
+            // Calculate top.
+            float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + +drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
-                    boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.mWidthPerDay);
-                    if (config.mNumberOfVisibleDays == 1 && hasNoOverlaps) {
-                        right -= config.mEventMarginHorizontal * 2;
-                    }
+            // Calculate bottom.
+            float bottom = top + eventRect.bottom;
 
-                    // Draw the event and the event name on top of it.
-                    if (left < right &&
-                            left < width &&
-                            top < height &&
-                            right > drawingConfig.mHeaderColumnWidth &&
-                            bottom > 0) {
-                        eventRect.rectF = new RectF(left, top, right, bottom);
-                        drawingConfig.mEventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.mDefaultEventColor : event.getColor());
-                        canvas.drawRoundRect(eventRect.rectF, config.mEventCornerRadius, config.mEventCornerRadius, drawingConfig.mEventBackgroundPaint);
-                        drawEventTitle(event, eventRect.rectF, canvas, top, left);
-                    } else {
-                        eventRect.rectF = null;
-                    }
-                }
+            // Calculate left and right.
+            float left = startFromPixel + eventRect.left * drawingConfig.widthPerDay;
+            if (left < startFromPixel) {
+                left += config.overlappingEventGap;
+            }
+            float right = left + eventRect.width * drawingConfig.widthPerDay;
+            if (right < startFromPixel + drawingConfig.widthPerDay) {
+                right -= config.overlappingEventGap;
+            }
+
+            boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
+            if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
+                right -= config.eventMarginHorizontal * 2;
+            }
+
+            // Draw the event and the event name on top of it.
+            if (left < right &&
+                    left < width &&
+                    top < height &&
+                    right > drawingConfig.headerColumnWidth &&
+                    bottom > 0) {
+                eventRect.rectF = new RectF(left, top, right, bottom);
+                drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
+                canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
+                drawEventTitle(event, eventRect.rectF, canvas, top, left);
+            } else {
+                eventRect.rectF = null;
             }
         }
     }
@@ -138,8 +144,8 @@ public class EventsDrawer {
      * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      */
     private void drawEventTitle(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
-        if (rect.right - rect.left - config.mEventPadding * 2 < 0) return;
-        if (rect.bottom - rect.top - config.mEventPadding * 2 < 0) return;
+        if (rect.right - rect.left - config.eventPadding * 2 < 0) return;
+        if (rect.bottom - rect.top - config.eventPadding * 2 < 0) return;
 
         // Prepare the name of the event.
         SpannableStringBuilder bob = new SpannableStringBuilder();
@@ -154,11 +160,11 @@ public class EventsDrawer {
             bob.append(event.getLocation());
         }
 
-        int availableHeight = (int) (rect.bottom - originalTop - config.mEventPadding * 2);
-        int availableWidth = (int) (rect.right - originalLeft - config.mEventPadding * 2);
+        int availableHeight = (int) (rect.bottom - originalTop - config.eventPadding * 2);
+        int availableWidth = (int) (rect.right - originalLeft - config.eventPadding * 2);
 
         // Get text dimensions.
-        StaticLayout textLayout = new StaticLayout(bob, drawingConfig.mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        StaticLayout textLayout = new StaticLayout(bob, drawingConfig.eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
@@ -167,7 +173,7 @@ public class EventsDrawer {
             int availableLineCount = availableHeight / lineHeight;
             do {
                 // Ellipsize text to fit into event rect.
-                textLayout = new StaticLayout(TextUtils.ellipsize(bob, drawingConfig.mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), drawingConfig.mEventTextPaint, (int) (rect.right - originalLeft - config.mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                textLayout = new StaticLayout(TextUtils.ellipsize(bob, drawingConfig.eventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), drawingConfig.eventTextPaint, (int) (rect.right - originalLeft - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
@@ -177,7 +183,7 @@ public class EventsDrawer {
 
             // Draw text.
             canvas.save();
-            canvas.translate(originalLeft + config.mEventPadding, originalTop + config.mEventPadding);
+            canvas.translate(originalLeft + config.eventPadding, originalTop + config.eventPadding);
             textLayout.draw(canvas);
             canvas.restore();
         }
