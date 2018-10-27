@@ -89,12 +89,12 @@ public class WeekViewScrollHandler {
     private int scaledTouchSlop = 0;
 
     // Listeners
-    public EventClickListener eventClickListener;
-    public EventLongPressListener eventLongPressListener;
-    public WeekViewLoader weekViewLoader;
-    public EmptyViewClickListener emptyViewClickListener;
-    public EmptyViewLongPressListener emptyViewLongPressListener;
-    public ScrollListener scrollListener;
+    private EventClickListener eventClickListener;
+    private EventLongPressListener eventLongPressListener;
+    private WeekViewLoader weekViewLoader;
+    private EmptyViewClickListener emptyViewClickListener;
+    private EmptyViewLongPressListener emptyViewLongPressListener;
+    private ScrollListener scrollListener;
 
     private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -220,7 +220,7 @@ public class WeekViewScrollHandler {
             if (data.getAllEventChips() != null && eventLongPressListener != null) {
                 List<EventChip> reversedEventChips = data.getAllEventChips();
                 Collections.reverse(reversedEventChips);
-                
+
                 for (EventChip event : reversedEventChips) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
@@ -240,6 +240,54 @@ public class WeekViewScrollHandler {
             }
         }
     };
+
+    public EventClickListener getEventClickListener() {
+        return eventClickListener;
+    }
+
+    public void setEventClickListener(EventClickListener eventClickListener) {
+        this.eventClickListener = eventClickListener;
+    }
+
+    public EventLongPressListener getEventLongPressListener() {
+        return eventLongPressListener;
+    }
+
+    public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
+        this.eventLongPressListener = eventLongPressListener;
+    }
+
+    public WeekViewLoader getWeekViewLoader() {
+        return weekViewLoader;
+    }
+
+    public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
+        this.weekViewLoader = weekViewLoader;
+    }
+
+    public EmptyViewClickListener getEmptyViewClickListener() {
+        return emptyViewClickListener;
+    }
+
+    public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener) {
+        this.emptyViewClickListener = emptyViewClickListener;
+    }
+
+    public EmptyViewLongPressListener getEmptyViewLongPressListener() {
+        return emptyViewLongPressListener;
+    }
+
+    public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener) {
+        this.emptyViewLongPressListener = emptyViewLongPressListener;
+    }
+
+    public ScrollListener getScrollListener() {
+        return scrollListener;
+    }
+
+    public void setScrollListener(ScrollListener scrollListener) {
+        this.scrollListener = scrollListener;
+    }
 
     private void goToNearestOrigin() {
         double leftDays = drawingConfig.currentOrigin.x / (drawingConfig.widthPerDay + config.columnGap);

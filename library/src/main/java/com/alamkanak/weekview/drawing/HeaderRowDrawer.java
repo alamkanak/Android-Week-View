@@ -97,6 +97,7 @@ public class HeaderRowDrawer {
     }
 
     // TODO: Break up into multiple methods
+    // Move parts into EventsDrawer
     public void drawHeaderRowAndEvents(View view, Canvas canvas) {
         int width = WeekView.getViewWidth();
         int height = WeekView.getViewHeight();

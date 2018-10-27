@@ -12,6 +12,21 @@ import java.util.Locale;
  */
 public class DateUtils {
 
+    public static Calendar withTimeAtStartOfDay(Calendar date) {
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        return date;
+    }
+
+    public static int getDaysUntilDate(Calendar date) {
+        long dateInMillis = date.getTimeInMillis();
+        long todayInMillis = today().getTimeInMillis();
+        long diff = dateInMillis - todayInMillis;
+        return (int) (diff / Constants.DAY_IN_MILLIS);
+    }
+
     /**
      * Checks if two times are on the same day.
      * @param dayOne The first day.

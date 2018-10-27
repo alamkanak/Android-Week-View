@@ -29,6 +29,8 @@ import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.Calendar;
 
+import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
@@ -43,7 +45,6 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     private WeekViewConfig config;
-    private WeekViewDrawingConfig drawingConfig; // TODO: Unify with WeekViewConfig
 
     private WeekViewViewState viewState;
     private WeekViewScrollHandler scrollHandler;
@@ -78,14 +79,13 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         WeekViewData data = new WeekViewData();
         viewState = new WeekViewViewState();
 
-        drawingConfig = new WeekViewDrawingConfig(context, config);
-        scrollHandler = new WeekViewScrollHandler(context, this, config, drawingConfig, data);
+        config.drawingConfig = new WeekViewDrawingConfig(context, config);
+        scrollHandler = new WeekViewScrollHandler(context, this, config, config.drawingConfig, data);
 
-        EventsDrawer eventsDrawer = new EventsDrawer(config, drawingConfig);
-        timeColumnDrawer = new TimeColumnDrawer(config, drawingConfig);
+        EventsDrawer eventsDrawer = new EventsDrawer(config, config.drawingConfig);
+        timeColumnDrawer = new TimeColumnDrawer(config, config.drawingConfig);
 
-        headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, drawingConfig, data, viewState);
-
+        headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, config.drawingConfig, data, viewState);
     }
 
     public static int getViewWidth() {
@@ -141,24 +141,25 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     /////////////////////////////////////////////////////////////////
 
     public void setOnEventClickListener(EventClickListener listener) {
-        scrollHandler.eventClickListener = listener;
+        scrollHandler.setEventClickListener(listener);
     }
 
     public EventClickListener getEventClickListener() {
-        return scrollHandler.eventClickListener;
+        return scrollHandler.getEventClickListener();
     }
 
     @Nullable
     public MonthLoader.MonthChangeListener getMonthChangeListener() {
-        if (scrollHandler.weekViewLoader instanceof MonthLoader) {
-            return ((MonthLoader) scrollHandler.weekViewLoader).getOnMonthChangeListener();
+        if (scrollHandler.getWeekViewLoader() instanceof MonthLoader) {
+            return ((MonthLoader) scrollHandler.getWeekViewLoader()).getOnMonthChangeListener();
         }
         return null;
     }
 
     public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
-        scrollHandler.weekViewLoader = new MonthLoader(monthChangeListener);
-        headerRowDrawer.setWeekViewLoader(scrollHandler.weekViewLoader);
+        WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
+        scrollHandler.setWeekViewLoader(weekViewLoader);
+        headerRowDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     /**
@@ -169,7 +170,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The event loader.
      */
     public WeekViewLoader getWeekViewLoader() {
-        return scrollHandler.weekViewLoader;
+        return scrollHandler.getWeekViewLoader();
     }
 
     /**
@@ -180,45 +181,41 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param weekViewLoader The event loader.
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
-        scrollHandler.weekViewLoader = weekViewLoader;
-
-        // TODO: Look for other solution
+        scrollHandler.setWeekViewLoader(weekViewLoader);
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     public EventLongPressListener getEventLongPressListener() {
-        return scrollHandler.eventLongPressListener;
+        return scrollHandler.getEventLongPressListener();
     }
 
     public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
-        scrollHandler.eventLongPressListener = eventLongPressListener;
+        scrollHandler.setEventLongPressListener(eventLongPressListener);
     }
 
     public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener) {
-        scrollHandler.emptyViewClickListener = emptyViewClickListener;
+        scrollHandler.setEmptyViewClickListener(emptyViewClickListener);
     }
 
     public EmptyViewClickListener getEmptyViewClickListener() {
-        return scrollHandler.emptyViewClickListener;
+        return scrollHandler.getEmptyViewClickListener();
     }
 
     public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener) {
-        scrollHandler.emptyViewLongPressListener = emptyViewLongPressListener;
+        scrollHandler.setEmptyViewLongPressListener(emptyViewLongPressListener);
     }
 
     public EmptyViewLongPressListener getEmptyViewLongPressListener() {
-        return scrollHandler.emptyViewLongPressListener;
+        return scrollHandler.getEmptyViewLongPressListener();
     }
 
-    public void setScrollListener(ScrollListener scrolledListener) {
-        scrollHandler.scrollListener = scrolledListener;
-
-        // TODO: Look for other solution
-        headerRowDrawer.setScrollListener(scrolledListener);
+    public void setScrollListener(ScrollListener scrollListener) {
+        scrollHandler.setScrollListener(scrollListener);
+        headerRowDrawer.setScrollListener(scrollListener);
     }
 
     public ScrollListener getScrollListener() {
-        return scrollHandler.scrollListener;
+        return scrollHandler.getScrollListener();
     }
 
     /**
@@ -227,7 +224,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The date, time interpreter.
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
-        return drawingConfig.getDateTimeInterpreter(getContext());
+        return config.drawingConfig.getDateTimeInterpreter(getContext());
     }
 
     /**
@@ -236,7 +233,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param dateTimeInterpreter The date, time interpreter.
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
-        drawingConfig.setDateTimeInterpreter(dateTimeInterpreter, getContext());
+        config.drawingConfig.setDateTimeInterpreter(dateTimeInterpreter, getContext());
     }
 
 
@@ -255,9 +252,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
-        // TODO: Look for other solution
-        config.numberOfVisibleDays = numberOfVisibleDays;
-        drawingConfig.resetOrigin();
+        config.setNumberOfVisibleDays(numberOfVisibleDays);
         invalidate();
     }
 
@@ -266,7 +261,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setHourHeight(int hourHeight) {
-        drawingConfig.newHourHeight = hourHeight;
+        config.drawingConfig.newHourHeight = hourHeight;
         invalidate();
     }
 
@@ -314,8 +309,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setTextSize(int textSize) {
-        config.textSize = textSize;
-        drawingConfig.setTextSize(textSize);
+        config.setTextSize(textSize);
         invalidate();
     }
 
@@ -333,8 +327,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setHeaderColumnTextColor(int headerColumnTextColor) {
-        config.headerColumnTextColor = headerColumnTextColor;
-        drawingConfig.setHeaderColumnTextColor(headerColumnTextColor);
+        config.setHeaderColumnTextColor(headerColumnTextColor);
         invalidate();
     }
 
@@ -352,8 +345,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setHeaderRowBackgroundColor(int headerRowBackgroundColor) {
-        config.headerRowBackgroundColor = headerRowBackgroundColor;
-        drawingConfig.headerBackgroundPaint.setColor(headerRowBackgroundColor);
+        config.setHeaderColumnTextColor(headerRowBackgroundColor);
         invalidate();
     }
 
@@ -362,8 +354,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setDayBackgroundColor(int dayBackgroundColor) {
-        config.dayBackgroundColor = dayBackgroundColor;
-        drawingConfig.dayBackgroundPaint.setColor(dayBackgroundColor);
+        config.setDayBackgroundColor(dayBackgroundColor);
         invalidate();
     }
 
@@ -373,7 +364,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     public void setHourSeparatorColor(int hourSeparatorColor) {
         config.hourSeparatorColor = hourSeparatorColor;
-        drawingConfig.hourSeparatorPaint.setColor(hourSeparatorColor);
+        config.drawingConfig.hourSeparatorPaint.setColor(hourSeparatorColor);
         invalidate();
     }
 
@@ -382,8 +373,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setTodayBackgroundColor(int todayBackgroundColor) {
-        config.todayBackgroundColor = todayBackgroundColor;
-        drawingConfig.todayBackgroundPaint.setColor(todayBackgroundColor);
+        config.setTodayBackgroundColor(todayBackgroundColor);
         invalidate();
     }
 
@@ -392,8 +382,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setHourSeparatorStrokeWidth(int hourSeparatorWidth) {
-        config.hourSeparatorStrokeWidth = hourSeparatorWidth;
-        drawingConfig.hourSeparatorPaint.setStrokeWidth(hourSeparatorWidth);
+        config.setHourSeparatorStrokeWidth(hourSeparatorWidth);
         invalidate();
     }
 
@@ -402,8 +391,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setTodayHeaderTextColor(int todayHeaderTextColor) {
-        config.todayHeaderTextColor = todayHeaderTextColor;
-        drawingConfig.todayHeaderTextPaint.setColor(todayHeaderTextColor);
+        config.setTodayHeaderTextColor(todayHeaderTextColor);
         invalidate();
     }
 
@@ -412,8 +400,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setEventTextSize(int eventTextSize) {
-        config.eventTextSize = eventTextSize;
-        drawingConfig.eventTextPaint.setTextSize(eventTextSize);
+        config.setEventTextSize(eventTextSize);
         invalidate();
     }
 
@@ -422,8 +409,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setEventTextColor(int eventTextColor) {
-        config.eventTextColor = eventTextColor;
-        drawingConfig.eventTextPaint.setColor(eventTextColor);
+        config.setEventTextColor(eventTextColor);
         invalidate();
     }
 
@@ -441,17 +427,16 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     public void setHeaderColumnBackgroundColor(int headerColumnBackgroundColor) {
-        config.headerColumnBackgroundColor = headerColumnBackgroundColor;
-        drawingConfig.headerColumnBackgroundPaint.setColor(headerColumnBackgroundColor);
+        config.setHeaderColumnBackgroundColor(headerColumnBackgroundColor);
         invalidate();
     }
 
     public int getDefaultEventColor() {
-        return drawingConfig.defaultEventColor;
+        return config.drawingConfig.defaultEventColor;
     }
 
     public void setDefaultEventColor(int defaultEventColor) {
-        drawingConfig.defaultEventColor = defaultEventColor;
+        config.drawingConfig.defaultEventColor = defaultEventColor;
         invalidate();
     }
 
@@ -761,10 +746,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         scrollHandler.scroller.forceFinished(true);
         scrollHandler.currentScrollDirection = scrollHandler.currentFlingDirection = Direction.NONE;
 
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
+        date = DateUtils.withTimeAtStartOfDay(date);
 
         if (viewState.areDimensionsInvalid) {
             viewState.scrollToDay = date;
@@ -773,14 +755,8 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
         viewState.shouldRefreshEvents = true;
 
-        Calendar today = DateUtils.today();
-
-        // TODO: Code quality
-        long day = 1000L * 60L * 60L * 24L;
-        long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
-        long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
-        long dateDifference = (dateInMillis / day) - (todayInMillis / day);
-        drawingConfig.currentOrigin.x = -dateDifference * (drawingConfig.widthPerDay + config.columnGap);
+        int diff = DateUtils.getDaysUntilDate(date);
+        config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
         invalidate();
     }
 
@@ -803,19 +779,21 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
             return;
         }
 
-        int verticalOffset = 0;
-        if (hour > 24) {
-            verticalOffset = config.hourHeight * 24;
-        } else if (hour > 0) {
-            verticalOffset = (int) (config.hourHeight * hour);
-        }
+        // TODO: hour should be an int
+        hour = Math.min(hour, HOURS_PER_DAY);
+        int verticalOffset = (int) (config.hourHeight * hour);
 
-        // TODO: Code quality
-        if (verticalOffset > config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom) {
-            verticalOffset = (int) (config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom);
-        }
+        // TODO: Abstract away in WeekViewConfig
+        double dayHeight = config.hourHeight * HOURS_PER_DAY;
+        double viewHeight = getHeight();
+        double headerHeight = config.drawingConfig.headerHeight;
+        double totalHeaderPadding = config.headerRowPadding * 2;
+        double headerBottomMargin = config.drawingConfig.headerMarginBottom;
 
-        drawingConfig.currentOrigin.y = -verticalOffset;
+        double desiredOffset = dayHeight - viewHeight + headerHeight + totalHeaderPadding + headerBottomMargin;
+        verticalOffset = (int) Math.min(desiredOffset, verticalOffset);
+
+        config.drawingConfig.currentOrigin.y = -verticalOffset;
         invalidate();
     }
 
@@ -825,7 +803,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The first hour that is visible.
      */
     public double getFirstVisibleHour() {
-        return (drawingConfig.currentOrigin.y * -1) / config.hourHeight;
+        return (config.drawingConfig.currentOrigin.y * -1) / config.hourHeight;
     }
 
 }

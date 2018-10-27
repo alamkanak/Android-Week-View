@@ -7,12 +7,13 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 
 import com.alamkanak.weekview.R;
+import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
 
 import java.util.Calendar;
 
 public class WeekViewConfig {
 
-    private static WeekViewConfig INSTANCE;
+    public WeekViewDrawingConfig drawingConfig;
 
     public boolean showFirstDayOfWeekFirst = false;
 
@@ -103,6 +104,65 @@ public class WeekViewConfig {
         } finally {
             a.recycle();
         }
+    }
+
+    public void setNumberOfVisibleDays(int numberOfVisibleDays) {
+        this.numberOfVisibleDays = numberOfVisibleDays;
+        drawingConfig.resetOrigin();
+    }
+
+    public void setTextSize(int textSize) {
+        this.textSize = textSize;
+        drawingConfig.setTextSize(textSize);
+    }
+
+    public void setHeaderColumnTextColor(int textColor) {
+        headerColumnTextColor = textColor;
+        drawingConfig.setHeaderColumnTextColor(headerColumnTextColor);
+    }
+
+    public void setHeaderRowBackgroundColor(int headerRowBackgroundColor) {
+        this.headerRowBackgroundColor = headerRowBackgroundColor;
+        drawingConfig.headerBackgroundPaint.setColor(headerRowBackgroundColor);
+    }
+
+    public void setDayBackgroundColor(int dayBackgroundColor) {
+        this.dayBackgroundColor = dayBackgroundColor;
+        drawingConfig.dayBackgroundPaint.setColor(dayBackgroundColor);
+    }
+
+    public void setTodayBackgroundColor(int todayBackgroundColor) {
+        this.todayBackgroundColor = todayBackgroundColor;
+        drawingConfig.todayBackgroundPaint.setColor(todayBackgroundColor);
+    }
+
+    public void setHourSeparatorStrokeWidth(int hourSeparatorWidth) {
+        this.hourSeparatorStrokeWidth = hourSeparatorWidth;
+        drawingConfig.hourSeparatorPaint.setStrokeWidth(hourSeparatorWidth);
+    }
+
+    public void setTodayHeaderTextColor(int todayHeaderTextColor) {
+        this.todayHeaderTextColor = todayHeaderTextColor;
+        drawingConfig.todayHeaderTextPaint.setColor(todayHeaderTextColor);
+    }
+
+    public void setEventTextSize(int eventTextSize) {
+        this.eventTextSize = eventTextSize;
+        drawingConfig.eventTextPaint.setTextSize(eventTextSize);
+    }
+
+    public void setEventTextColor(int eventTextColor) {
+        this.eventTextColor = eventTextColor;
+        drawingConfig.eventTextPaint.setColor(eventTextColor);
+    }
+
+    public void setHeaderColumnBackgroundColor(int headerColumnBackgroundColor) {
+        this.headerColumnBackgroundColor = headerColumnBackgroundColor;
+        drawingConfig.headerColumnBackgroundPaint.setColor(headerColumnBackgroundColor);
+    }
+
+    public float getTotalDayWidth() {
+        return drawingConfig.widthPerDay + columnGap;
     }
 
     public boolean isSingleDay() {
