@@ -214,31 +214,36 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         List<WeekViewEvent> events = new ArrayList<>();
 
         // The first millisecond of the next day is still the same day. (no need to split events for this).
-        Calendar endTime = (Calendar) this.getEndTime().clone();
+        Calendar endTime = (Calendar) this.endTime.clone();
         endTime.add(Calendar.MILLISECOND, -1);
 
         if (!isSameDay(endTime)) {
-            endTime = (Calendar) this.getStartTime().clone();
+            // TODO: Code quality
+            endTime = (Calendar) startTime.clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(),
-                    this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
-            event1.setColor(this.getColor());
+
+            // TODO: Use Kotlin with copy(endTime = newEndTime)
+            WeekViewEvent event1 = new WeekViewEvent(id, name, location, startTime, endTime, isAllDay);
+            event1.setColor(color);
             events.add(event1);
 
             // Add other days.
-            Calendar otherDay = (Calendar) this.getStartTime().clone();
+            Calendar otherDay = (Calendar) startTime.clone();
             otherDay.add(Calendar.DATE, 1);
-            while (!DateUtils.isSameDay(otherDay, this.getEndTime())) {
+
+            // TODO: Code quality
+            while (!DateUtils.isSameDay(otherDay, this.endTime)) {
                 Calendar overDay = (Calendar) otherDay.clone();
                 overDay.set(Calendar.HOUR_OF_DAY, 0);
                 overDay.set(Calendar.MINUTE, 0);
+
                 Calendar endOfOverDay = (Calendar) overDay.clone();
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
-                WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(),
-                        null, overDay, endOfOverDay, this.isAllDay());
-                eventMore.setColor(this.getColor());
+
+                WeekViewEvent eventMore = new WeekViewEvent(id, name, null, overDay, endOfOverDay, isAllDay);
+                eventMore.setColor(color);
                 events.add(eventMore);
 
                 // Add next day.
@@ -246,12 +251,12 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             }
 
             // Add last day.
-            Calendar startTime = (Calendar) this.getEndTime().clone();
+            Calendar startTime = (Calendar) this.endTime.clone();
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(),
-                    this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
-            event2.setColor(this.getColor());
+
+            WeekViewEvent event2 = new WeekViewEvent(id, name, location, startTime, this.endTime, isAllDay);
+            event2.setColor(color);
             events.add(event2);
         } else {
             events.add(this);

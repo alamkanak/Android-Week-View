@@ -25,9 +25,15 @@ public class EventsDrawer {
         this.drawingConfig = drawingConfig;
     }
 
+    // TODO: Unify both methods?
+
     public void draw(List<EventRect> eventRects,
                      int width, int height,
                      Calendar date, float startFromPixel, Canvas canvas) {
+        if (eventRects == null) {
+            return;
+        }
+
         for (int i = 0; i < eventRects.size(); i++) {
             EventRect eventRect = eventRects.get(i);
             WeekViewEvent event = eventRect.event;
@@ -35,9 +41,11 @@ public class EventsDrawer {
                 continue;
             }
 
+            // TODO: Code quality
             // Calculate top.
             float top = config.hourHeight * 24 * eventRect.top / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
+            // TODO: Code quality
             // Calculate bottom.
             float bottom = eventRect.bottom;
             bottom = config.hourHeight * 24 * bottom / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - config.eventMarginVertical;
@@ -56,16 +64,16 @@ public class EventsDrawer {
             boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
             if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
                 right -= config.eventMarginHorizontal * 2;
-            } else if (config.numberOfVisibleDays == 1) {
-                right -= config.eventMarginHorizontal * 2;
             }
 
+            // TODO: Code quality
             // Draw the event and the event name on top of it.
             if (left < right
                     && left < width
                     && top < height
                     && right > drawingConfig.headerColumnWidth
                     && bottom > drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.timeTextHeight / 2 + drawingConfig.headerMarginBottom) {
+                // TODO: Code quality
                 eventRect.rectF = new RectF(left, top, right, bottom);
                 drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
                 canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
@@ -98,6 +106,7 @@ public class EventsDrawer {
 
             EventRect eventRect = eventRects.get(i);
 
+            // TODO: Code quality
             // Calculate top.
             float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + +drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
@@ -120,11 +129,13 @@ public class EventsDrawer {
             }
 
             // Draw the event and the event name on top of it.
+            // TODO: Code quality
             if (left < right &&
                     left < width &&
                     top < height &&
                     right > drawingConfig.headerColumnWidth &&
                     bottom > 0) {
+                // TODO: Code quality
                 eventRect.rectF = new RectF(left, top, right, bottom);
                 drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
                 canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
@@ -143,7 +154,7 @@ public class EventsDrawer {
      * @param canvas       The canvas to draw upon.
      * @param originalTop  The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
-     */
+     */ // TODO: Code quality (number of arguments
     private void drawEventTitle(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
         if (rect.right - rect.left - config.eventPadding * 2 < 0) return;
         if (rect.bottom - rect.top - config.eventPadding * 2 < 0) return;
@@ -164,6 +175,7 @@ public class EventsDrawer {
         int availableHeight = (int) (rect.bottom - originalTop - config.eventPadding * 2);
         int availableWidth = (int) (rect.right - originalLeft - config.eventPadding * 2);
 
+        // TODO: Code quality
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(stringBuilder, drawingConfig.eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
@@ -173,6 +185,7 @@ public class EventsDrawer {
             // Calculate available number of line counts.
             int availableLineCount = availableHeight / lineHeight;
             do {
+                // TODO: Code quality
                 // Ellipsize text to fit into event rect.
                 textLayout = new StaticLayout(TextUtils.ellipsize(stringBuilder, drawingConfig.eventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), drawingConfig.eventTextPaint, (int) (rect.right - originalLeft - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 

@@ -132,10 +132,26 @@ public class WeekViewDrawingConfig {
         currentOrigin = new PointF(0, 0);
     }
 
+    public void setTextSize(int textSize) {
+        todayHeaderTextPaint.setTextSize(textSize);
+        headerTextPaint.setTextSize(textSize);
+        timeTextPaint.setTextSize(textSize);
+    }
+
+    public void setHeaderColumnTextColor(int headerColumnTextColor) {
+        headerTextPaint.setColor(headerColumnTextColor);
+        timeTextPaint.setColor(headerColumnTextColor);
+    }
+
+    public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter, Context context) {
+        this.dateTimeInterpreter = dateTimeInterpreter;
+        initTextTimeWidth(context);
+    }
+
     /**
      * Initialize time column width. Calculate value with all possible hours (supposed widest text).
      */
-    public void initTextTimeWidth(Context context) {
+    private void initTextTimeWidth(Context context) {
         DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
         timeTextWidth = 0;
         for (int i = 0; i < 24; i++) {

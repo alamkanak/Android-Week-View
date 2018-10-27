@@ -11,15 +11,17 @@ import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.model.WeekViewViewState;
+import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
-import static com.alamkanak.weekview.utils.DateUtils.today;
 
 public class HeaderRowDrawer {
+
+    // TODO: Fix all-day events not shown on first loading
 
     private Listener listener;
 
@@ -52,6 +54,7 @@ public class HeaderRowDrawer {
         this.scrollListener = scrollListener;
     }
 
+    // TODO: Make just as high as text + padding, no extra bottom padding or something
     public float calculateHeaderHeight(List<EventRect> eventRects,
                                        int numberOfVisibleDays, Calendar firstVisibleDay) {
         if (eventRects == null || eventRects.isEmpty()) {
@@ -96,7 +99,7 @@ public class HeaderRowDrawer {
         drawConfig.headerHeight = calculateHeaderHeight(
                 data.eventRects, config.numberOfVisibleDays, viewState.firstVisibleDay);
 
-        Calendar today = today();
+        Calendar today = DateUtils.today();
 
         if (viewState.areDimensionsInvalid) {
             config.effectiveMinHourHeight = Math.max(config.minHourHeight, (int) ((height - drawConfig.headerHeight - config.headerRowPadding * 2 - drawConfig.headerMarginBottom) / 24));
@@ -253,8 +256,11 @@ public class HeaderRowDrawer {
 
             // Draw the line at the current time.
             if (config.showNowLine && sameDay) {
+                // TODO: Code quality
                 float startY = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom + drawConfig.currentOrigin.y;
                 Calendar now = Calendar.getInstance();
+
+                // TODO: Draw dot at the beginning of the line
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * config.hourHeight;
                 canvas.drawLine(start, startY + beforeNow, startPixel + drawConfig.widthPerDay, startY + beforeNow, drawConfig.nowLinePaint);
             }
@@ -267,17 +273,21 @@ public class HeaderRowDrawer {
         canvas.save();
 
         // Hide everything in the first cell (top left corner).
+        // TODO: Code quality
         canvas.clipRect(0, 0, drawConfig.timeTextWidth + config.headerColumnPadding * 2, drawConfig.headerHeight + config.headerRowPadding * 2);
 
+        // TODO: Code quality
         canvas.drawRect(0, 0, drawConfig.timeTextWidth + config.headerColumnPadding * 2, drawConfig.headerHeight + config.headerRowPadding * 2, drawConfig.headerBackgroundPaint);
 
         canvas.restore();
         canvas.save();
 
         // Clip to paint header row only.
+        // TODO: Code quality
         canvas.clipRect(drawConfig.headerColumnWidth, 0, width, drawConfig.headerHeight + config.headerRowPadding * 2);
 
         // Draw the header background.
+        // TODO: Code quality
         canvas.drawRect(0, 0, width, drawConfig.headerHeight + config.headerRowPadding * 2, drawConfig.headerBackgroundPaint);
 
         // Draw the header row texts.
@@ -296,15 +306,17 @@ public class HeaderRowDrawer {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
             }
 
+            // TODO: Code quality
             float x = startPixel + drawConfig.widthPerDay / 2;
             float y = drawConfig.headerTextHeight + config.headerRowPadding;
             Paint textPaint = sameDay ? drawConfig.todayHeaderTextPaint : drawConfig.headerTextPaint;
             canvas.drawText(dayLabel, x, y, textPaint);
 
-            if (config.numberOfVisibleDays == 1) {
+            if (config.isSingleDay()) {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
+            // TODO: Code quality
             eventsDrawer.drawAllDayEvents(data.eventRects, width, height, day, startPixel, canvas);
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
@@ -379,7 +391,7 @@ public class HeaderRowDrawer {
             outerLoop:
             for (List<EventRect> collisionGroup : collisionGroups) {
                 for (EventRect groupEvent : collisionGroup) {
-                    if (isEventsCollide(groupEvent.event, eventRect.event)
+                    if (groupEvent.event.collidesWith(eventRect.event)
                             && groupEvent.event.isAllDay() == eventRect.event.isAllDay()) {
                         collisionGroup.add(eventRect);
                         isPlaced = true;
@@ -463,21 +475,6 @@ public class HeaderRowDrawer {
                 j++;
             }
         }
-    }
-
-    /**
-     * Checks if two events overlap.
-     *
-     * @param event1 The first event.
-     * @param event2 The second event.
-     * @return true if the events overlap.
-     */
-    private boolean isEventsCollide(WeekViewEvent event1, WeekViewEvent event2) {
-        long start1 = event1.getStartTime().getTimeInMillis();
-        long end1 = event1.getEndTime().getTimeInMillis();
-        long start2 = event2.getStartTime().getTimeInMillis();
-        long end2 = event2.getEndTime().getTimeInMillis();
-        return !((start1 >= end2) || (end1 <= start2));
     }
 
     public interface Listener {

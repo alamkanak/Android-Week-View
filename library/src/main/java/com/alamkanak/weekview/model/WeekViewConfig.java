@@ -104,4 +104,8 @@ public class WeekViewConfig {
         }
     }
 
+    public boolean isSingleDay() {
+        return numberOfVisibleDays == 1;
+    }
+
 }

@@ -25,6 +25,7 @@ import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
 import com.alamkanak.weekview.scrolling.WeekViewScrollHandler;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
+import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.Calendar;
 
@@ -39,7 +40,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     private WeekViewConfig config;
-    private WeekViewDrawingConfig drawingConfig;
+    private WeekViewDrawingConfig drawingConfig; // TODO: Unify with WeekViewConfig
 
     private WeekViewViewState viewState;
     private WeekViewScrollHandler scrollHandler;
@@ -121,7 +122,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     @Override
     public void invalidate() {
         super.invalidate();
-        viewState.areDimensionsInvalid = true;
+        viewState.invalidate();
     }
 
     /////////////////////////////////////////////////////////////////
@@ -171,6 +172,8 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
         scrollHandler.weekViewLoader = weekViewLoader;
+
+        // TODO: Look for other solution
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
     }
 
@@ -200,6 +203,8 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     public void setScrollListener(ScrollListener scrolledListener) {
         scrollHandler.scrollListener = scrolledListener;
+
+        // TODO: Look for other solution
         headerRowDrawer.setScrollListener(scrolledListener);
     }
 
@@ -222,10 +227,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param dateTimeInterpreter The date, time interpreter.
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
-        drawingConfig.dateTimeInterpreter = dateTimeInterpreter;
-
-        // Refresh time column width
-        drawingConfig.initTextTimeWidth(getContext());
+        drawingConfig.setDateTimeInterpreter(dateTimeInterpreter, getContext());
     }
 
 
@@ -244,6 +246,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
+        // TODO: Look for other solution
         config.numberOfVisibleDays = numberOfVisibleDays;
         drawingConfig.resetOrigin();
         invalidate();
@@ -303,9 +306,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     public void setTextSize(int textSize) {
         config.textSize = textSize;
-        drawingConfig.todayHeaderTextPaint.setTextSize(textSize);
-        drawingConfig.headerTextPaint.setTextSize(textSize);
-        drawingConfig.timeTextPaint.setTextSize(textSize);
+        drawingConfig.setTextSize(textSize);
         invalidate();
     }
 
@@ -324,8 +325,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     public void setHeaderColumnTextColor(int headerColumnTextColor) {
         config.headerColumnTextColor = headerColumnTextColor;
-        drawingConfig.headerTextPaint.setColor(headerColumnTextColor);
-        drawingConfig.timeTextPaint.setColor(headerColumnTextColor);
+        drawingConfig.setHeaderColumnTextColor(headerColumnTextColor);
         invalidate();
     }
 
@@ -764,12 +764,9 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
         viewState.shouldRefreshEvents = true;
 
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
+        Calendar today = DateUtils.today();
 
+        // TODO: Code quality
         long day = 1000L * 60L * 60L * 24L;
         long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
         long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
@@ -804,6 +801,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
             verticalOffset = (int) (config.hourHeight * hour);
         }
 
+        // TODO: Code quality
         if (verticalOffset > config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom) {
             verticalOffset = (int) (config.hourHeight * 24 - getHeight() + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom);
         }

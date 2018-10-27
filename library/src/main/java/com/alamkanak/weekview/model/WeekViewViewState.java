@@ -15,4 +15,8 @@ public class WeekViewViewState {
 
     public boolean shouldRefreshEvents;
 
+    public void invalidate() {
+        areDimensionsInvalid = false;
+    }
+
 }
