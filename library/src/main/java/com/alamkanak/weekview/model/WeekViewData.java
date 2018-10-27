@@ -8,10 +8,10 @@ import java.util.List;
 
 public class WeekViewData {
 
-    public List<EventChip> eventChips;
+    private List<EventChip> eventChips;
 
-    public List<EventChip> normalEventChips;
-    public List<EventChip> allDayEventChips;
+    private List<EventChip> normalEventChips;
+    private List<EventChip> allDayEventChips;
 
     public List<? extends WeekViewEvent> previousPeriodEvents;
     public List<? extends WeekViewEvent> currentPeriodEvents;
@@ -29,6 +29,7 @@ public class WeekViewData {
 
     // TODO: Use this
     public void setEventChips(List<EventChip> eventChips) {
+        this.eventChips = eventChips;
         normalEventChips = new ArrayList<>();
         allDayEventChips = new ArrayList<>();
 
@@ -39,6 +40,18 @@ public class WeekViewData {
                 normalEventChips.add(eventChip);
             }
         }
+    }
+
+    public List<EventChip> getAllEventChips() {
+        return eventChips;
+    }
+
+    public List<EventChip> getNormalEventChips() {
+        return normalEventChips;
+    }
+
+    public List<EventChip> getAllDayEventChips() {
+        return allDayEventChips;
     }
 
     /**

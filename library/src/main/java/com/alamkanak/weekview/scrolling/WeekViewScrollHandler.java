@@ -190,8 +190,9 @@ public class WeekViewScrollHandler {
             // TODO: Potential for perf improvement
 
             // If the tap was on an event then trigger the callback.
-            if (data.eventChips != null && eventClickListener != null) {
-                List<EventChip> reversedEventChips = data.eventChips;
+            if (data.getAllEventChips() != null && eventClickListener != null) {
+                // TODO: Use ID of event or internal ID
+                List<EventChip> reversedEventChips = data.getAllEventChips();
                 Collections.reverse(reversedEventChips);
                 for (EventChip event : reversedEventChips) {
                     if (event.isHit(e)) {
@@ -216,9 +217,10 @@ public class WeekViewScrollHandler {
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
 
-            if (eventLongPressListener != null && data.eventChips != null) {
-                List<EventChip> reversedEventChips = data.eventChips;
+            if (data.getAllEventChips() != null && eventLongPressListener != null) {
+                List<EventChip> reversedEventChips = data.getAllEventChips();
                 Collections.reverse(reversedEventChips);
+                
                 for (EventChip event : reversedEventChips) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);

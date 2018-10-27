@@ -48,7 +48,7 @@ public class WeekViewLoaderHelper {
             }
 
             // Clear events.
-            data.eventChips.clear();
+            data.getAllEventChips().clear();
             data.sortAndCacheEvents(previousPeriodEvents);
             data.sortAndCacheEvents(currentPeriodEvents);
             data.sortAndCacheEvents(nextPeriodEvents);

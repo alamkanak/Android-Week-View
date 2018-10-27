@@ -107,7 +107,7 @@ public class HeaderRowDrawer {
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
 
         drawConfig.headerHeight = calculateHeaderHeight(
-                data.eventChips, config.numberOfVisibleDays, viewState.firstVisibleDay);
+                data.getAllDayEventChips(), config.numberOfVisibleDays, viewState.firstVisibleDay);
 
         Calendar today = DateUtils.today();
 
@@ -179,8 +179,8 @@ public class HeaderRowDrawer {
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for event rectangles.
-        if (data.eventChips != null) {
-            for (EventChip eventChip : data.eventChips) {
+        if (data.getAllEventChips() != null) {
+            for (EventChip eventChip : data.getAllEventChips()) {
                 eventChip.rectF = null;
             }
         }
@@ -219,7 +219,7 @@ public class HeaderRowDrawer {
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
             // TODO: Cleanup
-            if (data.eventChips == null || viewState.shouldRefreshEvents ||
+            if (data.getAllEventChips() == null || viewState.shouldRefreshEvents ||
                     (dayNumber == leftDaysWithGaps + 1 && data.fetchedPeriod != (int) weekViewLoader.toWeekViewPeriodIndex(day) &&
                             Math.abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
                 getMoreEvents(view, day);
@@ -236,7 +236,7 @@ public class HeaderRowDrawer {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
-            eventsDrawer.drawEvents(data.eventChips, width, height, day, startPixel, canvas);
+            eventsDrawer.drawEvents(data.getNormalEventChips(), width, height, day, startPixel, canvas);
 
             // Draw the line at the current time.
             if (config.showNowLine && sameDay) {
@@ -295,7 +295,7 @@ public class HeaderRowDrawer {
             }
 
             // TODO: Code quality
-            eventsDrawer.drawAllDayEvents(data.eventChips, day, startPixel, canvas);
+            eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), day, startPixel, canvas);
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
     }
@@ -309,8 +309,8 @@ public class HeaderRowDrawer {
      */
     private void getMoreEvents(View view, Calendar day) {
         // Get more events if the month is changed.
-        if (data.eventChips == null) {
-            data.eventChips = new ArrayList<>();
+        if (data.getAllEventChips() == null) {
+            data.setEventChips(new ArrayList<EventChip>()); // = new ArrayList<>();
         }
 
         if (weekViewLoader == null && !view.isInEditMode()) {
@@ -327,12 +327,13 @@ public class HeaderRowDrawer {
         }
 
         // Prepare to calculate positions of each events.
-        List<EventChip> tempEvents = data.eventChips;
-        data.eventChips = new ArrayList<>();
+        List<EventChip> tempEvents = data.getAllEventChips();
+        List<EventChip> results = new ArrayList<>();
+        //data.setEventChips(new ArrayList<EventChip>()); //.eventChips = new ArrayList<>();
 
         // Iterate through each day with events to calculate the position of the events.
         while (!tempEvents.isEmpty()) {
-            ArrayList<EventChip> eventChips = new ArrayList<>(tempEvents.size());
+            List<EventChip> eventChips = new ArrayList<>();
 
             // Get first event for a day.
             EventChip firstRect = tempEvents.remove(0);
@@ -351,7 +352,10 @@ public class HeaderRowDrawer {
                 }
             }
             computePositionOfEvents(eventChips);
+            results.addAll(eventChips);
         }
+
+        data.setEventChips(results);
     }
 
     /**
@@ -448,7 +452,7 @@ public class HeaderRowDrawer {
                         eventChip.bottom = config.allDayEventHeight;
                     }
 
-                    data.eventChips.add(eventChip);
+                    //data.getAllEventChips().add(eventChip);
                 }
                 j++;
             }
