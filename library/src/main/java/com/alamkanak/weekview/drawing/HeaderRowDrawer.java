@@ -237,7 +237,7 @@ public class HeaderRowDrawer {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
-            eventsDrawer.drawEvents(data.getNormalEventChips(), width, height, day, startPixel, canvas);
+            eventsDrawer.drawEvents(data.getNormalEventChips(), day, startPixel, canvas);
 
             // Draw the line at the current time.
             if (config.showNowLine && sameDay) {

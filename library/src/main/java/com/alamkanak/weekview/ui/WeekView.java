@@ -82,7 +82,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         config.drawingConfig = new WeekViewDrawingConfig(context, config);
         scrollHandler = new WeekViewScrollHandler(context, this, config, config.drawingConfig, data);
 
-        EventsDrawer eventsDrawer = new EventsDrawer(config, config.drawingConfig);
+        EventsDrawer eventsDrawer = new EventsDrawer(config);
         timeColumnDrawer = new TimeColumnDrawer(config, config.drawingConfig);
 
         headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, config.drawingConfig, data, viewState);

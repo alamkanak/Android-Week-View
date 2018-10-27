@@ -20,15 +20,17 @@ public class EventsDrawer {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
+    private EventChipRectCalculator chipRectCalculator;
 
-    public EventsDrawer(WeekViewConfig config, WeekViewDrawingConfig drawingConfig) {
+    public EventsDrawer(WeekViewConfig config) {
         this.config = config;
-        this.drawingConfig = drawingConfig;
+        this.drawingConfig = config.drawingConfig;
+        this.chipRectCalculator = new EventChipRectCalculator(config);
     }
 
     // TODO: Unify both methods?
 
-    void drawEvents(List<EventChip> eventChips, int width, int height,
+    void drawEvents(List<EventChip> eventChips,
                     Calendar date, float startFromPixel, Canvas canvas) {
         if (eventChips == null) {
             return;
@@ -37,49 +39,16 @@ public class EventsDrawer {
         for (int i = 0; i < eventChips.size(); i++) {
             EventChip eventChip = eventChips.get(i);
             WeekViewEvent event = eventChip.event;
-            if (!event.isSameDay(date) || event.isAllDay()) {
+            if (!event.isSameDay(date)) {
                 continue;
             }
 
-            // TODO: Code quality
-            // Calculate top.
-            float top = config.hourHeight * 24 * eventChip.top / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
-
-            // TODO: Fix white bar at top of screen
-
-            // TODO: Code quality
-            // Calculate bottom.
-            float bottom = eventChip.bottom;
-            bottom = config.hourHeight * 24 * bottom / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - config.eventMarginVertical;
-
-            // Calculate left and right.
-            float left = startFromPixel + eventChip.left * drawingConfig.widthPerDay;
-            if (left < startFromPixel) {
-                left += config.overlappingEventGap;
-            }
-
-            float right = left + eventChip.width * drawingConfig.widthPerDay;
-            if (right < startFromPixel + drawingConfig.widthPerDay) {
-                right -= config.overlappingEventGap;
-            }
-
-            boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
-            if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
-                right -= config.eventMarginHorizontal * 2;
-            }
-
-            // TODO: Code quality
-            // Draw the event and the event name on top of it.
-            if (left < right
-                    && left < width
-                    && top < height
-                    && right > drawingConfig.headerColumnWidth
-                    && bottom > drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.timeTextHeight / 2 + drawingConfig.headerMarginBottom) {
-                // TODO: Code quality
-                eventChip.rectF = new RectF(left, top, right, bottom);
+            RectF chipRect = chipRectCalculator.calculate(eventChip, startFromPixel);
+            if (isValidSingleEventRect(chipRect)) {
+                eventChip.rectF = chipRect;
                 drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
                 canvas.drawRoundRect(eventChip.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
-                drawEventTitle(event, eventChip.rectF, canvas, top, left);
+                drawEventTitle(event, eventChip.rectF, canvas, eventChip.rectF.top, eventChip.rectF.left);
             } else {
                 eventChip.rectF = null;
             }
@@ -100,16 +69,17 @@ public class EventsDrawer {
         }
 
         for (int i = 0; i < eventChips.size(); i++) {
-            WeekViewEvent event = eventChips.get(i).event;
-            if (!event.isSameDay(date) || !event.isAllDay()) {
+            EventChip eventChip = eventChips.get(i);
+            WeekViewEvent event = eventChip.event;
+            if (!event.isSameDay(date)) {
                 continue;
             }
 
-            EventChip eventChip = eventChips.get(i);
+            //RectF chipRect = chipRectCalculator.calculateAllDay(eventChip, startFromPixel);
 
             // TODO: Code quality
             // Calculate top.
-            float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + +drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
+            float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
             // Calculate bottom.
             float bottom = top + eventChip.bottom;
@@ -124,29 +94,20 @@ public class EventsDrawer {
                 right -= config.overlappingEventGap;
             }
 
-            //boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
-            if (config.numberOfVisibleDays == 1) {
+            boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
+            if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
                 right -= config.eventMarginHorizontal * 2;
             }
 
             // Draw the event and the event name on top of it.
             // TODO: Code quality
-            if (isValidRect(left, top, right, bottom)) {
-                // TODO: Code quality
-                // TODO: Fix height of rects
-
-                /* TODO
-                 * 1. Calculate text height with pre-set rect height
-                 * 2. Update rect height with new text height
-                 */
-
+            if (isValidAllDayEventRect(left, top, right, bottom)) {
                 // TODO: What if multiple all-day events?
 
                 RectF initialRect = new RectF(left, top, right, bottom);
                 int lineHeight = calculateTextHeight(event, initialRect, top, left);
                 int chipHeight = lineHeight + (config.eventPadding * 2) + 1;
 
-                //int lineHeight = drawEventTitle(event, eventRect.rectF, canvas, top, left);
                 eventChip.rectF = new RectF(left, top, right, top + chipHeight);
                 drawingConfig.setEventBackgroundColorOrDefault(event);
                 canvas.drawRoundRect(eventChip.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
@@ -157,7 +118,19 @@ public class EventsDrawer {
         }
     }
 
-    private boolean isValidRect(float left, float top, float right, float bottom) {
+    private boolean isValidSingleEventRect(RectF rect) {
+        float totalHeaderHeight = drawingConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawingConfig.headerMarginBottom;
+
+        return rect.left < rect.right
+                && rect.left < WeekView.getViewWidth()
+                && rect.top < WeekView.getViewHeight()
+                && rect.right > drawingConfig.headerColumnWidth
+                && rect.bottom > totalHeaderHeight + drawingConfig.timeTextHeight / 2;
+    }
+
+    private boolean isValidAllDayEventRect(float left, float top, float right, float bottom) {
         return left < right
                 && left < WeekView.getViewWidth()
                 && top < WeekView.getViewHeight()
