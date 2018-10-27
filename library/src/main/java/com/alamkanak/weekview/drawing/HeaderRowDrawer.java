@@ -464,7 +464,7 @@ public class HeaderRowDrawer {
 
         void goToDate(Calendar date);
 
-        void goToHour(double hour);
+        void goToHour(int hour);
 
     }
 

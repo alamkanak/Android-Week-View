@@ -71,7 +71,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
             }
 
             @Override
-            public void goToHour(double hour) {
+            public void goToHour(int hour) {
                 WeekView.this.goToHour(hour);
             }
         };
@@ -773,15 +773,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      *
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
-    public void goToHour(double hour) {
+    public void goToHour(int hour) {
         if (viewState.areDimensionsInvalid) {
             viewState.scrollToHour = hour;
             return;
         }
 
-        // TODO: hour should be an int
-        hour = Math.min(hour, HOURS_PER_DAY);
-        int verticalOffset = (int) (config.hourHeight * hour);
+        hour = (int) Math.min(hour, HOURS_PER_DAY);
+        int verticalOffset = config.hourHeight * hour;
 
         // TODO: Abstract away in WeekViewConfig
         double dayHeight = config.hourHeight * HOURS_PER_DAY;

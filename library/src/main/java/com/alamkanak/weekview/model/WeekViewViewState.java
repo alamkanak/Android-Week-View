@@ -5,7 +5,7 @@ import java.util.Calendar;
 public class WeekViewViewState {
 
     public Calendar scrollToDay = null;
-    public double scrollToHour = -1;
+    public int scrollToHour = -1;
 
     public boolean isFirstDraw = true;
     public boolean areDimensionsInvalid = true;
