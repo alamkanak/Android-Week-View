@@ -11,6 +11,7 @@ import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.model.WeekViewViewState;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
+import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MINUTE;
 
 public class HeaderRowDrawer {
 
@@ -55,8 +58,8 @@ public class HeaderRowDrawer {
     }
 
     // TODO: Make just as high as text + padding, no extra bottom padding or something
-    public float calculateHeaderHeight(List<EventRect> eventRects,
-                                       int numberOfVisibleDays, Calendar firstVisibleDay) {
+    private float calculateHeaderHeight(List<EventRect> eventRects,
+                                        int numberOfVisibleDays, Calendar firstVisibleDay) {
         if (eventRects == null || eventRects.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
@@ -81,15 +84,22 @@ public class HeaderRowDrawer {
         }
 
         if (containsAllDayEvent) {
-            return drawConfig.headerTextHeight + (config.allDayEventHeight + drawConfig.headerMarginBottom);
+            float headerTextSize = drawConfig.eventTextPaint.getTextSize();
+            float totalEventPadding = config.eventPadding * 2;
+            return drawConfig.headerTextHeight + (headerTextSize + totalEventPadding + drawConfig.headerMarginBottom);
+
+            // TODO: Make adapt to number of all-day events
+
+            //return drawConfig.headerTextHeight + (config.allDayEventHeight + drawConfig.headerMarginBottom);
         } else {
             return drawConfig.headerTextHeight;
         }
     }
 
+    // TODO: Break up into multiple methods
     public void drawHeaderRowAndEvents(View view, Canvas canvas) {
-        int width = view.getWidth();
-        int height = view.getHeight();
+        int width = WeekView.getViewWidth();
+        int height = WeekView.getViewHeight();
 
         // Calculate the available width for each day.
         drawConfig.headerColumnWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
@@ -118,6 +128,7 @@ public class HeaderRowDrawer {
             viewState.scrollToHour = -1;
             viewState.areDimensionsInvalid = false;
         }
+
         if (viewState.isFirstDraw) {
             viewState.isFirstDraw = false;
 
@@ -161,7 +172,7 @@ public class HeaderRowDrawer {
         Calendar day = (Calendar) today.clone();
         day.add(Calendar.HOUR, 6);
 
-        // Prepare to iterate for each hour to draw the hour lines.
+        // Prepare to iterate for each hour to drawTimeColumn the hour lines.
         int lineCount = (int) ((height - drawConfig.headerHeight - config.headerRowPadding * 2 -
                 drawConfig.headerMarginBottom) / config.hourHeight) + 1;
         lineCount = (lineCount) * (config.numberOfVisibleDays + 1);
@@ -187,6 +198,13 @@ public class HeaderRowDrawer {
             scrollListener.onFirstVisibleDayChanged(viewState.firstVisibleDay, oldFirstVisibleDay);
         }
 
+        DayBackgroundDrawer dayBackgroundDrawer = new DayBackgroundDrawer(config, drawConfig);
+        BackgroundGridDrawer backgroundGridDrawer = new BackgroundGridDrawer(config, drawConfig);
+        NowLineDrawer nowLineDrawer = new NowLineDrawer(config, drawConfig);
+
+        // TODO: Filter eventRects and allDayEventRects
+
+        // TODO: Cleanup
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + config.numberOfVisibleDays + 1;
              dayNumber++) {
@@ -200,6 +218,7 @@ public class HeaderRowDrawer {
 
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
+            // TODO: Cleanup
             if (data.eventRects == null || viewState.shouldRefreshEvents ||
                     (dayNumber == leftDaysWithGaps + 1 && data.fetchedPeriod != (int) weekViewLoader.toWeekViewPeriodIndex(day) &&
                             Math.abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
@@ -207,62 +226,21 @@ public class HeaderRowDrawer {
                 viewState.shouldRefreshEvents = false;
             }
 
-            // Draw background color for each day.
-            float start = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
-            if (drawConfig.widthPerDay + startPixel - start > 0) {
-                if (config.showDistinctPastFutureColor) {
-                    boolean isWeekend = day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
-                    Paint pastPaint = isWeekend && config.showDistinctWeekendColor ? drawConfig.pastWeekendBackgroundPaint : drawConfig.pastBackgroundPaint;
-                    Paint futurePaint = isWeekend && config.showDistinctWeekendColor ? drawConfig.futureWeekendBackgroundPaint : drawConfig.futureBackgroundPaint;
-                    float startY = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom + drawConfig.currentOrigin.y;
+            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+            dayBackgroundDrawer.drawDayBackground(day, height, startX, startPixel, canvas);
+            backgroundGridDrawer.drawGrid(hourLines, height, startX, startPixel, canvas);
 
-                    if (sameDay) {
-                        Calendar now = Calendar.getInstance();
-                        float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * config.hourHeight;
-                        canvas.drawRect(start, startY, startPixel + drawConfig.widthPerDay, startY + beforeNow, pastPaint);
-                        canvas.drawRect(start, startY + beforeNow, startPixel + drawConfig.widthPerDay, height, futurePaint);
-                    } else if (day.before(today)) {
-                        canvas.drawRect(start, startY, startPixel + drawConfig.widthPerDay, height, pastPaint);
-                    } else {
-                        canvas.drawRect(start, startY, startPixel + drawConfig.widthPerDay, height, futurePaint);
-                    }
-                } else {
-                    canvas.drawRect(start, drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom, startPixel + drawConfig.widthPerDay, height, sameDay ? drawConfig.todayBackgroundPaint : drawConfig.dayBackgroundPaint);
-                }
-            }
-
-            // Prepare the separator lines for hours.
-            int i = 0;
-            for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
-                float top = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.currentOrigin.y + config.hourHeight * hourNumber + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom;
-                if (top > drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom - config.hourSeparatorStrokeWidth && top < height && startPixel + drawConfig.widthPerDay - start > 0) {
-                    hourLines[i * 4] = start;
-                    hourLines[i * 4 + 1] = top;
-                    hourLines[i * 4 + 2] = startPixel + drawConfig.widthPerDay;
-                    hourLines[i * 4 + 3] = top;
-                    i++;
-                }
-            }
-
-            // Draw the lines for hours.
-            canvas.drawLines(hourLines, drawConfig.hourSeparatorPaint);
-
-            // Draw the events.
-            if (config.numberOfVisibleDays == 1) {
+            if (config.isSingleDay()) {
+                // Add a margin at the start if we're in day view. Otherwise, screen space is too
+                // precious and we refrain from doing so.
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
-            eventsDrawer.draw(data.eventRects, width, height, day, startPixel, canvas);
+            eventsDrawer.drawEvents(data.eventRects, width, height, day, startPixel, canvas);
 
             // Draw the line at the current time.
             if (config.showNowLine && sameDay) {
-                // TODO: Code quality
-                float startY = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom + drawConfig.currentOrigin.y;
-                Calendar now = Calendar.getInstance();
-
-                // TODO: Draw dot at the beginning of the line
-                float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * config.hourHeight;
-                canvas.drawLine(start, startY + beforeNow, startPixel + drawConfig.widthPerDay, startY + beforeNow, drawConfig.nowLinePaint);
+                nowLineDrawer.drawLine(startX, startPixel, canvas);
             }
 
             // In the next iteration, start from the next day.
@@ -298,7 +276,7 @@ public class HeaderRowDrawer {
             // Check if the day is today.
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            boolean sameDay = isSameDay(day, today);
+            boolean isSameDay = isSameDay(day, today);
 
             // Draw the day labels.
             String dayLabel = drawConfig.dateTimeInterpreter.interpretDate(day);
@@ -306,10 +284,10 @@ public class HeaderRowDrawer {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
             }
 
-            // TODO: Code quality
+            // TODO: Code quality (Move to DayLabelDrawer?)
             float x = startPixel + drawConfig.widthPerDay / 2;
             float y = drawConfig.headerTextHeight + config.headerRowPadding;
-            Paint textPaint = sameDay ? drawConfig.todayHeaderTextPaint : drawConfig.headerTextPaint;
+            Paint textPaint = isSameDay ? drawConfig.todayHeaderTextPaint : drawConfig.headerTextPaint;
             canvas.drawText(dayLabel, x, y, textPaint);
 
             if (config.isSingleDay()) {
@@ -317,7 +295,7 @@ public class HeaderRowDrawer {
             }
 
             // TODO: Code quality
-            eventsDrawer.drawAllDayEvents(data.eventRects, width, height, day, startPixel, canvas);
+            eventsDrawer.drawAllDayEvents(data.eventRects, day, startPixel, canvas);
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
     }
@@ -461,10 +439,10 @@ public class HeaderRowDrawer {
                     eventRect.left = j / columns.size();
 
                     if (!eventRect.event.isAllDay()) {
-                        eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60
-                                + eventRect.event.getStartTime().get(Calendar.MINUTE);
-                        eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60
-                                + eventRect.event.getEndTime().get(Calendar.MINUTE);
+                        eventRect.top = eventRect.event.getStartTime().get(HOUR_OF_DAY) * 60
+                                + eventRect.event.getStartTime().get(MINUTE);
+                        eventRect.bottom = eventRect.event.getEndTime().get(HOUR_OF_DAY) * 60
+                                + eventRect.event.getEndTime().get(MINUTE);
                     } else {
                         eventRect.top = 0;
                         eventRect.bottom = config.allDayEventHeight;
@@ -481,7 +459,7 @@ public class HeaderRowDrawer {
 
         void goToDate(Calendar date);
 
-        void goToHour(double hour); // TODO: Use JodaTime for this
+        void goToHour(double hour);
 
     }
 

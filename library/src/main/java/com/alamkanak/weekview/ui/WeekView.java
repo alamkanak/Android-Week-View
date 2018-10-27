@@ -35,6 +35,9 @@ import java.util.Calendar;
  */
 public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
+    private static int width;
+    private static int height;
+
     public enum Direction {
         NONE, LEFT, RIGHT, VERTICAL
     }
@@ -85,18 +88,29 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
 
     }
 
+    public static int getViewWidth() {
+        return width;
+    }
+
+    public static int getViewHeight() {
+        return height;
+    }
+
     // fix rotation changes
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         viewState.areDimensionsInvalid = true;
+
+        WeekView.width = width;
+        WeekView.height = height;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
-        timeColumnDrawer.draw(canvas, getHeight());
+        timeColumnDrawer.drawTimeColumn(canvas);
     }
 
     @Override
@@ -107,11 +121,6 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     @Override
     public void onScrolled() {
         postInvalidateOnAnimation();
-    }
-
-    @Override
-    public int getViewHeight() {
-        return getHeight();
     }
 
     @Override

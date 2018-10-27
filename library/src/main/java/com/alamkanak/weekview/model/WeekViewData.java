@@ -2,12 +2,16 @@ package com.alamkanak.weekview.model;
 
 import com.alamkanak.weekview.drawing.EventRect;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class WeekViewData {
 
     public List<EventRect> eventRects;
+
+    public List<EventRect> normalEventRects;
+    public List<EventRect> allDayEventRects;
 
     public List<? extends WeekViewEvent> previousPeriodEvents;
     public List<? extends WeekViewEvent> currentPeriodEvents;
@@ -21,6 +25,20 @@ public class WeekViewData {
         currentPeriodEvents = null;
         nextPeriodEvents = null;
         fetchedPeriod = -1;
+    }
+
+    // TODO: Use this
+    public void setEventRects(List<EventRect> eventRects) {
+        normalEventRects = new ArrayList<>();
+        allDayEventRects = new ArrayList<>();
+
+        for (EventRect eventRect : eventRects) {
+            if (eventRect.event.isAllDay()) {
+                allDayEventRects.add(eventRect);
+            } else {
+                normalEventRects.add(eventRect);
+            }
+        }
     }
 
     /**

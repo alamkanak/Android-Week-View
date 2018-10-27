@@ -12,6 +12,8 @@ import java.util.Calendar;
 
 public class WeekViewConfig {
 
+    private static WeekViewConfig INSTANCE;
+
     public boolean showFirstDayOfWeekFirst = false;
 
     public int hourHeight = 50;
@@ -26,7 +28,7 @@ public class WeekViewConfig {
     public int numberOfVisibleDays = 3;
     public int headerRowPadding = 10;
     public int headerRowBackgroundColor = Color.WHITE;
-    public int dayBackgroundColor = Color.rgb(245, 245, 245);
+    public int dayBackgroundColor = Color.rgb(255, 255, 255);
     public int pastBackgroundColor = Color.rgb(227, 227, 227);
     public int futureBackgroundColor = Color.rgb(245, 245, 245);
     public int pastWeekendBackgroundColor = 0;
@@ -34,7 +36,7 @@ public class WeekViewConfig {
     public int nowLineColor = Color.rgb(102, 102, 102);
     public int nowLineThickness = 5;
     public int hourSeparatorColor = Color.rgb(230, 230, 230);
-    public int todayBackgroundColor = Color.rgb(239, 247, 254);
+    public int todayBackgroundColor = Color.rgb(255, 255, 255);
     public int hourSeparatorStrokeWidth = 2;
     public int todayHeaderTextColor = Color.rgb(39, 137, 228);
     public int eventTextSize = 12;

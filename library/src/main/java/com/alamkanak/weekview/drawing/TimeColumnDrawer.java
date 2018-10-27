@@ -3,6 +3,7 @@ package com.alamkanak.weekview.drawing;
 import android.graphics.Canvas;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.ui.WeekView;
 
 public class TimeColumnDrawer {
 
@@ -14,8 +15,9 @@ public class TimeColumnDrawer {
         this.drawingConfig = drawingConfig;
     }
 
-    public void draw(Canvas canvas, int bottom) {
+    public void drawTimeColumn(Canvas canvas) {
         float top = drawingConfig.headerHeight + config.headerRowPadding * 2;
+        int bottom = WeekView.getViewHeight();
 
         // Draw the background color for the header column.
         canvas.drawRect(0, top, drawingConfig.headerColumnWidth, bottom, drawingConfig.headerColumnBackgroundPaint);
@@ -31,8 +33,10 @@ public class TimeColumnDrawer {
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
             String time = drawingConfig.dateTimeInterpreter.interpretTime(i);
-            if (time == null)
+            if (time == null) {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+            }
+
             if (top < bottom) {
                 float x = drawingConfig.timeTextWidth + config.headerColumnPadding;
                 float y = top + drawingConfig.timeTextHeight;

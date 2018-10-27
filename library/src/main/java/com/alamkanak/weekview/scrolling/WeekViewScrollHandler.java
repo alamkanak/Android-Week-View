@@ -173,10 +173,10 @@ public class WeekViewScrollHandler {
             switch (currentFlingDirection) {
                 case LEFT:
                 case RIGHT:
-                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, (int) (velocityX * config.xScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
+                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, (int) (velocityX * config.xScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - WeekView.getViewHeight()), 0);
                     break;
                 case VERTICAL:
-                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
+                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - WeekView.getViewHeight()), 0);
                     break;
             }
 
@@ -187,12 +187,14 @@ public class WeekViewScrollHandler {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            // TODO: Potential for perf improvement
+
             // If the tap was on an event then trigger the callback.
             if (data.eventRects != null && eventClickListener != null) {
                 List<EventRect> reversedEventRects = data.eventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
-                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+                    if (event.isHit(e)) {
                         eventClickListener.onEventClick(event.originalEvent, event.rectF);
                         return super.onSingleTapConfirmed(e);
                     }
@@ -345,7 +347,6 @@ public class WeekViewScrollHandler {
     public interface Listener {
         void onScaled();
         void onScrolled();
-        int getViewHeight();
         void performHapticFeedback();
     }
 

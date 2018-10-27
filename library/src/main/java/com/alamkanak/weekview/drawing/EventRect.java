@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.RectF;
+import android.view.MotionEvent;
 
 import com.alamkanak.weekview.model.WeekViewEvent;
 
@@ -38,6 +39,17 @@ public class EventRect {
         this.event = event;
         this.rectF = rectF;
         this.originalEvent = originalEvent;
+    }
+
+    public boolean isHit(MotionEvent e) {
+        if (rectF == null) {
+            return false;
+        }
+
+        return e.getX() > rectF.left
+                && e.getX() < rectF.right
+                && e.getY() > rectF.top
+                && e.getY() < rectF.bottom;
     }
 
 }

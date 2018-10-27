@@ -162,12 +162,12 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(this, "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Clicked " + event.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(this, "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Long pressed event: " + event.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
