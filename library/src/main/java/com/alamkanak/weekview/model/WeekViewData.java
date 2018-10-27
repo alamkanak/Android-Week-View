@@ -1,6 +1,6 @@
 package com.alamkanak.weekview.model;
 
-import com.alamkanak.weekview.drawing.EventRect;
+import com.alamkanak.weekview.drawing.EventChip;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +8,10 @@ import java.util.List;
 
 public class WeekViewData {
 
-    public List<EventRect> eventRects;
+    public List<EventChip> eventChips;
 
-    public List<EventRect> normalEventRects;
-    public List<EventRect> allDayEventRects;
+    public List<EventChip> normalEventChips;
+    public List<EventChip> allDayEventChips;
 
     public List<? extends WeekViewEvent> previousPeriodEvents;
     public List<? extends WeekViewEvent> currentPeriodEvents;
@@ -20,7 +20,7 @@ public class WeekViewData {
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
     public void clear() {
-        eventRects.clear();
+        eventChips.clear();
         previousPeriodEvents = null;
         currentPeriodEvents = null;
         nextPeriodEvents = null;
@@ -28,15 +28,15 @@ public class WeekViewData {
     }
 
     // TODO: Use this
-    public void setEventRects(List<EventRect> eventRects) {
-        normalEventRects = new ArrayList<>();
-        allDayEventRects = new ArrayList<>();
+    public void setEventChips(List<EventChip> eventChips) {
+        normalEventChips = new ArrayList<>();
+        allDayEventChips = new ArrayList<>();
 
-        for (EventRect eventRect : eventRects) {
-            if (eventRect.event.isAllDay()) {
-                allDayEventRects.add(eventRect);
+        for (EventChip eventChip : eventChips) {
+            if (eventChip.event.isAllDay()) {
+                allDayEventChips.add(eventChip);
             } else {
-                normalEventRects.add(eventRect);
+                normalEventChips.add(eventChip);
             }
         }
     }
@@ -74,7 +74,7 @@ public class WeekViewData {
 
         List<WeekViewEvent> splittedEvents = event.splitWeekViewEvents();
         for (WeekViewEvent splittedEvent : splittedEvents) {
-            eventRects.add(new EventRect(splittedEvent, event, null));
+            eventChips.add(new EventChip(splittedEvent, event, null));
         }
     }
 

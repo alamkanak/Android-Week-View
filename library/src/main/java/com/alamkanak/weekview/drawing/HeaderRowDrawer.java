@@ -58,9 +58,9 @@ public class HeaderRowDrawer {
     }
 
     // TODO: Make just as high as text + padding, no extra bottom padding or something
-    private float calculateHeaderHeight(List<EventRect> eventRects,
+    private float calculateHeaderHeight(List<EventChip> eventChips,
                                         int numberOfVisibleDays, Calendar firstVisibleDay) {
-        if (eventRects == null || eventRects.isEmpty()) {
+        if (eventChips == null || eventChips.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
 
@@ -70,8 +70,8 @@ public class HeaderRowDrawer {
             Calendar day = (Calendar) firstVisibleDay.clone();
             day.add(Calendar.DATE, i);
 
-            for (int j = 0; j < eventRects.size(); j++) {
-                WeekViewEvent event = eventRects.get(j).event;
+            for (int j = 0; j < eventChips.size(); j++) {
+                WeekViewEvent event = eventChips.get(j).event;
                 if (event.isSameDay(day) && event.isAllDay()) {
                     containsAllDayEvent = true;
                     break;
@@ -107,7 +107,7 @@ public class HeaderRowDrawer {
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
 
         drawConfig.headerHeight = calculateHeaderHeight(
-                data.eventRects, config.numberOfVisibleDays, viewState.firstVisibleDay);
+                data.eventChips, config.numberOfVisibleDays, viewState.firstVisibleDay);
 
         Calendar today = DateUtils.today();
 
@@ -179,9 +179,9 @@ public class HeaderRowDrawer {
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for event rectangles.
-        if (data.eventRects != null) {
-            for (EventRect eventRect : data.eventRects) {
-                eventRect.rectF = null;
+        if (data.eventChips != null) {
+            for (EventChip eventChip : data.eventChips) {
+                eventChip.rectF = null;
             }
         }
 
@@ -219,7 +219,7 @@ public class HeaderRowDrawer {
             // Get more events if necessary. We want to store the events 3 months beforehand. Get
             // events only when it is the first iteration of the loop.
             // TODO: Cleanup
-            if (data.eventRects == null || viewState.shouldRefreshEvents ||
+            if (data.eventChips == null || viewState.shouldRefreshEvents ||
                     (dayNumber == leftDaysWithGaps + 1 && data.fetchedPeriod != (int) weekViewLoader.toWeekViewPeriodIndex(day) &&
                             Math.abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
                 getMoreEvents(view, day);
@@ -236,7 +236,7 @@ public class HeaderRowDrawer {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
-            eventsDrawer.drawEvents(data.eventRects, width, height, day, startPixel, canvas);
+            eventsDrawer.drawEvents(data.eventChips, width, height, day, startPixel, canvas);
 
             // Draw the line at the current time.
             if (config.showNowLine && sameDay) {
@@ -295,7 +295,7 @@ public class HeaderRowDrawer {
             }
 
             // TODO: Code quality
-            eventsDrawer.drawAllDayEvents(data.eventRects, day, startPixel, canvas);
+            eventsDrawer.drawAllDayEvents(data.eventChips, day, startPixel, canvas);
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
     }
@@ -309,8 +309,8 @@ public class HeaderRowDrawer {
      */
     private void getMoreEvents(View view, Calendar day) {
         // Get more events if the month is changed.
-        if (data.eventRects == null) {
-            data.eventRects = new ArrayList<>();
+        if (data.eventChips == null) {
+            data.eventChips = new ArrayList<>();
         }
 
         if (weekViewLoader == null && !view.isInEditMode()) {
@@ -327,30 +327,30 @@ public class HeaderRowDrawer {
         }
 
         // Prepare to calculate positions of each events.
-        List<EventRect> tempEvents = data.eventRects;
-        data.eventRects = new ArrayList<>();
+        List<EventChip> tempEvents = data.eventChips;
+        data.eventChips = new ArrayList<>();
 
         // Iterate through each day with events to calculate the position of the events.
         while (!tempEvents.isEmpty()) {
-            ArrayList<EventRect> eventRects = new ArrayList<>(tempEvents.size());
+            ArrayList<EventChip> eventChips = new ArrayList<>(tempEvents.size());
 
             // Get first event for a day.
-            EventRect firstRect = tempEvents.remove(0);
-            eventRects.add(firstRect);
+            EventChip firstRect = tempEvents.remove(0);
+            eventChips.add(firstRect);
 
             int i = 0;
             while (i < tempEvents.size()) {
                 // Collect all other events for same day.
-                EventRect eventRect = tempEvents.get(i);
-                WeekViewEvent event = eventRect.event;
+                EventChip eventChip = tempEvents.get(i);
+                WeekViewEvent event = eventChip.event;
                 if (firstRect.event.isSameDay(event)) {
                     tempEvents.remove(i);
-                    eventRects.add(eventRect);
+                    eventChips.add(eventChip);
                 } else {
                     i++;
                 }
             }
-            computePositionOfEvents(eventRects);
+            computePositionOfEvents(eventChips);
         }
     }
 
@@ -358,20 +358,20 @@ public class HeaderRowDrawer {
      * Calculates the left and right positions of each events. This comes handy specially if events
      * are overlapping.
      *
-     * @param eventRects The events along with their wrapper class.
+     * @param eventChips The events along with their wrapper class.
      */
-    private void computePositionOfEvents(List<EventRect> eventRects) {
+    private void computePositionOfEvents(List<EventChip> eventChips) {
         // Make "collision groups" for all events that collide with others.
-        List<List<EventRect>> collisionGroups = new ArrayList<>();
-        for (EventRect eventRect : eventRects) {
+        List<List<EventChip>> collisionGroups = new ArrayList<>();
+        for (EventChip eventChip : eventChips) {
             boolean isPlaced = false;
 
             outerLoop:
-            for (List<EventRect> collisionGroup : collisionGroups) {
-                for (EventRect groupEvent : collisionGroup) {
-                    if (groupEvent.event.collidesWith(eventRect.event)
-                            && groupEvent.event.isAllDay() == eventRect.event.isAllDay()) {
-                        collisionGroup.add(eventRect);
+            for (List<EventChip> collisionGroup : collisionGroups) {
+                for (EventChip groupEvent : collisionGroup) {
+                    if (groupEvent.event.collidesWith(eventChip.event)
+                            && groupEvent.event.isAllDay() == eventChip.event.isAllDay()) {
+                        collisionGroup.add(eventChip);
                         isPlaced = true;
                         break outerLoop;
                     }
@@ -379,13 +379,13 @@ public class HeaderRowDrawer {
             }
 
             if (!isPlaced) {
-                List<EventRect> newGroup = new ArrayList<>();
-                newGroup.add(eventRect);
+                List<EventChip> newGroup = new ArrayList<>();
+                newGroup.add(eventChip);
                 collisionGroups.add(newGroup);
             }
         }
 
-        for (List<EventRect> collisionGroup : collisionGroups) {
+        for (List<EventChip> collisionGroup : collisionGroups) {
             expandEventsToMaxWidth(collisionGroup);
         }
     }
@@ -396,28 +396,28 @@ public class HeaderRowDrawer {
      *
      * @param collisionGroup The group of events which overlap with each other.
      */
-    private void expandEventsToMaxWidth(List<EventRect> collisionGroup) {
+    private void expandEventsToMaxWidth(List<EventChip> collisionGroup) {
         // Expand the events to maximum possible width.
-        List<List<EventRect>> columns = new ArrayList<>();
-        columns.add(new ArrayList<EventRect>());
+        List<List<EventChip>> columns = new ArrayList<>();
+        columns.add(new ArrayList<EventChip>());
 
-        for (EventRect eventRect : collisionGroup) {
+        for (EventChip eventChip : collisionGroup) {
             boolean isPlaced = false;
 
-            for (List<EventRect> column : columns) {
+            for (List<EventChip> column : columns) {
                 if (column.size() == 0) {
-                    column.add(eventRect);
+                    column.add(eventChip);
                     isPlaced = true;
-                } else if (!eventRect.event.collidesWith(column.get(column.size() - 1).event)) {
-                    column.add(eventRect);
+                } else if (!eventChip.event.collidesWith(column.get(column.size() - 1).event)) {
+                    column.add(eventChip);
                     isPlaced = true;
                     break;
                 }
             }
 
             if (!isPlaced) {
-                List<EventRect> newColumn = new ArrayList<>();
-                newColumn.add(eventRect);
+                List<EventChip> newColumn = new ArrayList<>();
+                newColumn.add(eventChip);
                 columns.add(newColumn);
             }
         }
@@ -425,30 +425,30 @@ public class HeaderRowDrawer {
         // Calculate left and right position for all the events.
         // Get the maxRowCount by looking in all columns.
         int maxRowCount = 0;
-        for (List<EventRect> column : columns) {
+        for (List<EventChip> column : columns) {
             maxRowCount = Math.max(maxRowCount, column.size());
         }
 
         for (int i = 0; i < maxRowCount; i++) {
             // Set the left and right values of the event.
             float j = 0;
-            for (List<EventRect> column : columns) {
+            for (List<EventChip> column : columns) {
                 if (column.size() >= i + 1) {
-                    EventRect eventRect = column.get(i);
-                    eventRect.width = 1f / columns.size();
-                    eventRect.left = j / columns.size();
+                    EventChip eventChip = column.get(i);
+                    eventChip.width = 1f / columns.size();
+                    eventChip.left = j / columns.size();
 
-                    if (!eventRect.event.isAllDay()) {
-                        eventRect.top = eventRect.event.getStartTime().get(HOUR_OF_DAY) * 60
-                                + eventRect.event.getStartTime().get(MINUTE);
-                        eventRect.bottom = eventRect.event.getEndTime().get(HOUR_OF_DAY) * 60
-                                + eventRect.event.getEndTime().get(MINUTE);
+                    if (!eventChip.event.isAllDay()) {
+                        eventChip.top = eventChip.event.getStartTime().get(HOUR_OF_DAY) * 60
+                                + eventChip.event.getStartTime().get(MINUTE);
+                        eventChip.bottom = eventChip.event.getEndTime().get(HOUR_OF_DAY) * 60
+                                + eventChip.event.getEndTime().get(MINUTE);
                     } else {
-                        eventRect.top = 0;
-                        eventRect.bottom = config.allDayEventHeight;
+                        eventChip.top = 0;
+                        eventChip.bottom = config.allDayEventHeight;
                     }
 
-                    data.eventRects.add(eventRect);
+                    data.eventChips.add(eventChip);
                 }
                 j++;
             }

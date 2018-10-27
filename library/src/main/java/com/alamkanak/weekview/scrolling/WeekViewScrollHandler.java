@@ -11,7 +11,7 @@ import android.widget.OverScroller;
 
 import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.data.WeekViewLoader;
-import com.alamkanak.weekview.drawing.EventRect;
+import com.alamkanak.weekview.drawing.EventChip;
 import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
 import com.alamkanak.weekview.listeners.EmptyViewClickListener;
 import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
@@ -190,10 +190,10 @@ public class WeekViewScrollHandler {
             // TODO: Potential for perf improvement
 
             // If the tap was on an event then trigger the callback.
-            if (data.eventRects != null && eventClickListener != null) {
-                List<EventRect> reversedEventRects = data.eventRects;
-                Collections.reverse(reversedEventRects);
-                for (EventRect event : reversedEventRects) {
+            if (data.eventChips != null && eventClickListener != null) {
+                List<EventChip> reversedEventChips = data.eventChips;
+                Collections.reverse(reversedEventChips);
+                for (EventChip event : reversedEventChips) {
                     if (event.isHit(e)) {
                         eventClickListener.onEventClick(event.originalEvent, event.rectF);
                         return super.onSingleTapConfirmed(e);
@@ -216,10 +216,10 @@ public class WeekViewScrollHandler {
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
 
-            if (eventLongPressListener != null && data.eventRects != null) {
-                List<EventRect> reversedEventRects = data.eventRects;
-                Collections.reverse(reversedEventRects);
-                for (EventRect event : reversedEventRects) {
+            if (eventLongPressListener != null && data.eventChips != null) {
+                List<EventChip> reversedEventChips = data.eventChips;
+                Collections.reverse(reversedEventChips);
+                for (EventChip event : reversedEventChips) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
                         listener.performHapticFeedback();

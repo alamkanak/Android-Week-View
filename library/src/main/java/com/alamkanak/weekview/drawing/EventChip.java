@@ -13,10 +13,11 @@ import com.alamkanak.weekview.model.WeekViewEvent;
  * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
  * instance will be stored in "event".
  */
-public class EventRect {
+public class EventChip {
 
     public WeekViewEvent event;
     public WeekViewEvent originalEvent;
+
     public RectF rectF;
     public float left;
     public float width;
@@ -35,7 +36,7 @@ public class EventRect {
      * @param originalEvent The original event that was passed by the user.
      * @param rectF         The rectangle.
      */
-    public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
+    public EventChip(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
         this.event = event;
         this.rectF = rectF;
         this.originalEvent = originalEvent;

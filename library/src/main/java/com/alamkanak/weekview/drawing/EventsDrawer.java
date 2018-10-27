@@ -28,37 +28,37 @@ public class EventsDrawer {
 
     // TODO: Unify both methods?
 
-    void drawEvents(List<EventRect> eventRects, int width, int height,
+    void drawEvents(List<EventChip> eventChips, int width, int height,
                     Calendar date, float startFromPixel, Canvas canvas) {
-        if (eventRects == null) {
+        if (eventChips == null) {
             return;
         }
 
-        for (int i = 0; i < eventRects.size(); i++) {
-            EventRect eventRect = eventRects.get(i);
-            WeekViewEvent event = eventRect.event;
+        for (int i = 0; i < eventChips.size(); i++) {
+            EventChip eventChip = eventChips.get(i);
+            WeekViewEvent event = eventChip.event;
             if (!event.isSameDay(date) || event.isAllDay()) {
                 continue;
             }
 
             // TODO: Code quality
             // Calculate top.
-            float top = config.hourHeight * 24 * eventRect.top / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
+            float top = config.hourHeight * 24 * eventChip.top / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
             // TODO: Fix white bar at top of screen
 
             // TODO: Code quality
             // Calculate bottom.
-            float bottom = eventRect.bottom;
+            float bottom = eventChip.bottom;
             bottom = config.hourHeight * 24 * bottom / 1440 + drawingConfig.currentOrigin.y + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - config.eventMarginVertical;
 
             // Calculate left and right.
-            float left = startFromPixel + eventRect.left * drawingConfig.widthPerDay;
+            float left = startFromPixel + eventChip.left * drawingConfig.widthPerDay;
             if (left < startFromPixel) {
                 left += config.overlappingEventGap;
             }
 
-            float right = left + eventRect.width * drawingConfig.widthPerDay;
+            float right = left + eventChip.width * drawingConfig.widthPerDay;
             if (right < startFromPixel + drawingConfig.widthPerDay) {
                 right -= config.overlappingEventGap;
             }
@@ -76,12 +76,12 @@ public class EventsDrawer {
                     && right > drawingConfig.headerColumnWidth
                     && bottom > drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.timeTextHeight / 2 + drawingConfig.headerMarginBottom) {
                 // TODO: Code quality
-                eventRect.rectF = new RectF(left, top, right, bottom);
+                eventChip.rectF = new RectF(left, top, right, bottom);
                 drawingConfig.eventBackgroundPaint.setColor(event.getColor() == 0 ? drawingConfig.defaultEventColor : event.getColor());
-                canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
-                drawEventTitle(event, eventRect.rectF, canvas, top, left);
+                canvas.drawRoundRect(eventChip.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
+                drawEventTitle(event, eventChip.rectF, canvas, top, left);
             } else {
-                eventRect.rectF = null;
+                eventChip.rectF = null;
             }
         }
     }
@@ -93,33 +93,33 @@ public class EventsDrawer {
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to drawTimeColumn upon.
      */
-    void drawAllDayEvents(List<EventRect> eventRects,
+    void drawAllDayEvents(List<EventChip> eventChips,
                           Calendar date, float startFromPixel, Canvas canvas) {
-        if (eventRects == null) {
+        if (eventChips == null) {
             return;
         }
 
-        for (int i = 0; i < eventRects.size(); i++) {
-            WeekViewEvent event = eventRects.get(i).event;
+        for (int i = 0; i < eventChips.size(); i++) {
+            WeekViewEvent event = eventChips.get(i).event;
             if (!event.isSameDay(date) || !event.isAllDay()) {
                 continue;
             }
 
-            EventRect eventRect = eventRects.get(i);
+            EventChip eventChip = eventChips.get(i);
 
             // TODO: Code quality
             // Calculate top.
             float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + +drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
 
             // Calculate bottom.
-            float bottom = top + eventRect.bottom;
+            float bottom = top + eventChip.bottom;
 
             // Calculate left and right.
-            float left = startFromPixel + eventRect.left * drawingConfig.widthPerDay;
+            float left = startFromPixel + eventChip.left * drawingConfig.widthPerDay;
             if (left < startFromPixel) {
                 left += config.overlappingEventGap;
             }
-            float right = left + eventRect.width * drawingConfig.widthPerDay;
+            float right = left + eventChip.width * drawingConfig.widthPerDay;
             if (right < startFromPixel + drawingConfig.widthPerDay) {
                 right -= config.overlappingEventGap;
             }
@@ -147,12 +147,12 @@ public class EventsDrawer {
                 int chipHeight = lineHeight + (config.eventPadding * 2) + 1;
 
                 //int lineHeight = drawEventTitle(event, eventRect.rectF, canvas, top, left);
-                eventRect.rectF = new RectF(left, top, right, top + chipHeight);
+                eventChip.rectF = new RectF(left, top, right, top + chipHeight);
                 drawingConfig.setEventBackgroundColorOrDefault(event);
-                canvas.drawRoundRect(eventRect.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
-                drawEventTitle(event, eventRect.rectF, canvas, top, left);
+                canvas.drawRoundRect(eventChip.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
+                drawEventTitle(event, eventChip.rectF, canvas, top, left);
             } else {
-                eventRect.rectF = null;
+                eventChip.rectF = null;
             }
         }
     }
