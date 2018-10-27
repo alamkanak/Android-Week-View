@@ -75,43 +75,16 @@ public class EventsDrawer {
                 continue;
             }
 
-            //RectF chipRect = chipRectCalculator.calculateAllDay(eventChip, startFromPixel);
+            RectF chipRect = chipRectCalculator.calculateAllDay(eventChip, startFromPixel);
+            if (isValidAllDayEventRect(chipRect)) {
+                eventChip.rectF = chipRect;
+                int lineHeight = calculateTextHeight(eventChip);
+                int chipHeight = lineHeight + (config.eventPadding * 2);
 
-            // TODO: Code quality
-            // Calculate top.
-            float top = config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 + config.eventMarginVertical;
-
-            // Calculate bottom.
-            float bottom = top + eventChip.bottom;
-
-            // Calculate left and right.
-            float left = startFromPixel + eventChip.left * drawingConfig.widthPerDay;
-            if (left < startFromPixel) {
-                left += config.overlappingEventGap;
-            }
-            float right = left + eventChip.width * drawingConfig.widthPerDay;
-            if (right < startFromPixel + drawingConfig.widthPerDay) {
-                right -= config.overlappingEventGap;
-            }
-
-            boolean hasNoOverlaps = (right == startFromPixel + drawingConfig.widthPerDay);
-            if (config.numberOfVisibleDays == 1 && hasNoOverlaps) {
-                right -= config.eventMarginHorizontal * 2;
-            }
-
-            // Draw the event and the event name on top of it.
-            // TODO: Code quality
-            if (isValidAllDayEventRect(left, top, right, bottom)) {
-                // TODO: What if multiple all-day events?
-
-                RectF initialRect = new RectF(left, top, right, bottom);
-                int lineHeight = calculateTextHeight(event, initialRect, top, left);
-                int chipHeight = lineHeight + (config.eventPadding * 2) + 1;
-
-                eventChip.rectF = new RectF(left, top, right, top + chipHeight);
+                eventChip.rectF = new RectF(chipRect.left, chipRect.top, chipRect.right, chipRect.top + chipHeight);
                 drawingConfig.setEventBackgroundColorOrDefault(event);
                 canvas.drawRoundRect(eventChip.rectF, config.eventCornerRadius, config.eventCornerRadius, drawingConfig.eventBackgroundPaint);
-                drawEventTitle(event, eventChip.rectF, canvas, top, left);
+                drawEventTitle(event, eventChip.rectF, canvas, chipRect.top, chipRect.left);
             } else {
                 eventChip.rectF = null;
             }
@@ -130,18 +103,23 @@ public class EventsDrawer {
                 && rect.bottom > totalHeaderHeight + drawingConfig.timeTextHeight / 2;
     }
 
-    private boolean isValidAllDayEventRect(float left, float top, float right, float bottom) {
-        return left < right
-                && left < WeekView.getViewWidth()
-                && top < WeekView.getViewHeight()
-                && right > drawingConfig.headerColumnWidth
-                && bottom > 0;
+    private boolean isValidAllDayEventRect(RectF rect) {
+        return rect.left < rect.right
+                && rect.left < WeekView.getViewWidth()
+                && rect.top < WeekView.getViewHeight()
+                && rect.right > drawingConfig.headerColumnWidth
+                && rect.bottom > 0;
     }
 
-    private int calculateTextHeight(WeekViewEvent event, RectF rect,
-                                    float originalTop, float originalLeft) {
-        boolean negativeWidth = (rect.right - rect.left - config.eventPadding * 2) < 0;
-        boolean negativeHeight = (rect.bottom - rect.top - config.eventPadding * 2) < 0;
+    private int calculateTextHeight(EventChip eventChip) {
+        WeekViewEvent event = eventChip.event;
+        float left = eventChip.rectF.left;
+        float top = eventChip.rectF.top;
+        float right = eventChip.rectF.right;
+        float bottom = eventChip.rectF.bottom;
+
+        boolean negativeWidth = (right - left - config.eventPadding * 2) < 0;
+        boolean negativeHeight = (bottom - top - config.eventPadding * 2) < 0;
         if (negativeWidth || negativeHeight) {
             return 0;
         }
@@ -159,8 +137,8 @@ public class EventsDrawer {
             stringBuilder.append(event.getLocation());
         }
 
-        int availableHeight = (int) (rect.bottom - originalTop - config.eventPadding * 2);
-        int availableWidth = (int) (rect.right - originalLeft - config.eventPadding * 2);
+        int availableHeight = (int) (bottom - top - config.eventPadding * 2);
+        int availableWidth = (int) (right - left - config.eventPadding * 2);
 
         // TODO: Code quality
         // Get text dimensions.
@@ -178,7 +156,7 @@ public class EventsDrawer {
                 // Ellipsize text to fit into event rect.
                 int availableArea = availableLineCount * availableWidth;
                 CharSequence ellipsized = TextUtils.ellipsize(stringBuilder, drawingConfig.eventTextPaint, availableArea, TextUtils.TruncateAt.END);
-                textLayout = new StaticLayout(ellipsized, drawingConfig.eventTextPaint, (int) (rect.right - originalLeft - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                textLayout = new StaticLayout(ellipsized, drawingConfig.eventTextPaint, (int) (right - left - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
