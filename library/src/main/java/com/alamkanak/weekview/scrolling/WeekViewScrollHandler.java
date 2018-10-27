@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
-import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.data.WeekViewLoader;
 import com.alamkanak.weekview.drawing.EventRect;
 import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;

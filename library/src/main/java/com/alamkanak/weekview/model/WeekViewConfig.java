@@ -14,7 +14,6 @@ public class WeekViewConfig {
 
     public boolean showFirstDayOfWeekFirst = false;
 
-    // Attributes and their default values.
     public int hourHeight = 50;
     public int minHourHeight = 0; //no minimum specified (will be dynamic, based on screen)
     public int effectiveMinHourHeight = minHourHeight; //compensates for the fact that you can't keep zooming out.

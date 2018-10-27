@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public interface WeekViewLoader {
+
     /**
      * Convert a date into a double that will be used to reference when you're loading data.
      *
@@ -23,4 +24,5 @@ public interface WeekViewLoader {
      * @return A list with the events of this period
      */
     List<? extends WeekViewEvent> onLoad(int periodIndex);
+
 }

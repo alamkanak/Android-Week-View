@@ -1,6 +1,6 @@
 package com.alamkanak.weekview.data;
 
-import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
 
@@ -16,10 +16,10 @@ import java.util.List;
  */
 public class MonthLoader implements WeekViewLoader {
 
-    private MonthChangeListener mOnMonthChangeListener;
+    private MonthChangeListener onMonthChangeListener;
 
     public MonthLoader(MonthChangeListener listener){
-        this.mOnMonthChangeListener = listener;
+        this.onMonthChangeListener = listener;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MonthLoader implements WeekViewLoader {
         int newMonth = periodIndex % 12 + 1;
 
         List<WeekViewDisplayable> displayableItems =
-                mOnMonthChangeListener.onMonthChange(newYear, newMonth);
+                onMonthChangeListener.onMonthChange(newYear, newMonth);
 
         List<WeekViewEvent> events = new ArrayList<>();
         for (WeekViewDisplayable displayableItem : displayableItems) {
@@ -46,11 +46,11 @@ public class MonthLoader implements WeekViewLoader {
     }
 
     public MonthChangeListener getOnMonthChangeListener() {
-        return mOnMonthChangeListener;
+        return onMonthChangeListener;
     }
 
     public void setOnMonthChangeListener(MonthChangeListener onMonthChangeListener) {
-        this.mOnMonthChangeListener = onMonthChangeListener;
+        this.onMonthChangeListener = onMonthChangeListener;
     }
 
     public interface MonthChangeListener {

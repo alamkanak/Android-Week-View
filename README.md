@@ -72,7 +72,7 @@ Usage
 2. Add WeekView in your xml layout.
 
     ```xml
-    <com.alamkanak.weekview.WeekView
+    <com.alamkanak.weekview.ui.WeekView
             android:id="@+id/weekView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

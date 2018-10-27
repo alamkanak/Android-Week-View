@@ -1,4 +1,4 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -24,6 +24,7 @@ import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
 import com.alamkanak.weekview.scrolling.WeekViewScrollHandler;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 
 import java.util.Calendar;
 

@@ -2,6 +2,7 @@ package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
@@ -148,23 +149,23 @@ public class EventsDrawer {
         if (rect.bottom - rect.top - config.eventPadding * 2 < 0) return;
 
         // Prepare the name of the event.
-        SpannableStringBuilder bob = new SpannableStringBuilder();
+        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         if (event.getName() != null) {
-            bob.append(event.getName());
-            bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, bob.length(), 0);
-            bob.append(' ');
+            stringBuilder.append(event.getName());
+            stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, stringBuilder.length(), 0);
+            stringBuilder.append(' ');
         }
 
         // Prepare the location of the event.
         if (event.getLocation() != null) {
-            bob.append(event.getLocation());
+            stringBuilder.append(event.getLocation());
         }
 
         int availableHeight = (int) (rect.bottom - originalTop - config.eventPadding * 2);
         int availableWidth = (int) (rect.right - originalLeft - config.eventPadding * 2);
 
         // Get text dimensions.
-        StaticLayout textLayout = new StaticLayout(bob, drawingConfig.eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        StaticLayout textLayout = new StaticLayout(stringBuilder, drawingConfig.eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
@@ -173,7 +174,7 @@ public class EventsDrawer {
             int availableLineCount = availableHeight / lineHeight;
             do {
                 // Ellipsize text to fit into event rect.
-                textLayout = new StaticLayout(TextUtils.ellipsize(bob, drawingConfig.eventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), drawingConfig.eventTextPaint, (int) (rect.right - originalLeft - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                textLayout = new StaticLayout(TextUtils.ellipsize(stringBuilder, drawingConfig.eventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), drawingConfig.eventTextPaint, (int) (rect.right - originalLeft - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;

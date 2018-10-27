@@ -332,8 +332,8 @@ public class HeaderRowDrawer {
             data.clear();
         }
 
-        if (weekViewLoader != null) {
-            WeekViewLoaderHelper.load(view, data, viewState, weekViewLoader, day);
+        if (weekViewLoader != null && !view.isInEditMode()) {
+            WeekViewLoaderHelper.load(data, viewState, weekViewLoader, day);
         }
 
         // Prepare to calculate positions of each events.

@@ -63,6 +63,7 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
 
     @Override
     public void success(List<Event> events, Response response) {
+        Toast.makeText(this, "Will show events ...", Toast.LENGTH_LONG).show();
         this.events.clear();
         for (Event event : events) {
             this.events.add(event.toWeekViewEvent());

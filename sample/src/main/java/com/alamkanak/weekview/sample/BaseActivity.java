@@ -8,9 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.data.MonthLoader;
-import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
 import com.alamkanak.weekview.listeners.EventClickListener;
 import com.alamkanak.weekview.listeners.EventLongPressListener;

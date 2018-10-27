@@ -8,7 +8,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
-import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.utils.DateUtils;
 

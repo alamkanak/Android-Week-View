@@ -1,7 +1,5 @@
 package com.alamkanak.weekview.data;
 
-import android.view.View;
-
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.model.WeekViewViewState;
@@ -11,14 +9,14 @@ import java.util.List;
 
 public class WeekViewLoaderHelper {
 
-    public static void load(View view, WeekViewData data, WeekViewViewState viewState,
+    public static void load(WeekViewData data, WeekViewViewState viewState,
                             WeekViewLoader weekViewLoader, Calendar day) {
         int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
         boolean isRefreshEligible = data.fetchedPeriod < 0
                 || data.fetchedPeriod != periodToFetch
                 || viewState.shouldRefreshEvents;
 
-        if (!view.isInEditMode() && isRefreshEligible) {
+        if (isRefreshEligible) {
             List<? extends WeekViewEvent> previousPeriodEvents = null;
             List<? extends WeekViewEvent> currentPeriodEvents = null;
             List<? extends WeekViewEvent> nextPeriodEvents = null;
