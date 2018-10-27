@@ -782,14 +782,10 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         hour = (int) Math.min(hour, HOURS_PER_DAY);
         int verticalOffset = config.hourHeight * hour;
 
-        // TODO: Abstract away in WeekViewConfig
-        double dayHeight = config.hourHeight * HOURS_PER_DAY;
+        float dayHeight = config.getTotalDayHeight();
         double viewHeight = getHeight();
-        double headerHeight = config.drawingConfig.headerHeight;
-        double totalHeaderPadding = config.headerRowPadding * 2;
-        double headerBottomMargin = config.drawingConfig.headerMarginBottom;
 
-        double desiredOffset = dayHeight - viewHeight + headerHeight + totalHeaderPadding + headerBottomMargin;
+        double desiredOffset = dayHeight - viewHeight;
         verticalOffset = (int) Math.min(desiredOffset, verticalOffset);
 
         config.drawingConfig.currentOrigin.y = -verticalOffset;

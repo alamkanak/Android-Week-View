@@ -11,6 +11,8 @@ import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
 
 import java.util.Calendar;
 
+import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+
 public class WeekViewConfig {
 
     public WeekViewDrawingConfig drawingConfig;
@@ -163,6 +165,14 @@ public class WeekViewConfig {
 
     public float getTotalDayWidth() {
         return drawingConfig.widthPerDay + columnGap;
+    }
+
+    public float getTotalDayHeight() {
+        float dayHeight = hourHeight * HOURS_PER_DAY;
+        float headerHeight = drawingConfig.headerHeight;
+        float totalHeaderPadding = headerRowPadding * 2;
+        float headerBottomMargin = drawingConfig.headerMarginBottom;
+        return dayHeight + headerHeight + totalHeaderPadding + headerBottomMargin;
     }
 
     public boolean isSingleDay() {
