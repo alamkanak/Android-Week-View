@@ -25,6 +25,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import static android.view.KeyEvent.ACTION_UP;
+import static com.alamkanak.weekview.ui.WeekView.Direction.LEFT;
+import static com.alamkanak.weekview.ui.WeekView.Direction.NONE;
+import static com.alamkanak.weekview.ui.WeekView.Direction.RIGHT;
+import static com.alamkanak.weekview.ui.WeekView.Direction.VERTICAL;
 import static com.alamkanak.weekview.utils.DateUtils.today;
 
 public class WeekViewScrollHandler {
@@ -72,17 +77,16 @@ public class WeekViewScrollHandler {
         });
     }
 
-    public GestureDetector gestureDetector;
     public OverScroller scroller;
+    public WeekView.Direction currentScrollDirection = NONE;
+    public WeekView.Direction currentFlingDirection = NONE;
 
-    public WeekView.Direction currentScrollDirection = WeekView.Direction.NONE;
-    public WeekView.Direction currentFlingDirection = WeekView.Direction.NONE;
+    private GestureDetector gestureDetector;
+    private ScaleGestureDetector scaleDetector;
+    private boolean isZooming;
 
-    public ScaleGestureDetector scaleDetector;
-    public boolean isZooming;
-
-    public int minimumFlingVelocity = 0;
-    public int scaledTouchSlop = 0;
+    private int minimumFlingVelocity = 0;
+    private int scaledTouchSlop = 0;
 
     // Listeners
     public EventClickListener eventClickListener;
@@ -92,157 +96,157 @@ public class WeekViewScrollHandler {
     public EmptyViewLongPressListener emptyViewLongPressListener;
     public ScrollListener scrollListener;
 
-    private final GestureDetector.SimpleOnGestureListener gestureListener =
-            new GestureDetector.SimpleOnGestureListener() {
+    private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
 
-                @Override
-                public boolean onDown(MotionEvent e) {
-                    goToNearestOrigin();
-                    return true;
+        @Override
+        public boolean onDown(MotionEvent e) {
+            goToNearestOrigin();
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            // Check if view is zoomed.
+            if (isZooming) {
+                return true;
+            }
+
+            switch (currentScrollDirection) {
+                case NONE: {
+                    // Allow scrolling only in one direction.
+                    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+                        if (distanceX > 0) {
+                            currentScrollDirection = LEFT;
+                        } else {
+                            currentScrollDirection = RIGHT;
+                        }
+                    } else {
+                        currentScrollDirection = VERTICAL;
+                    }
+                    break;
                 }
-
-                @Override
-                public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-                    // Check if view is zoomed.
-                    if (isZooming)
-                        return true;
-
-                    switch (currentScrollDirection) {
-                        case NONE: {
-                            // Allow scrolling only in one direction.
-                            if (Math.abs(distanceX) > Math.abs(distanceY)) {
-                                if (distanceX > 0) {
-                                    currentScrollDirection = WeekView.Direction.LEFT;
-                                } else {
-                                    currentScrollDirection = WeekView.Direction.RIGHT;
-                                }
-                            } else {
-                                currentScrollDirection = WeekView.Direction.VERTICAL;
-                            }
-                            break;
-                        }
-                        case LEFT: {
-                            // Change direction if there was enough change.
-                            if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX < -scaledTouchSlop)) {
-                                currentScrollDirection = WeekView.Direction.RIGHT;
-                            }
-                            break;
-                        }
-                        case RIGHT: {
-                            // Change direction if there was enough change.
-                            if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX > scaledTouchSlop)) {
-                                currentScrollDirection = WeekView.Direction.LEFT;
-                            }
-                            break;
-                        }
+                case LEFT: {
+                    // Change direction if there was enough change.
+                    if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX < -scaledTouchSlop)) {
+                        currentScrollDirection = RIGHT;
                     }
-
-                    // Calculate the new origin after scroll.
-                    switch (currentScrollDirection) {
-                        case LEFT:
-                        case RIGHT:
-                            drawingConfig.currentOrigin.x -= distanceX * config.xScrollingSpeed;
-                            listener.onScrolled();
-                            break;
-                        case VERTICAL:
-                            drawingConfig.currentOrigin.y -= distanceY;
-                            listener.onScrolled();
-                            break;
-                    }
-                    return true;
+                    break;
                 }
-
-                @Override
-                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                    if (isZooming)
-                        return true;
-
-                    if ((currentFlingDirection == WeekView.Direction.LEFT && !config.horizontalFlingEnabled) ||
-                            (currentFlingDirection == WeekView.Direction.RIGHT && !config.horizontalFlingEnabled) ||
-                            (currentFlingDirection == WeekView.Direction.VERTICAL && !config.verticalFlingEnabled)) {
-                        return true;
+                case RIGHT: {
+                    // Change direction if there was enough change.
+                    if (Math.abs(distanceX) > Math.abs(distanceY) && (distanceX > scaledTouchSlop)) {
+                        currentScrollDirection = LEFT;
                     }
+                    break;
+                }
+            }
 
-                    scroller.forceFinished(true);
-
-                    currentFlingDirection = currentScrollDirection;
-                    switch (currentFlingDirection) {
-                        case LEFT:
-                        case RIGHT:
-                            scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, (int) (velocityX * config.xScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
-                            break;
-                        case VERTICAL:
-                            scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
-                            break;
-                    }
-
+            // Calculate the new origin after scroll.
+            switch (currentScrollDirection) {
+                case LEFT:
+                case RIGHT:
+                    drawingConfig.currentOrigin.x -= distanceX * config.xScrollingSpeed;
                     listener.onScrolled();
-                    return true;
-                }
+                    break;
+                case VERTICAL:
+                    drawingConfig.currentOrigin.y -= distanceY;
+                    listener.onScrolled();
+                    break;
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (isZooming)
+                return true;
+
+            if ((currentFlingDirection == LEFT && !config.horizontalFlingEnabled) ||
+                    (currentFlingDirection == RIGHT && !config.horizontalFlingEnabled) ||
+                    (currentFlingDirection == VERTICAL && !config.verticalFlingEnabled)) {
+                return true;
+            }
+
+            scroller.forceFinished(true);
+
+            currentFlingDirection = currentScrollDirection;
+            switch (currentFlingDirection) {
+                case LEFT:
+                case RIGHT:
+                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, (int) (velocityX * config.xScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
+                    break;
+                case VERTICAL:
+                    scroller.fling((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(config.hourHeight * 24 + drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom + drawingConfig.timeTextHeight / 2 - listener.getViewHeight()), 0);
+                    break;
+            }
+
+            listener.onScrolled();
+            return true;
+        }
 
 
-                @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    // If the tap was on an event then trigger the callback.
-                    if (data.eventRects != null && eventClickListener != null) {
-                        List<EventRect> reversedEventRects = data.eventRects;
-                        Collections.reverse(reversedEventRects);
-                        for (EventRect event : reversedEventRects) {
-                            if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                                eventClickListener.onEventClick(event.originalEvent, event.rectF);
-                                return super.onSingleTapConfirmed(e);
-                            }
-                        }
-                    }
-
-                    // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewClickListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
-                        Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
-                        if (selectedTime != null) {
-                            emptyViewClickListener.onEmptyViewClicked(selectedTime);
-                        }
-                    }
-
-                    return super.onSingleTapConfirmed(e);
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    super.onLongPress(e);
-
-                    if (eventLongPressListener != null && data.eventRects != null) {
-                        List<EventRect> reversedEventRects = data.eventRects;
-                        Collections.reverse(reversedEventRects);
-                        for (EventRect event : reversedEventRects) {
-                            if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                                eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
-                                listener.performHapticFeedback();
-                                return;
-                            }
-                        }
-                    }
-
-                    // If the tap was on in an empty space, then trigger the callback.
-                    if (emptyViewLongPressListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
-                        Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
-                        if (selectedTime != null) {
-                            listener.performHapticFeedback();
-                            emptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
-                        }
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            // If the tap was on an event then trigger the callback.
+            if (data.eventRects != null && eventClickListener != null) {
+                List<EventRect> reversedEventRects = data.eventRects;
+                Collections.reverse(reversedEventRects);
+                for (EventRect event : reversedEventRects) {
+                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+                        eventClickListener.onEventClick(event.originalEvent, event.rectF);
+                        return super.onSingleTapConfirmed(e);
                     }
                 }
-            };
+            }
+
+            // If the tap was on in an empty space, then trigger the callback.
+            if (emptyViewClickListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
+                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                if (selectedTime != null) {
+                    emptyViewClickListener.onEmptyViewClicked(selectedTime);
+                }
+            }
+
+            return super.onSingleTapConfirmed(e);
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+
+            if (eventLongPressListener != null && data.eventRects != null) {
+                List<EventRect> reversedEventRects = data.eventRects;
+                Collections.reverse(reversedEventRects);
+                for (EventRect event : reversedEventRects) {
+                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+                        eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
+                        listener.performHapticFeedback();
+                        return;
+                    }
+                }
+            }
+
+            // If the tap was on in an empty space, then trigger the callback.
+            if (emptyViewLongPressListener != null && e.getX() > drawingConfig.headerColumnWidth && e.getY() > (drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.headerMarginBottom)) {
+                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                if (selectedTime != null) {
+                    listener.performHapticFeedback();
+                    emptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
+                }
+            }
+        }
+    };
 
     private void goToNearestOrigin() {
         double leftDays = drawingConfig.currentOrigin.x / (drawingConfig.widthPerDay + config.columnGap);
 
-        if (currentFlingDirection != WeekView.Direction.NONE) {
+        if (currentFlingDirection != NONE) {
             // snap to nearest day
             leftDays = Math.round(leftDays);
-        } else if (currentScrollDirection == WeekView.Direction.LEFT) {
+        } else if (currentScrollDirection == LEFT) {
             // snap to last day
             leftDays = Math.floor(leftDays);
-        } else if (currentScrollDirection == WeekView.Direction.RIGHT) {
+        } else if (currentScrollDirection == RIGHT) {
             // snap to next day
             leftDays = Math.ceil(leftDays);
         } else {
@@ -259,8 +263,9 @@ public class WeekViewScrollHandler {
             scroller.startScroll((int) drawingConfig.currentOrigin.x, (int) drawingConfig.currentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / drawingConfig.widthPerDay * config.scrollDuration));
             listener.onScrolled();
         }
+
         // Reset scrolling and fling direction.
-        currentScrollDirection = currentFlingDirection = WeekView.Direction.NONE;
+        currentScrollDirection = currentFlingDirection = NONE;
     }
 
     /**
@@ -271,9 +276,12 @@ public class WeekViewScrollHandler {
      * @return The time and date at the clicked position.
      */
     private Calendar getTimeFromPoint(float x, float y) {
+        // TODO: Code quality
         int leftDaysWithGaps = (int) -(Math.ceil(drawingConfig.currentOrigin.x / (drawingConfig.widthPerDay + config.columnGap)));
-        float startPixel = drawingConfig.currentOrigin.x + (drawingConfig.widthPerDay + config.columnGap) * leftDaysWithGaps +
-                drawingConfig.headerColumnWidth;
+        float startPixel = drawingConfig.currentOrigin.x + (drawingConfig.widthPerDay + config.columnGap) * leftDaysWithGaps
+                + drawingConfig.headerColumnWidth;
+
+        // TODO: Code quality
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + config.numberOfVisibleDays + 1;
              dayNumber++) {
@@ -291,6 +299,7 @@ public class WeekViewScrollHandler {
             }
             startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
+
         return null;
     }
 
@@ -299,24 +308,22 @@ public class WeekViewScrollHandler {
         boolean val = gestureDetector.onTouchEvent(event);
 
         // Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection are set.
-        if (event.getAction() == MotionEvent.ACTION_UP && !isZooming && currentFlingDirection == WeekView.Direction.NONE) {
-            if (currentScrollDirection == WeekView.Direction.RIGHT || currentScrollDirection == WeekView.Direction.LEFT) {
+        if (event.getAction() == ACTION_UP && !isZooming && currentFlingDirection == NONE) {
+            if (currentScrollDirection == RIGHT || currentScrollDirection == LEFT) {
                 goToNearestOrigin();
             }
-            currentScrollDirection = WeekView.Direction.NONE;
+            currentScrollDirection = NONE;
         }
 
         return val;
     }
 
     public void computeScroll() {
-        if (scroller.isFinished()) {
-            if (currentFlingDirection != WeekView.Direction.NONE) {
-                // Snap to day after fling is finished.
-                goToNearestOrigin();
-            }
+        if (scroller.isFinished() && currentFlingDirection != NONE) {
+            // Snap to day after fling is finished.
+            goToNearestOrigin();
         } else {
-            if (currentFlingDirection != WeekView.Direction.NONE && shouldForceFinishScroll()) {
+            if (currentFlingDirection != NONE && shouldForceFinishScroll()) {
                 goToNearestOrigin();
             } else if (scroller.computeScrollOffset()) {
                 drawingConfig.currentOrigin.y = scroller.getCurrY();
@@ -331,7 +338,7 @@ public class WeekViewScrollHandler {
      *
      * @return true if scrolling should be stopped before reaching the end of animation.
      */
-    public boolean shouldForceFinishScroll() {
+    private boolean shouldForceFinishScroll() {
         return scroller.getCurrVelocity() <= minimumFlingVelocity;
     }
 

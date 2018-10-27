@@ -56,7 +56,6 @@ public class WeekViewConfig {
     public int scrollDuration = 250;
 
     public WeekViewConfig(Context context, AttributeSet attrs) {
-        // Get the attribute values (if any).
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
         try {
             firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, firstDayOfWeek);

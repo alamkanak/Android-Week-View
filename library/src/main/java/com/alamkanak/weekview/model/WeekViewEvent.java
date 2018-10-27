@@ -30,81 +30,49 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
      * Initializes the event for week view.
      * @param id The id of the event.
      * @param name Name of the event.
-     * @param startYear Year when the event starts.
-     * @param startMonth Month when the event starts.
-     * @param startDay Day when the event starts.
-     * @param startHour Hour (in 24-hour format) when the event starts.
-     * @param startMinute Minute when the event starts.
-     * @param endYear Year when the event ends.
-     * @param endMonth Month when the event ends.
-     * @param endDay Day when the event ends.
-     * @param endHour Hour (in 24-hour format) when the event ends.
-     * @param endMinute Minute when the event ends.
-     */
-    public WeekViewEvent(long id, String name, int startYear, int startMonth,
-                         int startDay, int startHour, int startMinute, int endYear,
-                         int endMonth, int endDay, int endHour, int endMinute) {
-        this.id = id;
-
-        this.startTime = Calendar.getInstance();
-        this.startTime.set(Calendar.YEAR, startYear);
-        this.startTime.set(Calendar.MONTH, startMonth-1);
-        this.startTime.set(Calendar.DAY_OF_MONTH, startDay);
-        this.startTime.set(Calendar.HOUR_OF_DAY, startHour);
-        this.startTime.set(Calendar.MINUTE, startMinute);
-
-        this.endTime = Calendar.getInstance();
-        this.endTime.set(Calendar.YEAR, endYear);
-        this.endTime.set(Calendar.MONTH, endMonth-1);
-        this.endTime.set(Calendar.DAY_OF_MONTH, endDay);
-        this.endTime.set(Calendar.HOUR_OF_DAY, endHour);
-        this.endTime.set(Calendar.MINUTE, endMinute);
-
-        this.name = name;
-    }
-
-    /**
-     * Initializes the event for week view.
-     * @param id The id of the event.
-     * @param name Name of the event.
-     * @param location The location of the event.
-     * @param startTime The time when the event starts.
-     * @param endTime The time when the event ends.
-     * @param allDay Is the event an all day event.
-     */
-    public WeekViewEvent(long id, String name, String location,
-                         Calendar startTime, Calendar endTime, boolean allDay) {
-        this.id = id;
-        this.name = name;
-        this.location = location;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.isAllDay = allDay;
-    }
-
-    /**
-     * Initializes the event for week view.
-     * @param id The id of the event.
-     * @param name Name of the event.
-     * @param location The location of the event.
-     * @param startTime The time when the event starts.
-     * @param endTime The time when the event ends.
-     */
-    private WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
-        this(id, name, location, startTime, endTime, false);
-    }
-
-    /**
-     * Initializes the event for week view.
-     * @param id The id of the event.
-     * @param name Name of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
     public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
-        this(id, name, null, startTime, endTime);
+        this(id, name, startTime, endTime, null, false);
     }
 
+    /**
+     * Initializes the event for week view.
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     */
+    private WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String location) {
+        this(id, name, startTime, endTime, location, false);
+    }
+
+    /**
+     * Initializes the event for week view.
+     * @param id The id of the event.
+     * @param name Name of the event.
+     * @param location The location of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime The time when the event ends.
+     * @param isAllDay Is the event an all day event.
+     */
+    public WeekViewEvent(long id, String name, Calendar startTime,
+                         Calendar endTime, String location, boolean isAllDay) {
+        this(id, name, startTime, endTime, location, 0, isAllDay);
+    }
+
+    public WeekViewEvent(long id, String name, Calendar startTime,
+                         Calendar endTime, String location, int color, boolean isAllDay) {
+        this.id = id;
+        this.name = name;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.location = location;
+        this.color = color;
+        this.isAllDay = isAllDay;
+    }
 
     public Calendar getStartTime() {
         return startTime;
@@ -199,9 +167,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         if (o == null || getClass() != o.getClass()) return false;
 
         WeekViewEvent that = (WeekViewEvent) o;
-
         return id == that.id;
-
     }
 
     @Override
@@ -224,7 +190,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             endTime.set(Calendar.MINUTE, 59);
 
             // TODO: Use Kotlin with copy(endTime = newEndTime)
-            WeekViewEvent event1 = new WeekViewEvent(id, name, location, startTime, endTime, isAllDay);
+            WeekViewEvent event1 = new WeekViewEvent(id, name, startTime, endTime, location, isAllDay);
             event1.setColor(color);
             events.add(event1);
 
@@ -242,7 +208,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
 
-                WeekViewEvent eventMore = new WeekViewEvent(id, name, null, overDay, endOfOverDay, isAllDay);
+                WeekViewEvent eventMore = new WeekViewEvent(id, name, overDay, endOfOverDay, location, isAllDay);
                 eventMore.setColor(color);
                 events.add(eventMore);
 
@@ -255,7 +221,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
 
-            WeekViewEvent event2 = new WeekViewEvent(id, name, location, startTime, this.endTime, isAllDay);
+            WeekViewEvent event2 = new WeekViewEvent(id, name, startTime, this.endTime, location, isAllDay);
             event2.setColor(color);
             events.add(event2);
         } else {
@@ -269,4 +235,5 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
     public WeekViewEvent toWeekViewEvent() {
         return this;
     }
+
 }

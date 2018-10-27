@@ -102,12 +102,7 @@ public class Event {
         endTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
 
         // Create an week view event.
-        WeekViewEvent weekViewEvent = new WeekViewEvent();
-        weekViewEvent.setName(getName());
-        weekViewEvent.setStartTime(startTime);
-        weekViewEvent.setEndTime(endTime);
-        weekViewEvent.setColor(Color.parseColor(getColor()));
-
-        return weekViewEvent;
+        int color = Color.parseColor(getColor());
+        return new WeekViewEvent(0, getName(), startTime, endTime, null, color, false);
     }
 }
