@@ -182,7 +182,7 @@ public class HeaderRowDrawer {
         // Clear the cache for event rectangles.
         if (data.getAllEventChips() != null) {
             for (EventChip eventChip : data.getAllEventChips()) {
-                eventChip.rectF = null;
+                eventChip.rect = null;
             }
         }
 

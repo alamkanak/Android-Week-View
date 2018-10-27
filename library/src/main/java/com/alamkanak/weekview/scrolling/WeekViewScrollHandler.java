@@ -196,7 +196,7 @@ public class WeekViewScrollHandler {
                 Collections.reverse(reversedEventChips);
                 for (EventChip event : reversedEventChips) {
                     if (event.isHit(e)) {
-                        eventClickListener.onEventClick(event.originalEvent, event.rectF);
+                        eventClickListener.onEventClick(event.originalEvent, event.rect);
                         return super.onSingleTapConfirmed(e);
                     }
                 }
@@ -222,8 +222,8 @@ public class WeekViewScrollHandler {
                 Collections.reverse(reversedEventChips);
 
                 for (EventChip event : reversedEventChips) {
-                    if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                        eventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
+                    if (event.rect != null && e.getX() > event.rect.left && e.getX() < event.rect.right && e.getY() > event.rect.top && e.getY() < event.rect.bottom) {
+                        eventLongPressListener.onEventLongPress(event.originalEvent, event.rect);
                         listener.performHapticFeedback();
                         return;
                     }

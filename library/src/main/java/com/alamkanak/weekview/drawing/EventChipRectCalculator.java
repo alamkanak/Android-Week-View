@@ -15,7 +15,7 @@ class EventChipRectCalculator {
         this.config = config;
     }
 
-    RectF calculate(EventChip eventChip, float startFromPixel) {
+    RectF calculateSingleEvent(EventChip eventChip, float startFromPixel) {
         // TODO: Fix white bar at top of screen
 
         float eventMargin = config.eventMarginVertical;
@@ -57,7 +57,7 @@ class EventChipRectCalculator {
         return new RectF(left, top, right, bottom);
     }
 
-    RectF calculateAllDay(EventChip eventChip, float startFromPixel) {
+    RectF calculateAllDayEvent(EventChip eventChip, float startFromPixel) {
         float headerHeight = config.headerRowPadding * 2 + config.drawingConfig.headerMarginBottom;
         float widthPerDay = config.drawingConfig.widthPerDay;
         float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
