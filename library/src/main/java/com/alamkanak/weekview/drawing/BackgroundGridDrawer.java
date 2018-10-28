@@ -12,9 +12,9 @@ class BackgroundGridDrawer {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    BackgroundGridDrawer(WeekViewConfig config, WeekViewDrawingConfig drawConfig) {
+    BackgroundGridDrawer(WeekViewConfig config) {
         this.config = config;
-        this.drawConfig = drawConfig;
+        this.drawConfig = config.drawingConfig;
     }
 
     void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {

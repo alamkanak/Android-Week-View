@@ -14,9 +14,9 @@ class NowLineDrawer {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    NowLineDrawer(WeekViewConfig config, WeekViewDrawingConfig drawConfig) {
+    NowLineDrawer(WeekViewConfig config) {
         this.config = config;
-        this.drawConfig = drawConfig;
+        this.drawConfig = config.drawingConfig;
     }
 
     void drawLine(float startX, float startPixel, Canvas canvas) {

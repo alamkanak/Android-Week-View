@@ -7,8 +7,10 @@ import com.alamkanak.weekview.model.WeekViewViewState;
 import java.util.Calendar;
 import java.util.List;
 
+@Deprecated
 public class WeekViewLoaderHelper {
 
+    @Deprecated
     public static void load(WeekViewData data, WeekViewViewState viewState,
                             WeekViewLoader weekViewLoader, Calendar day) {
         int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);

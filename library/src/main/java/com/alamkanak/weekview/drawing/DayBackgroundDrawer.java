@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.Calendar;
@@ -20,37 +21,38 @@ class DayBackgroundDrawer {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    DayBackgroundDrawer(WeekViewConfig config, WeekViewDrawingConfig drawConfig) {
+    DayBackgroundDrawer(WeekViewConfig config) {
         this.config = config;
-        this.drawConfig = drawConfig;
+        this.drawConfig = config.drawingConfig;
     }
 
-    void drawDayBackground(Calendar day, int height,
-                           float startX, float startPixel, Canvas canvas) {
-        Calendar today = DateUtils.today();
-        boolean isToday = isSameDay(day, today);
+    void drawDayBackground(Calendar day, float startX, float startPixel, Canvas canvas) {
+        final Calendar today = DateUtils.today();
+        final boolean isToday = isSameDay(day, today);
 
         if (drawConfig.widthPerDay + startPixel - startX <= 0) {
             return;
         }
 
-        float headerHeight = drawConfig.headerHeight
+        final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
+
+        final int height = WeekView.getViewHeight();
 
         if (config.showDistinctPastFutureColor) {
             boolean isWeekend = day.get(DAY_OF_WEEK) == SATURDAY || day.get(DAY_OF_WEEK) == SUNDAY;
             boolean useWeekendColor = isWeekend && config.showDistinctWeekendColor;
 
-            Paint pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor);
-            Paint futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor);
+            final Paint pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor);
+            final Paint futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor);
 
-            float startY = headerHeight + drawConfig.timeTextHeight / 2 + drawConfig.currentOrigin.y;
-            float endX = startPixel + drawConfig.widthPerDay;
+            final float startY = headerHeight + drawConfig.timeTextHeight / 2 + drawConfig.currentOrigin.y;
+            final float endX = startPixel + drawConfig.widthPerDay;
 
             if (isToday) {
-                Calendar now = Calendar.getInstance();
-                float beforeNow = (now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f) * config.hourHeight;
+                final Calendar now = Calendar.getInstance();
+                final float beforeNow = (now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f) * config.hourHeight;
                 canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint);
                 canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint);
             } else if (day.before(today)) {
@@ -59,9 +61,9 @@ class DayBackgroundDrawer {
                 canvas.drawRect(startX, startY, endX, height, futurePaint);
             }
         } else {
-            Paint todayPaint = drawConfig.getTodayBackgroundPaint(isToday);
-            float top = headerHeight + drawConfig.timeTextHeight / 2;
-            float right = startPixel + drawConfig.widthPerDay;
+            final Paint todayPaint = drawConfig.getTodayBackgroundPaint(isToday);
+            final float top = headerHeight + drawConfig.timeTextHeight / 2;
+            final float right = startPixel + drawConfig.widthPerDay;
             canvas.drawRect(startX, top, right, height, todayPaint);
         }
     }

@@ -111,7 +111,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
+        headerRowDrawer.drawHeaderRowAndEvents(canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
         //eventsDrawer.drawEvents(data, canvas);
     }

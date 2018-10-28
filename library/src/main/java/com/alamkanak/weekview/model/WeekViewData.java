@@ -19,14 +19,6 @@ public class WeekViewData {
 
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
-    public void clear() {
-        eventChips.clear();
-        previousPeriodEvents = null;
-        currentPeriodEvents = null;
-        nextPeriodEvents = null;
-        fetchedPeriod = -1;
-    }
-
     // TODO: Use this
     public void setEventChips(List<EventChip> eventChips) {
         this.eventChips = eventChips;
@@ -52,6 +44,22 @@ public class WeekViewData {
 
     public List<EventChip> getAllDayEventChips() {
         return allDayEventChips;
+    }
+
+    public void clearEventChipsCache() {
+        if (eventChips != null) {
+            for (EventChip eventChip : eventChips) {
+                eventChip.rect = null;
+            }
+        }
+    }
+
+    public void clear() {
+        eventChips.clear();
+        previousPeriodEvents = null;
+        currentPeriodEvents = null;
+        nextPeriodEvents = null;
+        fetchedPeriod = -1;
     }
 
     /**

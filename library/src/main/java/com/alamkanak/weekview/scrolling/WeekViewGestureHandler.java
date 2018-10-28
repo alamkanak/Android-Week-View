@@ -43,7 +43,7 @@ public class WeekViewGestureHandler {
     private WeekViewDrawingConfig drawingConfig;
 
     public WeekViewGestureHandler(Context context, View view,
-                                  final WeekViewConfig config, WeekViewData data) {
+                                  WeekViewConfig config, WeekViewData data) {
         this.listener = (Listener) view;
 
         this.data = data;
@@ -71,7 +71,8 @@ public class WeekViewGestureHandler {
 
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                drawingConfig.newHourHeight = round(config.hourHeight * detector.getScaleFactor());
+                float hourHeight = WeekViewGestureHandler.this.config.hourHeight;
+                drawingConfig.newHourHeight = round(hourHeight * detector.getScaleFactor());
                 listener.onScaled();
                 return true;
             }
