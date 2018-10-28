@@ -30,6 +30,10 @@ import com.alamkanak.weekview.utils.DateUtils;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+import static com.alamkanak.weekview.utils.DateUtils.today;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.Calendar.DAY_OF_WEEK;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -111,9 +115,97 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        // TODO: Move to DrawingConfig
+        scrollToDateAndHourIfNecessary();
+        moveCurrentOriginIfFirstDraw();
+        calculateNewHourHeighAfterZoomingIfNecessary();
+        updateVerticalOriginIfNecessary();
+
         headerRowDrawer.drawHeaderRowAndEvents(canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
         //eventsDrawer.drawEvents(data, canvas);
+    }
+
+    private void scrollToDateAndHourIfNecessary() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        int height = WeekView.getViewHeight();
+
+        if (!viewState.areDimensionsInvalid) {
+            return;
+        }
+
+        // TODO: Why here?
+        config.effectiveMinHourHeight = max(config.minHourHeight, (int) ((height - drawConfig.headerHeight - config.headerRowPadding * 2 - drawConfig.headerMarginBottom) / 24));
+
+        viewState.areDimensionsInvalid = false;
+        if (viewState.scrollToDay != null) {
+            goToDate(viewState.scrollToDay);
+        }
+
+        viewState.areDimensionsInvalid = false;
+        if (viewState.scrollToHour >= 0) {
+            goToHour(viewState.scrollToHour);
+        }
+
+        viewState.scrollToDay = null;
+        viewState.scrollToHour = -1;
+        viewState.areDimensionsInvalid = false;
+    }
+
+    private void moveCurrentOriginIfFirstDraw() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+        Calendar today = today();
+
+        if (viewState.isFirstDraw) {
+            viewState.isFirstDraw = false;
+
+            // If the week view is being drawn for the first time, then consider the first day of the week.
+            boolean isWeekView = config.numberOfVisibleDays >= 7;
+            boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
+            if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
+                int difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
+                drawConfig.currentOrigin.x += (drawConfig.widthPerDay + config.columnGap) * difference;
+            }
+        }
+    }
+
+    private void calculateNewHourHeighAfterZoomingIfNecessary() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        // Calculate the new height due to the zooming.
+        if (drawConfig.newHourHeight > 0) {
+            if (drawConfig.newHourHeight < config.effectiveMinHourHeight) {
+                drawConfig.newHourHeight = config.effectiveMinHourHeight;
+            } else if (drawConfig.newHourHeight > config.maxHourHeight) {
+                drawConfig.newHourHeight = config.maxHourHeight;
+            }
+
+            drawConfig.currentOrigin.y = (drawConfig.currentOrigin.y / config.hourHeight) * drawConfig.newHourHeight;
+            config.hourHeight = drawConfig.newHourHeight;
+            drawConfig.newHourHeight = -1;
+        }
+    }
+
+    private void updateVerticalOriginIfNecessary() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        int height = WeekView.getViewHeight();
+
+        // If the new currentOrigin.y is invalid, make it valid.
+        float dayHeight = config.hourHeight * 24;
+        float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+        float halfTextHeight = drawConfig.timeTextHeight / 2;
+
+        float potentialNewVerticalOrigin = height - (dayHeight + headerHeight + halfTextHeight);
+
+        drawConfig.currentOrigin.y = max(drawConfig.currentOrigin.y, potentialNewVerticalOrigin);
+
+        // TODO: Figure out why this is needed
+        drawConfig.currentOrigin.y = min(drawConfig.currentOrigin.y, 0);
     }
 
     @Override

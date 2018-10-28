@@ -17,11 +17,8 @@ import java.util.List;
 
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
 import static com.alamkanak.weekview.utils.DateUtils.today;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.util.Calendar.DATE;
-import static java.util.Calendar.DAY_OF_WEEK;
 
 public class HeaderRowDrawer {
 
@@ -92,7 +89,7 @@ public class HeaderRowDrawer {
         }
     }
 
-    private void calculateAvailableSpace() {
+    private void calculateAvailableSpaceForHeader() {
         int width = WeekView.getViewWidth();
 
         // Calculate the available width for each day
@@ -105,6 +102,7 @@ public class HeaderRowDrawer {
                 data.getAllDayEventChips(), config.numberOfVisibleDays, viewState.firstVisibleDay);
     }
 
+    /*
     private void scrollToDateAndHourIfNecessary() {
         int height = WeekView.getViewHeight();
 
@@ -129,7 +127,9 @@ public class HeaderRowDrawer {
         viewState.scrollToHour = -1;
         viewState.areDimensionsInvalid = false;
     }
+    */
 
+    /*
     private void moveCurrentOriginIfFirstDraw() {
         Calendar today = today();
 
@@ -145,7 +145,9 @@ public class HeaderRowDrawer {
             }
         }
     }
+    */
 
+    /*
     private void calculateNewHourHeighAfterZoomingIfNecessary() {
         // Calculate the new height due to the zooming.
         if (drawConfig.newHourHeight > 0) {
@@ -160,7 +162,9 @@ public class HeaderRowDrawer {
             drawConfig.newHourHeight = -1;
         }
     }
+    */
 
+    /*
     private void updateVerticalOriginIfNecessary() {
         int height = WeekView.getViewHeight();
 
@@ -178,6 +182,7 @@ public class HeaderRowDrawer {
         // TODO: Figure out why this is needed
         drawConfig.currentOrigin.y = min(drawConfig.currentOrigin.y, 0);
     }
+    */
 
     private void drawDayLabelsAndAllDayEvents(int start, int size, float startPixel, Canvas canvas) {
         DayLabelDrawer dayLabelDrawer = new DayLabelDrawer(config);
@@ -326,12 +331,11 @@ public class HeaderRowDrawer {
     // TODO: Break up into multiple methods
     // Move parts into EventsDrawer
     public void drawHeaderRowAndEvents(Canvas canvas) {
-        // TODO: List all methods here
-        calculateAvailableSpace();
-        scrollToDateAndHourIfNecessary();
-        moveCurrentOriginIfFirstDraw();
-        calculateNewHourHeighAfterZoomingIfNecessary();
-        updateVerticalOriginIfNecessary();
+        calculateAvailableSpaceForHeader();
+        // TODO scrollToDateAndHourIfNecessary();
+        // TODO moveCurrentOriginIfFirstDraw();
+        // TODO calculateNewHourHeighAfterZoomingIfNecessary();
+        // TODO updateVerticalOriginIfNecessary();
 
         // Consider scroll offset.
         int leftDaysWithGaps = (int) -(Math.ceil(drawConfig.currentOrigin.x / (drawConfig.widthPerDay + config.columnGap)));
