@@ -33,6 +33,7 @@ import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.Calendar;
+import java.util.List;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
@@ -63,6 +64,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     private WeekViewGestureHandler gestureHandler;
 
     private HeaderRowDrawer headerRowDrawer;
+    private DayLabelDrawer dayLabelDrawer;
     private EventsDrawer eventsDrawer;
     private TimeColumnDrawer timeColumnDrawer;
 
@@ -88,6 +90,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         timeColumnDrawer = new TimeColumnDrawer(config);
 
         headerRowDrawer = new HeaderRowDrawer(config, data, viewState);
+        dayLabelDrawer = new DayLabelDrawer(config);
     }
 
     public static int getViewWidth() {
@@ -135,11 +138,14 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         final int start = leftDaysWithGaps + 1;
         final int end = start + config.numberOfVisibleDays + 1;
 
+        List<Calendar> days = DateUtils.getDateRange(start, end);
+
         final float[] hourLines = getHourLines();
         drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
 
         headerRowDrawer.draw(canvas);
-        drawDayLabelsAndAllDayEvents(start, end, startPixel, canvas);
+        dayLabelDrawer.draw(days, startPixel, canvas);
+        eventsDrawer.drawAllDayEvents(data, days, startPixel, canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
     }
 
@@ -322,29 +328,6 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
             }
 
             // In the next iteration, start from the next day.
-            startPixel += drawConfig.widthPerDay + config.columnGap;
-        }
-    }
-
-    private void drawDayLabelsAndAllDayEvents(int start, int size, float startPixel, Canvas canvas) {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        final DayLabelDrawer dayLabelDrawer = new DayLabelDrawer(config);
-
-        Calendar today = today();
-        Calendar day;
-
-        for (int dayNumber = start; dayNumber <= size; dayNumber++) {
-            // Check if the day is today.
-            day = (Calendar) today.clone();
-            day.add(DATE, dayNumber - 1);
-
-            dayLabelDrawer.draw(day, startPixel, canvas);
-
-            if (config.isSingleDay()) {
-                startPixel = startPixel + config.eventMarginHorizontal;
-            }
-
-            eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), day, startPixel, canvas);
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
     }

@@ -17,14 +17,12 @@ import static java.util.Calendar.DATE;
 public class DateUtils {
 
     public static List<Calendar> getDateRange(int daysSinceToday, int size) {
-        Calendar today = today();
-        Calendar day;
-
         List<Calendar> days = new ArrayList<>();
 
         for (int dayNumber = daysSinceToday; dayNumber <= size; dayNumber++) {
-            day = (Calendar) today.clone();
+            Calendar day = today();
             day.add(DATE, dayNumber - 1);
+            days.add(day);
         }
 
         return days;

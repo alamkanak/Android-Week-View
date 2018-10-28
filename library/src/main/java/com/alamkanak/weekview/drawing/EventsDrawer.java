@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.text.style.StyleSpan;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.ui.WeekView;
 
@@ -56,16 +57,35 @@ public class EventsDrawer {
     /**
      * Draw all the all-day events of a particular day.
      *
-     * @param date           The day.
-     * @param startFromPixel The left position of the day area. The events will never go any left from this value.
+     * @param //date           The day.
+     * @param //startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to drawTimeColumn upon.
      */
-    public void drawAllDayEvents(List<EventChip> eventChips,
-                                 Calendar date, float startFromPixel, Canvas canvas) {
+    public void drawAllDayEvents(WeekViewData data, List<Calendar> dayRange,
+                                 float startPixel, Canvas canvas) {
+        List<EventChip> eventChips = data.getAllDayEventChips();
         if (eventChips == null) {
             return;
         }
 
+        for (Calendar day : dayRange) {
+            if (config.isSingleDay()) {
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
+            for (EventChip eventChip : eventChips) {
+                WeekViewEvent event = eventChip.event;
+                if (!event.isSameDay(day)) {
+                    continue;
+                }
+
+                drawAllDayEvent(eventChip, startPixel, canvas);
+            }
+
+            startPixel += drawingConfig.widthPerDay + config.columnGap;
+        }
+
+        /*
         for (int i = 0; i < eventChips.size(); i++) {
             EventChip eventChip = eventChips.get(i);
             WeekViewEvent event = eventChip.event;
@@ -73,17 +93,22 @@ public class EventsDrawer {
                 continue;
             }
 
-            RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
-            if (isValidAllDayEventRect(chipRect)) {
-                eventChip.rect = chipRect;
-                int lineHeight = calculateTextHeight(eventChip);
-                int chipHeight = lineHeight + (config.eventPadding * 2);
+            drawAllDayEvent(eventChip, startFromPixel, canvas);
+        }
+        */
+    }
 
-                eventChip.rect = new RectF(chipRect.left, chipRect.top, chipRect.right, chipRect.top + chipHeight);
-                eventChip.draw(config, canvas);
-            } else {
-                eventChip.rect = null;
-            }
+    private void drawAllDayEvent(EventChip eventChip, float startFromPixel, Canvas canvas) {
+        RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
+        if (isValidAllDayEventRect(chipRect)) {
+            eventChip.rect = chipRect;
+            int lineHeight = calculateTextHeight(eventChip);
+            int chipHeight = lineHeight + (config.eventPadding * 2);
+
+            eventChip.rect = new RectF(chipRect.left, chipRect.top, chipRect.right, chipRect.top + chipHeight);
+            eventChip.draw(config, canvas);
+        } else {
+            eventChip.rect = null;
         }
     }
 

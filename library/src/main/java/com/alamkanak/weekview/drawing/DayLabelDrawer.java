@@ -23,7 +23,12 @@ public class DayLabelDrawer {
 
     public void draw(List<Calendar> dayRange, float startPixel, Canvas canvas) {
         for (Calendar day : dayRange) {
-            drawLabel(day, startPixel, canvas);
+            draw(day, startPixel, canvas);
+
+            if (config.isSingleDay()) {
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
             startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
     }
