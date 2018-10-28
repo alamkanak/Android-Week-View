@@ -20,19 +20,21 @@ public class NowLineDrawer {
     }
 
     public void drawLine(float startX, float startPixel, Canvas canvas) {
-        float startY = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom + drawConfig.currentOrigin.y;
-        Calendar now = Calendar.getInstance();
+        final float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+        final float startY = headerHeight + drawConfig.timeTextHeight / 2 + drawConfig.currentOrigin.y;
+        final Calendar now = Calendar.getInstance();
 
-        // TODO: Draw dot at the beginning of the line
-        // Draw the line
-        float portionOfDay = now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f;
-        float beforeNow = portionOfDay * config.hourHeight;
-        float lineStartY = startY + beforeNow;
+        // Draw line
+        final float portionOfDay = now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f;
+        final float beforeNow = portionOfDay * config.hourHeight;
+        final float lineStartY = startY + beforeNow;
         canvas.drawLine(startX, lineStartY, startPixel + drawConfig.widthPerDay, lineStartY, drawConfig.nowLinePaint);
 
-        // Draw a dot at the beginning of the line
-        float dotRadius = drawConfig.nowDotPaint.getStrokeWidth();
-        float dotMargin = 32;
+        // Draw dot at the beginning of the line
+        final float dotRadius = drawConfig.nowDotPaint.getStrokeWidth();
+        final float dotMargin = 32;
         canvas.drawCircle(startX + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
     }
 

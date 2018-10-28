@@ -8,9 +8,8 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
-import com.alamkanak.weekview.model.WeekViewEvent;
-import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +41,6 @@ public class WeekViewDrawingConfig {
     public Paint nowLinePaint;
     public Paint nowDotPaint;
     public Paint todayHeaderTextPaint;
-    //public Paint eventBackgroundPaint;
     public float headerColumnWidth;
     public TextPaint eventTextPaint;
     public Paint headerColumnBackgroundPaint;
@@ -154,10 +152,6 @@ public class WeekViewDrawingConfig {
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter, Context context) {
         this.dateTimeInterpreter = dateTimeInterpreter;
         initTextTimeWidth(context);
-    }
-
-    public void setEventBackgroundColorOrDefault(WeekViewEvent event) {
-        //eventBackgroundPaint.setColor(event.getColor() == 0 ? defaultEventColor : event.getColor());
     }
 
     public Paint getPastBackgroundPaint(boolean useWeekendColor) {

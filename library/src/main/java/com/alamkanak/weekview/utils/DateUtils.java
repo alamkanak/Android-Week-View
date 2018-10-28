@@ -4,13 +4,31 @@ import android.content.Context;
 import android.text.format.DateFormat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
+
+import static java.util.Calendar.DATE;
 
 /**
  * Created by jesse on 6/02/2016.
  */
 public class DateUtils {
+
+    public static List<Calendar> getDateRange(int daysSinceToday, int size) {
+        Calendar today = today();
+        Calendar day;
+
+        List<Calendar> days = new ArrayList<>();
+
+        for (int dayNumber = daysSinceToday; dayNumber <= size; dayNumber++) {
+            day = (Calendar) today.clone();
+            day.add(DATE, dayNumber - 1);
+        }
+
+        return days;
+    }
 
     public static Calendar withTimeAtStartOfDay(Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);

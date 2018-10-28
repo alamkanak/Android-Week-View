@@ -78,18 +78,6 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         super(context, attrs, defStyleAttr);
         config = new WeekViewConfig(context, attrs);
 
-        HeaderRowDrawer.Listener listener = new HeaderRowDrawer.Listener() {
-            @Override
-            public void goToDate(Calendar date) {
-                WeekView.this.goToDate(date);
-            }
-
-            @Override
-            public void goToHour(int hour) {
-                WeekView.this.goToHour(hour);
-            }
-        };
-
         data = new WeekViewData();
         viewState = new WeekViewViewState();
 
@@ -99,7 +87,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         eventsDrawer = new EventsDrawer(config);
         timeColumnDrawer = new TimeColumnDrawer(config);
 
-        headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, data, viewState);
+        headerRowDrawer = new HeaderRowDrawer(config, data, viewState);
     }
 
     public static int getViewWidth() {
@@ -150,11 +138,9 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         final float[] hourLines = getHourLines();
         drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
 
-        headerRowDrawer.drawHeaderRowAndEvents(canvas);
+        headerRowDrawer.draw(canvas);
+        drawDayLabelsAndAllDayEvents(start, end, startPixel, canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
-        //eventsDrawer.drawEvents(data, canvas);
-
-        //drawDayLabelsAndAllDayEvents(start, end, startPixel, canvas),
     }
 
     private void scrollToDateAndHourIfNecessary() {
@@ -409,7 +395,6 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
         WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
         gestureHandler.setWeekViewLoader(weekViewLoader);
-        headerRowDrawer.setWeekViewLoader(weekViewLoader);
         //eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
@@ -433,7 +418,6 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
         gestureHandler.setWeekViewLoader(weekViewLoader);
-        headerRowDrawer.setWeekViewLoader(weekViewLoader);
         //eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
@@ -463,7 +447,6 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
 
     public void setScrollListener(ScrollListener scrollListener) {
         gestureHandler.setScrollListener(scrollListener);
-        headerRowDrawer.setScrollListener(scrollListener);
     }
 
     public ScrollListener getScrollListener() {
