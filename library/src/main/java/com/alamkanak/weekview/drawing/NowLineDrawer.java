@@ -9,17 +9,17 @@ import java.util.Calendar;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
 
-class NowLineDrawer {
+public class NowLineDrawer {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    NowLineDrawer(WeekViewConfig config) {
+    public NowLineDrawer(WeekViewConfig config) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
     }
 
-    void drawLine(float startX, float startPixel, Canvas canvas) {
+    public void drawLine(float startX, float startPixel, Canvas canvas) {
         float startY = drawConfig.headerHeight + config.headerRowPadding * 2 + drawConfig.timeTextHeight / 2 + drawConfig.headerMarginBottom + drawConfig.currentOrigin.y;
         Calendar now = Calendar.getInstance();
 

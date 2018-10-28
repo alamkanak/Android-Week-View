@@ -60,8 +60,8 @@ public class EventsDrawer {
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to drawTimeColumn upon.
      */
-    void drawAllDayEvents(List<EventChip> eventChips,
-                          Calendar date, float startFromPixel, Canvas canvas) {
+    public void drawAllDayEvents(List<EventChip> eventChips,
+                                 Calendar date, float startFromPixel, Canvas canvas) {
         if (eventChips == null) {
             return;
         }

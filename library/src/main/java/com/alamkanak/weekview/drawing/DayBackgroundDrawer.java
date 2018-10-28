@@ -16,17 +16,17 @@ import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.SATURDAY;
 import static java.util.Calendar.SUNDAY;
 
-class DayBackgroundDrawer {
+public class DayBackgroundDrawer {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    DayBackgroundDrawer(WeekViewConfig config) {
+    public DayBackgroundDrawer(WeekViewConfig config) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
     }
 
-    void drawDayBackground(Calendar day, float startX, float startPixel, Canvas canvas) {
+    public void drawDayBackground(Calendar day, float startX, float startPixel, Canvas canvas) {
         final Calendar today = DateUtils.today();
         final boolean isToday = isSameDay(day, today);
 

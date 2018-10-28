@@ -3,7 +3,6 @@ package com.alamkanak.weekview.drawing;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.alamkanak.weekview.data.EventChipsProvider;
 import com.alamkanak.weekview.data.WeekViewLoader;
 import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
@@ -15,9 +14,7 @@ import com.alamkanak.weekview.ui.WeekView;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
 import static com.alamkanak.weekview.utils.DateUtils.today;
-import static java.lang.Math.round;
 import static java.util.Calendar.DATE;
 
 public class HeaderRowDrawer {
@@ -206,6 +203,7 @@ public class HeaderRowDrawer {
         }
     }
 
+    /*
     private void drawMainAreaWithEvents(float[] hourLines, int start, int end, float startPixel, Canvas canvas) {
         DayBackgroundDrawer dayBackgroundDrawer = new DayBackgroundDrawer(config);
         BackgroundGridDrawer backgroundGridDrawer = new BackgroundGridDrawer(config);
@@ -260,7 +258,9 @@ public class HeaderRowDrawer {
             startPixel += drawConfig.widthPerDay + config.columnGap;
         }
     }
+    */
 
+    /*
     private float[] getHourLines() {
         int height = WeekView.getViewHeight();
         float headerHeight = drawConfig.headerHeight
@@ -270,7 +270,9 @@ public class HeaderRowDrawer {
         lineCount = (lineCount) * (config.numberOfVisibleDays + 1);
         return new float[lineCount * 4];
     }
+    */
 
+    /*
     private void clipEventsRect(Canvas canvas) {
         int width = WeekView.getViewWidth();
         int height = WeekView.getViewHeight();
@@ -283,7 +285,9 @@ public class HeaderRowDrawer {
         float halfTextHeight = drawConfig.timeTextHeight / 2;
         canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
     }
+    */
 
+    /*
     private void notifyScrollListeners() {
         // Iterate through each day.
         Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
@@ -298,6 +302,7 @@ public class HeaderRowDrawer {
             scrollListener.onFirstVisibleDayChanged(viewState.firstVisibleDay, oldFirstVisibleDay);
         }
     }
+    */
 
     private void drawCompleteHeaderRow(Canvas canvas) {
         int width = WeekView.getViewWidth();
@@ -337,35 +342,33 @@ public class HeaderRowDrawer {
         // TODO calculateNewHourHeighAfterZoomingIfNecessary();
         // TODO updateVerticalOriginIfNecessary();
 
-        // Consider scroll offset.
+        // Consider scroll offset
         int leftDaysWithGaps = (int) -(Math.ceil(drawConfig.currentOrigin.x / (drawConfig.widthPerDay + config.columnGap)));
         float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
         float startPixel = drawConfig.currentOrigin.x
                 + totalDayWidth * leftDaysWithGaps
                 + drawConfig.headerColumnWidth;
 
-        Calendar today = today();
+        //Calendar today = today();
 
         // Prepare to iterate for each day.
-        Calendar day = (Calendar) today.clone();
-        day.add(Calendar.HOUR, 6);
+        //Calendar day = (Calendar) today.clone();
+        //day.add(Calendar.HOUR, 6);
 
         // Prepare to iterate for each hour to draw the hour lines.
-        float[] hourLines = getHourLines();
+        // TODO float[] hourLines = getHourLines();
 
         // Clear the cache for event rectangles.
-        data.clearEventChipsCache();
+        // TODO data.clearEventChipsCache();
+        // TODO canvas.save();
+        // TODO clipEventsRect(canvas);
 
-        canvas.save();
-
-        clipEventsRect(canvas);
-
-        notifyScrollListeners();
+        // TODO notifyScrollListeners();
 
         int start = leftDaysWithGaps + 1;
         int end = start + config.numberOfVisibleDays + 1;
 
-        drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
+        // TODO drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
 
         drawCompleteHeaderRow(canvas);
 

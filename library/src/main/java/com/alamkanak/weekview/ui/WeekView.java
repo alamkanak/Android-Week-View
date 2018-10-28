@@ -9,10 +9,15 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.alamkanak.weekview.data.EventChipsProvider;
 import com.alamkanak.weekview.data.MonthLoader;
 import com.alamkanak.weekview.data.WeekViewLoader;
+import com.alamkanak.weekview.drawing.BackgroundGridDrawer;
+import com.alamkanak.weekview.drawing.DayBackgroundDrawer;
+import com.alamkanak.weekview.drawing.DayLabelDrawer;
 import com.alamkanak.weekview.drawing.EventsDrawer;
 import com.alamkanak.weekview.drawing.HeaderRowDrawer;
+import com.alamkanak.weekview.drawing.NowLineDrawer;
 import com.alamkanak.weekview.drawing.TimeColumnDrawer;
 import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
 import com.alamkanak.weekview.listeners.EmptyViewClickListener;
@@ -30,9 +35,12 @@ import com.alamkanak.weekview.utils.DateUtils;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
 import static com.alamkanak.weekview.utils.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
+import static java.util.Calendar.DATE;
 import static java.util.Calendar.DAY_OF_WEEK;
 
 /**
@@ -122,9 +130,31 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         calculateNewHourHeighAfterZoomingIfNecessary();
         updateVerticalOriginIfNecessary();
 
+        notifyScrollListeners();
+
+        // Clear the cache for event rectangles.
+        data.clearEventChipsCache();
+        canvas.save();
+        clipEventsRect(canvas);
+
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+        final int leftDaysWithGaps = (int) -(Math.ceil(drawConfig.currentOrigin.x / (drawConfig.widthPerDay + config.columnGap)));
+        final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
+        final float startPixel = drawConfig.currentOrigin.x
+                + totalDayWidth * leftDaysWithGaps
+                + drawConfig.headerColumnWidth;
+
+        final int start = leftDaysWithGaps + 1;
+        final int end = start + config.numberOfVisibleDays + 1;
+
+        final float[] hourLines = getHourLines();
+        drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
+
         headerRowDrawer.drawHeaderRowAndEvents(canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
         //eventsDrawer.drawEvents(data, canvas);
+
+        //drawDayLabelsAndAllDayEvents(start, end, startPixel, canvas),
     }
 
     private void scrollToDateAndHourIfNecessary() {
@@ -206,6 +236,131 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
 
         // TODO: Figure out why this is needed
         drawConfig.currentOrigin.y = min(drawConfig.currentOrigin.y, 0);
+    }
+
+    private void notifyScrollListeners() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        // Iterate through each day.
+        Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
+        Calendar today = today();
+
+        viewState.firstVisibleDay = (Calendar) today.clone();
+
+        float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
+        viewState.firstVisibleDay.add(DATE, round(drawConfig.currentOrigin.x / totalDayWidth) * -1);
+
+        boolean hasFirstVisibleDayChanged = !viewState.firstVisibleDay.equals(oldFirstVisibleDay);
+        if (hasFirstVisibleDayChanged && getScrollListener() != null) {
+            getScrollListener().onFirstVisibleDayChanged(viewState.firstVisibleDay, oldFirstVisibleDay);
+        }
+    }
+
+    private void clipEventsRect(Canvas canvas) {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        int width = WeekView.getViewWidth();
+        int height = WeekView.getViewHeight();
+
+        // Clip to paint events only.
+        float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+
+        float halfTextHeight = drawConfig.timeTextHeight / 2;
+        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
+    }
+
+    private float[] getHourLines() {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+        int height = WeekView.getViewHeight();
+        float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+        int lineCount = (int) ((height - headerHeight) / config.hourHeight) + 1;
+        lineCount = (lineCount) * (config.numberOfVisibleDays + 1);
+        return new float[lineCount * 4];
+    }
+
+    private void drawMainAreaWithEvents(float[] hourLines, int start, int end, float startPixel, Canvas canvas) {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        DayBackgroundDrawer dayBackgroundDrawer = new DayBackgroundDrawer(config);
+        BackgroundGridDrawer backgroundGridDrawer = new BackgroundGridDrawer(config);
+        NowLineDrawer nowLineDrawer = new NowLineDrawer(config);
+
+        // TODO: Filter eventRects and allDayEventRects
+
+        WeekViewLoader weekViewLoader = getWeekViewLoader();
+        EventChipsProvider eventChipsProvider = new EventChipsProvider(config, data, viewState);
+        eventChipsProvider.setWeekViewLoader(weekViewLoader);
+
+        Calendar today = today();
+        Calendar day;
+
+        for (int dayNumber = start; dayNumber <= end; dayNumber++) {
+
+            // Check if the day is today.
+            day = (Calendar) today.clone();
+            viewState.lastVisibleDay = (Calendar) day.clone();
+            day.add(DATE, dayNumber - 1);
+            viewState.lastVisibleDay.add(DATE, dayNumber - 2);
+            boolean sameDay = isSameDay(day, today);
+
+            // Get more events if necessary. We want to store the events 3 months beforehand. Get
+            // events only when it is the first iteration of the loop.
+            // TODO: Cleanup
+            if (data.getAllEventChips() == null || viewState.shouldRefreshEvents ||
+                    (dayNumber == start && data.fetchedPeriod != (int) weekViewLoader.toWeekViewPeriodIndex(day) &&
+                            Math.abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
+                //getMoreEvents(view, day);
+                eventChipsProvider.loadEventsAndCalculateEventChipPositions(day);
+                viewState.shouldRefreshEvents = false;
+            }
+
+            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+            dayBackgroundDrawer.drawDayBackground(day, startX, startPixel, canvas);
+            backgroundGridDrawer.drawGrid(hourLines, startX, startPixel, canvas);
+
+            if (config.isSingleDay()) {
+                // Add a margin at the start if we're in day view. Otherwise, screen space is too
+                // precious and we refrain from doing so.
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
+            eventsDrawer.drawEvents(data.getNormalEventChips(), day, startPixel, canvas);
+
+            // Draw the line at the current time.
+            if (config.showNowLine && sameDay) {
+                nowLineDrawer.drawLine(startX, startPixel, canvas);
+            }
+
+            // In the next iteration, start from the next day.
+            startPixel += drawConfig.widthPerDay + config.columnGap;
+        }
+    }
+
+    private void drawDayLabelsAndAllDayEvents(int start, int size, float startPixel, Canvas canvas) {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+        final DayLabelDrawer dayLabelDrawer = new DayLabelDrawer(config);
+
+        Calendar today = today();
+        Calendar day;
+
+        for (int dayNumber = start; dayNumber <= size; dayNumber++) {
+            // Check if the day is today.
+            day = (Calendar) today.clone();
+            day.add(DATE, dayNumber - 1);
+
+            dayLabelDrawer.draw(day, startPixel, canvas);
+
+            if (config.isSingleDay()) {
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
+            eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), day, startPixel, canvas);
+            startPixel += drawConfig.widthPerDay + config.columnGap;
+        }
     }
 
     @Override

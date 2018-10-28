@@ -7,17 +7,17 @@ import com.alamkanak.weekview.ui.WeekView;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 
-class BackgroundGridDrawer {
+public class BackgroundGridDrawer {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    BackgroundGridDrawer(WeekViewConfig config) {
+    public BackgroundGridDrawer(WeekViewConfig config) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
     }
 
-    void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {
+    public void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {
         int height = WeekView.getViewHeight();
 
         float headerHeight = drawConfig.headerHeight
