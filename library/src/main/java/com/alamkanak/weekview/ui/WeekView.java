@@ -84,7 +84,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         config.drawingConfig = new WeekViewDrawingConfig(context, config);
         gestureHandler = new WeekViewGestureHandler(context, this, config, data);
 
-        eventsDrawer = new EventsDrawer(config, viewState);
+        eventsDrawer = new EventsDrawer(config);
         timeColumnDrawer = new TimeColumnDrawer(config);
 
         headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, data, viewState);
@@ -111,9 +111,9 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        headerRowDrawer.drawHeaderRow(this, canvas);
+        headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
-        eventsDrawer.drawEvents(data, canvas);
+        //eventsDrawer.drawEvents(data, canvas);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
         gestureHandler.setWeekViewLoader(weekViewLoader);
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
-        eventsDrawer.setWeekViewLoader(weekViewLoader);
+        //eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     /**
@@ -187,7 +187,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
         gestureHandler.setWeekViewLoader(weekViewLoader);
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
-        eventsDrawer.setWeekViewLoader(weekViewLoader);
+        //eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     public EventLongPressListener getEventLongPressListener() {

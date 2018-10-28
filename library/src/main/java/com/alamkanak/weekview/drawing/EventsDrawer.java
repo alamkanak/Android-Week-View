@@ -30,8 +30,8 @@ public class EventsDrawer {
 
     // TODO: Unify both methods?
 
-    void drawEvents(List<EventChip> eventChips,
-                    Calendar date, float startFromPixel, Canvas canvas) {
+    public void drawEvents(List<EventChip> eventChips,
+                           Calendar date, float startFromPixel, Canvas canvas) {
         if (eventChips == null) {
             return;
         }

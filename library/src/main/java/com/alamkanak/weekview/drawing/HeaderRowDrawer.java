@@ -1,7 +1,6 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.view.View;
 
 import com.alamkanak.weekview.data.WeekViewLoader;
@@ -39,12 +38,11 @@ public class HeaderRowDrawer {
     private ScrollListener scrollListener;
 
     public HeaderRowDrawer(Listener listener, EventsDrawer eventsDrawer,
-                           WeekViewConfig config, WeekViewDrawingConfig drawConfig,
-                           WeekViewData data, WeekViewViewState viewState) {
+                           WeekViewConfig config, WeekViewData data, WeekViewViewState viewState) {
         this.listener = listener;
         this.eventsDrawer = eventsDrawer;
         this.config = config;
-        this.drawConfig = drawConfig;
+        this.drawConfig = config.drawingConfig;
         this.data = data;
         this.viewState = viewState;
     }
@@ -229,7 +227,7 @@ public class HeaderRowDrawer {
 
             float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
             dayBackgroundDrawer.drawDayBackground(day, height, startX, startPixel, canvas);
-            backgroundGridDrawer.drawGrid(hourLines, height, startX, startPixel, canvas);
+            backgroundGridDrawer.drawGrid(hourLines, startX, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
@@ -272,24 +270,15 @@ public class HeaderRowDrawer {
         // Draw the header row texts.
         startPixel = startFromPixel;
 
+        DayLabelDrawer dayLabelDrawer = new DayLabelDrawer(config);
+
         int size = leftDaysWithGaps + config.numberOfVisibleDays + 1;
         for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= size; dayNumber++) {
             // Check if the day is today.
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            boolean isSameDay = isSameDay(day, today);
 
-            // Draw the day labels.
-            String dayLabel = drawConfig.dateTimeInterpreter.interpretDate(day);
-            if (dayLabel == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-            }
-
-            // TODO: Code quality (Move to DayLabelDrawer?)
-            float x = startPixel + drawConfig.widthPerDay / 2;
-            float y = drawConfig.headerTextHeight + config.headerRowPadding;
-            Paint textPaint = isSameDay ? drawConfig.todayHeaderTextPaint : drawConfig.headerTextPaint;
-            canvas.drawText(dayLabel, x, y, textPaint);
+            dayLabelDrawer.draw(day, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.eventMarginHorizontal;
