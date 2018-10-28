@@ -5,14 +5,16 @@ import android.graphics.Canvas;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.ui.WeekView;
 
+import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+
 public class TimeColumnDrawer {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
 
-    public TimeColumnDrawer(WeekViewConfig config, WeekViewDrawingConfig drawingConfig) {
+    public TimeColumnDrawer(WeekViewConfig config) {
         this.config = config;
-        this.drawingConfig = drawingConfig;
+        this.drawingConfig = config.drawingConfig;
     }
 
     public void drawTimeColumn(Canvas canvas) {
@@ -25,10 +27,15 @@ public class TimeColumnDrawer {
         canvas.restore();
         canvas.save();
 
-        canvas.clipRect(0, drawingConfig.headerHeight + config.headerRowPadding * 2, drawingConfig.headerColumnWidth, bottom);
+        canvas.clipRect(0, top, drawingConfig.headerColumnWidth, bottom);
 
-        for (int i = 0; i < 24; i++) {
-            top = drawingConfig.headerHeight + config.headerRowPadding * 2 + drawingConfig.currentOrigin.y + config.hourHeight * i + drawingConfig.headerMarginBottom;
+        // The original header height
+        float headerHeight = top;
+
+        for (int i = 0; i < HOURS_PER_DAY; i++) {
+            float headerBottomMargin = drawingConfig.headerMarginBottom;
+            float heightOfHour = config.hourHeight * i;
+            top = headerHeight + drawingConfig.currentOrigin.y + heightOfHour + headerBottomMargin;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.

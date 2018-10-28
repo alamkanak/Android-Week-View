@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.Layout;
@@ -51,9 +52,17 @@ public class EventChip {
     }
 
     public void draw(WeekViewConfig config, Canvas canvas) {
-        config.drawingConfig.setEventBackgroundColorOrDefault(event);
-        canvas.drawRoundRect(rect, config.eventCornerRadius, config.eventCornerRadius, config.drawingConfig.eventBackgroundPaint);
+        float cornerRadius = config.eventCornerRadius;
+        Paint backgroundPaint = getBackgroundPaint(); // TODO: Get stuff out DrawingConfig
+        //config.drawingConfig.setEventBackgroundColorOrDefault(event);
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
         drawEventTitle(config, canvas);
+    }
+
+    private Paint getBackgroundPaint() {
+        Paint paint = new Paint();
+        paint.setColor(event.getColorOrDefault());
+        return paint;
     }
 
     private void drawEventTitle(WeekViewConfig config, Canvas canvas) {

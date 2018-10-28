@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.model;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 
 import com.alamkanak.weekview.utils.DateUtils;
@@ -13,6 +14,8 @@ import java.util.List;
  * Website: http://april-shower.com
  */
 public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEvent> {
+
+    private static final int DEFAULT_COLOR = Color.parseColor("#9fc6e7");
 
     private long id;
     private String title;
@@ -108,6 +111,10 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
 
     public int getColor() {
         return color;
+    }
+
+    public int getColorOrDefault() {
+        return (color != 0) ? color : DEFAULT_COLOR;
     }
 
     public void setColor(int color) {

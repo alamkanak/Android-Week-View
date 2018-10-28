@@ -21,7 +21,8 @@ public class WeekViewLoaderHelper {
             List<? extends WeekViewEvent> currentPeriodEvents = null;
             List<? extends WeekViewEvent> nextPeriodEvents = null;
 
-            if (data.previousPeriodEvents != null && data.currentPeriodEvents != null && data.nextPeriodEvents != null) {
+            if (data.previousPeriodEvents != null
+                    && data.currentPeriodEvents != null && data.nextPeriodEvents != null) {
                 if (periodToFetch == data.fetchedPeriod - 1) {
                     currentPeriodEvents = data.previousPeriodEvents;
                     nextPeriodEvents = data.currentPeriodEvents;

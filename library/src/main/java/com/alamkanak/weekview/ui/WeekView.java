@@ -23,7 +23,7 @@ import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
-import com.alamkanak.weekview.scrolling.WeekViewScrollHandler;
+import com.alamkanak.weekview.scrolling.WeekViewGestureHandler;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
@@ -35,7 +35,7 @@ import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  */
-public class WeekView extends View implements WeekViewScrollHandler.Listener {
+public class WeekView extends View implements WeekViewGestureHandler.Listener {
 
     private static int width;
     private static int height;
@@ -45,11 +45,13 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     }
 
     private WeekViewConfig config;
+    private WeekViewData data;
 
     private WeekViewViewState viewState;
-    private WeekViewScrollHandler scrollHandler;
+    private WeekViewGestureHandler gestureHandler;
 
     private HeaderRowDrawer headerRowDrawer;
+    private EventsDrawer eventsDrawer;
     private TimeColumnDrawer timeColumnDrawer;
 
     public WeekView(Context context) {
@@ -76,16 +78,16 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
             }
         };
 
-        WeekViewData data = new WeekViewData();
+        data = new WeekViewData();
         viewState = new WeekViewViewState();
 
         config.drawingConfig = new WeekViewDrawingConfig(context, config);
-        scrollHandler = new WeekViewScrollHandler(context, this, config, config.drawingConfig, data);
+        gestureHandler = new WeekViewGestureHandler(context, this, config, data);
 
-        EventsDrawer eventsDrawer = new EventsDrawer(config);
-        timeColumnDrawer = new TimeColumnDrawer(config, config.drawingConfig);
+        eventsDrawer = new EventsDrawer(config, viewState);
+        timeColumnDrawer = new TimeColumnDrawer(config);
 
-        headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, config.drawingConfig, data, viewState);
+        headerRowDrawer = new HeaderRowDrawer(listener, eventsDrawer, config, data, viewState);
     }
 
     public static int getViewWidth() {
@@ -109,8 +111,9 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        headerRowDrawer.drawHeaderRowAndEvents(this, canvas);
+        headerRowDrawer.drawHeaderRow(this, canvas);
         timeColumnDrawer.drawTimeColumn(canvas);
+        eventsDrawer.drawEvents(data, canvas);
     }
 
     @Override
@@ -141,25 +144,26 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     /////////////////////////////////////////////////////////////////
 
     public void setOnEventClickListener(EventClickListener listener) {
-        scrollHandler.setEventClickListener(listener);
+        gestureHandler.setEventClickListener(listener);
     }
 
     public EventClickListener getEventClickListener() {
-        return scrollHandler.getEventClickListener();
+        return gestureHandler.getEventClickListener();
     }
 
     @Nullable
     public MonthLoader.MonthChangeListener getMonthChangeListener() {
-        if (scrollHandler.getWeekViewLoader() instanceof MonthLoader) {
-            return ((MonthLoader) scrollHandler.getWeekViewLoader()).getOnMonthChangeListener();
+        if (gestureHandler.getWeekViewLoader() instanceof MonthLoader) {
+            return ((MonthLoader) gestureHandler.getWeekViewLoader()).getOnMonthChangeListener();
         }
         return null;
     }
 
     public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
         WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
-        scrollHandler.setWeekViewLoader(weekViewLoader);
+        gestureHandler.setWeekViewLoader(weekViewLoader);
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
+        eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     /**
@@ -170,7 +174,7 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @return The event loader.
      */
     public WeekViewLoader getWeekViewLoader() {
-        return scrollHandler.getWeekViewLoader();
+        return gestureHandler.getWeekViewLoader();
     }
 
     /**
@@ -181,41 +185,42 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
      * @param weekViewLoader The event loader.
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
-        scrollHandler.setWeekViewLoader(weekViewLoader);
+        gestureHandler.setWeekViewLoader(weekViewLoader);
         headerRowDrawer.setWeekViewLoader(weekViewLoader);
+        eventsDrawer.setWeekViewLoader(weekViewLoader);
     }
 
     public EventLongPressListener getEventLongPressListener() {
-        return scrollHandler.getEventLongPressListener();
+        return gestureHandler.getEventLongPressListener();
     }
 
     public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
-        scrollHandler.setEventLongPressListener(eventLongPressListener);
+        gestureHandler.setEventLongPressListener(eventLongPressListener);
     }
 
     public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener) {
-        scrollHandler.setEmptyViewClickListener(emptyViewClickListener);
+        gestureHandler.setEmptyViewClickListener(emptyViewClickListener);
     }
 
     public EmptyViewClickListener getEmptyViewClickListener() {
-        return scrollHandler.getEmptyViewClickListener();
+        return gestureHandler.getEmptyViewClickListener();
     }
 
     public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener) {
-        scrollHandler.setEmptyViewLongPressListener(emptyViewLongPressListener);
+        gestureHandler.setEmptyViewLongPressListener(emptyViewLongPressListener);
     }
 
     public EmptyViewLongPressListener getEmptyViewLongPressListener() {
-        return scrollHandler.getEmptyViewLongPressListener();
+        return gestureHandler.getEmptyViewLongPressListener();
     }
 
     public void setScrollListener(ScrollListener scrollListener) {
-        scrollHandler.setScrollListener(scrollListener);
+        gestureHandler.setScrollListener(scrollListener);
         headerRowDrawer.setScrollListener(scrollListener);
     }
 
     public ScrollListener getScrollListener() {
-        return scrollHandler.getScrollListener();
+        return gestureHandler.getScrollListener();
     }
 
     /**
@@ -712,14 +717,14 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return scrollHandler.onTouchEvent(event);
+        return gestureHandler.onTouchEvent(event);
     }
 
 
     @Override
     public void computeScroll() {
         super.computeScroll();
-        scrollHandler.computeScroll();
+        gestureHandler.computeScroll();
     }
 
 
@@ -737,14 +742,18 @@ public class WeekView extends View implements WeekViewScrollHandler.Listener {
         goToDate(today);
     }
 
+    public void goToCurrentTime() {
+        // TODO
+    }
+
     /**
      * Show a specific day on the week view.
      *
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
-        scrollHandler.scroller.forceFinished(true);
-        scrollHandler.currentScrollDirection = scrollHandler.currentFlingDirection = Direction.NONE;
+        gestureHandler.scroller.forceFinished(true);
+        gestureHandler.currentScrollDirection = gestureHandler.currentFlingDirection = Direction.NONE;
 
         date = DateUtils.withTimeAtStartOfDay(date);
 

@@ -42,7 +42,7 @@ public class WeekViewDrawingConfig {
     public Paint nowLinePaint;
     public Paint nowDotPaint;
     public Paint todayHeaderTextPaint;
-    public Paint eventBackgroundPaint;
+    //public Paint eventBackgroundPaint;
     public float headerColumnWidth;
     public TextPaint eventTextPaint;
     public Paint headerColumnBackgroundPaint;
@@ -119,8 +119,8 @@ public class WeekViewDrawingConfig {
         todayHeaderTextPaint.setColor(config.todayHeaderTextColor);
 
         // Prepare event background color.
-        eventBackgroundPaint = new Paint();
-        eventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
+        //eventBackgroundPaint = new Paint();
+        //eventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
 
         // Prepare header column background color.
         headerColumnBackgroundPaint = new Paint();
@@ -157,7 +157,19 @@ public class WeekViewDrawingConfig {
     }
 
     public void setEventBackgroundColorOrDefault(WeekViewEvent event) {
-        eventBackgroundPaint.setColor(event.getColor() == 0 ? defaultEventColor : event.getColor());
+        //eventBackgroundPaint.setColor(event.getColor() == 0 ? defaultEventColor : event.getColor());
+    }
+
+    public Paint getPastBackgroundPaint(boolean useWeekendColor) {
+        return useWeekendColor ? pastWeekendBackgroundPaint : pastBackgroundPaint;
+    }
+
+    public Paint getFutureBackgroundPaint(boolean useWeekendColor) {
+        return useWeekendColor ? futureWeekendBackgroundPaint : futureBackgroundPaint;
+    }
+
+    public Paint getTodayBackgroundPaint(boolean isToday) {
+        return isToday ? todayBackgroundPaint : dayBackgroundPaint;
     }
 
     /**
