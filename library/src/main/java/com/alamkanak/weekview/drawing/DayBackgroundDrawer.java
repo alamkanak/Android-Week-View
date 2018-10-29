@@ -26,7 +26,25 @@ public class DayBackgroundDrawer {
         this.drawConfig = config.drawingConfig;
     }
 
-    public void drawDayBackground(Calendar day, float startX, float startPixel, Canvas canvas) {
+    public void draw(DrawingContext drawingContext, Canvas canvas) {
+        float startPixel = drawingContext.startPixel;
+
+        for (Calendar day : drawingContext.dayRange) {
+            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+            drawDayBackground(day, startX, startPixel, canvas);
+
+            if (config.isSingleDay()) {
+                // Add a margin at the start if we're in day view. Otherwise, screen space is too
+                // precious and we refrain from doing so.
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
+            // In the next iteration, start from the next day.
+            startPixel += drawConfig.widthPerDay + config.columnGap;
+        }
+    }
+
+    private void drawDayBackground(Calendar day, float startX, float startPixel, Canvas canvas) {
         final Calendar today = DateUtils.today();
         final boolean isToday = isSameDay(day, today);
 

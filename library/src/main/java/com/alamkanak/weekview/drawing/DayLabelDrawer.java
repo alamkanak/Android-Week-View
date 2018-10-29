@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import com.alamkanak.weekview.model.WeekViewConfig;
 
 import java.util.Calendar;
-import java.util.List;
 
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
 import static com.alamkanak.weekview.utils.DateUtils.today;
@@ -21,9 +20,11 @@ public class DayLabelDrawer {
         this.drawingConfig = config.drawingConfig;
     }
 
-    public void draw(List<Calendar> dayRange, float startPixel, Canvas canvas) {
-        for (Calendar day : dayRange) {
-            draw(day, startPixel, canvas);
+    public void draw(DrawingContext drawingContext, Canvas canvas) {
+        float startPixel = drawingContext.startPixel;
+
+        for (Calendar day : drawingContext.dayRange) {
+            drawLabel(day, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.eventMarginHorizontal;
@@ -31,10 +32,6 @@ public class DayLabelDrawer {
 
             startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
-    }
-
-    public void draw(Calendar day, float startPixel, Canvas canvas) {
-        drawLabel(day, startPixel, canvas);
     }
 
     private void drawLabel(Calendar day, float startPixel, Canvas canvas) {

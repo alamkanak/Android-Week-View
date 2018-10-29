@@ -29,10 +29,36 @@ public class EventsDrawer {
         this.rectCalculator = new EventChipRectCalculator(config);
     }
 
-    // TODO: Unify both methods?
+    // TODO: Use this instead of separate calls
+    public void draw(List<Calendar> dayRange, WeekViewData data,
+                     float startPixel, Canvas canvas) {
+        //drawSingleEvents(dayRange, data.getNormalEventChips(), startPixel, canvas);
+        //drawAllDayEvents(dayRange, data.getAllDayEventChips(), startPixel, canvas);
+    }
 
-    public void drawEvents(List<EventChip> eventChips,
-                           Calendar date, float startFromPixel, Canvas canvas) {
+    public void drawSingleEvents(List<EventChip> eventChips,
+                                 DrawingContext drawingContext, Canvas canvas) {
+        float startPixel = drawingContext.startPixel;
+
+        // Draw single events
+        for (Calendar day : drawingContext.dayRange) {
+            //float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+
+            if (config.isSingleDay()) {
+                // Add a margin at the start if we're in day view. Otherwise, screen space is too
+                // precious and we refrain from doing so.
+                startPixel = startPixel + config.eventMarginHorizontal;
+            }
+
+            drawEventsForDate(eventChips, day, startPixel, canvas);
+
+            // In the next iteration, start from the next day.
+            startPixel += drawingConfig.widthPerDay + config.columnGap;
+        }
+    }
+
+    private void drawEventsForDate(List<EventChip> eventChips, Calendar date,
+                                   float startFromPixel, Canvas canvas) {
         if (eventChips == null) {
             return;
         }
@@ -61,14 +87,15 @@ public class EventsDrawer {
      * @param //startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to drawTimeColumn upon.
      */
-    public void drawAllDayEvents(WeekViewData data, List<Calendar> dayRange,
-                                 float startPixel, Canvas canvas) {
-        List<EventChip> eventChips = data.getAllDayEventChips();
+    public void drawAllDayEvents(List<EventChip> eventChips,
+                                 DrawingContext drawingContext, Canvas canvas) {
         if (eventChips == null) {
             return;
         }
 
-        for (Calendar day : dayRange) {
+        float startPixel = drawingContext.startPixel;
+
+        for (Calendar day : drawingContext.dayRange) {
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
@@ -84,18 +111,6 @@ public class EventsDrawer {
 
             startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
-
-        /*
-        for (int i = 0; i < eventChips.size(); i++) {
-            EventChip eventChip = eventChips.get(i);
-            WeekViewEvent event = eventChip.event;
-            if (!event.isSameDay(date)) {
-                continue;
-            }
-
-            drawAllDayEvent(eventChip, startFromPixel, canvas);
-        }
-        */
     }
 
     private void drawAllDayEvent(EventChip eventChip, float startFromPixel, Canvas canvas) {
@@ -132,7 +147,6 @@ public class EventsDrawer {
                 && rect.bottom > 0;
     }
 
-    // TODO: Move somewhere else?
     private int calculateTextHeight(EventChip eventChip) {
         WeekViewEvent event = eventChip.event;
         float left = eventChip.rect.left;

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static java.lang.Math.abs;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
 
@@ -31,6 +32,21 @@ public class EventChipsProvider {
         this.weekViewLoader = weekViewLoader;
     }
 
+    public void loadEventsIfNecessary(List<Calendar> dayRange /*, WeekViewLoader weekViewLoader*/) {
+        for (Calendar day : dayRange) {
+            //boolean isSameDay = isSameDay(day, today);
+            boolean hasNoEvents = data.getAllEventChips() == null;
+            boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
+                    && abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
+
+            // Check if this particular day has been fetched
+            if (hasNoEvents || viewState.shouldRefreshEvents || needsToFetchPeriod) {
+                loadEventsAndCalculateEventChipPositions(day);
+                viewState.shouldRefreshEvents = false;
+            }
+        }
+    }
+
     /**
      * Gets more events of one/more month(s) if necessary. This method is called when the user is
      * scrolling the week view. The week view stores the events of three months: the visible month,
@@ -38,7 +54,7 @@ public class EventChipsProvider {
      *
      * @param day The day the user is currently in.
      */
-    public void loadEventsAndCalculateEventChipPositions(Calendar day) {
+    private void loadEventsAndCalculateEventChipPositions(Calendar day) {
         // Get more events if the month is changed.
         if (data.getAllEventChips() == null) {
             data.setEventChips(new ArrayList<EventChip>()); // = new ArrayList<>();

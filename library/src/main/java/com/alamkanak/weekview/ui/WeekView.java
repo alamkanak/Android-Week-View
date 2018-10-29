@@ -15,6 +15,7 @@ import com.alamkanak.weekview.data.WeekViewLoader;
 import com.alamkanak.weekview.drawing.BackgroundGridDrawer;
 import com.alamkanak.weekview.drawing.DayBackgroundDrawer;
 import com.alamkanak.weekview.drawing.DayLabelDrawer;
+import com.alamkanak.weekview.drawing.DrawingContext;
 import com.alamkanak.weekview.drawing.EventsDrawer;
 import com.alamkanak.weekview.drawing.HeaderRowDrawer;
 import com.alamkanak.weekview.drawing.NowLineDrawer;
@@ -33,10 +34,8 @@ import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.Calendar;
-import java.util.List;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
-import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
 import static com.alamkanak.weekview.utils.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -67,6 +66,11 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     private DayLabelDrawer dayLabelDrawer;
     private EventsDrawer eventsDrawer;
     private TimeColumnDrawer timeColumnDrawer;
+    private DayBackgroundDrawer dayBackgroundDrawer;
+    private BackgroundGridDrawer backgroundGridDrawer;
+    private NowLineDrawer nowLineDrawer;
+
+    private EventChipsProvider eventChipsProvider;
 
     public WeekView(Context context) {
         this(context, null);
@@ -91,6 +95,13 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
 
         headerRowDrawer = new HeaderRowDrawer(config, data, viewState);
         dayLabelDrawer = new DayLabelDrawer(config);
+
+        dayBackgroundDrawer = new DayBackgroundDrawer(config);
+        backgroundGridDrawer = new BackgroundGridDrawer(config);
+        nowLineDrawer = new NowLineDrawer(config);
+
+        eventChipsProvider = new EventChipsProvider(config, data, viewState);
+        eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
     }
 
     public static int getViewWidth() {
@@ -120,32 +131,25 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         moveCurrentOriginIfFirstDraw();
         calculateNewHourHeighAfterZoomingIfNecessary();
         updateVerticalOriginIfNecessary();
-
         notifyScrollListeners();
 
-        // Clear the cache for event rectangles.
-        data.clearEventChipsCache();
-        canvas.save();
-        clipEventsRect(canvas);
+        prepareEventDrawing(canvas);
 
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        final int leftDaysWithGaps = (int) -(Math.ceil(drawConfig.currentOrigin.x / (drawConfig.widthPerDay + config.columnGap)));
-        final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
-        final float startPixel = drawConfig.currentOrigin.x
-                + totalDayWidth * leftDaysWithGaps
-                + drawConfig.headerColumnWidth;
+        final DrawingContext drawingContext = DrawingContext.create(config);
+        eventChipsProvider.loadEventsIfNecessary(drawingContext.dayRange);
 
-        final int start = leftDaysWithGaps + 1;
-        final int end = start + config.numberOfVisibleDays + 1;
+        dayBackgroundDrawer.draw(drawingContext, canvas);
+        backgroundGridDrawer.draw(drawingContext, canvas);
 
-        List<Calendar> days = DateUtils.getDateRange(start, end);
+        eventsDrawer.drawSingleEvents(data.getNormalEventChips(), drawingContext, canvas);
 
-        final float[] hourLines = getHourLines();
-        drawMainAreaWithEvents(hourLines, start, end, startPixel, canvas);
-
+        nowLineDrawer.draw(drawingContext, canvas);
         headerRowDrawer.draw(canvas);
-        dayLabelDrawer.draw(days, startPixel, canvas);
-        eventsDrawer.drawAllDayEvents(data, days, startPixel, canvas);
+        dayLabelDrawer.draw(drawingContext, canvas);
+
+        // TODO Unify with drawSingleDayEvents()
+        eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), drawingContext, canvas);
+
         timeColumnDrawer.drawTimeColumn(canvas);
     }
 
@@ -263,73 +267,11 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
     }
 
-    private float[] getHourLines() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        int height = WeekView.getViewHeight();
-        float headerHeight = drawConfig.headerHeight
-                + config.headerRowPadding * 2
-                + drawConfig.headerMarginBottom;
-        int lineCount = (int) ((height - headerHeight) / config.hourHeight) + 1;
-        lineCount = (lineCount) * (config.numberOfVisibleDays + 1);
-        return new float[lineCount * 4];
-    }
-
-    private void drawMainAreaWithEvents(float[] hourLines, int start, int end, float startPixel, Canvas canvas) {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
-        DayBackgroundDrawer dayBackgroundDrawer = new DayBackgroundDrawer(config);
-        BackgroundGridDrawer backgroundGridDrawer = new BackgroundGridDrawer(config);
-        NowLineDrawer nowLineDrawer = new NowLineDrawer(config);
-
-        // TODO: Filter eventRects and allDayEventRects
-
-        WeekViewLoader weekViewLoader = getWeekViewLoader();
-        EventChipsProvider eventChipsProvider = new EventChipsProvider(config, data, viewState);
-        eventChipsProvider.setWeekViewLoader(weekViewLoader);
-
-        Calendar today = today();
-        Calendar day;
-
-        for (int dayNumber = start; dayNumber <= end; dayNumber++) {
-
-            // Check if the day is today.
-            day = (Calendar) today.clone();
-            viewState.lastVisibleDay = (Calendar) day.clone();
-            day.add(DATE, dayNumber - 1);
-            viewState.lastVisibleDay.add(DATE, dayNumber - 2);
-            boolean sameDay = isSameDay(day, today);
-
-            // Get more events if necessary. We want to store the events 3 months beforehand. Get
-            // events only when it is the first iteration of the loop.
-            // TODO: Cleanup
-            if (data.getAllEventChips() == null || viewState.shouldRefreshEvents ||
-                    (dayNumber == start && data.fetchedPeriod != (int) weekViewLoader.toWeekViewPeriodIndex(day) &&
-                            Math.abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
-                //getMoreEvents(view, day);
-                eventChipsProvider.loadEventsAndCalculateEventChipPositions(day);
-                viewState.shouldRefreshEvents = false;
-            }
-
-            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
-            dayBackgroundDrawer.drawDayBackground(day, startX, startPixel, canvas);
-            backgroundGridDrawer.drawGrid(hourLines, startX, startPixel, canvas);
-
-            if (config.isSingleDay()) {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                startPixel = startPixel + config.eventMarginHorizontal;
-            }
-
-            eventsDrawer.drawEvents(data.getNormalEventChips(), day, startPixel, canvas);
-
-            // Draw the line at the current time.
-            if (config.showNowLine && sameDay) {
-                nowLineDrawer.drawLine(startX, startPixel, canvas);
-            }
-
-            // In the next iteration, start from the next day.
-            startPixel += drawConfig.widthPerDay + config.columnGap;
-        }
+    private void prepareEventDrawing(Canvas canvas) {
+        // Clear the cache for event rectangles.
+        data.clearEventChipsCache();
+        canvas.save();
+        clipEventsRect(canvas);
     }
 
     @Override
@@ -378,7 +320,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
         WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
         gestureHandler.setWeekViewLoader(weekViewLoader);
-        //eventsDrawer.setWeekViewLoader(weekViewLoader);
+        eventChipsProvider.setWeekViewLoader(weekViewLoader);
     }
 
     /**
@@ -401,7 +343,7 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
      */
     public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
         gestureHandler.setWeekViewLoader(weekViewLoader);
-        //eventsDrawer.setWeekViewLoader(weekViewLoader);
+        eventChipsProvider.setWeekViewLoader(weekViewLoader);
     }
 
     public EventLongPressListener getEventLongPressListener() {
