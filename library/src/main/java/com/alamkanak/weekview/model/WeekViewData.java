@@ -19,7 +19,6 @@ public class WeekViewData {
 
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
-    // TODO: Use this
     public void setEventChips(List<EventChip> eventChips) {
         this.eventChips = eventChips;
         normalEventChips = new ArrayList<>();

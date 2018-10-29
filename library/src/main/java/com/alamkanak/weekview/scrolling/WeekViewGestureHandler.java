@@ -190,25 +190,25 @@ public class WeekViewGestureHandler {
         }
 
         private void onFlingHorizontal(float originalVelocityX) {
-            int startX = (int) drawingConfig.currentOrigin.x;
-            int startY = (int) drawingConfig.currentOrigin.y;
+            final int startX = (int) drawingConfig.currentOrigin.x;
+            final int startY = (int) drawingConfig.currentOrigin.y;
 
-            int velocityX = (int) (originalVelocityX * config.xScrollingSpeed);
-            int velocityY = 0;
+            final int velocityX = (int) (originalVelocityX * config.xScrollingSpeed);
+            final int velocityY = 0;
 
-            int minX = Integer.MIN_VALUE;
-            int maxX = Integer.MAX_VALUE;
+            final int minX = Integer.MIN_VALUE;
+            final int maxX = Integer.MAX_VALUE;
 
-            int dayHeight = config.hourHeight * HOURS_PER_DAY;
-            int viewHeight = WeekView.getViewHeight();
+            final int dayHeight = config.hourHeight * HOURS_PER_DAY;
+            final int viewHeight = WeekView.getViewHeight();
 
-            float headerHeight = drawingConfig.headerHeight
+            final float headerHeight = drawingConfig.headerHeight
                     + config.headerRowPadding * 2
                     + drawingConfig.headerMarginBottom;
-            float halfTextHeight = drawingConfig.timeTextHeight / 2;
+            final float halfTextHeight = drawingConfig.timeTextHeight / 2;
 
-            int minY = (int) (dayHeight + headerHeight + halfTextHeight - viewHeight) * (-1);
-            int maxY = 0;
+            final int minY = (int) (dayHeight + headerHeight + halfTextHeight - viewHeight) * (-1);
+            final int maxY = 0;
 
             scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         }
@@ -242,7 +242,7 @@ public class WeekViewGestureHandler {
             // TODO: Potential for perf improvement
 
             // If the tap was on an event then trigger the callback.
-            List<EventChip> eventChips = data.getAllEventChips();
+            final List<EventChip> eventChips = data.getAllEventChips();
             if (eventChips != null && eventClickListener != null) {
                 // TODO: Use ID of event or internal ID
                 for (EventChip eventChip : eventChips) {
@@ -254,14 +254,14 @@ public class WeekViewGestureHandler {
             }
 
             // If the tap was on in an empty space, then trigger the callback.
-            float headerHeight = drawingConfig.headerHeight
+            final float headerHeight = drawingConfig.headerHeight
                     + config.headerRowPadding * 2
                     + drawingConfig.headerMarginBottom;
-            float timeColumnWidth = drawingConfig.headerColumnWidth;
+            final float timeColumnWidth = drawingConfig.headerColumnWidth;
 
             if (emptyViewClickListener != null
                     && e.getX() > timeColumnWidth && e.getY() > headerHeight) {
-                Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
+                final Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                 if (selectedTime != null) {
                     emptyViewClickListener.onEmptyViewClicked(selectedTime);
                 }
