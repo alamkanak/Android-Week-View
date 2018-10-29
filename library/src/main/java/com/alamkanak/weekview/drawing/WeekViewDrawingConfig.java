@@ -9,11 +9,17 @@ import android.graphics.Typeface;
 import android.text.TextPaint;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import static com.alamkanak.weekview.utils.DateUtils.today;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.Calendar.DAY_OF_WEEK;
 
 public class WeekViewDrawingConfig {
     
@@ -132,6 +138,47 @@ public class WeekViewDrawingConfig {
 
         // Set default event color.
         defaultEventColor = Color.parseColor("#9fc6e7");
+    }
+
+    public void moveCurrentOriginIfFirstDraw(WeekViewConfig config) {
+        // If the week view is being drawn for the first time, then consider the first day of the week.
+        Calendar today = today();
+        boolean isWeekView = config.numberOfVisibleDays >= 7;
+        boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
+        if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
+            int difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
+            currentOrigin.x += (widthPerDay + config.columnGap) * difference;
+        }
+    }
+
+    public void refreshAfterZooming(WeekViewConfig config) {
+        if (newHourHeight > 0) {
+            if (newHourHeight < config.effectiveMinHourHeight) {
+                newHourHeight = config.effectiveMinHourHeight;
+            } else if (newHourHeight > config.maxHourHeight) {
+                newHourHeight = config.maxHourHeight;
+            }
+
+            currentOrigin.y = (currentOrigin.y / config.hourHeight) * newHourHeight;
+            config.hourHeight = newHourHeight;
+            newHourHeight = -1;
+        }
+    }
+
+    public void updateVerticalOrigin(WeekViewConfig config) {
+        final int height = WeekView.getViewHeight();
+
+        // If the new currentOrigin.y is invalid, make it valid.
+        final float dayHeight = config.hourHeight * 24;
+        final float headerHeight = this.headerHeight + config.headerRowPadding * 2 + headerMarginBottom;
+        final float halfTextHeight = timeTextHeight / 2;
+
+        final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight + halfTextHeight);
+
+        currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin);
+
+        // TODO: Figure out why this is needed
+        currentOrigin.y = min(currentOrigin.y, 0);
     }
 
     public void resetOrigin() {

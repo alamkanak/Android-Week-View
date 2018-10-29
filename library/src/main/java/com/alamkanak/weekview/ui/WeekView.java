@@ -37,17 +37,16 @@ import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.utils.DateUtils.today;
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.util.Calendar.DATE;
-import static java.util.Calendar.DAY_OF_WEEK;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  */
-public class WeekView extends View implements WeekViewGestureHandler.Listener {
+public class WeekView extends View
+        implements WeekViewGestureHandler.Listener, WeekViewViewState.UpdateListener {
 
     private static int width;
     private static int height;
@@ -82,12 +81,13 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
 
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         config = new WeekViewConfig(context, attrs);
+        config.drawingConfig = new WeekViewDrawingConfig(context, config);
 
         data = new WeekViewData();
         viewState = new WeekViewViewState();
 
-        config.drawingConfig = new WeekViewDrawingConfig(context, config);
         gestureHandler = new WeekViewGestureHandler(context, this, config, data);
 
         eventsDrawer = new EventsDrawer(config);
@@ -126,11 +126,16 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // TODO: Move to DrawingConfig
-        scrollToDateAndHourIfNecessary();
-        moveCurrentOriginIfFirstDraw();
-        calculateNewHourHeighAfterZoomingIfNecessary();
-        updateVerticalOriginIfNecessary();
+        viewState.update(config, this);
+
+        if (viewState.isFirstDraw) {
+            viewState.isFirstDraw = false;
+            config.drawingConfig.moveCurrentOriginIfFirstDraw(config);
+        }
+
+        config.drawingConfig.refreshAfterZooming(config);
+        config.drawingConfig.updateVerticalOrigin(config);
+
         notifyScrollListeners();
 
         prepareEventDrawing(canvas);
@@ -153,118 +158,22 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         timeColumnDrawer.drawTimeColumn(canvas);
     }
 
-    private void scrollToDateAndHourIfNecessary() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
-        int height = WeekView.getViewHeight();
-
-        if (!viewState.areDimensionsInvalid) {
-            return;
-        }
-
-        // TODO: Why here?
-        config.effectiveMinHourHeight = max(config.minHourHeight, (int) ((height - drawConfig.headerHeight - config.headerRowPadding * 2 - drawConfig.headerMarginBottom) / 24));
-
-        viewState.areDimensionsInvalid = false;
-        if (viewState.scrollToDay != null) {
-            goToDate(viewState.scrollToDay);
-        }
-
-        viewState.areDimensionsInvalid = false;
-        if (viewState.scrollToHour >= 0) {
-            goToHour(viewState.scrollToHour);
-        }
-
-        viewState.scrollToDay = null;
-        viewState.scrollToHour = -1;
-        viewState.areDimensionsInvalid = false;
-    }
-
-    private void moveCurrentOriginIfFirstDraw() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        Calendar today = today();
-
-        if (viewState.isFirstDraw) {
-            viewState.isFirstDraw = false;
-
-            // If the week view is being drawn for the first time, then consider the first day of the week.
-            boolean isWeekView = config.numberOfVisibleDays >= 7;
-            boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
-            if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
-                int difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
-                drawConfig.currentOrigin.x += (drawConfig.widthPerDay + config.columnGap) * difference;
-            }
-        }
-    }
-
-    private void calculateNewHourHeighAfterZoomingIfNecessary() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
-        // Calculate the new height due to the zooming.
-        if (drawConfig.newHourHeight > 0) {
-            if (drawConfig.newHourHeight < config.effectiveMinHourHeight) {
-                drawConfig.newHourHeight = config.effectiveMinHourHeight;
-            } else if (drawConfig.newHourHeight > config.maxHourHeight) {
-                drawConfig.newHourHeight = config.maxHourHeight;
-            }
-
-            drawConfig.currentOrigin.y = (drawConfig.currentOrigin.y / config.hourHeight) * drawConfig.newHourHeight;
-            config.hourHeight = drawConfig.newHourHeight;
-            drawConfig.newHourHeight = -1;
-        }
-    }
-
-    private void updateVerticalOriginIfNecessary() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
-        int height = WeekView.getViewHeight();
-
-        // If the new currentOrigin.y is invalid, make it valid.
-        float dayHeight = config.hourHeight * 24;
-        float headerHeight = drawConfig.headerHeight
-                + config.headerRowPadding * 2
-                + drawConfig.headerMarginBottom;
-        float halfTextHeight = drawConfig.timeTextHeight / 2;
-
-        float potentialNewVerticalOrigin = height - (dayHeight + headerHeight + halfTextHeight);
-
-        drawConfig.currentOrigin.y = max(drawConfig.currentOrigin.y, potentialNewVerticalOrigin);
-
-        // TODO: Figure out why this is needed
-        drawConfig.currentOrigin.y = min(drawConfig.currentOrigin.y, 0);
-    }
-
     private void notifyScrollListeners() {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
 
         // Iterate through each day.
-        Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
-        Calendar today = today();
+        final Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
+        final Calendar today = today();
 
         viewState.firstVisibleDay = (Calendar) today.clone();
 
-        float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
+        final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
         viewState.firstVisibleDay.add(DATE, round(drawConfig.currentOrigin.x / totalDayWidth) * -1);
 
-        boolean hasFirstVisibleDayChanged = !viewState.firstVisibleDay.equals(oldFirstVisibleDay);
+        final boolean hasFirstVisibleDayChanged = !viewState.firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
             getScrollListener().onFirstVisibleDayChanged(viewState.firstVisibleDay, oldFirstVisibleDay);
         }
-    }
-
-    private void clipEventsRect(Canvas canvas) {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
-        int width = WeekView.getViewWidth();
-        int height = WeekView.getViewHeight();
-
-        // Clip to paint events only.
-        float headerHeight = drawConfig.headerHeight
-                + config.headerRowPadding * 2
-                + drawConfig.headerMarginBottom;
-
-        float halfTextHeight = drawConfig.timeTextHeight / 2;
-        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
     }
 
     private void prepareEventDrawing(Canvas canvas) {
@@ -272,6 +181,21 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
         data.clearEventChipsCache();
         canvas.save();
         clipEventsRect(canvas);
+    }
+
+    private void clipEventsRect(Canvas canvas) {
+        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
+
+        final int width = WeekView.getViewWidth();
+        final int height = WeekView.getViewHeight();
+
+        // Clip to paint events only.
+        final float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+
+        final float halfTextHeight = drawConfig.timeTextHeight / 2;
+        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
     }
 
     @Override
@@ -943,14 +867,14 @@ public class WeekView extends View implements WeekViewGestureHandler.Listener {
             return;
         }
 
-        hour = (int) Math.min(hour, HOURS_PER_DAY);
+        hour = min(hour, HOURS_PER_DAY);
         int verticalOffset = config.hourHeight * hour;
 
-        float dayHeight = config.getTotalDayHeight();
-        double viewHeight = getHeight();
+        final float dayHeight = config.getTotalDayHeight();
+        final double viewHeight = getHeight();
 
-        double desiredOffset = dayHeight - viewHeight;
-        verticalOffset = (int) Math.min(desiredOffset, verticalOffset);
+        final double desiredOffset = dayHeight - viewHeight;
+        verticalOffset = (int) min(desiredOffset, verticalOffset);
 
         config.drawingConfig.currentOrigin.y = -verticalOffset;
         invalidate();
