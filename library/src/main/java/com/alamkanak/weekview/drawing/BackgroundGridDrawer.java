@@ -8,6 +8,7 @@ import com.alamkanak.weekview.ui.WeekView;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+import static java.lang.Math.max;
 
 public class BackgroundGridDrawer {
 
@@ -21,16 +22,17 @@ public class BackgroundGridDrawer {
 
     public void draw(DrawingContext drawingContext, Canvas canvas) {
         float startPixel = drawingContext.startPixel;
+        float[] hourLines;
 
-        for (Calendar day : drawingContext.dayRange) {
-            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
-            float[] hourLines = getHourLines();
+        for (Calendar ignored : drawingContext.dayRange) {
+            float startX = max(startPixel, drawConfig.headerColumnWidth);
+            hourLines = getHourLines();
             drawGrid(hourLines, startX, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
-                startPixel = startPixel + config.eventMarginHorizontal;
+                startPixel += config.eventMarginHorizontal;
             }
 
             // In the next iteration, start from the next day.
@@ -40,8 +42,8 @@ public class BackgroundGridDrawer {
 
     private float[] getHourLines() {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        int height = WeekView.getViewHeight();
-        float headerHeight = drawConfig.headerHeight
+        final int height = WeekView.getViewHeight();
+        final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
         int lineCount = (int) ((height - headerHeight) / config.hourHeight) + 1;
@@ -50,25 +52,25 @@ public class BackgroundGridDrawer {
     }
 
     private void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {
-        int height = WeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
-        float headerHeight = drawConfig.headerHeight
+        final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
 
         int i = 0;
         for (int hour = 0; hour < HOURS_PER_DAY; hour++) {
-            float heightOfHour = config.hourHeight * hour;
-            float halfTextHeight = drawConfig.timeTextHeight / 2;
-            float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour + halfTextHeight;
+            final float heightOfHour = config.hourHeight * hour;
+            final float halfTextHeight = drawConfig.timeTextHeight / 2;
+            final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour + halfTextHeight;
 
-            float widthPerDay = drawConfig.widthPerDay;
-            float separatorWidth = config.hourSeparatorStrokeWidth;
+            final float widthPerDay = drawConfig.widthPerDay;
+            final float separatorWidth = config.hourSeparatorStrokeWidth;
 
             // TODO: Proper names
-            boolean a = top > headerHeight + halfTextHeight - separatorWidth;
-            boolean b = top < height;
-            boolean c = startPixel + widthPerDay - startX > 0;
+            final boolean a = top > headerHeight + halfTextHeight - separatorWidth;
+            final boolean b = top < height;
+            final boolean c = startPixel + widthPerDay - startX > 0;
 
             if (a && b && c) {
                 hourLines[i * 4] = startX;

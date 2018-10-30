@@ -9,16 +9,10 @@ import java.util.List;
 public class DrawingContext {
 
     public final List<Calendar> dayRange;
+    final float startPixel;
 
-    //public final int leftDaysWithGaps;
-    //public final float totalDayWidth;
-    public final float startPixel;
-
-    private DrawingContext(List<Calendar> dayRange, /*int leftDaysWithGaps,
-                           float totalDayWidth,*/ float startPixel) {
+    private DrawingContext(List<Calendar> dayRange, float startPixel) {
         this.dayRange = dayRange;
-        //this.leftDaysWithGaps = leftDaysWithGaps;
-        //this.totalDayWidth = totalDayWidth;
         this.startPixel = startPixel;
     }
 
@@ -34,7 +28,7 @@ public class DrawingContext {
         final int end = start + config.numberOfVisibleDays + 1;
         final List<Calendar> dayRange = DateUtils.getDateRange(start, end);
 
-        return new DrawingContext(dayRange, /*leftDaysWithGaps, totalDayWidth,*/ startPixel);
+        return new DrawingContext(dayRange, startPixel);
     }
 
 }

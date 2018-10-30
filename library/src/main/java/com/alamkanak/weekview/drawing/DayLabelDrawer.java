@@ -27,7 +27,7 @@ public class DayLabelDrawer {
             drawLabel(day, startPixel, canvas);
 
             if (config.isSingleDay()) {
-                startPixel = startPixel + config.eventMarginHorizontal;
+                startPixel += config.eventMarginHorizontal;
             }
 
             startPixel += drawingConfig.widthPerDay + config.columnGap;

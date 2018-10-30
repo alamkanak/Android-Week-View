@@ -24,12 +24,12 @@ import static java.util.Calendar.HOUR_OF_DAY;
 
 public class WeekViewDrawingConfig {
     
-    public Paint timeTextPaint;
-    public float timeTextWidth;
+    Paint timeTextPaint;
+    float timeTextWidth;
     public float timeTextHeight;
 
-    public Paint headerTextPaint;
-    public float headerTextHeight;
+    Paint headerTextPaint;
+    float headerTextHeight;
     public float headerHeight;
 
     public PointF currentOrigin = new PointF(0f, 0f);
@@ -40,13 +40,13 @@ public class WeekViewDrawingConfig {
     public float headerMarginBottom;
 
     public Paint todayBackgroundPaint;
-    public Paint futureBackgroundPaint;
-    public Paint pastBackgroundPaint;
-    public Paint futureWeekendBackgroundPaint;
-    public Paint pastWeekendBackgroundPaint;
+    private Paint futureBackgroundPaint;
+    private Paint pastBackgroundPaint;
+    private Paint futureWeekendBackgroundPaint;
+    private Paint pastWeekendBackgroundPaint;
 
-    public Paint nowLinePaint;
-    public Paint nowDotPaint;
+    Paint nowLinePaint;
+    Paint nowDotPaint;
     public Paint todayHeaderTextPaint;
     public float headerColumnWidth;
     public TextPaint eventTextPaint;
@@ -55,7 +55,7 @@ public class WeekViewDrawingConfig {
 
     public int newHourHeight = -1;
 
-    public DateTimeInterpreter dateTimeInterpreter;
+    DateTimeInterpreter dateTimeInterpreter;
     
     public WeekViewDrawingConfig(Context context, WeekViewConfig config) {
         // Measure settings for time column.
@@ -200,15 +200,15 @@ public class WeekViewDrawingConfig {
         initTextTimeWidth(context);
     }
 
-    public Paint getPastBackgroundPaint(boolean useWeekendColor) {
+    Paint getPastBackgroundPaint(boolean useWeekendColor) {
         return useWeekendColor ? pastWeekendBackgroundPaint : pastBackgroundPaint;
     }
 
-    public Paint getFutureBackgroundPaint(boolean useWeekendColor) {
+    Paint getFutureBackgroundPaint(boolean useWeekendColor) {
         return useWeekendColor ? futureWeekendBackgroundPaint : futureBackgroundPaint;
     }
 
-    public Paint getTodayBackgroundPaint(boolean isToday) {
+    Paint getTodayBackgroundPaint(boolean isToday) {
         return isToday ? todayBackgroundPaint : dayBackgroundPaint;
     }
 

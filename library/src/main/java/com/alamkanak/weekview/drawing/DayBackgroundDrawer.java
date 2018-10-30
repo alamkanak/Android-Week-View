@@ -10,6 +10,7 @@ import com.alamkanak.weekview.utils.DateUtils;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.DateUtils.isSameDay;
+import static java.lang.Math.max;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
@@ -30,13 +31,13 @@ public class DayBackgroundDrawer {
         float startPixel = drawingContext.startPixel;
 
         for (Calendar day : drawingContext.dayRange) {
-            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+            float startX = max(startPixel, drawConfig.headerColumnWidth);
             drawDayBackground(day, startX, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
-                startPixel = startPixel + config.eventMarginHorizontal;
+                startPixel += config.eventMarginHorizontal;
             }
 
             // In the next iteration, start from the next day.
@@ -59,8 +60,8 @@ public class DayBackgroundDrawer {
         final int height = WeekView.getViewHeight();
 
         if (config.showDistinctPastFutureColor) {
-            boolean isWeekend = day.get(DAY_OF_WEEK) == SATURDAY || day.get(DAY_OF_WEEK) == SUNDAY;
-            boolean useWeekendColor = isWeekend && config.showDistinctWeekendColor;
+            final boolean isWeekend = day.get(DAY_OF_WEEK) == SATURDAY || day.get(DAY_OF_WEEK) == SUNDAY;
+            final boolean useWeekendColor = isWeekend && config.showDistinctWeekendColor;
 
             final Paint pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor);
             final Paint futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor);
