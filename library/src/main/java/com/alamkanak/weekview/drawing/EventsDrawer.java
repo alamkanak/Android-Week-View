@@ -3,10 +3,11 @@ package com.alamkanak.weekview.drawing;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.style.StyleSpan;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
@@ -15,6 +16,8 @@ import com.alamkanak.weekview.ui.WeekView;
 
 import java.util.Calendar;
 import java.util.List;
+
+import static android.text.Layout.Alignment.ALIGN_NORMAL;
 
 public class EventsDrawer {
 
@@ -104,13 +107,11 @@ public class EventsDrawer {
     }
 
     private void drawAllDayEvent(EventChip eventChip, float startFromPixel, Canvas canvas) {
-        RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
+        final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
         if (isValidAllDayEventRect(chipRect)) {
             eventChip.rect = chipRect;
-            int lineHeight = calculateTextHeight(eventChip);
-            int chipHeight = lineHeight + (config.eventPadding * 2);
-
-            eventChip.rect = new RectF(chipRect.left, chipRect.top, chipRect.right, chipRect.top + chipHeight);
+            final int chipHeight = calculateChipHeight(eventChip);
+            eventChip.rect.bottom = chipRect.top + chipHeight;
             eventChip.draw(config, canvas);
         } else {
             eventChip.rect = null;
@@ -118,7 +119,7 @@ public class EventsDrawer {
     }
 
     private boolean isValidSingleEventRect(RectF rect) {
-        float totalHeaderHeight = drawingConfig.headerHeight
+        final float totalHeaderHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawingConfig.headerMarginBottom;
 
@@ -137,15 +138,15 @@ public class EventsDrawer {
                 && rect.bottom > 0;
     }
 
-    private int calculateTextHeight(EventChip eventChip) {
-        WeekViewEvent event = eventChip.event;
-        float left = eventChip.rect.left;
-        float top = eventChip.rect.top;
-        float right = eventChip.rect.right;
-        float bottom = eventChip.rect.bottom;
+    private int calculateChipHeight(EventChip eventChip) {
+        final WeekViewEvent event = eventChip.event;
+        final float left = eventChip.rect.left;
+        final float top = eventChip.rect.top;
+        final float right = eventChip.rect.right;
+        final float bottom = eventChip.rect.bottom;
 
-        boolean negativeWidth = (right - left - config.eventPadding * 2) < 0;
-        boolean negativeHeight = (bottom - top - config.eventPadding * 2) < 0;
+        final boolean negativeWidth = (right - left - config.eventPadding * 2) < 0;
+        final boolean negativeHeight = (bottom - top - config.eventPadding * 2) < 0;
         if (negativeWidth || negativeHeight) {
             return 0;
         }
@@ -163,26 +164,24 @@ public class EventsDrawer {
             stringBuilder.append(event.getLocation());
         }
 
-        int availableHeight = (int) (bottom - top - config.eventPadding * 2);
-        int availableWidth = (int) (right - left - config.eventPadding * 2);
+        final int availableHeight = (int) (bottom - top - config.eventPadding * 2);
+        final int availableWidth = (int) (right - left - config.eventPadding * 2);
 
-        // TODO: Code quality
         // Get text dimensions.
-        StaticLayout textLayout = new StaticLayout(stringBuilder, drawingConfig.eventTextPaint,
-                availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        final TextPaint textPaint = drawingConfig.eventTextPaint;
+        StaticLayout textLayout = new StaticLayout(
+                stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-        int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+        final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
-            // Calculate available number of line counts.
             int availableLineCount = availableHeight / lineHeight;
             do {
-                // TODO: Code quality
-                // TODO: Don't truncate
                 // Ellipsize text to fit into event rect.
-                int availableArea = availableLineCount * availableWidth;
-                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder, drawingConfig.eventTextPaint, availableArea, TextUtils.TruncateAt.END);
-                textLayout = new StaticLayout(ellipsized, drawingConfig.eventTextPaint, (int) (right - left - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                final int availableArea = availableLineCount * availableWidth;
+                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TruncateAt.END);
+                final int width = (int) (right - left - config.eventPadding * 2);
+                textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
@@ -191,7 +190,7 @@ public class EventsDrawer {
             } while (textLayout.getHeight() > availableHeight);
         }
 
-        return lineHeight;
+        return lineHeight + (config.eventPadding * 2);
     }
 
 }

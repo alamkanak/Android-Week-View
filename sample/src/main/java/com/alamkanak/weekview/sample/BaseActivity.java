@@ -42,7 +42,7 @@ public abstract class BaseActivity extends AppCompatActivity
         setContentView(R.layout.activity_base);
 
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) findViewById(R.id.weekView);
+        mWeekView = findViewById(R.id.weekView);
 
         // Show a toast message about the touched event.
         mWeekView.setOnEventClickListener(this);
@@ -61,7 +61,6 @@ public abstract class BaseActivity extends AppCompatActivity
         // the week view. This is optional.
         setupDateTimeInterpreter(false);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -140,14 +139,12 @@ public abstract class BaseActivity extends AppCompatActivity
                     weekday = String.valueOf(weekday.charAt(0));
                 }
 
-                String result = weekday.toUpperCase() + format.format(date.getTime());
-                return result;
+                return weekday.toUpperCase() + format.format(date.getTime());
             }
 
             @Override
             public String interpretTime(int hour) {
-                String result = hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
-                return result;
+                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
             }
         });
     }

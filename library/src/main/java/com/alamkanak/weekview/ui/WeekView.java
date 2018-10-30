@@ -125,6 +125,7 @@ public class WeekView extends View
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        final boolean isFirstDraw = viewState.isFirstDraw;
 
         viewState.update(config, this);
 
@@ -155,6 +156,11 @@ public class WeekView extends View
         eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), drawingContext, canvas);
 
         timeColumnDrawer.drawTimeColumn(canvas);
+
+        if (isFirstDraw) {
+            // Temporary workaround to make sure that the events are actually being displayed
+            invalidate();
+        }
     }
 
     private void notifyScrollListeners() {
@@ -835,8 +841,6 @@ public class WeekView extends View
         gestureHandler.scroller.forceFinished(true);
         gestureHandler.currentScrollDirection = gestureHandler.currentFlingDirection = Direction.NONE;
 
-        date = DateUtils.withTimeAtStartOfDay(date);
-
         if (viewState.areDimensionsInvalid) {
             viewState.scrollToDay = date;
             return;
@@ -844,7 +848,7 @@ public class WeekView extends View
 
         viewState.shouldRefreshEvents = true;
 
-        int diff = DateUtils.getDaysUntilDate(date);
+        final int diff = DateUtils.getDaysUntilDate(date);
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
         invalidate();
     }
