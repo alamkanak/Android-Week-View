@@ -20,6 +20,7 @@ import static com.alamkanak.weekview.utils.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Calendar.DAY_OF_WEEK;
+import static java.util.Calendar.HOUR_OF_DAY;
 
 public class WeekViewDrawingConfig {
     
@@ -217,7 +218,7 @@ public class WeekViewDrawingConfig {
     private void initTextTimeWidth(Context context) {
         DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
         timeTextWidth = 0;
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < HOUR_OF_DAY; i++) {
             String time = interpreter.interpretTime(i);
             if (time == null) {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
@@ -236,11 +237,14 @@ public class WeekViewDrawingConfig {
 
     private DateTimeInterpreter buildDateTimeInterpreter(final Context context) {
         return new DateTimeInterpreter() {
+            private SimpleDateFormat sdfDate = DateUtils.getDateFormat();
+            private SimpleDateFormat sdfTime = DateUtils.getTimeFormat(context);
+            private Calendar calendar = Calendar.getInstance();
+
             @Override
             public String interpretDate(Calendar date) {
                 try {
-                    SimpleDateFormat sdf = DateUtils.getDateFormat();
-                    return sdf.format(date.getTime()).toUpperCase();
+                    return sdfDate.format(date.getTime()).toUpperCase();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return "";
@@ -249,13 +253,11 @@ public class WeekViewDrawingConfig {
 
             @Override
             public String interpretTime(int hour) {
-                Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE, 0);
 
                 try {
-                    SimpleDateFormat sdf = DateUtils.getTimeFormat(context);
-                    return sdf.format(calendar.getTime());
+                    return sdfTime.format(calendar.getTime());
                 } catch (Exception e) {
                     e.printStackTrace();
                     return "";
