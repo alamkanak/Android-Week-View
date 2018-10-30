@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.text.style.StyleSpan;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
-import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.alamkanak.weekview.ui.WeekView;
 
@@ -29,21 +28,12 @@ public class EventsDrawer {
         this.rectCalculator = new EventChipRectCalculator(config);
     }
 
-    // TODO: Use this instead of separate calls
-    public void draw(List<Calendar> dayRange, WeekViewData data,
-                     float startPixel, Canvas canvas) {
-        //drawSingleEvents(dayRange, data.getNormalEventChips(), startPixel, canvas);
-        //drawAllDayEvents(dayRange, data.getAllDayEventChips(), startPixel, canvas);
-    }
-
     public void drawSingleEvents(List<EventChip> eventChips,
                                  DrawingContext drawingContext, Canvas canvas) {
         float startPixel = drawingContext.startPixel;
 
         // Draw single events
         for (Calendar day : drawingContext.dayRange) {
-            //float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
-
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
@@ -83,9 +73,9 @@ public class EventsDrawer {
     /**
      * Draw all the all-day events of a particular day.
      *
-     * @param //date           The day.
-     * @param //startFromPixel The left position of the day area. The events will never go any left from this value.
-     * @param canvas         The canvas to drawTimeColumn upon.
+     * @param eventChips The list of {@link EventChip}s to draw
+     * @param drawingContext The {@link DrawingContext} to use for drawing
+     * @param canvas         The canvas to draw upon.
      */
     public void drawAllDayEvents(List<EventChip> eventChips,
                                  DrawingContext drawingContext, Canvas canvas) {

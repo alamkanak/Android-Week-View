@@ -16,8 +16,6 @@ import static java.util.Calendar.DATE;
 
 public class HeaderRowDrawer {
 
-    // TODO: Fix all-day events not shown on first loading
-
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 

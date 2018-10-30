@@ -53,8 +53,7 @@ public class EventChip {
 
     public void draw(WeekViewConfig config, Canvas canvas) {
         float cornerRadius = config.eventCornerRadius;
-        Paint backgroundPaint = getBackgroundPaint(); // TODO: Get stuff out DrawingConfig
-        //config.drawingConfig.setEventBackgroundColorOrDefault(event);
+        Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
         drawEventTitle(config, canvas);
     }

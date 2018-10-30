@@ -182,21 +182,22 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         return (int) (id ^ (id >>> 32));
     }
 
-    public List<WeekViewEvent> splitWeekViewEvents() {
-        //This function splits the WeekViewEvent in WeekViewEvents by day
+    /**
+     * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}
+     * @return A list of {@link WeekViewEvent}
+     */
+    List<WeekViewEvent> splitWeekViewEvents() {
         List<WeekViewEvent> events = new ArrayList<>();
 
-        // The first millisecond of the next day is still the same day. (no need to split events for this).
+        // The first millisecond of the next day is still the same day - no need to split events for this
         Calendar endTime = (Calendar) this.endTime.clone();
         endTime.add(Calendar.MILLISECOND, -1);
 
         if (!isSameDay(endTime)) {
-            // TODO: Code quality
             endTime = (Calendar) startTime.clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
 
-            // TODO: Use Kotlin with copy(endTime = newEndTime)
             WeekViewEvent event1 = new WeekViewEvent(id, title, startTime, endTime, location, isAllDay);
             event1.setColor(color);
             events.add(event1);
@@ -205,7 +206,6 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             Calendar otherDay = (Calendar) startTime.clone();
             otherDay.add(Calendar.DATE, 1);
 
-            // TODO: Code quality
             while (!DateUtils.isSameDay(otherDay, this.endTime)) {
                 Calendar overDay = (Calendar) otherDay.clone();
                 overDay.set(Calendar.HOUR_OF_DAY, 0);

@@ -141,7 +141,7 @@ public class WeekView extends View
         prepareEventDrawing(canvas);
 
         final DrawingContext drawingContext = DrawingContext.create(config);
-        eventChipsProvider.loadEventsIfNecessary(drawingContext.dayRange);
+        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange);
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
         backgroundGridDrawer.draw(drawingContext, canvas);
@@ -152,7 +152,6 @@ public class WeekView extends View
         headerRowDrawer.draw(canvas);
         dayLabelDrawer.draw(drawingContext, canvas);
 
-        // TODO Unify with drawSingleDayEvents()
         eventsDrawer.drawAllDayEvents(data.getAllDayEventChips(), drawingContext, canvas);
 
         timeColumnDrawer.drawTimeColumn(canvas);
@@ -817,12 +816,14 @@ public class WeekView extends View
      * Show today on the week view.
      */
     public void goToToday() {
-        Calendar today = Calendar.getInstance();
-        goToDate(today);
+        goToDate(today());
     }
 
     public void goToCurrentTime() {
-        // TODO
+        final Calendar today = Calendar.getInstance();
+        final int hour = today.get(Calendar.HOUR_OF_DAY);
+        goToDate(today);
+        goToHour(hour);
     }
 
     /**

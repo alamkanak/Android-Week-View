@@ -239,12 +239,9 @@ public class WeekViewGestureHandler {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            // TODO: Potential for perf improvement
-
-            // If the tap was on an event then trigger the callback.
             final List<EventChip> eventChips = data.getAllEventChips();
+
             if (eventChips != null && eventClickListener != null) {
-                // TODO: Use ID of event or internal ID
                 for (EventChip eventChip : eventChips) {
                     if (eventChip.isHit(e)) {
                         eventClickListener.onEventClick(eventChip.originalEvent, eventChip.rect);
@@ -419,7 +416,6 @@ public class WeekViewGestureHandler {
             boolean isWithinDay = (touchX > start) & (touchX < startPixel + widthPerDay);
 
             if (b && isWithinDay) {
-                // TODO: Simplify this
                 Calendar day = today();
                 day.add(Calendar.DATE, dayNumber - 1);
 

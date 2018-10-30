@@ -1,5 +1,7 @@
 package com.alamkanak.weekview.data;
 
+import android.view.View;
+
 import com.alamkanak.weekview.drawing.EventChip;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
@@ -32,16 +34,15 @@ public class EventChipsProvider {
         this.weekViewLoader = weekViewLoader;
     }
 
-    public void loadEventsIfNecessary(List<Calendar> dayRange /*, WeekViewLoader weekViewLoader*/) {
+    public void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
         for (Calendar day : dayRange) {
-            //boolean isSameDay = isSameDay(day, today);
             boolean hasNoEvents = data.getAllEventChips() == null;
             boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
                     && abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
             if (hasNoEvents || viewState.shouldRefreshEvents || needsToFetchPeriod) {
-                loadEventsAndCalculateEventChipPositions(day);
+                loadEventsAndCalculateEventChipPositions(view, day);
                 viewState.shouldRefreshEvents = false;
             }
         }
@@ -54,13 +55,13 @@ public class EventChipsProvider {
      *
      * @param day The day the user is currently in.
      */
-    private void loadEventsAndCalculateEventChipPositions(Calendar day) {
+    private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
         // Get more events if the month is changed.
         if (data.getAllEventChips() == null) {
-            data.setEventChips(new ArrayList<EventChip>()); // = new ArrayList<>();
+            data.setEventChips(new ArrayList<EventChip>());
         }
 
-        if (weekViewLoader == null) { // TODO && !view.isInEditMode()) {
+        if (weekViewLoader == null && !view.isInEditMode()) {
             throw new IllegalStateException("You must provide a MonthChangeListener");
         }
 
@@ -119,7 +120,6 @@ public class EventChipsProvider {
         }
 
         // Clear events.
-        // TODO: Polish this
         data.getAllEventChips().clear();
         data.sortAndCacheEvents(previousPeriodEvents);
         data.sortAndCacheEvents(currentPeriodEvents);
@@ -259,7 +259,7 @@ public class EventChipsProvider {
                         eventChip.bottom = config.allDayEventHeight;
                     }
 
-                    // TODO data.getAllEventChips().add(eventChip);
+                    // data.getAllEventChips().add(eventChip);
                 }
                 j++;
             }

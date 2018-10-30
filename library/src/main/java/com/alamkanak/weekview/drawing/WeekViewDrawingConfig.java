@@ -176,8 +176,6 @@ public class WeekViewDrawingConfig {
         final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight + halfTextHeight);
 
         currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin);
-
-        // TODO: Figure out why this is needed
         currentOrigin.y = min(currentOrigin.y, 0);
     }
 

@@ -16,26 +16,24 @@ class EventChipRectCalculator {
     }
 
     RectF calculateSingleEvent(EventChip eventChip, float startFromPixel) {
-        // TODO: Fix white bar at top of screen
+        final float eventMargin = config.eventMarginVertical;
+        final float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
 
-        float eventMargin = config.eventMarginVertical;
-        float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
+        final float verticalOrigin = config.drawingConfig.currentOrigin.y;
+        final float widthPerDay = config.drawingConfig.widthPerDay;
 
-        float verticalOrigin = config.drawingConfig.currentOrigin.y;
-        float widthPerDay = config.drawingConfig.widthPerDay;
-
-        float headerHeight = config.drawingConfig.headerHeight;
-        float headerPadding = config.headerRowPadding * 2;
-        float headerBottomMargin = config.drawingConfig.headerMarginBottom;
-        float totalHeaderHeight = headerHeight + headerPadding + headerBottomMargin;
+        final float headerHeight = config.drawingConfig.headerHeight;
+        final float headerPadding = config.headerRowPadding * 2;
+        final float headerBottomMargin = config.drawingConfig.headerMarginBottom;
+        final float totalHeaderHeight = headerHeight + headerPadding + headerBottomMargin;
 
         // Calculate top
-        float verticalDistanceFromTop = config.hourHeight * HOURS_PER_DAY * eventChip.top / MINUTES_PER_DAY;
-        float top = verticalDistanceFromTop + verticalOrigin + totalHeaderHeight + halfTextHeight + eventMargin;
+        final float verticalDistanceFromTop = config.hourHeight * HOURS_PER_DAY * eventChip.top / MINUTES_PER_DAY;
+        final float top = verticalDistanceFromTop + verticalOrigin + totalHeaderHeight + halfTextHeight + eventMargin;
 
         // Calculate bottom
-        float verticalDistanceFromBottom = config.hourHeight * HOURS_PER_DAY * eventChip.bottom / MINUTES_PER_DAY;
-        float bottom = verticalDistanceFromBottom + verticalOrigin + totalHeaderHeight + halfTextHeight - eventMargin;
+        final float verticalDistanceFromBottom = config.hourHeight * HOURS_PER_DAY * eventChip.bottom / MINUTES_PER_DAY;
+        final float bottom = verticalDistanceFromBottom + verticalOrigin + totalHeaderHeight + halfTextHeight - eventMargin;
 
         // Calculate left
         float left = startFromPixel + eventChip.left * widthPerDay;
@@ -58,15 +56,15 @@ class EventChipRectCalculator {
     }
 
     RectF calculateAllDayEvent(EventChip eventChip, float startFromPixel) {
-        float headerHeight = config.headerRowPadding * 2 + config.drawingConfig.headerMarginBottom;
-        float widthPerDay = config.drawingConfig.widthPerDay;
-        float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
+        final float headerHeight = config.headerRowPadding * 2 + config.drawingConfig.headerMarginBottom;
+        final float widthPerDay = config.drawingConfig.widthPerDay;
+        final float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
 
         // Calculate top
-        float top = headerHeight + halfTextHeight + config.eventMarginVertical;
+        final float top = headerHeight + halfTextHeight + config.eventMarginVertical;
 
         // Calculate bottom
-        float bottom = top + eventChip.bottom;
+        final float bottom = top + eventChip.bottom;
 
         // Calculate left
         float left = startFromPixel + eventChip.left * widthPerDay;
