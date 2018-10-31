@@ -91,7 +91,6 @@ public class EventChip {
             stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, stringBuilder.length(), 0);
         }
 
-        // TODO: Don't do work twice!
         // Prepare the location of the event.
         if (event.getLocation() != null) {
             stringBuilder.append(' ');
@@ -101,7 +100,6 @@ public class EventChip {
         int availableHeight = (int) (rect.bottom - rect.top - config.eventPadding * 2);
         int availableWidth = (int) (rect.right - rect.left - config.eventPadding * 2);
 
-        // TODO: Code quality
         // Get text dimensions.
         final TextPaint textPaint = config.drawingConfig.eventTextPaint;
         StaticLayout textLayout = new StaticLayout(stringBuilder,
@@ -110,10 +108,8 @@ public class EventChip {
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
-            // Calculate available number of line counts.
             int availableLineCount = availableHeight / lineHeight;
             do {
-                // TODO: Code quality
                 // TODO: Don't truncate
                 // Ellipsize text to fit into event rect.
                 int availableArea = availableLineCount * availableWidth;
@@ -123,10 +119,8 @@ public class EventChip {
                 final int width = (int) (rect.right - rect.left - config.eventPadding * 2);
                 textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-                // Reduce line count.
-                availableLineCount--;
-
                 // Repeat until text is short enough.
+                availableLineCount--;
             } while (textLayout.getHeight() > availableHeight);
 
             // Draw text.
