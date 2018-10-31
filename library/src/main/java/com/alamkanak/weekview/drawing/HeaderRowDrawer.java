@@ -43,20 +43,19 @@ public class HeaderRowDrawer {
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
 
         // Calculate the header height
-        drawConfig.headerHeight = calculateHeaderHeight(
-                data.getAllDayEventChips(), config.numberOfVisibleDays, viewState.firstVisibleDay);
+        drawConfig.headerHeight = calculateHeaderHeight();
     }
 
-    private float calculateHeaderHeight(List<EventChip> eventChips,
-                                        int numberOfVisibleDays, Calendar firstVisibleDay) {
+    private float calculateHeaderHeight() {
+        List<EventChip> eventChips = data.getAllDayEventChips();
         if (eventChips == null || eventChips.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
 
         // Make sure the header is the right size (depends on AllDay events)
         boolean containsAllDayEvent = false;
-        for (int i = 0; i < numberOfVisibleDays; i++) {
-            Calendar day = (Calendar) firstVisibleDay.clone();
+        for (int i = 0; i < config.numberOfVisibleDays; i++) {
+            Calendar day = (Calendar) viewState.firstVisibleDay.clone();
             day.add(DATE, i);
 
             for (int j = 0; j < eventChips.size(); j++) {

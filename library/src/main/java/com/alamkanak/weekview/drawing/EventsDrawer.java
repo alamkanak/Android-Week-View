@@ -3,6 +3,7 @@ package com.alamkanak.weekview.drawing;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -110,9 +111,11 @@ public class EventsDrawer {
         final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
         if (isValidAllDayEventRect(chipRect)) {
             eventChip.rect = chipRect;
-            final int chipHeight = calculateChipHeight(eventChip);
-            eventChip.rect.bottom = chipRect.top + chipHeight;
-            eventChip.draw(config, canvas);
+
+            final StaticLayout textLayout = calculateChipTextLayout(eventChip);
+            if (textLayout != null) {
+                eventChip.draw(config, textLayout, canvas);
+            }
         } else {
             eventChip.rect = null;
         }
@@ -138,7 +141,8 @@ public class EventsDrawer {
                 && rect.bottom > 0;
     }
 
-    private int calculateChipHeight(EventChip eventChip) {
+    @Nullable
+    private StaticLayout calculateChipTextLayout(EventChip eventChip) {
         final WeekViewEvent event = eventChip.event;
         final float left = eventChip.rect.left;
         final float top = eventChip.rect.top;
@@ -148,7 +152,7 @@ public class EventsDrawer {
         final boolean negativeWidth = (right - left - config.eventPadding * 2) < 0;
         final boolean negativeHeight = (bottom - top - config.eventPadding * 2) < 0;
         if (negativeWidth || negativeHeight) {
-            return 0;
+            return null;
         }
 
         // Prepare the name of the event.
@@ -190,7 +194,9 @@ public class EventsDrawer {
             } while (textLayout.getHeight() > availableHeight);
         }
 
-        return lineHeight + (config.eventPadding * 2);
+        final int chipHeight = lineHeight + (config.eventPadding * 2);
+        eventChip.rect.bottom = eventChip.rect.top + chipHeight;
+        return textLayout;
     }
 
 }

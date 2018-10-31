@@ -4,15 +4,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.text.Layout;
+import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.view.MotionEvent;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewEvent;
+
+import static android.text.Layout.Alignment.ALIGN_NORMAL;
 
 /**
  * A class to hold reference to the events and their visual representation. An EventRect is
@@ -52,10 +55,20 @@ public class EventChip {
     }
 
     public void draw(WeekViewConfig config, Canvas canvas) {
+        draw(config, null, canvas);
+    }
+
+    public void draw(WeekViewConfig config, @Nullable StaticLayout textLayout, Canvas canvas) {
         float cornerRadius = config.eventCornerRadius;
         Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
-        drawEventTitle(config, canvas);
+
+        if (textLayout != null) {
+            // The text height has already been calculated
+            drawEventTitle(config, textLayout, canvas);
+        } else {
+            calculateTextHeightAndDrawTitle(config, canvas);
+        }
     }
 
     private Paint getBackgroundPaint() {
@@ -64,7 +77,7 @@ public class EventChip {
         return paint;
     }
 
-    private void drawEventTitle(WeekViewConfig config, Canvas canvas) {
+    private void calculateTextHeightAndDrawTitle(WeekViewConfig config, Canvas canvas) {
         boolean negativeWidth = (rect.right - rect.left - config.eventPadding * 2) < 0;
         boolean negativeHeight = (rect.bottom - rect.top - config.eventPadding * 2) < 0;
         if (negativeWidth || negativeHeight) {
@@ -90,7 +103,9 @@ public class EventChip {
 
         // TODO: Code quality
         // Get text dimensions.
-        StaticLayout textLayout = new StaticLayout(stringBuilder, config.drawingConfig.eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        final TextPaint textPaint = config.drawingConfig.eventTextPaint;
+        StaticLayout textLayout = new StaticLayout(stringBuilder,
+                textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
@@ -102,8 +117,11 @@ public class EventChip {
                 // TODO: Don't truncate
                 // Ellipsize text to fit into event rect.
                 int availableArea = availableLineCount * availableWidth;
-                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder, config.drawingConfig.eventTextPaint, availableArea, TextUtils.TruncateAt.END);
-                textLayout = new StaticLayout(ellipsized, config.drawingConfig.eventTextPaint, (int) (rect.right - rect.left - config.eventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder,
+                        textPaint, availableArea, TextUtils.TruncateAt.END);
+
+                final int width = (int) (rect.right - rect.left - config.eventPadding * 2);
+                textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
@@ -112,11 +130,15 @@ public class EventChip {
             } while (textLayout.getHeight() > availableHeight);
 
             // Draw text.
-            canvas.save();
-            canvas.translate(rect.left + config.eventPadding, rect.top + config.eventPadding);
-            textLayout.draw(canvas);
-            canvas.restore();
+            drawEventTitle(config, textLayout, canvas);
         }
+    }
+
+    private void drawEventTitle(WeekViewConfig config, StaticLayout textLayout, Canvas canvas) {
+        canvas.save();
+        canvas.translate(rect.left + config.eventPadding, rect.top + config.eventPadding);
+        textLayout.draw(canvas);
+        canvas.restore();
     }
 
     public boolean isHit(MotionEvent e) {
