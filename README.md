@@ -1,35 +1,149 @@
 Android Week View
 =================
 
-**Android Week View** is an Android library to display calendar views within an app. It was developed by [Raquib-ul Alam](https://github.com/alamkanak). Because it is not currently maintained and does not work when using API level 28, I’m providing this fork.
+**Android Week View** is an Android library for displaying calendar views within an app. It was initially developed by [Raquib-ul Alam](https://github.com/alamkanak), but is not currently maintained and does not work when using API level 28. Therefore, I’m providing this fork. 
 
 Usage
 ---------
-1. Add JitPack repository to your build file.
+1. Add the JitPack repository to your project-level build file and the dependency to the app-level build file.
 ```groovy
+// build.gradle (project-level)
 allprojects {
  repositories {
- ...
- maven { url 'https://jitpack.io' }
+  ...
+  maven { url 'https://jitpack.io' }
  }
+}
+
+// build.gradle (app-level)
+implementation 'com.github.thellmund:Android-Week-View:1.3' // Bugfix-only version
+implementation 'com.github.thellmund:Android-Week-View:3.0' // Version with updated API
+```
+
+2. Add `WeekView` in your XML layout.
+```xml
+<com.alamkanak.weekview.ui.WeekView
+    android:id="@+id/weekView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:eventTextColor="@color/white"
+    app:textSize="12sp"
+    app:hourHeight="60dp"
+    app:headerColumnPadding="8dp"
+    app:headerColumnTextColor="@color/light_blue"
+    app:headerRowPadding="12dp"
+    app:columnGap="8dp"
+    app:noOfVisibleDays="3"
+    app:headerRowBackgroundColor="@color/light_gray"
+    app:dayBackgroundColor="@color/white"
+    app:todayBackgroundColor="@color/light_blue"
+    app:headerColumnBackground="@color/white"/>
+```
+
+3. Prepare the class of objects that you want to display in `WeekView` by implementing `WeekViewDisplayable<T>`.
+```java
+public class CalendarItem implements WeekViewDisplayable<CalendarItem> {
+
+    private long id;
+    private String title;
+    private DateTime startTime;
+    private DateTime endTime;
+    private String location;
+    private int color;
+    
+    /* ... */
+    
+    @Override
+    public WeekViewEvent<CalendarItem> toWeekViewEvent() {
+        // Note: It's important to pass "this" as the last argument to WeekViewEvent's constructor.
+        // This way, the EventClickListener can return this object in its onEventClick() method.
+        boolean isAllDay = DateUtils.isAllDay(startTime, endTime);
+        return new WeekViewEvent<>(
+            id, title, startTime.toGregorianCalendar(), 
+            endTime.toGregorianCalendar(), location, color, isAllDay, this
+        );
+    }
+
 }
 ```
 
-2. Add the dependency.
-```groovy
-// For the bugfix-only version
-implementation 'com.github.thellmund:Android-Week-View:1.3'
+4. Configure `WeekView` in code.
+```java
+WeekView<CalendarItem> weekView = (WeekView) findViewById(R.id.weekView);
+weekView.setOnEventClickListener(new EventClickListener<CalendarItem>() {
+    @Override
+    public void onEventClick(CalendarItem event, RectF eventRect) {
+        // Do something with the CalendarItem
+    }
+});
 
-// For the version with an updated API
-implementation 'com.github.thellmund:Android-Week-View:2.0'
+// WeekView has infinite horizontal scrolling. Therefore, you need to provide the events 
+// of a month whenever that the currently displayed month changes.
+weekView.setMonthChangeListener(new MonthLoader.MonthChangeListener<CalendarItem>() {
+    @Override
+    public List<WeekViewDisplayable<CalendarItem>> onMonthChange(Calendar startDate, Calendar endDate) {
+        return mDatabase.getCalendarItemsInRange(startDate, endDate);
+    }
+});
 ```
-More info about version 2.0 here: [Release 2.0](https://github.com/thellmund/Android-Week-View/releases/tag/2.0)
 
-Below, you find the original README by [Raquib-ul Alam](https://github.com/alamkanak).
+--- 
+
+Customization
+-------------------
+
+Many aspects of `WeekView` and the individual event chips can be customized.
+
+- `allDayEventHeight`: All-day events are displayed in a header row at the top. This attributes specifies their height. If not set, these events will be set to the height of their content.
+- `columnGap`: The horizontal gap between individual days.
+- `dayBackgroundColor`: The background color of the current day, e.g. to emphasize it in a multi-day view.
+- `eventMarginVertical`: The vertical gap between back-to-back events.
+- `eventPadding`: The gap between the event title and the border of its event chip. 
+- `eventTextColor`: The color of the event title and location in the event chip.
+- `eventTextSize`: The size of text in the event chip.
+- `firstDayOfWeek`: The first day of the week. Default is Monday.
+- `headerColumnBackground`: The background of the time column which is displayed on the left-hand side.
+- `headerColumnPadding`
+- `headerColumnTextColor`: The color of the hour text in the time column.
+- `headerRowBackgroundColor`: The background color of the header row which runs at the top of `WeekView`.
+- `headerRowPadding`: The padding within the header row.
+- `hourHeight`: The height with with one hour is displayed. Default is 50dp.
+- `hourSeparatorColor`: The color of the horizontal lines that indicate the hours.
+- `hourSeparatorHeight`: The height of the horizontal hour lines.
+- `noOfVisibleDays`: The number of days that are visible. Default is 3.
+- `overlappingEventGap`: The horizontal gap between events that occur concurrently.
+- `textSize`: The text size used for text in the time column and the days row, which contains the currently displayed days.
+- `todayBackgroundColor`: The background color of the current day.
+- `todayHeaderTextColor`: The text color of the current day in the days row.
+- `showDistinctPastFutureColor`: Indicates whether distinct background colors should be used for past and future days. Default is false.
+- `futureBackgroundColor`: The background color to use for future days. Requires `showDistinctPastFutureColor` to be true.
+- `pastBackgroundColor`: The background color to use for past days. Requires `showDistinctPastFutureColor` to be true.
+- `showDistinctWeekendColor`: Indicates whether weekends should be marked with a distinct color. Default is false.
+- `futureWeekendBackgroundColor`: The background color of future weekend days. Requires `showDistinctWeekendColor` to be true.
+- `pastWeekendBackgroundColor`: The background color of past weekend days. Requires `showDistinctWeekendColor` to be true.
+- `showNowLine`: Indicates whether a horizontal line should be displayed at the current time. Default is false.
+- `nowLineColor`: The color of the now line. 
+- `nowLineThickness`: The height of the now line.
+- `scrollDuration`: The duration of automatic scrolling. The value determines how fast `WeekView` scrolls to a particular day.
 
 ---
 
-Android Week View
+Customization
+-------------------
+
+The following interfaces are used to provide data and interactability to `WeekView`.  
+- `setMonthChangeListener()` to provide events to the calendar by months
+- `setOnEventClickListener()` to get a callback when an event is clicked
+- `setEventLongPressListener()` to get a callback when an event is long pressed
+- `setDateTimeInterpreter()` to set your own labels for the calendar header row and header column
+- `setWeekViewLoader()` to provide events to the calendar
+- `setEmptyViewClickListener()` to get a callback when any empty space is clicked
+- `setEmptyViewLongPressListener()` to get a callback when any empty space is long pressed
+- `setScrollListener()` to get an event every time the first visible day has changed
+
+---
+
+[Original README] Android Week View
 =================
 
 ![](images/screen-shot.png)
