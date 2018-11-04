@@ -48,7 +48,7 @@ public class WeekViewConfig {
     public int headerColumnBackgroundColor = Color.WHITE;
 
     public int overlappingEventGap = 0;
-    public int eventMarginVertical = 0;
+    public int eventMarginVertical = 3;
     public int eventMarginHorizontal = 0;
     public float xScrollingSpeed = 1f;
     public int eventCornerRadius = 0;
