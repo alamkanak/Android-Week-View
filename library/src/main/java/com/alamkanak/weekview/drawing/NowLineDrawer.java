@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
 
@@ -29,16 +30,12 @@ public class NowLineDrawer {
         for (Calendar day : drawingContext.dayRange) {
             boolean isSameDay = isSameDay(day, today);
             float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
-            //dayBackgroundDrawer.drawDayBackground(day, startX, startPixel, canvas);
-            //backgroundGridDrawer.drawGrid(hourLines, startX, startPixel, canvas);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
-
-            //eventsDrawer.drawEvents(data.getNormalEventChips(), day, startPixel, canvas);
 
             // Draw the line at the current time.
             if (config.showNowLine && isSameDay) {
@@ -66,7 +63,12 @@ public class NowLineDrawer {
         // Draw dot at the beginning of the line
         final float dotRadius = drawConfig.nowDotPaint.getStrokeWidth();
         final float dotMargin = 32;
-        canvas.drawCircle(startX + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
+
+        // We use startPixel to prevent the dot from sticking on the left side of the screen
+        canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
+
+        Log.d("Now line drawer", "StartX: " + startX);
+        Log.d("Now line drawer", "StartPixel: " + startPixel);
     }
 
 }
