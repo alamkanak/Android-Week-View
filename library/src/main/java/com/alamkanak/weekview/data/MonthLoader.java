@@ -3,10 +3,13 @@ package com.alamkanak.weekview.data;
 import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
+import com.alamkanak.weekview.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static com.alamkanak.weekview.utils.DateUtils.today;
 
 /**
  * This class is responsible for loading {@link WeekViewEvent}s into {@link WeekView}. It can handle
@@ -31,11 +34,23 @@ public class MonthLoader implements WeekViewLoader {
 
     @Override
     public List<? extends WeekViewEvent> onLoad(int periodIndex) {
-        int newYear = periodIndex / 12;
-        int newMonth = periodIndex % 12 + 1;
+        final int year = periodIndex / 12;
+        final int month = periodIndex % 12 + 1;
+
+        final Calendar startDate = DateUtils.withTimeAtStartOfDay(today());
+        startDate.set(Calendar.YEAR, year);
+        startDate.set(Calendar.MONTH, month); // TODO: Test
+        startDate.set(Calendar.DAY_OF_MONTH, 1);
+
+        final int maxDays = startDate.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        final Calendar endDate = DateUtils.withTimeAtStartOfDay(today());
+        startDate.set(Calendar.YEAR, year);
+        startDate.set(Calendar.MONTH, month); // TODO: Test
+        startDate.set(Calendar.DAY_OF_MONTH, maxDays);
 
         List<WeekViewDisplayable> displayableItems =
-                onMonthChangeListener.onMonthChange(newYear, newMonth);
+                onMonthChangeListener.onMonthChange(startDate, endDate);
 
         List<WeekViewEvent> events = new ArrayList<>();
         for (WeekViewDisplayable displayableItem : displayableItems) {
@@ -57,11 +72,11 @@ public class MonthLoader implements WeekViewLoader {
 
         /**
          * Called when the month displayed in the {@link WeekView} changes.
-         * @param newYear The year that is now being displayed
-         * @param newMonth The month that is now being displayed
+         * @param startDate A {@link Calendar} representing the start date of the month
+         * @param endDate A {@link Calendar} representing the end date of the month
          * @return The list of {@link WeekViewDisplayable} of the provided month
          */
-        List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth);
+        List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate);
 
     }
 }

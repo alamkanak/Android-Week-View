@@ -36,6 +36,14 @@ public class DateUtils {
         return date;
     }
 
+    public static Calendar withTimeAtEndOfDay(Calendar date) {
+        date.set(Calendar.HOUR_OF_DAY, 23);
+        date.set(Calendar.MINUTE, 59);
+        date.set(Calendar.SECOND, 59);
+        date.set(Calendar.MILLISECOND, 999);
+        return date;
+    }
+
     public static int getDaysUntilDate(Calendar date) {
         long dateInMillis = date.getTimeInMillis();
         long todayInMillis = today().getTimeInMillis();

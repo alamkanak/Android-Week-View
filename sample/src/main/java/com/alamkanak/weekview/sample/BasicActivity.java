@@ -15,7 +15,10 @@ import java.util.List;
 public class BasicActivity extends BaseActivity {
 
     @Override
-    public List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth) {
+    public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
+        final int newYear = startDate.get(Calendar.YEAR);
+        final int newMonth = startDate.get(Calendar.MONTH);
+
         // Populate the week view with some events.
         List<WeekViewDisplayable> events = new ArrayList<>();
 
