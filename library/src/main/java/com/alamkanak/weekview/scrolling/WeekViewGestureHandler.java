@@ -20,6 +20,7 @@ import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.ui.WeekView;
+import com.alamkanak.weekview.utils.WeekViewException;
 
 import java.util.Calendar;
 import java.util.List;
@@ -252,7 +253,7 @@ public class WeekViewGestureHandler<T> {
                         if (data != null) {
                             eventClickListener.onEventClick(data, eventChip.rect);
                         } else {
-                            // TODO Exception
+                            throw new WeekViewException("No data to show. Did you pass the original object into the constructor of WeekViewEvent?");
                         }
 
                         return super.onSingleTapConfirmed(e);
@@ -290,7 +291,7 @@ public class WeekViewGestureHandler<T> {
                         if (data != null) {
                             eventLongPressListener.onEventLongPress(data, eventChip.rect);
                         } else {
-                            // TODO Exception
+                            throw new WeekViewException("No data to show. Did you pass the original object into the constructor of WeekViewEvent?");
                         }
 
                         return;
