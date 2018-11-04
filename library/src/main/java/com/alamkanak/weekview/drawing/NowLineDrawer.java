@@ -1,7 +1,6 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
 
@@ -66,9 +65,6 @@ public class NowLineDrawer {
 
         // We use startPixel to prevent the dot from sticking on the left side of the screen
         canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
-
-        Log.d("Now line drawer", "StartX: " + startX);
-        Log.d("Now line drawer", "StartPixel: " + startPixel);
     }
 
 }
