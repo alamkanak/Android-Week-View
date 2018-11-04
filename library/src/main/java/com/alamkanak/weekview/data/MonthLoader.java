@@ -17,23 +17,23 @@ import static com.alamkanak.weekview.utils.DateUtils.today;
  * an interface that can be implemented in one's actual data class and handles the conversion to a
  * {@link WeekViewEvent}.
  */
-public class MonthLoader implements WeekViewLoader {
+public class MonthLoader<T> implements WeekViewLoader<T> {
 
-    private MonthChangeListener onMonthChangeListener;
+    private MonthChangeListener<T> onMonthChangeListener;
 
-    public MonthLoader(MonthChangeListener listener){
+    public MonthLoader(MonthChangeListener<T> listener){
         this.onMonthChangeListener = listener;
     }
 
     @Override
-    public double toWeekViewPeriodIndex(Calendar instance){
+    public double toWeekViewPeriodIndex(Calendar instance) {
         return instance.get(Calendar.YEAR) * 12
                 + instance.get(Calendar.MONTH)
                 + (instance.get(Calendar.DAY_OF_MONTH) - 1) / 30.0;
     }
 
     @Override
-    public List<? extends WeekViewEvent> onLoad(int periodIndex) {
+    public List<WeekViewEvent<T>> onLoad(int periodIndex) {
         final int year = periodIndex / 12;
         final int month = periodIndex % 12 + 1;
 
@@ -49,11 +49,11 @@ public class MonthLoader implements WeekViewLoader {
         startDate.set(Calendar.MONTH, month); // TODO: Test
         startDate.set(Calendar.DAY_OF_MONTH, maxDays);
 
-        List<WeekViewDisplayable> displayableItems =
+        List<WeekViewDisplayable<T>> displayableItems =
                 onMonthChangeListener.onMonthChange(startDate, endDate);
 
-        List<WeekViewEvent> events = new ArrayList<>();
-        for (WeekViewDisplayable displayableItem : displayableItems) {
+        List<WeekViewEvent<T>> events = new ArrayList<>();
+        for (WeekViewDisplayable<T> displayableItem : displayableItems) {
             events.add(displayableItem.toWeekViewEvent());
         }
 
@@ -64,11 +64,11 @@ public class MonthLoader implements WeekViewLoader {
         return onMonthChangeListener;
     }
 
-    public void setOnMonthChangeListener(MonthChangeListener onMonthChangeListener) {
+    public void setOnMonthChangeListener(MonthChangeListener<T> onMonthChangeListener) {
         this.onMonthChangeListener = onMonthChangeListener;
     }
 
-    public interface MonthChangeListener {
+    public interface MonthChangeListener<T> {
 
         /**
          * Called when the month displayed in the {@link WeekView} changes.
@@ -76,7 +76,7 @@ public class MonthLoader implements WeekViewLoader {
          * @param endDate A {@link Calendar} representing the end date of the month
          * @return The list of {@link WeekViewDisplayable} of the provided month
          */
-        List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate);
+        List<WeekViewDisplayable<T>> onMonthChange(Calendar startDate, Calendar endDate);
 
     }
 }

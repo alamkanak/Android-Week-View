@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -30,7 +29,7 @@ import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
-import com.alamkanak.weekview.scrolling.WeekViewGestureHandler;
+import com.alamkanak.weekview.gestures.WeekViewGestureHandler;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
@@ -46,7 +45,7 @@ import static java.util.Calendar.DATE;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  */
-public class WeekView extends View
+public class WeekView<T> extends View
         implements WeekViewGestureHandler.Listener, WeekViewViewState.UpdateListener {
 
     private static int width;
@@ -57,20 +56,20 @@ public class WeekView extends View
     }
 
     private WeekViewConfig config;
-    private WeekViewData data;
+    private WeekViewData<T> data;
 
     private WeekViewViewState viewState;
-    private WeekViewGestureHandler gestureHandler;
+    private WeekViewGestureHandler<T> gestureHandler;
 
     private HeaderRowDrawer headerRowDrawer;
     private DayLabelDrawer dayLabelDrawer;
-    private EventsDrawer eventsDrawer;
+    private EventsDrawer<T> eventsDrawer;
     private TimeColumnDrawer timeColumnDrawer;
     private DayBackgroundDrawer dayBackgroundDrawer;
     private BackgroundGridDrawer backgroundGridDrawer;
     private NowLineDrawer nowLineDrawer;
 
-    private EventChipsProvider eventChipsProvider;
+    private EventChipsProvider<T> eventChipsProvider;
 
     public WeekView(Context context) {
         this(context, null);
@@ -86,12 +85,12 @@ public class WeekView extends View
         config = new WeekViewConfig(context, attrs);
         config.drawingConfig = new WeekViewDrawingConfig(context, config);
 
-        data = new WeekViewData();
+        data = new WeekViewData<>();
         viewState = new WeekViewViewState();
 
-        gestureHandler = new WeekViewGestureHandler(context, this, config, data);
+        gestureHandler = new WeekViewGestureHandler<>(context, this, config, data);
 
-        eventsDrawer = new EventsDrawer(config);
+        eventsDrawer = new EventsDrawer<>(config);
         timeColumnDrawer = new TimeColumnDrawer(config);
 
         headerRowDrawer = new HeaderRowDrawer(config, data, viewState);
@@ -101,7 +100,7 @@ public class WeekView extends View
         backgroundGridDrawer = new BackgroundGridDrawer(config);
         nowLineDrawer = new NowLineDrawer(config);
 
-        eventChipsProvider = new EventChipsProvider(config, data, viewState);
+        eventChipsProvider = new EventChipsProvider<>(config, data, viewState);
         eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
     }
 
@@ -226,7 +225,7 @@ public class WeekView extends View
     //
     /////////////////////////////////////////////////////////////////
 
-    public void setOnEventClickListener(EventClickListener listener) {
+    public void setOnEventClickListener(EventClickListener<T> listener) {
         gestureHandler.setEventClickListener(listener);
     }
 
@@ -242,8 +241,8 @@ public class WeekView extends View
         return null;
     }
 
-    public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener monthChangeListener) {
-        WeekViewLoader weekViewLoader = new MonthLoader(monthChangeListener);
+    public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener<T> monthChangeListener) {
+        WeekViewLoader<T> weekViewLoader = new MonthLoader<>(monthChangeListener);
         gestureHandler.setWeekViewLoader(weekViewLoader);
         eventChipsProvider.setWeekViewLoader(weekViewLoader);
     }
@@ -255,7 +254,7 @@ public class WeekView extends View
      *
      * @return The event loader.
      */
-    public WeekViewLoader getWeekViewLoader() {
+    public WeekViewLoader<T> getWeekViewLoader() {
         return gestureHandler.getWeekViewLoader();
     }
 
@@ -266,7 +265,7 @@ public class WeekView extends View
      *
      * @param weekViewLoader The event loader.
      */
-    public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
+    public void setWeekViewLoader(WeekViewLoader<T> weekViewLoader) {
         gestureHandler.setWeekViewLoader(weekViewLoader);
         eventChipsProvider.setWeekViewLoader(weekViewLoader);
     }
@@ -275,7 +274,7 @@ public class WeekView extends View
         return gestureHandler.getEventLongPressListener();
     }
 
-    public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
+    public void setEventLongPressListener(EventLongPressListener<T> eventLongPressListener) {
         gestureHandler.setEventLongPressListener(eventLongPressListener);
     }
 
@@ -337,6 +336,9 @@ public class WeekView extends View
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
+        // TODO: Remove this workaround
+        viewState.isFirstDraw = true;
+
         config.setNumberOfVisibleDays(numberOfVisibleDays);
         invalidate();
     }

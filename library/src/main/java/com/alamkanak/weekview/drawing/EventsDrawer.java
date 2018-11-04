@@ -20,7 +20,7 @@ import java.util.List;
 
 import static android.text.Layout.Alignment.ALIGN_NORMAL;
 
-public class EventsDrawer {
+public class EventsDrawer<T> {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
@@ -32,7 +32,7 @@ public class EventsDrawer {
         this.rectCalculator = new EventChipRectCalculator(config);
     }
 
-    public void drawSingleEvents(List<EventChip> eventChips,
+    public void drawSingleEvents(List<EventChip<T>> eventChips,
                                  DrawingContext drawingContext, Canvas canvas) {
         float startPixel = drawingContext.startPixel;
 
@@ -51,7 +51,7 @@ public class EventsDrawer {
         }
     }
 
-    private void drawEventsForDate(List<EventChip> eventChips, Calendar date,
+    private void drawEventsForDate(List<EventChip<T>> eventChips, Calendar date,
                                    float startFromPixel, Canvas canvas) {
         if (eventChips == null) {
             return;
@@ -81,7 +81,7 @@ public class EventsDrawer {
      * @param drawingContext The {@link DrawingContext} to use for drawing
      * @param canvas         The canvas to draw upon.
      */
-    public void drawAllDayEvents(List<EventChip> eventChips,
+    public void drawAllDayEvents(List<EventChip<T>> eventChips,
                                  DrawingContext drawingContext, Canvas canvas) {
         if (eventChips == null) {
             return;

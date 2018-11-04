@@ -16,21 +16,21 @@ import static java.lang.Math.abs;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
 
-public class EventChipsProvider {
+public class EventChipsProvider<T> {
 
     private WeekViewConfig config;
-    private WeekViewData data;
-    private WeekViewLoader weekViewLoader;
+    private WeekViewData<T> data;
+    private WeekViewLoader<T> weekViewLoader;
     private WeekViewViewState viewState;
 
     public EventChipsProvider(WeekViewConfig config,
-                              WeekViewData data, WeekViewViewState viewState) {
+                              WeekViewData<T> data, WeekViewViewState viewState) {
         this.config = config;
         this.data = data;
         this.viewState = viewState;
     }
 
-    public void setWeekViewLoader(WeekViewLoader weekViewLoader) {
+    public void setWeekViewLoader(WeekViewLoader<T> weekViewLoader) {
         this.weekViewLoader = weekViewLoader;
     }
 
@@ -58,7 +58,7 @@ public class EventChipsProvider {
     private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
         // Get more events if the month is changed.
         if (data.getAllEventChips() == null) {
-            data.setEventChips(new ArrayList<EventChip>());
+            data.setEventChips(new ArrayList<EventChip<T>>());
         }
 
         if (weekViewLoader == null && !view.isInEditMode()) {
@@ -88,9 +88,9 @@ public class EventChipsProvider {
             return;
         }
 
-        List<? extends WeekViewEvent> previousPeriodEvents = null;
-        List<? extends WeekViewEvent> currentPeriodEvents = null;
-        List<? extends WeekViewEvent> nextPeriodEvents = null;
+        List<WeekViewEvent<T>> previousPeriodEvents = null;
+        List<WeekViewEvent<T>> currentPeriodEvents = null;
+        List<WeekViewEvent<T>> nextPeriodEvents = null;
 
         if (data.previousPeriodEvents != null
                 && data.currentPeriodEvents != null && data.nextPeriodEvents != null) {
@@ -133,23 +133,22 @@ public class EventChipsProvider {
 
     private void calculateEventChipPositions() {
         // Prepare to calculate positions of each events.
-        List<EventChip> tempEvents = data.getAllEventChips();
-        List<EventChip> results = new ArrayList<>();
-        //data.setEventChips(new ArrayList<EventChip>()); //.eventChips = new ArrayList<>();
+        List<EventChip<T>> tempEvents = data.getAllEventChips();
+        List<EventChip<T>> results = new ArrayList<>();
 
         // Iterate through each day with events to calculate the position of the events.
         while (!tempEvents.isEmpty()) {
-            List<EventChip> eventChips = new ArrayList<>();
+            List<EventChip<T>> eventChips = new ArrayList<>();
 
             // Get first event for a day.
-            EventChip firstRect = tempEvents.remove(0);
+            EventChip<T> firstRect = tempEvents.remove(0);
             eventChips.add(firstRect);
 
             int i = 0;
             while (i < tempEvents.size()) {
                 // Collect all other events for same day.
-                EventChip eventChip = tempEvents.get(i);
-                WeekViewEvent event = eventChip.event;
+                EventChip<T> eventChip = tempEvents.get(i);
+                WeekViewEvent<T> event = eventChip.event;
                 if (firstRect.event.isSameDay(event)) {
                     tempEvents.remove(i);
                     eventChips.add(eventChip);
@@ -171,7 +170,7 @@ public class EventChipsProvider {
      *
      * @param eventChips The events along with their wrapper class.
      */
-    private void computePositionOfEvents(List<EventChip> eventChips) {
+    private void computePositionOfEvents(List<EventChip<T>> eventChips) {
         // Make "collision groups" for all events that collide with others.
         List<List<EventChip>> collisionGroups = new ArrayList<>();
         for (EventChip eventChip : eventChips) {

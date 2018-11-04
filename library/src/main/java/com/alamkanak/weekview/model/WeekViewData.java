@@ -13,9 +13,9 @@ public class WeekViewData<T> {
     private List<EventChip<T>> normalEventChips;
     private List<EventChip<T>> allDayEventChips;
 
-    public List<? extends WeekViewEvent<T>> previousPeriodEvents;
-    public List<? extends WeekViewEvent<T>> currentPeriodEvents;
-    public List<? extends WeekViewEvent<T>> nextPeriodEvents;
+    public List<WeekViewEvent<T>> previousPeriodEvents;
+    public List<WeekViewEvent<T>> currentPeriodEvents;
+    public List<WeekViewEvent<T>> nextPeriodEvents;
 
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
