@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -210,12 +211,7 @@ public class WeekView extends View
 
     @Override
     public void onScrolled() {
-        postInvalidateOnAnimation();
-    }
-
-    @Override
-    public void performHapticFeedback() {
-        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     @Override

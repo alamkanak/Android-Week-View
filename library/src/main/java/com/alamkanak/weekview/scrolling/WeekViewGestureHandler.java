@@ -289,7 +289,6 @@ public class WeekViewGestureHandler<T> {
 
                         if (data != null) {
                             eventLongPressListener.onEventLongPress(data, eventChip.rect);
-                            listener.performHapticFeedback();
                         } else {
                             // TODO Exception
                         }
@@ -309,7 +308,6 @@ public class WeekViewGestureHandler<T> {
                     && e.getX() > timeColumnWidth && e.getY() > headerHeight) {
                 Calendar selectedTime = getTimeFromPoint(e.getX(), e.getY());
                 if (selectedTime != null) {
-                    listener.performHapticFeedback();
                     emptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
                 }
             }
@@ -499,7 +497,6 @@ public class WeekViewGestureHandler<T> {
     public interface Listener {
         void onScaled();
         void onScrolled();
-        void performHapticFeedback(); // TODO: Remove?
     }
 
 }
