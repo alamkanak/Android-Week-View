@@ -32,10 +32,10 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class AsyncActivity extends AppCompatActivity
-        implements EventClickListener<ApiEvent>, MonthLoader.MonthChangeListener,
+        implements EventClickListener<ApiEvent>, MonthLoader.MonthChangeListener<ApiEvent>,
         EventLongPressListener<ApiEvent>, EmptyViewLongPressListener, Callback<List<ApiEvent>> {
 
-    private List<WeekViewEvent> events = new ArrayList<>();
+    private List<WeekViewEvent<ApiEvent>> events = new ArrayList<>();
     boolean calledNetwork = false;
 
     private static final int TYPE_DAY_VIEW = 1;
@@ -43,7 +43,7 @@ public class AsyncActivity extends AppCompatActivity
     private static final int TYPE_WEEK_VIEW = 3;
 
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
-    private WeekView mWeekView;
+    private WeekView<ApiEvent> mWeekView;
 
     private ProgressDialog mProgressDialog;
 
@@ -169,7 +169,7 @@ public class AsyncActivity extends AppCompatActivity
     }
 
     @Override
-    public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
+    public List<WeekViewDisplayable<ApiEvent>> onMonthChange(Calendar startDate, Calendar endDate) {
         final int newYear = startDate.get(Calendar.YEAR);
         final int newMonth = startDate.get(Calendar.MONTH);
 
@@ -186,8 +186,8 @@ public class AsyncActivity extends AppCompatActivity
         }
 
         // Return only the events that matches newYear and newMonth.
-        List<WeekViewDisplayable> matchedEvents = new ArrayList<>();
-        for (WeekViewEvent event : events) {
+        List<WeekViewDisplayable<ApiEvent>> matchedEvents = new ArrayList<>();
+        for (WeekViewEvent<ApiEvent> event : events) {
             if (eventMatches(event, newYear, newMonth)) {
                 matchedEvents.add(event);
             }

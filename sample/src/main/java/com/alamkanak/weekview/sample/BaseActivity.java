@@ -31,7 +31,7 @@ import java.util.Locale;
  * Website: http://alamkanak.github.io
  */
 public class BaseActivity extends AppCompatActivity
-        implements EventClickListener<Event>, MonthLoader.MonthChangeListener,
+        implements EventClickListener<Event>, MonthLoader.MonthChangeListener<Event>,
         EventLongPressListener<Event>, EmptyViewLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;
@@ -39,7 +39,7 @@ public class BaseActivity extends AppCompatActivity
     private static final int TYPE_WEEK_VIEW = 3;
 
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
-    private WeekView mWeekView;
+    private WeekView<Event> mWeekView;
 
     private EventsDatabase mDatabase;
 
@@ -169,7 +169,7 @@ public class BaseActivity extends AppCompatActivity
     }
 
     @Override
-    public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
+    public List<WeekViewDisplayable<Event>> onMonthChange(Calendar startDate, Calendar endDate) {
         return mDatabase.getEventsInRange(startDate, endDate);
     }
 

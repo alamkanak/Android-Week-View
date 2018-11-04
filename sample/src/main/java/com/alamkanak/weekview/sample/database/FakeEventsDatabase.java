@@ -20,7 +20,7 @@ public class FakeEventsDatabase implements EventsDatabase {
     }
 
     @Override
-    public List<WeekViewDisplayable> getEventsInRange(Calendar startDate, Calendar endDate) {
+    public List<WeekViewDisplayable<Event>> getEventsInRange(Calendar startDate, Calendar endDate) {
         final int newYear = startDate.get(Calendar.YEAR);
         final int newMonth = startDate.get(Calendar.MONTH);
 
@@ -29,8 +29,8 @@ public class FakeEventsDatabase implements EventsDatabase {
         final int color3 = context.getResources().getColor(R.color.event_color_03);
         final int color4 = context.getResources().getColor(R.color.event_color_04);
 
-        List<WeekViewDisplayable> events = new ArrayList<>();
-        WeekViewDisplayable event;
+        List<WeekViewDisplayable<Event>> events = new ArrayList<>();
+        Event event;
 
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);

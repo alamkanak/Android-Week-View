@@ -5,7 +5,7 @@ import com.alamkanak.weekview.model.WeekViewEvent;
 
 import java.util.Calendar;
 
-public class Event implements WeekViewDisplayable {
+public class Event implements WeekViewDisplayable<Event> {
 
     private long id;
     private String title;
@@ -83,7 +83,7 @@ public class Event implements WeekViewDisplayable {
     }
 
     @Override
-    public WeekViewEvent toWeekViewEvent() {
+    public WeekViewEvent<Event> toWeekViewEvent() {
         return new WeekViewEvent<>(id, title, startTime, endTime, location, color, isAllDay, this);
     }
 
