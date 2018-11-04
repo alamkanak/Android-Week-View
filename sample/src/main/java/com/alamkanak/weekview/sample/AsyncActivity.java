@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.sample;
 
+import android.app.ProgressDialog;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,26 +14,29 @@ import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
 import com.alamkanak.weekview.listeners.EventClickListener;
 import com.alamkanak.weekview.listeners.EventLongPressListener;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
-import com.alamkanak.weekview.sample.apiclient.Event;
-import com.alamkanak.weekview.sample.database.EventsDatabase;
-import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
+import com.alamkanak.weekview.model.WeekViewEvent;
+import com.alamkanak.weekview.sample.apiclient.ApiEvent;
+import com.alamkanak.weekview.sample.apiclient.MyJsonService;
 import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * This is a base activity which contains week view and all the codes necessary to initialize the
- * week view.
- * Created by Raquib-ul-Alam Kanak on 1/3/2014.
- * Website: http://alamkanak.github.io
- */
-public class BaseActivity extends AppCompatActivity
-        implements EventClickListener<Event>, MonthLoader.MonthChangeListener,
-        EventLongPressListener<Event>, EmptyViewLongPressListener {
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
+public class AsyncActivity extends AppCompatActivity
+        implements EventClickListener<ApiEvent>, MonthLoader.MonthChangeListener,
+        EventLongPressListener<ApiEvent>, EmptyViewLongPressListener, Callback<List<ApiEvent>> {
+
+    private List<WeekViewEvent> events = new ArrayList<>();
+    boolean calledNetwork = false;
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -41,14 +45,17 @@ public class BaseActivity extends AppCompatActivity
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
     private WeekView mWeekView;
 
-    private EventsDatabase mDatabase;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
 
-        mDatabase = new FakeEventsDatabase(this);
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(true);
+        mProgressDialog.setMessage("Loading events ...");
+        mProgressDialog.show();
 
         mWeekView = findViewById(R.id.weekView);
         mWeekView.setOnEventClickListener(this);
@@ -69,7 +76,6 @@ public class BaseActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         setupDateTimeInterpreter(id == R.id.action_week_view);
-
         switch (id) {
             case R.id.action_today:
                 mWeekView.goToToday();
@@ -92,7 +98,6 @@ public class BaseActivity extends AppCompatActivity
         if (mWeekViewType == TYPE_DAY_VIEW) {
             return;
         }
-
         item.setChecked(!item.isChecked());
         mWeekViewType = TYPE_DAY_VIEW;
         mWeekView.setNumberOfVisibleDays(1);
@@ -133,11 +138,6 @@ public class BaseActivity extends AppCompatActivity
         mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
     }
 
-    /**
-     * Set up a date time interpreter which will show short date values when in week view and long
-     * date values otherwise.
-     * @param shortDate True if the date values should be short.
-     */
     private void setupDateTimeInterpreter(final boolean shortDate) {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
 
@@ -170,17 +170,68 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
-        return mDatabase.getEventsInRange(startDate, endDate);
+        final int newYear = startDate.get(Calendar.YEAR);
+        final int newMonth = startDate.get(Calendar.MONTH);
+
+        // Download events from network if it hasn't been done already. To understand how events are
+        // downloaded using retrofit, visit http://square.github.io/retrofit
+        if (!calledNetwork) {
+            RestAdapter retrofit = new RestAdapter.Builder()
+                    .setEndpoint("https://api.myjson.com/bins")
+                    .build();
+
+            MyJsonService service = retrofit.create(MyJsonService.class);
+            service.listEvents(this);
+            calledNetwork = true;
+        }
+
+        // Return only the events that matches newYear and newMonth.
+        List<WeekViewDisplayable> matchedEvents = new ArrayList<>();
+        for (WeekViewEvent event : events) {
+            if (eventMatches(event, newYear, newMonth)) {
+                matchedEvents.add(event);
+            }
+        }
+        return matchedEvents;
+    }
+
+    /**
+     * Checks if an event falls into a specific year and month.
+     * @param event The event to check for.
+     * @param year The year.
+     * @param month The month.
+     * @return True if the event matches the year and month.
+     */
+    private boolean eventMatches(WeekViewEvent event, int year, int month) {
+        return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
     }
 
     @Override
-    public void onEventClick(Event event, RectF eventRect) {
-        Toast.makeText(this, "Clicked " + event.getTitle(), Toast.LENGTH_SHORT).show();
+    public void success(List<ApiEvent> events, Response response) {
+        this.events.clear();
+        for (ApiEvent event : events) {
+            this.events.add(event.toWeekViewEvent());
+        }
+
+        mProgressDialog.dismiss();
+        mWeekView.notifyDataSetChanged();
     }
 
     @Override
-    public void onEventLongPress(Event event, RectF eventRect) {
-        Toast.makeText(this, "Long pressed event: " + event.getTitle(), Toast.LENGTH_SHORT).show();
+    public void failure(RetrofitError error) {
+        error.printStackTrace();
+        mProgressDialog.dismiss();
+        Toast.makeText(this, R.string.async_error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEventClick(ApiEvent event, RectF eventRect) {
+        Toast.makeText(this, "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEventLongPress(ApiEvent event, RectF eventRect) {
+        Toast.makeText(this, "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override

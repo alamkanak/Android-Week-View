@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.alamkanak.weekview.sample">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -8,7 +9,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -19,10 +21,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BasicActivity"
+            android:name=".BaseActivity"
             android:label="@string/title_activity_basic" />
         <activity
-            android:name=".AsynchronousActivity"
+            android:name=".AsyncActivity"
             android:label="@string/title_activity_asynchronous" />
     </application>
 

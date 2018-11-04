@@ -2,16 +2,14 @@ package com.alamkanak.weekview.listeners;
 
 import android.graphics.RectF;
 
-import com.alamkanak.weekview.model.WeekViewEvent;
-
-public interface EventClickListener {
+public interface EventClickListener<T> {
 
     /**
      * Triggered when clicked on one existing event
      *
-     * @param event:     event clicked.
+     * @param data:     event clicked.
      * @param eventRect: view containing the clicked event.
      */
-    void onEventClick(WeekViewEvent event, RectF eventRect);
+    void onEventClick(T data, RectF eventRect);
 
 }

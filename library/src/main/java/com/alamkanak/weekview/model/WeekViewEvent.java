@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
-public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEvent> {
+public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekViewEvent> {
 
     private static final int DEFAULT_COLOR = Color.parseColor("#9fc6e7");
 
@@ -24,6 +24,8 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
     private String location;
     private int color;
     private boolean isAllDay;
+
+    private T data;
 
     public WeekViewEvent() {
         // Free ad space
@@ -63,11 +65,11 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
      */
     public WeekViewEvent(long id, String title, Calendar startTime,
                          Calendar endTime, String location, boolean isAllDay) {
-        this(id, title, startTime, endTime, location, 0, isAllDay);
+        this(id, title, startTime, endTime, location, 0, isAllDay, null);
     }
 
-    public WeekViewEvent(long id, String title, Calendar startTime,
-                         Calendar endTime, String location, int color, boolean isAllDay) {
+    public WeekViewEvent(long id, String title, Calendar startTime, Calendar endTime,
+                         String location, int color, boolean isAllDay, T data) {
         this.id = id;
         this.title = title;
         this.startTime = startTime;
@@ -75,6 +77,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         this.location = location;
         this.color = color;
         this.isAllDay = isAllDay;
+        this.data = data;
     }
 
     public Calendar getStartTime() {
@@ -125,7 +128,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
         return isAllDay;
     }
 
-    public void setAllDay(boolean allDay) {
+    public void setIsAllDay(boolean allDay) {
         this.isAllDay = allDay;
     }
 
@@ -135,6 +138,14 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 
     public boolean isSameDay(Calendar other) {
@@ -186,8 +197,8 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
      * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}
      * @return A list of {@link WeekViewEvent}
      */
-    List<WeekViewEvent> splitWeekViewEvents() {
-        List<WeekViewEvent> events = new ArrayList<>();
+    List<WeekViewEvent<T>> splitWeekViewEvents() {
+        List<WeekViewEvent<T>> events = new ArrayList<>();
 
         // The first millisecond of the next day is still the same day - no need to split events for this
         Calendar endTime = (Calendar) this.endTime.clone();
@@ -198,7 +209,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
 
-            WeekViewEvent event1 = new WeekViewEvent(id, title, startTime, endTime, location, isAllDay);
+            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, endTime, location, isAllDay);
             event1.setColor(color);
             events.add(event1);
 
@@ -215,7 +226,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
 
-                WeekViewEvent eventMore = new WeekViewEvent(id, title, overDay, endOfOverDay, location, isAllDay);
+                WeekViewEvent<T> eventMore = new WeekViewEvent<>(id, title, overDay, endOfOverDay, location, isAllDay);
                 eventMore.setColor(color);
                 events.add(eventMore);
 
@@ -228,7 +239,7 @@ public class WeekViewEvent implements WeekViewDisplayable, Comparable<WeekViewEv
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
 
-            WeekViewEvent event2 = new WeekViewEvent(id, title, startTime, this.endTime, location, isAllDay);
+            WeekViewEvent<T> event2 = new WeekViewEvent<>(id, title, startTime, this.endTime, location, isAllDay);
             event2.setColor(color);
             events.add(event2);
         } else {

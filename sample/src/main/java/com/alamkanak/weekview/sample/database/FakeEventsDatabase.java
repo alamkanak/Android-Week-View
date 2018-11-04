@@ -1,26 +1,36 @@
-package com.alamkanak.weekview.sample;
+package com.alamkanak.weekview.sample.database;
+
+import android.content.Context;
 
 import com.alamkanak.weekview.model.WeekViewDisplayable;
-import com.alamkanak.weekview.model.WeekViewEvent;
+import com.alamkanak.weekview.sample.R;
+import com.alamkanak.weekview.sample.apiclient.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
-/**
- * A basic example of how to use week view library.
- * Created by Raquib-ul-Alam Kanak on 1/3/2014.
- * Website: http://alamkanak.github.io
- */
-public class BasicActivity extends BaseActivity {
+public class FakeEventsDatabase implements EventsDatabase {
+
+    private Context context;
+
+    public FakeEventsDatabase(Context context) {
+        this.context = context;
+    }
 
     @Override
-    public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
+    public List<WeekViewDisplayable> getEventsInRange(Calendar startDate, Calendar endDate) {
         final int newYear = startDate.get(Calendar.YEAR);
         final int newMonth = startDate.get(Calendar.MONTH);
 
-        // Populate the week view with some events.
+        final int color1 = context.getResources().getColor(R.color.event_color_01);
+        final int color2 = context.getResources().getColor(R.color.event_color_02);
+        final int color3 = context.getResources().getColor(R.color.event_color_03);
+        final int color4 = context.getResources().getColor(R.color.event_color_04);
+
         List<WeekViewDisplayable> events = new ArrayList<>();
+        WeekViewDisplayable event;
 
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);
@@ -30,8 +40,8 @@ public class BasicActivity extends BaseActivity {
         Calendar endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth - 1);
-        WeekViewEvent event = new WeekViewEvent(1, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_01));
+
+        event = new Event(1, getEventTitle(startTime), startTime, endTime, null, color1, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -43,8 +53,8 @@ public class BasicActivity extends BaseActivity {
         endTime.set(Calendar.HOUR_OF_DAY, 4);
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth-1);
-        event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_02));
+
+        event = new Event(10, getEventTitle(startTime), startTime, endTime, null, color2, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -55,8 +65,8 @@ public class BasicActivity extends BaseActivity {
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.HOUR_OF_DAY, 5);
         endTime.set(Calendar.MINUTE, 0);
-        event = new WeekViewEvent(10, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_03));
+
+        event = new Event(10, getEventTitle(startTime), startTime, endTime, null, color3, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -67,8 +77,8 @@ public class BasicActivity extends BaseActivity {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 2);
         endTime.set(Calendar.MONTH, newMonth-1);
-        event = new WeekViewEvent(2, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_02));
+
+        event = new Event(2, getEventTitle(startTime), startTime, endTime, null, color2, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -80,8 +90,8 @@ public class BasicActivity extends BaseActivity {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
         endTime.set(Calendar.MONTH, newMonth - 1);
-        event = new WeekViewEvent(3, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_03));
+
+        event = new Event(3, getEventTitle(startTime), startTime, endTime, null, color3, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -92,8 +102,8 @@ public class BasicActivity extends BaseActivity {
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
-        event = new WeekViewEvent(4, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_04));
+
+        event = new Event(4, getEventTitle(startTime), startTime, endTime, null, color4, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -104,8 +114,8 @@ public class BasicActivity extends BaseActivity {
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
-        event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_01));
+
+        event = new Event(5, getEventTitle(startTime), startTime, endTime, null, color1, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -116,8 +126,8 @@ public class BasicActivity extends BaseActivity {
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
-        event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.event_color_02));
+
+        event = new Event(5, getEventTitle(startTime), startTime, endTime, null, color2, false);
         events.add(event);
 
         //AllDay event
@@ -128,8 +138,8 @@ public class BasicActivity extends BaseActivity {
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 23);
-        event = new WeekViewEvent(7, getEventTitle(startTime), startTime, endTime, null, true);
-        event.setColor(getResources().getColor(R.color.event_color_04));
+
+        event = new Event(7, getEventTitle(startTime), startTime, endTime, null, color4, true);
         events.add(event);
         events.add(event);
 
@@ -142,8 +152,8 @@ public class BasicActivity extends BaseActivity {
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.DAY_OF_MONTH, 10);
         endTime.set(Calendar.HOUR_OF_DAY, 23);
-        event = new WeekViewEvent(8, getEventTitle(startTime), startTime, endTime, null, true);
-        event.setColor(getResources().getColor(R.color.event_color_03));
+
+        event = new Event(8, getEventTitle(startTime), startTime, endTime, null, color3, true);
         events.add(event);
 
         // All day event until 00:00 next day
@@ -157,11 +167,19 @@ public class BasicActivity extends BaseActivity {
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.DAY_OF_MONTH, 11);
-        event = new WeekViewEvent(8, getEventTitle(startTime), startTime, endTime, null, true);
-        event.setColor(getResources().getColor(R.color.event_color_01));
+
+        event = new Event(8, getEventTitle(startTime), startTime, endTime, null, color1, true);
         events.add(event);
 
         return events;
+    }
+
+    private String getEventTitle(Calendar time) {
+        int hour = time.get(Calendar.HOUR_OF_DAY);
+        int minute = time.get(Calendar.MINUTE);
+        int month = time.get(Calendar.MONTH) + 1;
+        int dayOfMonth = time.get(Calendar.DAY_OF_MONTH);
+        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth);
     }
 
 }

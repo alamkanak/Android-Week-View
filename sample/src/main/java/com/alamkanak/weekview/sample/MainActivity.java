@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.buttonBasic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BasicActivity.class);
+                Intent intent = new Intent(MainActivity.this, BaseActivity.class);
                 startActivity(intent);
             }
         });
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.buttonAsynchronous).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AsynchronousActivity.class);
+                Intent intent = new Intent(MainActivity.this, AsyncActivity.class);
                 startActivity(intent);
             }
         });

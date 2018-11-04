@@ -34,16 +34,16 @@ import static com.alamkanak.weekview.utils.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 
-public class WeekViewGestureHandler {
+public class WeekViewGestureHandler<T> {
 
     private Listener listener;
 
-    private WeekViewData data;
+    private WeekViewData<T> data;
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
 
     public WeekViewGestureHandler(Context context, View view,
-                                  WeekViewConfig config, WeekViewData data) {
+                                  WeekViewConfig config, WeekViewData<T> data) {
         this.listener = (Listener) view;
 
         this.data = data;
@@ -91,11 +91,13 @@ public class WeekViewGestureHandler {
     private int scaledTouchSlop = 0;
 
     // Listeners
-    private EventClickListener eventClickListener;
-    private EventLongPressListener eventLongPressListener;
-    private WeekViewLoader weekViewLoader;
+    private EventClickListener<T> eventClickListener;
+    private EventLongPressListener<T> eventLongPressListener;
+
     private EmptyViewClickListener emptyViewClickListener;
     private EmptyViewLongPressListener emptyViewLongPressListener;
+
+    private WeekViewLoader weekViewLoader;
     private ScrollListener scrollListener;
 
     private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -231,7 +233,7 @@ public class WeekViewGestureHandler {
                     + drawingConfig.headerMarginBottom;
             float halfTextHeight = drawingConfig.timeTextHeight / 2;
 
-            int minY = (int) (dayHeight + headerHeight + halfTextHeight - viewHeight) * (-1);;
+            int minY = (int) (dayHeight + headerHeight + halfTextHeight - viewHeight) * (-1);
             int maxY = 0;
 
             scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
@@ -239,12 +241,20 @@ public class WeekViewGestureHandler {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            final List<EventChip> eventChips = data.getAllEventChips();
+            final List<EventChip<T>> eventChips = data.getAllEventChips();
 
+            // TODO: Reduce code
             if (eventChips != null && eventClickListener != null) {
-                for (EventChip eventChip : eventChips) {
+                for (EventChip<T> eventChip : eventChips) {
                     if (eventChip.isHit(e)) {
-                        eventClickListener.onEventClick(eventChip.originalEvent, eventChip.rect);
+                        T data = eventChip.event.getData();
+
+                        if (data != null) {
+                            eventClickListener.onEventClick(data, eventChip.rect);
+                        } else {
+                            // TODO Exception
+                        }
+
                         return super.onSingleTapConfirmed(e);
                     }
                 }
@@ -271,12 +281,19 @@ public class WeekViewGestureHandler {
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
 
-            List<EventChip> eventChips = data.getAllEventChips();
+            List<EventChip<T>> eventChips = data.getAllEventChips();
             if (eventChips != null && eventLongPressListener != null) {
-                for (EventChip eventChip : eventChips) {
+                for (EventChip<T> eventChip : eventChips) {
                     if (eventChip.isHit(e)) {
-                        eventLongPressListener.onEventLongPress(eventChip.originalEvent, eventChip.rect);
-                        listener.performHapticFeedback();
+                        T data = eventChip.originalEvent.getData();
+
+                        if (data != null) {
+                            eventLongPressListener.onEventLongPress(data, eventChip.rect);
+                            listener.performHapticFeedback();
+                        } else {
+                            // TODO Exception
+                        }
+
                         return;
                     }
                 }
@@ -303,7 +320,7 @@ public class WeekViewGestureHandler {
         return eventClickListener;
     }
 
-    public void setEventClickListener(EventClickListener eventClickListener) {
+    public void setEventClickListener(EventClickListener<T> eventClickListener) {
         this.eventClickListener = eventClickListener;
     }
 
@@ -311,7 +328,7 @@ public class WeekViewGestureHandler {
         return eventLongPressListener;
     }
 
-    public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
+    public void setEventLongPressListener(EventLongPressListener<T> eventLongPressListener) {
         this.eventLongPressListener = eventLongPressListener;
     }
 
@@ -482,7 +499,7 @@ public class WeekViewGestureHandler {
     public interface Listener {
         void onScaled();
         void onScrolled();
-        void performHapticFeedback();
+        void performHapticFeedback(); // TODO: Remove?
     }
 
 }

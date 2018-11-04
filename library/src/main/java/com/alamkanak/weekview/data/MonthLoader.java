@@ -44,7 +44,7 @@ public class MonthLoader implements WeekViewLoader {
 
         final int maxDays = startDate.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        final Calendar endDate = DateUtils.withTimeAtStartOfDay(today());
+        final Calendar endDate = DateUtils.withTimeAtEndOfDay(today());
         startDate.set(Calendar.YEAR, year);
         startDate.set(Calendar.MONTH, month); // TODO: Test
         startDate.set(Calendar.DAY_OF_MONTH, maxDays);

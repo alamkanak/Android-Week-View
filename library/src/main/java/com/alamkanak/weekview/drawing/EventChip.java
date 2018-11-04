@@ -25,10 +25,10 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
  * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
  * instance will be stored in "event".
  */
-public class EventChip {
+public class EventChip<T> {
 
-    public WeekViewEvent event;
-    public WeekViewEvent originalEvent;
+    public WeekViewEvent<T> event;
+    public WeekViewEvent<T> originalEvent;
 
     public RectF rect;
     public float left;
@@ -48,7 +48,7 @@ public class EventChip {
      * @param originalEvent The original event that was passed by the user.
      * @param rect         The rectangle.
      */
-    public EventChip(WeekViewEvent event, WeekViewEvent originalEvent, RectF rect) {
+    public EventChip(WeekViewEvent<T> event, WeekViewEvent<T> originalEvent, RectF rect) {
         this.event = event;
         this.rect = rect;
         this.originalEvent = originalEvent;

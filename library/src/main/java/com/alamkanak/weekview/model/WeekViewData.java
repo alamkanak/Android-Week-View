@@ -6,25 +6,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WeekViewData {
+public class WeekViewData<T> {
 
-    private List<EventChip> eventChips;
+    private List<EventChip<T>> eventChips;
 
-    private List<EventChip> normalEventChips;
-    private List<EventChip> allDayEventChips;
+    private List<EventChip<T>> normalEventChips;
+    private List<EventChip<T>> allDayEventChips;
 
-    public List<? extends WeekViewEvent> previousPeriodEvents;
-    public List<? extends WeekViewEvent> currentPeriodEvents;
-    public List<? extends WeekViewEvent> nextPeriodEvents;
+    public List<? extends WeekViewEvent<T>> previousPeriodEvents;
+    public List<? extends WeekViewEvent<T>> currentPeriodEvents;
+    public List<? extends WeekViewEvent<T>> nextPeriodEvents;
 
     public int fetchedPeriod = -1; // the middle period the calendar has fetched.
 
-    public void setEventChips(List<EventChip> eventChips) {
+    public void setEventChips(List<EventChip<T>> eventChips) {
         this.eventChips = eventChips;
         normalEventChips = new ArrayList<>();
         allDayEventChips = new ArrayList<>();
 
-        for (EventChip eventChip : eventChips) {
+        for (EventChip<T> eventChip : eventChips) {
             if (eventChip.event.isAllDay()) {
                 allDayEventChips.add(eventChip);
             } else {
@@ -33,15 +33,15 @@ public class WeekViewData {
         }
     }
 
-    public List<EventChip> getAllEventChips() {
+    public List<EventChip<T>> getAllEventChips() {
         return eventChips;
     }
 
-    public List<EventChip> getNormalEventChips() {
+    public List<EventChip<T>> getNormalEventChips() {
         return normalEventChips;
     }
 
-    public List<EventChip> getAllDayEventChips() {
+    public List<EventChip<T>> getAllDayEventChips() {
         return allDayEventChips;
     }
 
@@ -66,9 +66,9 @@ public class WeekViewData {
      *
      * @param events The events to be sorted and cached.
      */
-    public void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
+    public void sortAndCacheEvents(List<WeekViewEvent<T>> events) {
         sortEvents(events);
-        for (WeekViewEvent event : events) {
+        for (WeekViewEvent<T> event : events) {
             cacheEvent(event);
         }
     }
@@ -78,7 +78,7 @@ public class WeekViewData {
      *
      * @param events The events to be sorted.
      */
-    private void sortEvents(List<? extends WeekViewEvent> events) {
+    private void sortEvents(List<WeekViewEvent<T>> events) {
         Collections.sort(events);
     }
 
@@ -87,14 +87,14 @@ public class WeekViewData {
      *
      * @param event The event to cache.
      */
-    private void cacheEvent(WeekViewEvent event) {
+    private void cacheEvent(WeekViewEvent<T> event) {
         if (event.getStartTime().compareTo(event.getEndTime()) >= 0) {
             return;
         }
 
-        List<WeekViewEvent> splittedEvents = event.splitWeekViewEvents();
-        for (WeekViewEvent splittedEvent : splittedEvents) {
-            eventChips.add(new EventChip(splittedEvent, event, null));
+        List<WeekViewEvent<T>> splittedEvents = event.splitWeekViewEvents();
+        for (WeekViewEvent<T> splittedEvent : splittedEvents) {
+            eventChips.add(new EventChip<>(splittedEvent, event, null));
         }
     }
 

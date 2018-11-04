@@ -28,6 +28,11 @@ public class DateUtils {
         return days;
     }
 
+    public static boolean isInRange(Calendar date, Calendar start, Calendar end) {
+        return date.getTimeInMillis() >= start.getTimeInMillis()
+                && date.getTimeInMillis() <= end.getTimeInMillis();
+    }
+
     public static Calendar withTimeAtStartOfDay(Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);

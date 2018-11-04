@@ -1,108 +1,90 @@
 package com.alamkanak.weekview.sample.apiclient;
 
-import android.annotation.SuppressLint;
-import android.graphics.Color;
-
+import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
-/**
- * An event model that was built for automatic serialization from json to object.
- * Created by Raquib-ul-Alam Kanak on 1/3/16.
- * Website: http://alamkanak.github.io
- */
-public class Event {
+public class Event implements WeekViewDisplayable {
 
-    @Expose @SerializedName("name")
-    private String mName;
-    @Expose @SerializedName("dayOfMonth")
-    private int mDayOfMonth;
-    @Expose @SerializedName("startTime")
-    private String mStartTime;
-    @Expose @SerializedName("endTime")
-    private String mEndTime;
-    @Expose @SerializedName("color")
-    private String mColor;
+    private long id;
+    private String title;
+    private Calendar startTime;
+    private Calendar endTime;
+    private String location;
+    private int color;
+    private boolean isAllDay;
 
-    public String getName() {
-        return mName;
+    public Event(long id, String title, Calendar startTime, Calendar endTime,
+                 String location, int color, boolean isAllDay) {
+        this.id = id;
+        this.title = title;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.location = location;
+        this.color = color;
+        this.isAllDay = isAllDay;
     }
 
-    public void setName(String name) {
-        this.mName = name;
+    public long getId() {
+        return id;
     }
 
-    public int getDayOfMonth() {
-        return mDayOfMonth;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public void setDayOfMonth(int dayOfMonth) {
-        this.mDayOfMonth = dayOfMonth;
+    public String getTitle() {
+        return title;
     }
 
-    public String getStartTime() {
-        return mStartTime;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void setStartTime(String startTime) {
-        this.mStartTime = startTime;
+    public Calendar getStartTime() {
+        return startTime;
     }
 
-    public String getEndTime() {
-        return mEndTime;
+    public void setStartTime(Calendar startTime) {
+        this.startTime = startTime;
     }
 
-    public void setEndTime(String endTime) {
-        this.mEndTime = endTime;
+    public Calendar getEndTime() {
+        return endTime;
     }
 
-    public String getColor() {
-        return mColor;
+    public void setEndTime(Calendar endTime) {
+        this.endTime = endTime;
     }
 
-    public void setColor(String color) {
-        this.mColor = color;
+    public String getLocation() {
+        return location;
     }
 
-    @SuppressLint("SimpleDateFormat")
-    public WeekViewEvent toWeekViewEvent(){
-
-        // Parse time.
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        Date start = new Date();
-        Date end = new Date();
-        try {
-            start = sdf.parse(getStartTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        try {
-            end = sdf.parse(getEndTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        // Initialize start and end time.
-        Calendar now = Calendar.getInstance();
-        Calendar startTime = (Calendar) now.clone();
-        startTime.setTimeInMillis(start.getTime());
-        startTime.set(Calendar.YEAR, now.get(Calendar.YEAR));
-        startTime.set(Calendar.MONTH, now.get(Calendar.MONTH));
-        startTime.set(Calendar.DAY_OF_MONTH, getDayOfMonth());
-        Calendar endTime = (Calendar) startTime.clone();
-        endTime.setTimeInMillis(end.getTime());
-        endTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR));
-        endTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
-        endTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
-
-        // Create an week view event.
-        int color = Color.parseColor(getColor());
-        return new WeekViewEvent(0, getName(), startTime, endTime, null, color, false);
+    public void setLocation(String location) {
+        this.location = location;
     }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public boolean isAllDay() {
+        return isAllDay;
+    }
+
+    public void setAllDay(boolean allDay) {
+        isAllDay = allDay;
+    }
+
+    @Override
+    public WeekViewEvent toWeekViewEvent() {
+        return new WeekViewEvent<>(id, title, startTime, endTime, location, color, isAllDay, this);
+    }
+
 }

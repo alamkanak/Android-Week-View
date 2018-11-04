@@ -9,6 +9,24 @@ import com.alamkanak.weekview.ui.WeekView;
  */
 public interface WeekViewDisplayable {
 
+    /*
+    public long getWeekViewEventId();
+
+    @NonNull
+    public String getWeekViewEventTitle();
+
+    @NonNull
+    public Calendar getWeekViewEventStartTime();
+
+    @NonNull
+    public Calendar getWeekViewEventEndTime();
+
+    @Nullable
+    public String getWeekViewEventLocation();
+
+    public int getWeekViewEventColor();
+    */
+
     /**
      * Returns a {@link WeekViewEvent} for use in {@link WeekView}.
      * @return A {@link WeekViewEvent}
