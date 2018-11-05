@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.ui.WeekView;
@@ -50,6 +51,12 @@ public class TimeColumnDrawer {
                 canvas.drawText(time, x, y, drawingConfig.timeTextPaint);
             }
         }
+
+        final float lineX = drawingConfig.headerColumnWidth - 1;
+        Paint linePaint = new Paint();
+        linePaint.setColor(config.headerRowBottomLineColor);
+        linePaint.setStrokeWidth(config.headerRowBottomLineWidth);
+        canvas.drawLine(lineX, headerHeight, lineX, bottom, linePaint);
 
         canvas.restore();
     }
