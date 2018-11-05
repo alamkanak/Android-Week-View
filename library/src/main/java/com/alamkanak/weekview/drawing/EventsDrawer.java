@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.drawing;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.support.annotation.Nullable;
@@ -105,6 +106,23 @@ public class EventsDrawer<T> {
 
             startPixel += drawingConfig.widthPerDay + config.columnGap;
         }
+
+        // Hide events when they are in the top left corner
+        final Paint headerBackground = drawingConfig.headerBackgroundPaint;
+
+        float headerRowBottomLine = 0;
+        if (config.showHeaderRowBottomLine) {
+            headerRowBottomLine = config.headerRowBottomLineWidth;
+        }
+
+        final float height = drawingConfig.headerHeight + config.headerRowPadding * 2 - headerRowBottomLine;
+        final float width = drawingConfig.timeTextWidth + config.headerColumnPadding * 2;
+
+        canvas.clipRect(0, 0, width, height);
+        canvas.drawRect(0, 0, width, height, headerBackground);
+
+        canvas.restore();
+        canvas.save();
     }
 
     private void drawAllDayEvent(EventChip eventChip, float startFromPixel, Canvas canvas) {
