@@ -726,6 +726,63 @@ public class WeekView<T> extends View
     }
 
     /**
+     * Get whether the dot on the left-hand side of the "now" line is displayed.
+     *
+     * @return True if "now" line dot is be displayed.
+     */
+    public boolean isShowNowLineDot() {
+        return config.showNowLineDot;
+    }
+
+    /**
+     * Set whether the dot on the left-hand side of the "now" line should be displayed
+     *
+     * @param showNowLineDot True if "now" line dot should be displayed.
+     */
+    public void setShowNowLineDot(boolean showNowLineDot) {
+        config.showNowLineDot = showNowLineDot;
+        invalidate();
+    }
+
+    /**
+     * Get the color of the dot on the left-hand side of the "now" line.
+     *
+     * @return The color of the "now" line dot.
+     */
+    public int getNowLineDotColor() {
+        return config.nowLineDotColor;
+    }
+
+    /**
+     * Set the color of the dot on the left-hand side of the "now" line.
+     *
+     * @param nowLineDotColor The color of the "now" line dot.
+     */
+    public void setNowLineDotColor(int nowLineDotColor) {
+        config.nowLineDotColor = nowLineDotColor;
+        invalidate();
+    }
+
+    /**
+     * Get the radius of the dot on the left-hand side of the "now" line.
+     *
+     * @return The radius of the "now" line dot.
+     */
+    public int getNowLineDotRadius() {
+        return config.nowLineDotRadius;
+    }
+
+    /**
+     * Set the radius of the dot on the left-hand side of the "now" line.
+     *
+     * @param nowLineDotRadius The radius of the "now" line dot.
+     */
+    public void setNowLineDotRadius(int nowLineDotRadius) {
+        config.nowLineDotRadius = nowLineDotRadius;
+        invalidate();
+    }
+
+    /**
      * Get whether the week view should fling horizontally.
      *
      * @return True if the week view has horizontal fling enabled.
