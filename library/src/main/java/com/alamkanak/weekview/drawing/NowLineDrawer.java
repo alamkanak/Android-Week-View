@@ -50,7 +50,7 @@ public class NowLineDrawer {
         final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
-        final float startY = headerHeight + drawConfig.timeTextHeight / 2 + drawConfig.currentOrigin.y;
+        final float startY = headerHeight + /*drawConfig.timeTextHeight / 2*/ 0 + + drawConfig.currentOrigin.y;
         final Calendar now = Calendar.getInstance();
 
         // Draw line

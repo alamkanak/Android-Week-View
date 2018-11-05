@@ -130,7 +130,7 @@ public class EventsDrawer<T> {
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
                 && rect.right > drawingConfig.headerColumnWidth
-                && rect.bottom > totalHeaderHeight + drawingConfig.timeTextHeight / 2;
+                && rect.bottom > totalHeaderHeight + 0; // TODO drawingConfig.timeTextHeight / 2;
     }
 
     private boolean isValidAllDayEventRect(RectF rect) {

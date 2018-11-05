@@ -17,7 +17,7 @@ class EventChipRectCalculator {
 
     RectF calculateSingleEvent(EventChip eventChip, float startFromPixel) {
         final float eventMargin = config.eventMarginVertical;
-        final float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
+        final float halfTextHeight = 0; // TODO config.drawingConfig.timeTextHeight / 2;
 
         final float verticalOrigin = config.drawingConfig.currentOrigin.y;
         final float widthPerDay = config.drawingConfig.widthPerDay;

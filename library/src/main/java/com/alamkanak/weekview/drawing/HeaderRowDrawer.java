@@ -14,15 +14,15 @@ import java.util.List;
 
 import static java.util.Calendar.DATE;
 
-public class HeaderRowDrawer {
+public class HeaderRowDrawer<T> {
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    private WeekViewData data;
+    private WeekViewData<T> data;
     private WeekViewViewState viewState;
 
-    public HeaderRowDrawer(WeekViewConfig config, WeekViewData data, WeekViewViewState viewState) {
+    public HeaderRowDrawer(WeekViewConfig config, WeekViewData<T> data, WeekViewViewState viewState) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
         this.data = data;
@@ -47,7 +47,7 @@ public class HeaderRowDrawer {
     }
 
     private float calculateHeaderHeight() {
-        List<EventChip> eventChips = data.getAllDayEventChips();
+        List<EventChip<T>> eventChips = data.getAllDayEventChips();
         if (eventChips == null || eventChips.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
@@ -75,7 +75,11 @@ public class HeaderRowDrawer {
             // TODO: Make adapt to number of all-day events
             float headerTextSize = drawConfig.eventTextPaint.getTextSize();
             float totalEventPadding = config.eventPadding * 2;
-            return drawConfig.headerTextHeight + (headerTextSize + totalEventPadding + drawConfig.headerMarginBottom);
+
+            float eventChipBottomPadding = config.textSize / 4;
+
+            return drawConfig.headerTextHeight + (headerTextSize
+                    + totalEventPadding + eventChipBottomPadding + drawConfig.headerMarginBottom);
         } else {
             return drawConfig.headerTextHeight;
         }

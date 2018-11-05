@@ -67,7 +67,8 @@ public class WeekViewDrawingConfig {
         Rect rect = new Rect();
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         timeTextHeight = rect.height();
-        headerMarginBottom = timeTextHeight / 2;
+        headerMarginBottom = 0; // TODO timeTextHeight / 2;
+        // TODO: Now padding in header row is missing
         initTextTimeWidth(context);
 
         // Measure settings for header row.

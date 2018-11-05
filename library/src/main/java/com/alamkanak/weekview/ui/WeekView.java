@@ -61,7 +61,7 @@ public class WeekView<T> extends View
     private WeekViewViewState viewState;
     private WeekViewGestureHandler<T> gestureHandler;
 
-    private HeaderRowDrawer headerRowDrawer;
+    private HeaderRowDrawer<T> headerRowDrawer;
     private DayLabelDrawer dayLabelDrawer;
     private EventsDrawer<T> eventsDrawer;
     private TimeColumnDrawer timeColumnDrawer;
@@ -93,7 +93,7 @@ public class WeekView<T> extends View
         eventsDrawer = new EventsDrawer<>(config);
         timeColumnDrawer = new TimeColumnDrawer(config);
 
-        headerRowDrawer = new HeaderRowDrawer(config, data, viewState);
+        headerRowDrawer = new HeaderRowDrawer<>(config, data, viewState);
         dayLabelDrawer = new DayLabelDrawer(config);
 
         dayBackgroundDrawer = new DayBackgroundDrawer(config);
@@ -199,7 +199,7 @@ public class WeekView<T> extends View
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
 
-        final float halfTextHeight = drawConfig.timeTextHeight / 2;
+        final float halfTextHeight = 0; // TODO drawConfig.timeTextHeight / 2;
         canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
     }
 

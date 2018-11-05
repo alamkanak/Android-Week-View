@@ -55,7 +55,7 @@ class WeekViewTouchHandler {
                 final float headerHeight = drawingConfig.headerHeight
                         + config.headerRowPadding * 2
                         + drawingConfig.headerMarginBottom;
-                final float halfTextHeight = drawingConfig.timeTextHeight / 2;
+                final float halfTextHeight = 0; // TODO drawingConfig.timeTextHeight / 2;
                 final float hourHeight = config.hourHeight;
 
                 final float pixelsFromZero = touchY - originY - halfTextHeight - headerHeight;
