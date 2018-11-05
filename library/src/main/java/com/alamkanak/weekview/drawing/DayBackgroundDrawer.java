@@ -81,9 +81,8 @@ public class DayBackgroundDrawer {
             }
         } else {
             final Paint todayPaint = drawConfig.getTodayBackgroundPaint(isToday);
-            final float top = headerHeight + 0; // TODO drawConfig.timeTextHeight / 2;
             final float right = startPixel + drawConfig.widthPerDay;
-            canvas.drawRect(startX, top, right, height, todayPaint);
+            canvas.drawRect(startX, headerHeight, right, height, todayPaint);
         }
     }
 

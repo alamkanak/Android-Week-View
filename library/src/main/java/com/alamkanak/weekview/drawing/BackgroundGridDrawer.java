@@ -61,13 +61,12 @@ public class BackgroundGridDrawer {
         int i = 0;
         for (int hour = 0; hour < HOURS_PER_DAY; hour++) {
             final float heightOfHour = config.hourHeight * hour;
-            final float halfTextHeight = 0; // TODO drawConfig.timeTextHeight / 2;
-            final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour + halfTextHeight;
+            final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour;
 
             final float widthPerDay = drawConfig.widthPerDay;
             final float separatorWidth = config.hourSeparatorStrokeWidth;
 
-            final boolean isNotHiddenByHeader = top > headerHeight + halfTextHeight - separatorWidth;
+            final boolean isNotHiddenByHeader = top > headerHeight - separatorWidth;
             final boolean isWithinVisibleRange = top < height;
             final boolean isVisibleHorizontally = startPixel + widthPerDay - startX > 0;
 

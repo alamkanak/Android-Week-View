@@ -67,8 +67,6 @@ public class WeekViewDrawingConfig {
         Rect rect = new Rect();
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         timeTextHeight = rect.height();
-        headerMarginBottom = 0; // TODO timeTextHeight / 2;
-        // TODO: Now padding in header row is missing
         initTextTimeWidth(context);
 
         // Measure settings for header row.
@@ -173,9 +171,8 @@ public class WeekViewDrawingConfig {
         // If the new currentOrigin.y is invalid, make it valid.
         final float dayHeight = config.hourHeight * 24;
         final float headerHeight = this.headerHeight + config.headerRowPadding * 2 + headerMarginBottom;
-        final float halfTextHeight = timeTextHeight / 2;
 
-        final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight + halfTextHeight);
+        final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight);
 
         currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin);
         currentOrigin.y = min(currentOrigin.y, 0);

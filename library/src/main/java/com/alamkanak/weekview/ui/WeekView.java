@@ -199,8 +199,7 @@ public class WeekView<T> extends View
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
 
-        final float halfTextHeight = 0; // TODO drawConfig.timeTextHeight / 2;
-        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight + halfTextHeight, width, height);
+        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight, width, height);
     }
 
     @Override
