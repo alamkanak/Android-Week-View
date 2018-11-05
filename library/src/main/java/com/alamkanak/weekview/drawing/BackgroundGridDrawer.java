@@ -63,7 +63,7 @@ public class BackgroundGridDrawer {
             final float heightOfHour = config.hourHeight * hour;
             final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour;
 
-            final float widthPerDay = drawConfig.widthPerDay;
+            final float widthPerDay = drawConfig.widthPerDay * config.columnGap;
             final float separatorWidth = config.hourSeparatorStrokeWidth;
 
             final boolean isNotHiddenByHeader = top > headerHeight - separatorWidth;
@@ -73,7 +73,7 @@ public class BackgroundGridDrawer {
             if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
                 hourLines[i * 4] = startX;
                 hourLines[i * 4 + 1] = top;
-                hourLines[i * 4 + 2] = startPixel + drawConfig.widthPerDay;
+                hourLines[i * 4 + 2] = startPixel + widthPerDay;
                 hourLines[i * 4 + 3] = top;
                 i++;
             }
