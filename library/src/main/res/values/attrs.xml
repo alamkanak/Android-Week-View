@@ -44,6 +44,9 @@
         <attr name="showNowLine" format="boolean"/>
         <attr name="nowLineColor" format="color"/>
         <attr name="nowLineThickness" format="dimension"/>
+        <attr name="showNowLineDot" format="boolean"/>
+        <attr name="nowLineDotColor" format="color"/>
+        <attr name="nowLineDotRadius" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
         <attr name="allDayEventHeight" format="dimension"/>

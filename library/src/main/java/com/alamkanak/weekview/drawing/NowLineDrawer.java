@@ -50,7 +50,7 @@ public class NowLineDrawer {
         final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
-        final float startY = headerHeight + /*drawConfig.timeTextHeight / 2*/ 0 + + drawConfig.currentOrigin.y;
+        final float startY = headerHeight + drawConfig.currentOrigin.y;
         final Calendar now = Calendar.getInstance();
 
         // Draw line
@@ -59,12 +59,15 @@ public class NowLineDrawer {
         final float lineStartY = startY + beforeNow;
         canvas.drawLine(startX, lineStartY, startPixel + drawConfig.widthPerDay, lineStartY, drawConfig.nowLinePaint);
 
-        // Draw dot at the beginning of the line
-        final float dotRadius = drawConfig.nowDotPaint.getStrokeWidth();
-        final float dotMargin = 32;
+        if (config.showNowLineDot) {
+            // Draw dot at the beginning of the line
+            final float dotRadius = drawConfig.nowDotPaint.getStrokeWidth();
+            final float dotMargin = 32;
 
-        // We use startPixel to prevent the dot from sticking on the left side of the screen
-        canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
+            // We use startPixel to prevent the dot from sticking on the left side of the screen
+            canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint);
+        }
+
     }
 
 }

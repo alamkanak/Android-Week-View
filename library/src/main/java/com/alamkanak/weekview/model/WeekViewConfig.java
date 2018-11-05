@@ -36,8 +36,15 @@ public class WeekViewConfig {
     public int futureBackgroundColor = Color.rgb(245, 245, 245);
     public int pastWeekendBackgroundColor = 0;
     public int futureWeekendBackgroundColor = 0;
+
+    public boolean showNowLine = false;
     public int nowLineColor = Color.rgb(102, 102, 102);
     public int nowLineThickness = 5;
+
+    public boolean showNowLineDot = false;
+    public int nowLineDotColor = Color.rgb(102, 102, 102);
+    public int nowLineDotRadius = 16;
+
     public int hourSeparatorColor = Color.rgb(230, 230, 230);
     public int todayBackgroundColor = Color.rgb(255, 255, 255);
     public int hourSeparatorStrokeWidth = 2;
@@ -53,7 +60,6 @@ public class WeekViewConfig {
     public float xScrollingSpeed = 1f;
     public int eventCornerRadius = 0;
     public boolean showDistinctWeekendColor = false;
-    public boolean showNowLine = false;
     public boolean showDistinctPastFutureColor = false;
     public boolean horizontalFlingEnabled = true;
     public boolean verticalFlingEnabled = true;
@@ -81,8 +87,6 @@ public class WeekViewConfig {
             pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, pastBackgroundColor);
             futureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor); // If not set, use the same color as in the week
             pastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, pastBackgroundColor);
-            nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, nowLineColor);
-            nowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, nowLineThickness);
             hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, hourSeparatorColor);
             todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, todayBackgroundColor);
             hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, hourSeparatorStrokeWidth);
@@ -99,6 +103,11 @@ public class WeekViewConfig {
             showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, showDistinctPastFutureColor);
             showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, showDistinctWeekendColor);
             showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, showNowLine);
+            nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, nowLineColor);
+            nowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, nowLineThickness);
+            showNowLineDot = a.getBoolean(R.styleable.WeekView_showNowLineDot, showNowLineDot);
+            nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, nowLineDotColor);
+            nowLineDotRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, nowLineDotRadius);
             horizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, horizontalFlingEnabled);
             verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, verticalFlingEnabled);
             allDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, allDayEventHeight);

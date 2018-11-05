@@ -47,6 +47,7 @@ public class WeekViewDrawingConfig {
 
     Paint nowLinePaint;
     Paint nowDotPaint;
+
     public Paint todayHeaderTextPaint;
     public float headerColumnWidth;
     public TextPaint eventTextPaint;
@@ -108,8 +109,8 @@ public class WeekViewDrawingConfig {
         // Prepare the "now" dot paint
         nowDotPaint = new Paint();
         nowDotPaint.setStyle(Paint.Style.FILL);
-        nowDotPaint.setStrokeWidth(config.nowLineThickness * 5);
-        nowDotPaint.setColor(config.nowLineColor);
+        nowDotPaint.setStrokeWidth(config.nowLineDotRadius);
+        nowDotPaint.setColor(config.nowLineDotColor);
 
         // Prepare today background color paint.
         todayBackgroundPaint = new Paint();

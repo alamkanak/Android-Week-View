@@ -21,9 +21,12 @@
         app:hourHeight="60dp"
         app:noOfVisibleDays="3"
         app:nowLineColor="@color/accent"
+        app:nowLineDotColor="@color/accent"
+        app:nowLineDotRadius="5dp"
         app:nowLineThickness="1dp"
         app:overlappingEventGap="4dp"
         app:showNowLine="true"
+        app:showNowLineDot="true"
         app:singleDayHorizontalMargin="8dp"
         app:textSize="12sp"
         app:todayHeaderTextColor="@color/accent" />

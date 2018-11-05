@@ -66,7 +66,7 @@ public class DayBackgroundDrawer {
             final Paint pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor);
             final Paint futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor);
 
-            final float startY = headerHeight + /*drawConfig.timeTextHeight / 2*/ 0 + + drawConfig.currentOrigin.y;
+            final float startY = headerHeight + drawConfig.currentOrigin.y;
             final float endX = startPixel + drawConfig.widthPerDay;
 
             if (isToday) {
