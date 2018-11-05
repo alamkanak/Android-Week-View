@@ -21,6 +21,7 @@ import com.alamkanak.weekview.drawing.HeaderRowDrawer;
 import com.alamkanak.weekview.drawing.NowLineDrawer;
 import com.alamkanak.weekview.drawing.TimeColumnDrawer;
 import com.alamkanak.weekview.drawing.WeekViewDrawingConfig;
+import com.alamkanak.weekview.gestures.WeekViewGestureHandler;
 import com.alamkanak.weekview.listeners.EmptyViewClickListener;
 import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
 import com.alamkanak.weekview.listeners.EventClickListener;
@@ -29,7 +30,6 @@ import com.alamkanak.weekview.listeners.ScrollListener;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.model.WeekViewData;
 import com.alamkanak.weekview.model.WeekViewViewState;
-import com.alamkanak.weekview.gestures.WeekViewGestureHandler;
 import com.alamkanak.weekview.utils.DateTimeInterpreter;
 import com.alamkanak.weekview.utils.DateUtils;
 
@@ -37,8 +37,8 @@ import java.util.Calendar;
 
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.utils.DateUtils.today;
+import static java.lang.Math.ceil;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static java.util.Calendar.DATE;
 
 /**
@@ -56,6 +56,7 @@ public class WeekView<T> extends View
     }
 
     private WeekViewConfig config;
+    private WeekViewDrawingConfig drawConfig;
     private WeekViewData<T> data;
 
     private WeekViewViewState viewState;
@@ -83,7 +84,8 @@ public class WeekView<T> extends View
         super(context, attrs, defStyleAttr);
 
         config = new WeekViewConfig(context, attrs);
-        config.drawingConfig = new WeekViewDrawingConfig(context, config);
+        drawConfig = new WeekViewDrawingConfig(context, config);
+        config.drawingConfig = drawConfig;
 
         data = new WeekViewData<>();
         viewState = new WeekViewViewState();
@@ -164,8 +166,6 @@ public class WeekView<T> extends View
     }
 
     private void notifyScrollListeners() {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
         // Iterate through each day.
         final Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
         final Calendar today = today();
@@ -173,7 +173,8 @@ public class WeekView<T> extends View
         viewState.firstVisibleDay = (Calendar) today.clone();
 
         final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
-        viewState.firstVisibleDay.add(DATE, round(drawConfig.currentOrigin.x / totalDayWidth) * -1);
+        final int delta = (int) ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1;
+        viewState.firstVisibleDay.add(DATE, delta);
 
         final boolean hasFirstVisibleDayChanged = !viewState.firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
@@ -189,8 +190,6 @@ public class WeekView<T> extends View
     }
 
     private void clipEventsRect(Canvas canvas) {
-        final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-
         final int width = WeekView.getViewWidth();
         final int height = WeekView.getViewHeight();
 
