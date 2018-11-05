@@ -37,6 +37,10 @@ public class WeekViewConfig {
     public int pastWeekendBackgroundColor = 0;
     public int futureWeekendBackgroundColor = 0;
 
+    public boolean showHeaderRowBottomLine = false;
+    public int headerRowBottomLineColor = Color.rgb(102, 102, 102);
+    public int headerRowBottomLineWidth = 1;
+
     public boolean showNowLine = false;
     public int nowLineColor = Color.rgb(102, 102, 102);
     public int nowLineThickness = 5;
@@ -112,6 +116,10 @@ public class WeekViewConfig {
             verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, verticalFlingEnabled);
             allDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, allDayEventHeight);
             scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, scrollDuration);
+
+            showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, showHeaderRowBottomLine);
+            headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, headerRowBottomLineColor);
+            headerRowBottomLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, headerRowBottomLineWidth);
         } finally {
             a.recycle();
         }

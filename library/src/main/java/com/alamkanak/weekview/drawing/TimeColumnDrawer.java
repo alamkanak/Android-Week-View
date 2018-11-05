@@ -32,7 +32,7 @@ public class TimeColumnDrawer {
         // The original header height
         float headerHeight = top;
 
-        for (int i = 0; i < HOURS_PER_DAY; i++) {
+        for (int i = 1; i < HOURS_PER_DAY; i++) {
             float headerBottomMargin = drawingConfig.headerMarginBottom;
             float heightOfHour = config.hourHeight * i;
             top = headerHeight + drawingConfig.currentOrigin.y + heightOfHour + headerBottomMargin;
@@ -46,7 +46,7 @@ public class TimeColumnDrawer {
 
             if (top < bottom) {
                 float x = drawingConfig.timeTextWidth + config.headerColumnPadding;
-                float y = top + drawingConfig.timeTextHeight;
+                float y = top + drawingConfig.timeTextHeight / 2;
                 canvas.drawText(time, x, y, drawingConfig.timeTextPaint);
             }
         }

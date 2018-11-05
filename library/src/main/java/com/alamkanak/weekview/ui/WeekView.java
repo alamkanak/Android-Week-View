@@ -435,6 +435,33 @@ public class WeekView<T> extends View
         invalidate();
     }
 
+    public boolean getShowHeaderRowBottomLine() {
+        return config.showHeaderRowBottomLine;
+    }
+
+    public void setShowHeaderRowBottomLine(boolean showHeaderRowBottomLine) {
+        config.showHeaderRowBottomLine = showHeaderRowBottomLine;
+        invalidate();
+    }
+
+    public int getHeaderRowBottomLineColor() {
+        return config.headerRowBottomLineColor;
+    }
+
+    public void setHeaderRowBottomLineColor(int headerRowBottomLineColor) {
+        config.headerRowBottomLineColor = headerRowBottomLineColor;
+        invalidate();
+    }
+
+    public int getHeaderRowBottomLineWidth() {
+        return config.headerRowBottomLineWidth;
+    }
+
+    public void setHeaderRowBottomLineWidth(int headerRowBottomLineWidth) {
+        config.headerRowBottomLineWidth= headerRowBottomLineWidth;
+        invalidate();
+    }
+
     public int getDayBackgroundColor() {
         return config.dayBackgroundColor;
     }

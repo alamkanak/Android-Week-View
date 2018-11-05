@@ -22,6 +22,9 @@
         <attr name="noOfVisibleDays" format="integer"/>
         <attr name="showFirstDayOfWeekFirst" format="boolean"/>
         <attr name="headerRowBackgroundColor" format="color"/>
+        <attr name="showHeaderRowBottomLine" format="boolean"/>
+        <attr name="headerRowBottomLineColor" format="color"/>
+        <attr name="headerRowBottomLineWidth" format="dimension"/>
         <attr name="dayBackgroundColor" format="color"/>
         <attr name="hourSeparatorColor" format="color"/>
         <attr name="todayBackgroundColor" format="color"/>

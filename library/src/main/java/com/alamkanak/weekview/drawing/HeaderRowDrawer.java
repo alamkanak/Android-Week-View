@@ -71,6 +71,11 @@ public class HeaderRowDrawer<T> {
             }
         }
 
+        int headerRowBottomLine = 0;
+        if (config.showHeaderRowBottomLine) {
+            headerRowBottomLine = config.headerRowBottomLineWidth;
+        }
+
         if (containsAllDayEvent) {
             // TODO: Make adapt to number of all-day events
             float headerTextSize = drawConfig.eventTextPaint.getTextSize();
@@ -79,23 +84,24 @@ public class HeaderRowDrawer<T> {
             float eventChipBottomPadding = config.textSize / 4;
 
             return drawConfig.headerTextHeight + (headerTextSize
-                    + totalEventPadding + eventChipBottomPadding + drawConfig.headerMarginBottom);
+                    + totalEventPadding + eventChipBottomPadding
+                    + headerRowBottomLine + drawConfig.headerMarginBottom);
         } else {
-            return drawConfig.headerTextHeight;
+            return drawConfig.headerTextHeight + headerRowBottomLine;
         }
     }
 
     private void drawHeaderRow(Canvas canvas) {
-        int width = WeekView.getViewWidth();
+        final int width = WeekView.getViewWidth();
 
         canvas.restore();
         canvas.save();
 
-        Paint headerBackground = drawConfig.headerBackgroundPaint;
-        float headerHeight = drawConfig.headerHeight + config.headerRowPadding * 2;
+        final Paint headerBackground = drawConfig.headerBackgroundPaint;
+        final float headerHeight = drawConfig.headerHeight + config.headerRowPadding * 2;
 
         // Hide everything in the top left corner
-        float topLeftCornerWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
+        final float topLeftCornerWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
         canvas.clipRect(0, 0, topLeftCornerWidth, headerHeight);
         canvas.drawRect(0, 0, topLeftCornerWidth, headerHeight, headerBackground);
 
@@ -104,9 +110,25 @@ public class HeaderRowDrawer<T> {
 
         // Clip to paint header row only.
         canvas.clipRect(drawConfig.headerColumnWidth, 0, width, headerHeight);
-
-        // Draw the header background.
         canvas.drawRect(0, 0, width, headerHeight, headerBackground);
+
+        canvas.restore();
+        canvas.save();
+
+        if (config.showHeaderRowBottomLine) {
+            drawHeaderBottomLine(headerHeight, width, canvas);
+        }
+    }
+
+    private void drawHeaderBottomLine(float headerHeight, int width, Canvas canvas) {
+        final int headerRowBottomLineWidth = config.headerRowBottomLineWidth;
+        final float topMargin = headerHeight - headerRowBottomLineWidth;
+
+        final Paint paint = new Paint();
+        paint.setStrokeWidth(headerRowBottomLineWidth);
+        paint.setColor(config.headerRowBottomLineColor);
+
+        canvas.drawLine(0, topMargin, width, topMargin, paint);
     }
 
 }
