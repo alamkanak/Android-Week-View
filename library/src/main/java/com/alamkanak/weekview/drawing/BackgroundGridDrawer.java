@@ -5,8 +5,6 @@ import android.graphics.Canvas;
 import com.alamkanak.weekview.model.WeekViewConfig;
 import com.alamkanak.weekview.ui.WeekView;
 
-import java.util.Calendar;
-
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 import static java.lang.Math.max;
 
@@ -21,10 +19,12 @@ public class BackgroundGridDrawer {
     }
 
     public void draw(DrawingContext drawingContext, Canvas canvas) {
+        final int size = drawingContext.dayRange.size();
+
         float startPixel = drawingContext.startPixel;
         float[] hourLines;
 
-        for (Calendar ignored : drawingContext.dayRange) {
+        for (int i = 0; i < size; i++) {
             float startX = max(startPixel, drawConfig.headerColumnWidth);
             hourLines = getHourLines();
             drawGrid(hourLines, startX, startPixel, canvas);
@@ -36,7 +36,7 @@ public class BackgroundGridDrawer {
             }
 
             // In the next iteration, start from the next day.
-            startPixel += drawConfig.widthPerDay + config.columnGap;
+            startPixel += config.getTotalDayWidth();
         }
     }
 
@@ -52,6 +52,26 @@ public class BackgroundGridDrawer {
     }
 
     private void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {
+        drawHourLines(hourLines, startX, startPixel, canvas);
+        drawDaySeparators(startPixel, canvas);
+    }
+
+    private void drawDaySeparators(float startPixel, Canvas canvas) {
+        final int days = config.numberOfVisibleDays;
+        final float widthPerDay = config.getTotalDayWidth();
+
+        final float top = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + drawConfig.headerMarginBottom;
+        final int height = WeekView.getViewHeight();
+
+        for (int i = 0; i < days; i++) {
+            final float start = startPixel + widthPerDay * (i + 1);
+            canvas.drawLine(start, top, start, top + height, drawConfig.hourSeparatorPaint);
+        }
+    }
+
+    private void drawHourLines(float[] hourLines, float startX, float startPixel, Canvas canvas) {
         final int height = WeekView.getViewHeight();
 
         final float headerHeight = drawConfig.headerHeight
@@ -79,7 +99,6 @@ public class BackgroundGridDrawer {
             }
         }
 
-        // Draw the lines for hours.
         canvas.drawLines(hourLines, drawConfig.hourSeparatorPaint);
     }
 

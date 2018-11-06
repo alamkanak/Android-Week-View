@@ -77,7 +77,6 @@ public class HeaderRowDrawer<T> {
         }
 
         if (containsAllDayEvent) {
-            // TODO: Make adapt to number of all-day events
             float headerTextSize = drawConfig.eventTextPaint.getTextSize();
             float totalEventPadding = config.eventPadding * 2;
 
