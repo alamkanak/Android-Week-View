@@ -75,11 +75,10 @@ public class BackgroundGridDrawer {
         final int height = WeekView.getViewHeight();
 
         final float headerHeight = drawConfig.headerHeight
-                + config.headerRowPadding * 2
-                + drawConfig.headerMarginBottom;
+                + config.headerRowPadding * 2;
 
         int i = 0;
-        for (int hour = 0; hour < HOURS_PER_DAY; hour++) {
+        for (int hour = 1; hour < HOURS_PER_DAY; hour++) {
             final float heightOfHour = config.hourHeight * hour;
             final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour;
 

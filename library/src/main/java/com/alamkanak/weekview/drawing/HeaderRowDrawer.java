@@ -97,7 +97,9 @@ public class HeaderRowDrawer<T> {
         canvas.save();
 
         final Paint headerBackground = drawConfig.headerBackgroundPaint;
-        final float headerHeight = drawConfig.headerHeight + config.headerRowPadding * 2;
+        final float headerHeight = drawConfig.headerHeight
+                + config.headerRowPadding * 2
+                + config.headerRowBottomLineWidth;
 
         // Hide everything in the top left corner
         final float topLeftCornerWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;

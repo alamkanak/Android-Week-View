@@ -19,7 +19,9 @@ public class TimeColumnDrawer {
     }
 
     public void drawTimeColumn(Canvas canvas) {
-        float top = drawingConfig.headerHeight + config.headerRowPadding * 2;
+        float top = drawingConfig.headerHeight
+                + config.headerRowPadding * 2
+                + config.headerRowBottomLineWidth;
         int bottom = WeekView.getViewHeight();
 
         // Draw the background color for the header column.
