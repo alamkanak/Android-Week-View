@@ -3,6 +3,8 @@ package com.alamkanak.weekview.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -50,10 +52,6 @@ public class WeekView<T> extends View
 
     private static int width;
     private static int height;
-
-    public enum Direction {
-        NONE, LEFT, RIGHT, VERTICAL
-    }
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
@@ -114,7 +112,20 @@ public class WeekView<T> extends View
         return height;
     }
 
-    // fix rotation changes
+    @Nullable
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        return new SavedState(superState, config.numberOfVisibleDays);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        config.setNumberOfVisibleDays(savedState.numberOfVisibleDays);
+    }
+
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
@@ -918,8 +929,7 @@ public class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
-        gestureHandler.scroller.forceFinished(true);
-        gestureHandler.currentScrollDirection = gestureHandler.currentFlingDirection = Direction.NONE;
+        gestureHandler.forceScrollFinished();
 
         if (viewState.areDimensionsInvalid) {
             viewState.scrollToDay = date;
@@ -972,6 +982,40 @@ public class WeekView<T> extends View
      */
     public double getFirstVisibleHour() {
         return (config.drawingConfig.currentOrigin.y * -1) / config.hourHeight;
+    }
+
+    protected static class SavedState extends BaseSavedState {
+
+        private final int numberOfVisibleDays;
+
+        private SavedState(Parcelable superState, int numberOfVisibleDays) {
+            super(superState);
+            this.numberOfVisibleDays = numberOfVisibleDays;
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            numberOfVisibleDays = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel destination, int flags) {
+            super.writeToParcel(destination, flags);
+            destination.writeInt(numberOfVisibleDays);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
+
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+
+        };
+
     }
 
 }

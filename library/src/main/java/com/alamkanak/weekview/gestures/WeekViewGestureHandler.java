@@ -26,14 +26,14 @@ import java.util.Calendar;
 import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
-import static com.alamkanak.weekview.ui.WeekView.Direction.LEFT;
-import static com.alamkanak.weekview.ui.WeekView.Direction.NONE;
-import static com.alamkanak.weekview.ui.WeekView.Direction.RIGHT;
-import static com.alamkanak.weekview.ui.WeekView.Direction.VERTICAL;
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
 import static java.lang.Math.round;
 
 public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureListener {
+
+    private enum Direction {
+        NONE, LEFT, RIGHT, VERTICAL
+    }
 
     private Listener listener;
 
@@ -43,9 +43,9 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
 
     private WeekViewTouchHandler touchHandler;
 
-    public OverScroller scroller;
-    public WeekView.Direction currentScrollDirection = NONE;
-    public WeekView.Direction currentFlingDirection = NONE;
+    private OverScroller scroller;
+    private Direction currentScrollDirection = Direction.NONE;
+    private Direction currentFlingDirection = Direction.NONE;
 
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleDetector;
@@ -127,26 +127,26 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
                 // Allow scrolling only in one direction.
                 if (absDistanceX > absDistanceY) {
                     if (distanceX > 0) {
-                        currentScrollDirection = LEFT;
+                        currentScrollDirection = Direction.LEFT;
                     } else {
-                        currentScrollDirection = RIGHT;
+                        currentScrollDirection = Direction.RIGHT;
                     }
                 } else {
-                    currentScrollDirection = VERTICAL;
+                    currentScrollDirection = Direction.VERTICAL;
                 }
                 break;
             }
             case LEFT: {
                 // Change direction if there was enough change.
                 if (absDistanceX > absDistanceY && distanceX < -scaledTouchSlop) {
-                    currentScrollDirection = RIGHT;
+                    currentScrollDirection = Direction.RIGHT;
                 }
                 break;
             }
             case RIGHT: {
                 // Change direction if there was enough change.
                 if (absDistanceX > absDistanceY && distanceX > scaledTouchSlop) {
-                    currentScrollDirection = LEFT;
+                    currentScrollDirection = Direction.LEFT;
                 }
                 break;
             }
@@ -173,9 +173,9 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
             return true;
         }
 
-        if ((currentFlingDirection == LEFT && !config.horizontalFlingEnabled) ||
-                (currentFlingDirection == RIGHT && !config.horizontalFlingEnabled) ||
-                (currentFlingDirection == VERTICAL && !config.verticalFlingEnabled)) {
+        if ((currentFlingDirection == Direction.LEFT && !config.horizontalFlingEnabled) ||
+                (currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled) ||
+                (currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled)) {
             return true;
         }
 
@@ -372,13 +372,13 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
         final float totalDayWidth = drawingConfig.widthPerDay + config.columnGap;
         double leftDays = drawingConfig.currentOrigin.x / totalDayWidth;
 
-        if (currentFlingDirection != NONE) {
+        if (currentFlingDirection != Direction.NONE) {
             // snap to nearest day
             leftDays = round(leftDays);
-        } else if (currentScrollDirection == LEFT) {
+        } else if (currentScrollDirection == Direction.LEFT) {
             // snap to last day
             leftDays = Math.floor(leftDays);
-        } else if (currentScrollDirection == RIGHT) {
+        } else if (currentScrollDirection == Direction.RIGHT) {
             // snap to next day
             leftDays = Math.ceil(leftDays);
         } else {
@@ -407,7 +407,7 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
         }
 
         // Reset scrolling and fling direction.
-        currentScrollDirection = currentFlingDirection = NONE;
+        currentScrollDirection = currentFlingDirection = Direction.NONE;
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -415,22 +415,27 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
         final boolean val = gestureDetector.onTouchEvent(event);
 
         // Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection are set
-        if (event.getAction() == ACTION_UP && !isZooming && currentFlingDirection == NONE) {
-            if (currentScrollDirection == RIGHT || currentScrollDirection == LEFT) {
+        if (event.getAction() == ACTION_UP && !isZooming && currentFlingDirection == Direction.NONE) {
+            if (currentScrollDirection == Direction.RIGHT || currentScrollDirection == Direction.LEFT) {
                 goToNearestOrigin();
             }
-            currentScrollDirection = NONE;
+            currentScrollDirection = Direction.NONE;
         }
 
         return val;
     }
 
+    public void forceScrollFinished() {
+        scroller.forceFinished(true);
+        currentScrollDirection = currentFlingDirection = Direction.NONE;
+    }
+
     public void computeScroll() {
-        if (scroller.isFinished() && currentFlingDirection != NONE) {
+        if (scroller.isFinished() && currentFlingDirection != Direction.NONE) {
             // Snap to day after fling is finished
             goToNearestOrigin();
         } else {
-            if (currentFlingDirection != NONE && shouldForceFinishScroll()) {
+            if (currentFlingDirection != Direction.NONE && shouldForceFinishScroll()) {
                 goToNearestOrigin();
             } else if (scroller.computeScrollOffset()) {
                 drawingConfig.currentOrigin.y = scroller.getCurrY();
