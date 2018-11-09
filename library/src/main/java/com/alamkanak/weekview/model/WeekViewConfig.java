@@ -196,4 +196,8 @@ public class WeekViewConfig {
         return numberOfVisibleDays == 1;
     }
 
+    public boolean isWeek() {
+        return numberOfVisibleDays == 7;
+    }
+
 }

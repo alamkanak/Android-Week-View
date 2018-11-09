@@ -56,7 +56,7 @@ public class BaseActivity extends AppCompatActivity
         mWeekView.setEventLongPressListener(this);
         mWeekView.setEmptyViewLongPressListener(this);
 
-        setupDateTimeInterpreter(false);
+        setupDateTimeInterpreter();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class BaseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        setupDateTimeInterpreter(id == R.id.action_week_view);
+        setupDateTimeInterpreter();
 
         switch (id) {
             case R.id.action_today:
@@ -136,20 +136,23 @@ public class BaseActivity extends AppCompatActivity
     /**
      * Set up a date time interpreter which will show short date values when in week view and long
      * date values otherwise.
-     * @param shortDate True if the date values should be short.
      */
-    private void setupDateTimeInterpreter(final boolean shortDate) {
+    private void setupDateTimeInterpreter() {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
 
             SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
             SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
             @Override
+            public String interpretShortDate(Calendar date) {
+                String weekday = weekdayNameFormat.format(date.getTime());
+                weekday = String.valueOf(weekday.charAt(0));
+                return weekday.toUpperCase() + format.format(date.getTime());
+            }
+
+            @Override
             public String interpretDate(Calendar date) {
                 String weekday = weekdayNameFormat.format(date.getTime());
-                if (shortDate) {
-                    weekday = String.valueOf(weekday.charAt(0));
-                }
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
 

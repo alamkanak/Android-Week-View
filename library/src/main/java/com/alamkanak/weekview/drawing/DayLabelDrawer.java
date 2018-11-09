@@ -39,7 +39,13 @@ public class DayLabelDrawer {
         boolean isSameDay = isSameDay(day, today);
 
         // Draw the day labels.
-        String dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day);
+        String dayLabel;
+        if (config.isWeek()) {
+            dayLabel = drawingConfig.dateTimeInterpreter.interpretShortDate(day);
+        } else {
+            dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day);
+        }
+
         if (dayLabel == null) {
             throw new IllegalStateException("A DateTimeInterpreter must not return null date");
         }

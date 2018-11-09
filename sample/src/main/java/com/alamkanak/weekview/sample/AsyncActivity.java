@@ -63,7 +63,7 @@ public class AsyncActivity extends AppCompatActivity
         mWeekView.setEventLongPressListener(this);
         mWeekView.setEmptyViewLongPressListener(this);
 
-        setupDateTimeInterpreter(false);
+        setupDateTimeInterpreter();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AsyncActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        setupDateTimeInterpreter(id == R.id.action_week_view);
+        setupDateTimeInterpreter();
         switch (id) {
             case R.id.action_today:
                 mWeekView.goToToday();
@@ -138,18 +138,22 @@ public class AsyncActivity extends AppCompatActivity
         mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
     }
 
-    private void setupDateTimeInterpreter(final boolean shortDate) {
+    private void setupDateTimeInterpreter() {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
 
             SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
             SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
             @Override
+            public String interpretShortDate(Calendar date) {
+                String weekday = weekdayNameFormat.format(date.getTime());
+                weekday = String.valueOf(weekday.charAt(0));
+                return weekday.toUpperCase() + format.format(date.getTime());
+            }
+
+            @Override
             public String interpretDate(Calendar date) {
                 String weekday = weekdayNameFormat.format(date.getTime());
-                if (shortDate) {
-                    weekday = String.valueOf(weekday.charAt(0));
-                }
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
 

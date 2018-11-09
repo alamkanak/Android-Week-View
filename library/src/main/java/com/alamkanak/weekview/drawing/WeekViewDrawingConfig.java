@@ -222,7 +222,7 @@ public class WeekViewDrawingConfig {
             if (time == null) {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             }
-            timeTextWidth = Math.max(timeTextWidth, timeTextPaint.measureText(time));
+            timeTextWidth = max(timeTextWidth, timeTextPaint.measureText(time));
         }
     }
 
@@ -236,9 +236,21 @@ public class WeekViewDrawingConfig {
 
     private DateTimeInterpreter buildDateTimeInterpreter(final Context context) {
         return new DateTimeInterpreter() {
+
             private SimpleDateFormat sdfDate = DateUtils.getDateFormat();
             private SimpleDateFormat sdfTime = DateUtils.getTimeFormat(context);
             private Calendar calendar = Calendar.getInstance();
+
+            @Override
+            public String interpretShortDate(Calendar date) {
+                try {
+                    // TODO
+                    return sdfDate.format(date.getTime()).toUpperCase();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return "";
+                }
+            }
 
             @Override
             public String interpretDate(Calendar date) {
