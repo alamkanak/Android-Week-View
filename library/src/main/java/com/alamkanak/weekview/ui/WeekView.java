@@ -42,6 +42,7 @@ import static com.alamkanak.weekview.utils.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.util.Calendar.DATE;
+import static java.util.Calendar.HOUR_OF_DAY;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -154,7 +155,7 @@ public class WeekView<T> extends View
 
         prepareEventDrawing(canvas);
 
-        final DrawingContext drawingContext = DrawingContext.create(config);
+        final DrawingContext drawingContext = DrawingContext.create(config, viewState);
         eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange);
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
@@ -198,6 +199,18 @@ public class WeekView<T> extends View
         data.clearEventChipsCache();
         canvas.save();
         clipEventsRect(canvas);
+        calculateWidthPerDay();
+    }
+
+    void calculateWidthPerDay() {
+        int width = WeekView.getViewWidth();
+
+        // Calculate the available width for each day
+        drawConfig.widthPerDay = width
+                - drawConfig.headerColumnWidth
+                - config.columnGap * (config.numberOfVisibleDays - 1)
+                - config.hourSeparatorStrokeWidth * (config.numberOfVisibleDays - 1);
+        drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
     }
 
     private void clipEventsRect(Canvas canvas) {
@@ -345,9 +358,6 @@ public class WeekView<T> extends View
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
-        // TODO: Remove this workaround
-        viewState.isFirstDraw = true;
-
         config.setNumberOfVisibleDays(numberOfVisibleDays);
         invalidate();
     }
@@ -918,7 +928,7 @@ public class WeekView<T> extends View
 
     public void goToCurrentTime() {
         final Calendar today = Calendar.getInstance();
-        final int hour = today.get(Calendar.HOUR_OF_DAY);
+        final int hour = today.get(HOUR_OF_DAY);
         goToDate(today);
         goToHour(hour);
     }

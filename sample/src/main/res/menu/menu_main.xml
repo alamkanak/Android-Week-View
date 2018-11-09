@@ -10,15 +10,15 @@
         <item android:id="@+id/action_day_view"
             android:title="@string/action_day_view"
             android:orderInCategory="100"
-            app:showAsAction="ifRoom"/>
+            app:showAsAction="never"/>
         <item android:id="@+id/action_three_day_view"
             android:title="@string/action_three_day_view"
-            android:orderInCategory="100"
-            app:showAsAction="ifRoom"
+            android:orderInCategory="200"
+            app:showAsAction="never"
             android:checked="true"/>
         <item android:id="@+id/action_week_view"
             android:title="@string/action_week_view"
-            android:orderInCategory="100"
-            app:showAsAction="ifRoom"/>
+            android:orderInCategory="300"
+            app:showAsAction="never"/>
     </group>
 </menu>

@@ -25,7 +25,7 @@ import static java.util.Calendar.HOUR_OF_DAY;
 public class WeekViewDrawingConfig {
     
     Paint timeTextPaint;
-    float timeTextWidth;
+    public float timeTextWidth;
     public float timeTextHeight;
 
     Paint headerTextPaint;

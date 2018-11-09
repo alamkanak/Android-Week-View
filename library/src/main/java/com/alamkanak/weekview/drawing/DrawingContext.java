@@ -1,8 +1,10 @@
 package com.alamkanak.weekview.drawing;
 
 import com.alamkanak.weekview.model.WeekViewConfig;
+import com.alamkanak.weekview.model.WeekViewViewState;
 import com.alamkanak.weekview.utils.DateUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class DrawingContext {
         this.startPixel = startPixel;
     }
 
-    public static DrawingContext create(WeekViewConfig config) {
+    public static DrawingContext create(WeekViewConfig config, WeekViewViewState viewState) {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
         final float totalDayWidth = config.getTotalDayWidth();
         final int leftDaysWithGaps = (int) (Math.ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
@@ -24,9 +26,16 @@ public class DrawingContext {
                 + totalDayWidth * leftDaysWithGaps
                 + drawConfig.headerColumnWidth;
 
-        final int start = leftDaysWithGaps + 1;
-        final int end = start + config.numberOfVisibleDays + 1;
-        final List<Calendar> dayRange = DateUtils.getDateRange(start, end);
+        List<Calendar> dayRange = new ArrayList<>();
+        if (config.isSingleDay()) {
+            final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
+            //day.add(Calendar.DAY_OF_MONTH, leftDaysWithGaps);
+            dayRange.add(day);
+        } else {
+            final int start = leftDaysWithGaps + 1;
+            final int end = start + config.numberOfVisibleDays + 1;
+            dayRange.addAll(DateUtils.getDateRange(start, end));
+        }
 
         return new DrawingContext(dayRange, startPixel);
     }
