@@ -54,11 +54,11 @@ public class EventChip<T> {
         this.originalEvent = originalEvent;
     }
 
-    public void draw(WeekViewConfig config, Canvas canvas) {
+    void draw(WeekViewConfig config, Canvas canvas) {
         draw(config, null, canvas);
     }
 
-    public void draw(WeekViewConfig config, @Nullable StaticLayout textLayout, Canvas canvas) {
+    void draw(WeekViewConfig config, @Nullable StaticLayout textLayout, Canvas canvas) {
         float cornerRadius = config.eventCornerRadius;
         Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);

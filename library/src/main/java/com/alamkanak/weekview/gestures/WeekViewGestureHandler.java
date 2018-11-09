@@ -27,6 +27,8 @@ import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
 import static com.alamkanak.weekview.utils.Constants.HOURS_PER_DAY;
+import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
 import static java.lang.Math.round;
 
 public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureListener {
@@ -369,7 +371,7 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
     }
 
     private void goToNearestOrigin() {
-        final float totalDayWidth = drawingConfig.widthPerDay + config.columnGap;
+        final float totalDayWidth = config.getTotalDayWidth();
         double leftDays = drawingConfig.currentOrigin.x / totalDayWidth;
 
         if (currentFlingDirection != Direction.NONE) {
@@ -377,10 +379,10 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
             leftDays = round(leftDays);
         } else if (currentScrollDirection == Direction.LEFT) {
             // snap to last day
-            leftDays = Math.floor(leftDays);
+            leftDays = floor(leftDays);
         } else if (currentScrollDirection == Direction.RIGHT) {
             // snap to next day
-            leftDays = Math.ceil(leftDays);
+            leftDays = ceil(leftDays);
         } else {
             // snap to nearest day
             leftDays = round(leftDays);

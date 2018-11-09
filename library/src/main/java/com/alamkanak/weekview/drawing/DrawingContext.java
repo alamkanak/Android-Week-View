@@ -18,7 +18,7 @@ public class DrawingContext {
 
     public static DrawingContext create(WeekViewConfig config) {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
+        final float totalDayWidth = config.getTotalDayWidth();
         final int leftDaysWithGaps = (int) (Math.ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
         final float startPixel = drawConfig.currentOrigin.x
                 + totalDayWidth * leftDaysWithGaps

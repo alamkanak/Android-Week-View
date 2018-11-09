@@ -48,7 +48,7 @@ public class EventsDrawer<T> {
             drawEventsForDate(eventChips, day, startPixel, canvas);
 
             // In the next iteration, start from the next day.
-            startPixel += drawingConfig.widthPerDay + config.columnGap;
+            startPixel += config.getTotalDayWidth();
         }
     }
 
@@ -104,7 +104,7 @@ public class EventsDrawer<T> {
                 drawAllDayEvent(eventChip, startPixel, canvas);
             }
 
-            startPixel += drawingConfig.widthPerDay + config.columnGap;
+            startPixel += config.getTotalDayWidth();
         }
 
         // Hide events when they are in the top left corner

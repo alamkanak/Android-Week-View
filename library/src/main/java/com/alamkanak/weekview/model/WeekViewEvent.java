@@ -194,7 +194,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     /**
-     * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}
+     * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}s
      * @return A list of {@link WeekViewEvent}
      */
     List<WeekViewEvent<T>> splitWeekViewEvents() {

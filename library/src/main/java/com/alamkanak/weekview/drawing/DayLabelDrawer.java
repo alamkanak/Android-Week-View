@@ -30,7 +30,7 @@ public class DayLabelDrawer {
                 startPixel += config.eventMarginHorizontal;
             }
 
-            startPixel += drawingConfig.widthPerDay + config.columnGap;
+            startPixel += config.getTotalDayWidth();
         }
     }
 

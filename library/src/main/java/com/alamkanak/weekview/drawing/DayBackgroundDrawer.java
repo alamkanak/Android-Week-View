@@ -41,7 +41,7 @@ public class DayBackgroundDrawer {
             }
 
             // In the next iteration, start from the next day.
-            startPixel += drawConfig.widthPerDay + config.columnGap;
+            startPixel += config.getTotalDayWidth();
         }
     }
 

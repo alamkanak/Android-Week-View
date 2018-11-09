@@ -143,19 +143,6 @@ public class FakeEventsDatabase implements EventsDatabase {
         events.add(event);
         events.add(event);
 
-        startTime = Calendar.getInstance();
-        startTime.set(Calendar.DAY_OF_MONTH, 8);
-        startTime.set(Calendar.HOUR_OF_DAY, 2);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
-        startTime.set(Calendar.YEAR, newYear);
-        endTime = (Calendar) startTime.clone();
-        endTime.set(Calendar.DAY_OF_MONTH, 10);
-        endTime.set(Calendar.HOUR_OF_DAY, 23);
-
-        event = new Event(8, getEventTitle(startTime), startTime, endTime, null, color3, true);
-        events.add(event);
-
         // All day event until 00:00 next day
         startTime = Calendar.getInstance();
         startTime.set(Calendar.DAY_OF_MONTH, 10);

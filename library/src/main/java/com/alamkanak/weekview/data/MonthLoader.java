@@ -39,14 +39,14 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
 
         final Calendar startDate = DateUtils.withTimeAtStartOfDay(today());
         startDate.set(Calendar.YEAR, year);
-        startDate.set(Calendar.MONTH, month); // TODO: Test
+        startDate.set(Calendar.MONTH, month);
         startDate.set(Calendar.DAY_OF_MONTH, 1);
 
         final int maxDays = startDate.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         final Calendar endDate = DateUtils.withTimeAtEndOfDay(today());
         endDate.set(Calendar.YEAR, year);
-        endDate.set(Calendar.MONTH, month); // TODO: Test
+        endDate.set(Calendar.MONTH, month);
         endDate.set(Calendar.DAY_OF_MONTH, maxDays);
 
         List<WeekViewDisplayable<T>> displayableItems =

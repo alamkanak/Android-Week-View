@@ -183,7 +183,7 @@ public class WeekView<T> extends View
 
         viewState.firstVisibleDay = (Calendar) today.clone();
 
-        final float totalDayWidth = drawConfig.widthPerDay + config.columnGap;
+        final float totalDayWidth = config.getTotalDayWidth();
         final int delta = (int) ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1;
         viewState.firstVisibleDay.add(DATE, delta);
 
