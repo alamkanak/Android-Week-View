@@ -39,7 +39,10 @@ public class HeaderRowDrawer<T> {
 
         // Calculate the available width for each day
         drawConfig.headerColumnWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
-        drawConfig.widthPerDay = width - drawConfig.headerColumnWidth - config.columnGap * (config.numberOfVisibleDays - 1);
+        drawConfig.widthPerDay = width
+                - drawConfig.headerColumnWidth
+                - config.columnGap * (config.numberOfVisibleDays - 1)
+                - config.hourSeparatorStrokeWidth * (config.numberOfVisibleDays - 1);
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
 
         // Calculate the header height

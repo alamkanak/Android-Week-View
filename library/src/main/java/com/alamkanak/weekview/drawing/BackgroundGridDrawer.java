@@ -82,7 +82,7 @@ public class BackgroundGridDrawer {
             final float heightOfHour = config.hourHeight * hour;
             final float top = headerHeight + drawConfig.currentOrigin.y + heightOfHour;
 
-            final float widthPerDay = drawConfig.widthPerDay * config.columnGap;
+            final float widthPerDay = config.getTotalDayWidth();
             final float separatorWidth = config.hourSeparatorStrokeWidth;
 
             final boolean isNotHiddenByHeader = top > headerHeight - separatorWidth;
