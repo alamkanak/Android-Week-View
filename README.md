@@ -128,7 +128,7 @@ Many aspects of `WeekView` and the individual event chips can be customized.
 
 ---
 
-Customization
+Interfaces
 -------------------
 
 The following interfaces are used to provide data and interactability to `WeekView`.  
