@@ -35,7 +35,7 @@ public class HeaderRowDrawer<T> {
     }
 
     private void calculateAvailableSpaceForHeader() {
-        drawConfig.headerColumnWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
+        drawConfig.headerColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
         drawConfig.headerHeight = calculateHeaderHeight();
     }
 
@@ -73,7 +73,7 @@ public class HeaderRowDrawer<T> {
             float headerTextSize = drawConfig.eventTextPaint.getTextSize();
             float totalEventPadding = config.eventPadding * 2;
 
-            float eventChipBottomPadding = config.textSize / 4;
+            float eventChipBottomPadding = config.timeColumnTextSize / 4;
 
             return drawConfig.headerTextHeight + (headerTextSize
                     + totalEventPadding + eventChipBottomPadding
@@ -95,7 +95,7 @@ public class HeaderRowDrawer<T> {
                 + config.headerRowBottomLineWidth;
 
         // Hide everything in the top left corner
-        final float topLeftCornerWidth = drawConfig.timeTextWidth + config.headerColumnPadding * 2;
+        final float topLeftCornerWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
         canvas.clipRect(0, 0, topLeftCornerWidth, headerHeight);
         canvas.drawRect(0, 0, topLeftCornerWidth, headerHeight, headerBackground);
 

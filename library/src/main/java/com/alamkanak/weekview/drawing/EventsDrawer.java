@@ -116,7 +116,7 @@ public class EventsDrawer<T> {
         }
 
         final float height = drawingConfig.headerHeight + config.headerRowPadding * 2 - headerRowBottomLine;
-        final float width = drawingConfig.timeTextWidth + config.headerColumnPadding * 2;
+        final float width = drawingConfig.timeTextWidth + config.timeColumnPadding * 2;
 
         canvas.clipRect(0, 0, width, height);
         canvas.drawRect(0, 0, width, height, headerBackground);

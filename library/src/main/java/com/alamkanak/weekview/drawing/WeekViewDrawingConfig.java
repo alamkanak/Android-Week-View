@@ -45,6 +45,8 @@ public class WeekViewDrawingConfig {
     private Paint futureWeekendBackgroundPaint;
     private Paint pastWeekendBackgroundPaint;
 
+    public Paint timeColumnSeparatorPaint;
+
     Paint nowLinePaint;
     Paint nowDotPaint;
 
@@ -62,8 +64,8 @@ public class WeekViewDrawingConfig {
         // Measure settings for time column.
         timeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         timeTextPaint.setTextAlign(Paint.Align.RIGHT);
-        timeTextPaint.setTextSize(config.textSize);
-        timeTextPaint.setColor(config.headerColumnTextColor);
+        timeTextPaint.setTextSize(config.timeColumnTextSize);
+        timeTextPaint.setColor(config.timeColumnTextColor);
 
         Rect rect = new Rect();
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
@@ -72,9 +74,9 @@ public class WeekViewDrawingConfig {
 
         // Measure settings for header row.
         headerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        headerTextPaint.setColor(config.headerColumnTextColor);
+        headerTextPaint.setColor(config.timeColumnTextColor);
         headerTextPaint.setTextAlign(Paint.Align.CENTER);
-        headerTextPaint.setTextSize(config.textSize);
+        headerTextPaint.setTextSize(config.timeColumnTextSize);
         headerTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         headerTextHeight = rect.height();
         headerTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -95,6 +97,11 @@ public class WeekViewDrawingConfig {
         pastWeekendBackgroundPaint = new Paint();
         pastWeekendBackgroundPaint.setColor(config.pastWeekendBackgroundColor);
 
+        // Prepare time column separator.
+        timeColumnSeparatorPaint = new Paint();
+        timeColumnSeparatorPaint.setColor(config.timeColumnSeparatorColor);
+        timeColumnSeparatorPaint.setStrokeWidth(config.timeColumnSeparatorStrokeWidth);
+
         // Prepare hour separator color paint.
         hourSeparatorPaint = new Paint();
         hourSeparatorPaint.setStyle(Paint.Style.STROKE);
@@ -103,7 +110,7 @@ public class WeekViewDrawingConfig {
 
         // Prepare the "now" line color paint
         nowLinePaint = new Paint();
-        nowLinePaint.setStrokeWidth(config.nowLineThickness);
+        nowLinePaint.setStrokeWidth(config.nowLineStrokeWidth);
         nowLinePaint.setColor(config.nowLineColor);
 
         // Prepare the "now" dot paint
@@ -119,7 +126,7 @@ public class WeekViewDrawingConfig {
         // Prepare today header text color paint.
         todayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         todayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        todayHeaderTextPaint.setTextSize(config.textSize);
+        todayHeaderTextPaint.setTextSize(config.timeColumnTextSize);
         todayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         todayHeaderTextPaint.setColor(config.todayHeaderTextColor);
 
@@ -129,7 +136,7 @@ public class WeekViewDrawingConfig {
 
         // Prepare header column background color.
         headerColumnBackgroundPaint = new Paint();
-        headerColumnBackgroundPaint.setColor(config.headerColumnBackgroundColor);
+        headerColumnBackgroundPaint.setColor(config.timeColumnBackgroundColor);
 
         // Prepare event text size and color.
         eventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);

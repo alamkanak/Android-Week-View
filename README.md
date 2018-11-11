@@ -28,7 +28,7 @@ implementation 'com.github.thellmund:Android-Week-View:3.0'
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:eventTextColor="@color/white"
-    app:textSize="12sp"
+    app:timeColumnTextSize="12sp"
     app:hourHeight="60dp"
     app:headerColumnPadding="8dp"
     app:headerColumnTextColor="@color/light_blue"

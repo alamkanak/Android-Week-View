@@ -29,7 +29,6 @@ public class DrawingContext {
         List<Calendar> dayRange = new ArrayList<>();
         if (config.isSingleDay()) {
             final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
-            //day.add(Calendar.DAY_OF_MONTH, leftDaysWithGaps);
             dayRange.add(day);
         } else {
             final int start = leftDaysWithGaps + 1;
