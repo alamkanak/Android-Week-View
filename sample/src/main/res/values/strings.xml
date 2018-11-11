@@ -7,6 +7,7 @@
     <string name="action_week_view">Week view</string>
     <string name="week_view">Week View</string>
     <string name="title_activity_basic">Basic Example</string>
+    <string name="title_activity_static">Basic Example (with static WeekView)</string>
     <string name="title_activity_asynchronous">Asynchronous Events</string>
     <string name="async_error">Could not download events from the internet</string>
 </resources>

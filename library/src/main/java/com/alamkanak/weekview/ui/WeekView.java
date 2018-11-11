@@ -911,6 +911,23 @@ public class WeekView<T> extends View
     }
 
     /**
+     * Returns whether the user can scroll horizontally. If not, the user can
+     * only scroll vertically.
+     *
+     * @return True if horizontal scrolling is enabled. Default is true.
+     */
+    public boolean isHorizontalScrollingEnabled() {
+        return config.horizontalScrollingEnabled;
+    }
+
+    /**
+     * Sets whether the user can scroll horizontally.
+     */
+    public void setHorizontalScrollingEnabled(boolean enabled) {
+        config.horizontalScrollingEnabled = enabled;
+    }
+
+    /**
      * Get whether the week view should fling vertically.
      *
      * @return True if the week view has vertical fling enabled.

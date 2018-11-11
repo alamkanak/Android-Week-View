@@ -26,6 +26,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.buttonStatic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StaticActivity.class);
+                startActivity(intent);
+            }
+        });
+
         findViewById(R.id.buttonAsynchronous).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

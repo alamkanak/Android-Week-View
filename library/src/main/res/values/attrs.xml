@@ -22,7 +22,6 @@
         <attr name="headerRowBottomLineWidth" format="dimension" />
 
         <!-- Time column -->
-        <!-- TODO -->
         <attr name="timeColumnTextColor" format="color" />
         <attr name="timeColumnBackground" format="color" />
         <attr name="timeColumnPadding" format="dimension" />
@@ -92,6 +91,7 @@
         <attr name="xScrollingSpeed" format="float" />
         <attr name="verticalFlingEnabled" format="boolean" />
         <attr name="horizontalFlingEnabled" format="boolean" />
+        <attr name="horizontalScrollingEnabled" format="boolean" />
         <attr name="scrollDuration" format="integer" />
 
     </declare-styleable>

@@ -124,10 +124,12 @@ public class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLi
         final float absDistanceX = Math.abs(distanceX);
         final float absDistanceY = Math.abs(distanceY);
 
+        final boolean canScrollHorizontally = config.horizontalScrollingEnabled;
+
         switch (currentScrollDirection) {
             case NONE: {
                 // Allow scrolling only in one direction.
-                if (absDistanceX > absDistanceY) {
+                if (absDistanceX > absDistanceY && canScrollHorizontally) {
                     if (distanceX > 0) {
                         currentScrollDirection = Direction.LEFT;
                     } else {

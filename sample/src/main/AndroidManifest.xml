@@ -24,6 +24,9 @@
             android:name=".BaseActivity"
             android:label="@string/week_view" />
         <activity
+            android:name=".StaticActivity"
+            android:label="@string/week_view" />
+        <activity
             android:name=".AsyncActivity"
             android:label="@string/week_view" />
     </application>

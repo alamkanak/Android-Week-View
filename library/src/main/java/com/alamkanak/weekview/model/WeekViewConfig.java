@@ -96,8 +96,9 @@ public class WeekViewConfig {
 
     // Scrolling
     public float xScrollingSpeed = 1f;
-    public boolean horizontalFlingEnabled = true;
     public boolean verticalFlingEnabled = true;
+    public boolean horizontalFlingEnabled = true;
+    public boolean horizontalScrollingEnabled = true;
     public int scrollDuration = 250;
 
     public WeekViewConfig(Context context, AttributeSet attrs) {
@@ -183,6 +184,7 @@ public class WeekViewConfig {
             // Scrolling
             xScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, xScrollingSpeed);
             horizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, horizontalFlingEnabled);
+            horizontalScrollingEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, horizontalScrollingEnabled);
             verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, verticalFlingEnabled);
             scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, scrollDuration);
         } finally {
