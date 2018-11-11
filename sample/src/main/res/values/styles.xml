@@ -1,14 +1,18 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/toolbar</item>
-        <item name="colorPrimaryDark">@color/accent</item>
+        <item name="colorPrimaryDark">#BBB</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColorPrimary">@color/toolbar_text</item>
         <item name="actionMenuTextColor">@color/toolbar_text</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="colorControlActivated">@color/accent</item>
+
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">#EEE</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/toolbar</item>
     </style>
 
     <style name="Button">

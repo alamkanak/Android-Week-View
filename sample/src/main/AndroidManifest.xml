@@ -22,10 +22,10 @@
         </activity>
         <activity
             android:name=".BaseActivity"
-            android:label="@string/title_activity_basic" />
+            android:label="@string/week_view" />
         <activity
             android:name=".AsyncActivity"
-            android:label="@string/title_activity_asynchronous" />
+            android:label="@string/week_view" />
     </application>
 
 </manifest>
