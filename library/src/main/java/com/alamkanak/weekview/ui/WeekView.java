@@ -459,9 +459,9 @@ public class WeekView<T> extends View
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Get the height of AllDay-events.
+     * Get the height of all-day events.
      *
-     * @return Height of AllDay-events.
+     * @return Height of all-day events.
      */
     public int getAllDayEventHeight() {
         return config.allDayEventHeight;
