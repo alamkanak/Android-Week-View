@@ -5,6 +5,13 @@ Android Week View
 
 ![](images/screen-shot-new.png)
 
+Features
+---------
+* Display single-day or multi-day calendar views in your app
+* Extensive styling customization possible
+* Infinite horizontal scrolling
+* Interactive via event click listeners
+
 Usage
 ---------
 1. Add the JitPack repository to your project-level build file and the dependency to the app-level build file.
