@@ -17,10 +17,11 @@ import static java.util.Calendar.DATE;
 class DateUtils {
 
     static List<Calendar> getDateRange(int daysSinceToday, int size) {
-        List<Calendar> days = new ArrayList<>();
+        final List<Calendar> days = new ArrayList<>();
+        Calendar day;
 
         for (int dayNumber = daysSinceToday; dayNumber <= size; dayNumber++) {
-            Calendar day = today();
+            day = today();
             day.add(DATE, dayNumber - 1);
             days.add(day);
         }
@@ -45,9 +46,9 @@ class DateUtils {
     }
 
     static int getDaysUntilDate(Calendar date) {
-        long dateInMillis = date.getTimeInMillis();
-        long todayInMillis = today().getTimeInMillis();
-        long diff = dateInMillis - todayInMillis;
+        final long dateInMillis = date.getTimeInMillis();
+        final long todayInMillis = today().getTimeInMillis();
+        final long diff = dateInMillis - todayInMillis;
         return (int) (diff / Constants.DAY_IN_MILLIS);
     }
 
@@ -67,7 +68,7 @@ class DateUtils {
      * @return the calendar instance
      */
     static Calendar today() {
-        Calendar today = Calendar.getInstance();
+        final Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);

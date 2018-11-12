@@ -90,7 +90,7 @@ final class WeekViewData<T> {
             return;
         }
 
-        List<WeekViewEvent<T>> splittedEvents = event.splitWeekViewEvents();
+        final List<WeekViewEvent<T>> splittedEvents = event.splitWeekViewEvents();
         for (WeekViewEvent<T> splittedEvent : splittedEvents) {
             eventChips.add(new EventChip<>(splittedEvent, event, null));
         }

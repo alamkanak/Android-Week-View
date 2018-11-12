@@ -53,7 +53,7 @@ class DayBackgroundDrawer {
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
 
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
         if (config.showDistinctPastFutureColor) {
             final boolean isWeekend = day.get(DAY_OF_WEEK) == SATURDAY || day.get(DAY_OF_WEEK) == SUNDAY;

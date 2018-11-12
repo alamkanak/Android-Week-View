@@ -34,7 +34,7 @@ class HeaderRowDrawer<T> {
     }
 
     private float calculateHeaderHeight() {
-        List<EventChip<T>> eventChips = data.getAllDayEventChips();
+        final List<EventChip<T>> eventChips = data.getAllDayEventChips();
         if (eventChips == null || eventChips.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
@@ -42,11 +42,11 @@ class HeaderRowDrawer<T> {
         // Make sure the header is the right size (depends on AllDay events)
         boolean containsAllDayEvent = false;
         for (int i = 0; i < config.numberOfVisibleDays; i++) {
-            Calendar day = (Calendar) viewState.firstVisibleDay.clone();
+            final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
             day.add(DATE, i);
 
             for (int j = 0; j < eventChips.size(); j++) {
-                WeekViewEvent event = eventChips.get(j).event;
+                final WeekViewEvent event = eventChips.get(j).event;
                 if (event.isSameDay(day) && event.isAllDay()) {
                     containsAllDayEvent = true;
                     break;
@@ -64,10 +64,9 @@ class HeaderRowDrawer<T> {
         }
 
         if (containsAllDayEvent) {
-            float headerTextSize = drawConfig.eventTextPaint.getTextSize();
-            float totalEventPadding = config.eventPadding * 2;
-
-            float eventChipBottomPadding = config.timeColumnTextSize / 4;
+            final float headerTextSize = drawConfig.eventTextPaint.getTextSize();
+            final float totalEventPadding = config.eventPadding * 2;
+            final float eventChipBottomPadding = config.timeColumnTextSize / 4;
 
             return drawConfig.headerTextHeight + (headerTextSize
                     + totalEventPadding + eventChipBottomPadding
@@ -78,7 +77,7 @@ class HeaderRowDrawer<T> {
     }
 
     private void drawHeaderRow(Canvas canvas) {
-        final int width = RealWeekView.getViewWidth();
+        final int width = WeekView.getViewWidth();
 
         canvas.restore();
         canvas.save();

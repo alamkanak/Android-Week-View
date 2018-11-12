@@ -44,10 +44,10 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
         endDate.set(Calendar.MONTH, month);
         endDate.set(Calendar.DAY_OF_MONTH, maxDays);
 
-        List<WeekViewDisplayable<T>> displayableItems =
+        final List<WeekViewDisplayable<T>> displayableItems =
                 onMonthChangeListener.onMonthChange(startDate, endDate);
 
-        List<WeekViewEvent<T>> events = new ArrayList<>();
+        final List<WeekViewEvent<T>> events = new ArrayList<>();
         for (WeekViewDisplayable<T> displayableItem : displayableItems) {
             events.add(displayableItem.toWeekViewEvent());
         }

@@ -48,6 +48,7 @@ final class WeekViewConfig {
     int eventTextSize = 12;
     int eventTextColor = Color.BLACK;
     int eventPadding = 8;
+    int defaultEventColor = Color.parseColor("#9fc6e7");
 
     // Event margins
     int columnGap = 10;
@@ -135,6 +136,7 @@ final class WeekViewConfig {
             eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
             eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, eventTextColor);
             eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, eventPadding);
+            defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, defaultEventColor);
 
             // Event margins
             columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, columnGap);

@@ -6,6 +6,7 @@ import java.util.Calendar;
 
 import static com.alamkanak.weekview.DateUtils.isSameDay;
 import static com.alamkanak.weekview.DateUtils.today;
+import static java.lang.Math.max;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
 
@@ -20,13 +21,13 @@ class NowLineDrawer {
     }
 
     void draw(DrawingContext drawingContext, Canvas canvas) {
-        Calendar today = today();
+        final Calendar today = today();
 
         float startPixel = drawingContext.startPixel;
 
         for (Calendar day : drawingContext.dayRange) {
-            boolean isSameDay = isSameDay(day, today);
-            float startX = (startPixel < drawConfig.headerColumnWidth ? drawConfig.headerColumnWidth : startPixel);
+            final boolean isSameDay = isSameDay(day, today);
+            final float startX = max(startPixel, drawConfig.headerColumnWidth);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too

@@ -55,13 +55,13 @@ class EventsDrawer<T> {
         }
 
         for (int i = 0; i < eventChips.size(); i++) {
-            EventChip eventChip = eventChips.get(i);
-            WeekViewEvent event = eventChip.event;
+            final EventChip eventChip = eventChips.get(i);
+            final WeekViewEvent event = eventChip.event;
             if (!event.isSameDay(date)) {
                 continue;
             }
 
-            RectF chipRect = rectCalculator.calculateSingleEvent(eventChip, startFromPixel);
+            final RectF chipRect = rectCalculator.calculateSingleEvent(eventChip, startFromPixel);
             if (isValidSingleEventRect(chipRect)) {
                 eventChip.rect = chipRect;
                 eventChip.draw(config, canvas);
@@ -92,7 +92,7 @@ class EventsDrawer<T> {
             }
 
             for (EventChip eventChip : eventChips) {
-                WeekViewEvent event = eventChip.event;
+                final WeekViewEvent event = eventChip.event;
                 if (!event.isSameDay(day)) {
                     continue;
                 }
@@ -141,16 +141,16 @@ class EventsDrawer<T> {
                 + drawingConfig.headerMarginBottom;
 
         return rect.left < rect.right
-                && rect.left < RealWeekView.getViewWidth()
-                && rect.top < RealWeekView.getViewHeight()
+                && rect.left < WeekView.getViewWidth()
+                && rect.top < WeekView.getViewHeight()
                 && rect.right > drawingConfig.headerColumnWidth
                 && rect.bottom > totalHeaderHeight;
     }
 
     private boolean isValidAllDayEventRect(RectF rect) {
         return rect.left < rect.right
-                && rect.left < RealWeekView.getViewWidth()
-                && rect.top < RealWeekView.getViewHeight()
+                && rect.left < WeekView.getViewWidth()
+                && rect.top < WeekView.getViewHeight()
                 && rect.right > drawingConfig.headerColumnWidth
                 && rect.bottom > 0;
     }
@@ -170,7 +170,7 @@ class EventsDrawer<T> {
         }
 
         // Prepare the name of the event.
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+        final SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         if (event.getTitle() != null) {
             stringBuilder.append(event.getTitle());
             stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, stringBuilder.length(), 0);
@@ -197,7 +197,8 @@ class EventsDrawer<T> {
             do {
                 // Ellipsize text to fit into event rect.
                 final int availableArea = availableLineCount * availableWidth;
-                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TruncateAt.END);
+                final CharSequence ellipsized =
+                        TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TruncateAt.END);
                 final int width = (int) (right - left - config.eventPadding * 2);
                 textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 

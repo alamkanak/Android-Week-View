@@ -10,11 +10,11 @@ import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.EmptyViewLongPressListener;
 import com.alamkanak.weekview.EventClickListener;
 import com.alamkanak.weekview.EventLongPressListener;
+import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.database.EventsDatabase;
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
-import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;

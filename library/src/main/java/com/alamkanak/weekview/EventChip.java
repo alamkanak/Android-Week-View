@@ -56,8 +56,8 @@ class EventChip<T> {
     }
 
     void draw(WeekViewConfig config, @Nullable StaticLayout textLayout, Canvas canvas) {
-        float cornerRadius = config.eventCornerRadius;
-        Paint backgroundPaint = getBackgroundPaint();
+        final float cornerRadius = config.eventCornerRadius;
+        final Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
         if (textLayout != null) {
@@ -69,20 +69,20 @@ class EventChip<T> {
     }
 
     private Paint getBackgroundPaint() {
-        Paint paint = new Paint();
+        final Paint paint = new Paint();
         paint.setColor(event.getColorOrDefault());
         return paint;
     }
 
     private void calculateTextHeightAndDrawTitle(WeekViewConfig config, Canvas canvas) {
-        boolean negativeWidth = (rect.right - rect.left - config.eventPadding * 2) < 0;
-        boolean negativeHeight = (rect.bottom - rect.top - config.eventPadding * 2) < 0;
+        final boolean negativeWidth = (rect.right - rect.left - config.eventPadding * 2) < 0;
+        final boolean negativeHeight = (rect.bottom - rect.top - config.eventPadding * 2) < 0;
         if (negativeWidth || negativeHeight) {
             return;
         }
 
         // Prepare the name of the event.
-        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+        final SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
         if (event.getTitle() != null) {
             stringBuilder.append(event.getTitle());
             stringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, stringBuilder.length(), 0);
@@ -94,23 +94,23 @@ class EventChip<T> {
             stringBuilder.append(event.getLocation());
         }
 
-        int availableHeight = (int) (rect.bottom - rect.top - config.eventPadding * 2);
-        int availableWidth = (int) (rect.right - rect.left - config.eventPadding * 2);
+        final int availableHeight = (int) (rect.bottom - rect.top - config.eventPadding * 2);
+        final int availableWidth = (int) (rect.right - rect.left - config.eventPadding * 2);
 
         // Get text dimensions.
         final TextPaint textPaint = config.drawingConfig.eventTextPaint;
         StaticLayout textLayout = new StaticLayout(stringBuilder,
                 textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-        int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+        final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
             int availableLineCount = availableHeight / lineHeight;
             do {
                 // TODO: Don't truncate
                 // Ellipsize text to fit into event rect.
-                int availableArea = availableLineCount * availableWidth;
-                CharSequence ellipsized = TextUtils.ellipsize(stringBuilder,
+                final int availableArea = availableLineCount * availableWidth;
+                final CharSequence ellipsized = TextUtils.ellipsize(stringBuilder,
                         textPaint, availableArea, TextUtils.TruncateAt.END);
 
                 final int width = (int) (rect.right - rect.left - config.eventPadding * 2);

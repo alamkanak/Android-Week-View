@@ -30,8 +30,8 @@ class EventChipsProvider<T> {
 
     void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
         for (Calendar day : dayRange) {
-            boolean hasNoEvents = data.getAllEventChips() == null;
-            boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
+            final boolean hasNoEvents = data.getAllEventChips() == null;
+            final boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
                     && abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
@@ -73,8 +73,8 @@ class EventChipsProvider<T> {
     }
 
     private void loadEvents(Calendar day) {
-        int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
-        boolean isRefreshEligible = data.fetchedPeriod < 0
+        final int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
+        final boolean isRefreshEligible = data.fetchedPeriod < 0
                 || data.fetchedPeriod != periodToFetch
                 || viewState.shouldRefreshEvents;
 
@@ -127,22 +127,22 @@ class EventChipsProvider<T> {
 
     private void calculateEventChipPositions() {
         // Prepare to calculate positions of each events.
-        List<EventChip<T>> tempEvents = data.getAllEventChips();
-        List<EventChip<T>> results = new ArrayList<>();
+        final List<EventChip<T>> tempEvents = data.getAllEventChips();
+        final List<EventChip<T>> results = new ArrayList<>();
 
         // Iterate through each day with events to calculate the position of the events.
         while (!tempEvents.isEmpty()) {
-            List<EventChip<T>> eventChips = new ArrayList<>();
+            final List<EventChip<T>> eventChips = new ArrayList<>();
 
-            // Get first event for a day.
-            EventChip<T> firstRect = tempEvents.remove(0);
+            final EventChip<T> firstRect = tempEvents.remove(0);
             eventChips.add(firstRect);
 
             int i = 0;
             while (i < tempEvents.size()) {
                 // Collect all other events for same day.
-                EventChip<T> eventChip = tempEvents.get(i);
-                WeekViewEvent<T> event = eventChip.event;
+                final EventChip<T> eventChip = tempEvents.get(i);
+                final WeekViewEvent<T> event = eventChip.event;
+
                 if (firstRect.event.isSameDay(event)) {
                     tempEvents.remove(i);
                     eventChips.add(eventChip);
@@ -166,7 +166,7 @@ class EventChipsProvider<T> {
      */
     private void computePositionOfEvents(List<EventChip<T>> eventChips) {
         // Make "collision groups" for all events that collide with others.
-        List<List<EventChip>> collisionGroups = new ArrayList<>();
+        final List<List<EventChip>> collisionGroups = new ArrayList<>();
         for (EventChip eventChip : eventChips) {
             boolean isPlaced = false;
 
@@ -183,7 +183,7 @@ class EventChipsProvider<T> {
             }
 
             if (!isPlaced) {
-                List<EventChip> newGroup = new ArrayList<>();
+                final List<EventChip> newGroup = new ArrayList<>();
                 newGroup.add(eventChip);
                 collisionGroups.add(newGroup);
             }

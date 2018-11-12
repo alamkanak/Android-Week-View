@@ -1,7 +1,6 @@
 package com.alamkanak.weekview;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -49,7 +48,6 @@ class WeekViewDrawingConfig {
     float headerColumnWidth;
     TextPaint eventTextPaint;
     Paint headerColumnBackgroundPaint;
-    int defaultEventColor;
 
     int newHourHeight = -1;
 
@@ -62,7 +60,7 @@ class WeekViewDrawingConfig {
         timeTextPaint.setTextSize(config.timeColumnTextSize);
         timeTextPaint.setColor(config.timeColumnTextColor);
 
-        Rect rect = new Rect();
+        final Rect rect = new Rect();
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         timeTextHeight = rect.height();
         initTextTimeWidth(context);
@@ -138,16 +136,13 @@ class WeekViewDrawingConfig {
         eventTextPaint.setStyle(Paint.Style.FILL);
         eventTextPaint.setColor(config.eventTextColor);
         eventTextPaint.setTextSize(config.eventTextSize);
-
-        // Set default event color.
-        defaultEventColor = Color.parseColor("#9fc6e7");
     }
 
     void moveCurrentOriginIfFirstDraw(WeekViewConfig config) {
         // If the week view is being drawn for the first time, then consider the first day of the week.
-        Calendar today = today();
-        boolean isWeekView = config.numberOfVisibleDays >= 7;
-        boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
+        final Calendar today = today();
+        final boolean isWeekView = config.numberOfVisibleDays >= 7;
+        final boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
         if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
             int difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
             currentOrigin.x += (widthPerDay + config.columnGap) * difference;
@@ -169,7 +164,7 @@ class WeekViewDrawingConfig {
     }
 
     void updateVerticalOrigin(WeekViewConfig config) {
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
         // If the new currentOrigin.y is invalid, make it valid.
         final float dayHeight = config.hourHeight * 24;
@@ -217,10 +212,11 @@ class WeekViewDrawingConfig {
      * Initialize time column width. Calculate value with all possible hours (supposed widest text).
      */
     private void initTextTimeWidth(Context context) {
-        DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
+        final DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
         timeTextWidth = 0;
+
         for (int i = 0; i < HOUR_OF_DAY; i++) {
-            String time = interpreter.interpretTime(i);
+            final String time = interpreter.interpretTime(i);
             if (time == null) {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             }

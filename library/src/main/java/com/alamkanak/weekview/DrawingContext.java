@@ -22,7 +22,7 @@ class DrawingContext {
                 + totalDayWidth * leftDaysWithGaps
                 + drawConfig.headerColumnWidth;
 
-        List<Calendar> dayRange = new ArrayList<>();
+        final List<Calendar> dayRange = new ArrayList<>();
         if (config.isSingleDay()) {
             final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
             dayRange.add(day);

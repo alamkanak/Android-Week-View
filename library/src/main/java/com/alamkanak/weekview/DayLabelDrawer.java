@@ -33,18 +33,18 @@ class DayLabelDrawer {
     }
 
     private void drawLabel(Calendar day, float startPixel, Canvas canvas) {
-        Calendar today = today();
-        boolean isSameDay = isSameDay(day, today);
+        final Calendar today = today();
+        final boolean isSameDay = isSameDay(day, today);
 
         // Draw the day labels.
-        String dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day);
+        final String dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day);
         if (dayLabel == null) {
             throw new IllegalStateException("A DateTimeInterpreter must not return null date");
         }
 
-        float x = startPixel + drawingConfig.widthPerDay / 2;
-        float y = drawingConfig.headerTextHeight + config.headerRowPadding;
-        Paint textPaint = isSameDay ? drawingConfig.todayHeaderTextPaint : drawingConfig.headerTextPaint;
+        final float x = startPixel + drawingConfig.widthPerDay / 2;
+        final float y = drawingConfig.headerTextHeight + config.headerRowPadding;
+        final Paint textPaint = isSameDay ? drawingConfig.todayHeaderTextPaint : drawingConfig.headerTextPaint;
         canvas.drawText(dayLabel, x, y, textPaint);
     }
 

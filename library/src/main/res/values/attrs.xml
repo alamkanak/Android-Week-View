@@ -45,6 +45,7 @@
         <attr name="eventTextSize" format="dimension" />
         <attr name="eventTextColor" format="color" />
         <attr name="eventPadding" format="dimension" />
+        <attr name="defaultEventColor" format="color" />
 
         <!-- Event margins -->
         <attr name="columnGap" format="dimension" />

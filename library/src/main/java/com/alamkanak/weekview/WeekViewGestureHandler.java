@@ -198,7 +198,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int maxX = Integer.MAX_VALUE;
 
         final int dayHeight = config.hourHeight * HOURS_PER_DAY;
-        final int viewHeight = RealWeekView.getViewHeight();
+        final int viewHeight = WeekView.getViewHeight();
 
         final float headerHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
@@ -221,7 +221,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int maxX = Integer.MAX_VALUE;
 
         final int dayHeight = config.hourHeight * HOURS_PER_DAY;
-        final int viewHeight = RealWeekView.getViewHeight();
+        final int viewHeight = WeekView.getViewHeight();
 
         final float headerHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
@@ -268,9 +268,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     public void onLongPress(MotionEvent e) {
         super.onLongPress(e);
 
-        EventChip<T> eventChip = findHitEvent(e);
+        final EventChip<T> eventChip = findHitEvent(e);
         if (eventChip != null && eventLongPressListener != null) {
-            T data = eventChip.originalEvent.getData();
+            final T data = eventChip.originalEvent.getData();
             if (data != null) {
                 eventLongPressListener.onEventLongPress(data, eventChip.rect);
             } else {
@@ -278,10 +278,10 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
             }
         }
 
-        float headerHeight = drawingConfig.headerHeight
+        final float headerHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawingConfig.headerMarginBottom;
-        float timeColumnWidth = drawingConfig.headerColumnWidth;
+        final float timeColumnWidth = drawingConfig.headerColumnWidth;
 
         // If the tap was on in an empty space, then trigger the callback.
         if (emptyViewLongPressListener != null
@@ -294,7 +294,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     }
 
     private EventChip<T> findHitEvent(MotionEvent e) {
-        List<EventChip<T>> eventChips = data.getAllEventChips();
+        final List<EventChip<T>> eventChips = data.getAllEventChips();
         if (eventChips != null) {
             for (EventChip<T> eventChip : eventChips) {
                 if (eventChip.isHit(e)) {

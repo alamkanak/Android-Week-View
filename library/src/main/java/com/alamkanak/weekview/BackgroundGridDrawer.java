@@ -39,7 +39,7 @@ class BackgroundGridDrawer {
 
     private float[] getHourLines() {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
         final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
@@ -60,7 +60,7 @@ class BackgroundGridDrawer {
         final float top = drawConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
         for (int i = 0; i < days; i++) {
             final float start = startPixel + widthPerDay * (i + 1);
@@ -69,7 +69,7 @@ class BackgroundGridDrawer {
     }
 
     private void drawHourLines(float[] hourLines, float startX, float startPixel, Canvas canvas) {
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
         final float headerHeight = drawConfig.headerHeight
                 + config.headerRowPadding * 2;

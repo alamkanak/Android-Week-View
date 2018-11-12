@@ -27,7 +27,7 @@ final class WeekViewViewState {
                 + config.headerRowPadding * 2
                 + config.drawingConfig.headerMarginBottom;
 
-        final int height = RealWeekView.getViewHeight();
+        final int height = WeekView.getViewHeight();
 
         config.effectiveMinHourHeight = max(
                 config.minHourHeight,
