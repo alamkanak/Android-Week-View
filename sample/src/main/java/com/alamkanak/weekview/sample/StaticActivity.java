@@ -56,15 +56,11 @@ public class StaticActivity extends AppCompatActivity
             SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
             @Override
-            public String interpretShortDate(Calendar date) {
-                String weekday = weekdayNameFormat.format(date.getTime());
-                weekday = String.valueOf(weekday.charAt(0));
-                return weekday.toUpperCase() + format.format(date.getTime());
-            }
-
-            @Override
             public String interpretDate(Calendar date) {
                 String weekday = weekdayNameFormat.format(date.getTime());
+                if (mWeekView.getNumberOfVisibleDays() == 7) {
+                    weekday = String.valueOf(weekday.charAt(0));
+                }
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
 

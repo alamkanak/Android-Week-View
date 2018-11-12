@@ -25,8 +25,8 @@ import static java.util.Calendar.HOUR_OF_DAY;
 public class WeekViewDrawingConfig {
     
     Paint timeTextPaint;
-    public float timeTextWidth;
-    public float timeTextHeight;
+    float timeTextWidth;
+    float timeTextHeight;
 
     Paint headerTextPaint;
     float headerTextHeight;
@@ -45,7 +45,7 @@ public class WeekViewDrawingConfig {
     private Paint futureWeekendBackgroundPaint;
     private Paint pastWeekendBackgroundPaint;
 
-    public Paint timeColumnSeparatorPaint;
+    Paint timeColumnSeparatorPaint;
 
     Paint nowLinePaint;
     Paint nowDotPaint;
@@ -235,29 +235,18 @@ public class WeekViewDrawingConfig {
 
     public DateTimeInterpreter getDateTimeInterpreter(Context context) {
         if (dateTimeInterpreter == null) {
-            dateTimeInterpreter = buildDateTimeInterpreter(context);
+            dateTimeInterpreter = buildDefaultDateTimeInterpreter(context);
         }
 
         return dateTimeInterpreter;
     }
 
-    private DateTimeInterpreter buildDateTimeInterpreter(final Context context) {
+    private DateTimeInterpreter buildDefaultDateTimeInterpreter(final Context context) {
         return new DateTimeInterpreter() {
 
             private SimpleDateFormat sdfDate = DateUtils.getDateFormat();
             private SimpleDateFormat sdfTime = DateUtils.getTimeFormat(context);
             private Calendar calendar = Calendar.getInstance();
-
-            @Override
-            public String interpretShortDate(Calendar date) {
-                try {
-                    // TODO
-                    return sdfDate.format(date.getTime()).toUpperCase();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return "";
-                }
-            }
 
             @Override
             public String interpretDate(Calendar date) {
