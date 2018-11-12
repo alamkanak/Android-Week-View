@@ -1,6 +1,6 @@
 package com.alamkanak.weekview.sample.database;
 
-import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
 
 import java.util.Calendar;

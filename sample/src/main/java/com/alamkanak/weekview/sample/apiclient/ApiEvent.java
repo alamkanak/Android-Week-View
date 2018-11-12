@@ -2,8 +2,8 @@ package com.alamkanak.weekview.sample.apiclient;
 
 import android.graphics.Color;
 
-import com.alamkanak.weekview.model.WeekViewDisplayable;
-import com.alamkanak.weekview.model.WeekViewEvent;
+import com.alamkanak.weekview.WeekViewDisplayable;
+import com.alamkanak.weekview.WeekViewEvent;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

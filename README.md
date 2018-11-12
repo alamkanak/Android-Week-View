@@ -30,7 +30,7 @@ implementation 'com.github.thellmund:Android-Week-View:3.0'
 
 2. Add `WeekView` in your XML layout.
 ```xml
-<com.alamkanak.weekview.ui.WeekView
+<com.alamkanak.weekview.WeekView
     android:id="@+id/weekView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

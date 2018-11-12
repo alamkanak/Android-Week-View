@@ -8,16 +8,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.data.MonthLoader;
-import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
-import com.alamkanak.weekview.listeners.EventClickListener;
-import com.alamkanak.weekview.listeners.EventLongPressListener;
-import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.EmptyViewLongPressListener;
+import com.alamkanak.weekview.EventClickListener;
+import com.alamkanak.weekview.EventLongPressListener;
+import com.alamkanak.weekview.MonthLoader;
+import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.database.EventsDatabase;
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
-import com.alamkanak.weekview.ui.WeekView;
-import com.alamkanak.weekview.utils.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

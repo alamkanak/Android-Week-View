@@ -2,7 +2,7 @@ package com.alamkanak.weekview.sample.database;
 
 import android.content.Context;
 
-import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.R;
 import com.alamkanak.weekview.sample.apiclient.Event;
 
