@@ -66,7 +66,7 @@ class BackgroundGridDrawer {
 
         for (int i = 0; i < days; i++) {
             final float start = startPixel + widthPerDay * (i + 1);
-            canvas.drawLine(start, top, start, top + height, drawConfig.hourSeparatorPaint);
+            canvas.drawLine(start, top, start, top + height, drawConfig.daySeparatorPaint);
         }
     }
 

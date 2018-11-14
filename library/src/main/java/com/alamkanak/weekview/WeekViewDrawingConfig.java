@@ -17,7 +17,7 @@ import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
 
 class WeekViewDrawingConfig {
-    
+
     Paint timeTextPaint;
     float timeTextWidth;
     float timeTextHeight;
@@ -31,6 +31,7 @@ class WeekViewDrawingConfig {
     float widthPerDay;
     Paint dayBackgroundPaint;
     Paint hourSeparatorPaint;
+    Paint daySeparatorPaint;
     float headerMarginBottom;
 
     Paint todayBackgroundPaint;
@@ -52,7 +53,7 @@ class WeekViewDrawingConfig {
     int newHourHeight = -1;
 
     DateTimeInterpreter dateTimeInterpreter;
-    
+
     WeekViewDrawingConfig(Context context, WeekViewConfig config) {
         // Measure settings for time column.
         timeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -100,6 +101,12 @@ class WeekViewDrawingConfig {
         hourSeparatorPaint.setStyle(Paint.Style.STROKE);
         hourSeparatorPaint.setStrokeWidth(config.hourSeparatorStrokeWidth);
         hourSeparatorPaint.setColor(config.hourSeparatorColor);
+
+        // Prepare day separator color paint.
+        daySeparatorPaint = new Paint();
+        daySeparatorPaint.setStyle(Paint.Style.STROKE);
+        daySeparatorPaint.setStrokeWidth(config.daySeparatorStrokeWidth);
+        daySeparatorPaint.setColor(config.daySeparatorColor);
 
         // Prepare the "now" line color paint
         nowLinePaint = new Paint();
@@ -263,5 +270,5 @@ class WeekViewDrawingConfig {
             }
         };
     }
-    
+
 }
