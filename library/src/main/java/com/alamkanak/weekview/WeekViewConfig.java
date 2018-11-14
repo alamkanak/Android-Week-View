@@ -176,7 +176,7 @@ final class WeekViewConfig {
             hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, hourSeparatorStrokeWidth);
 
             // Day separators
-            showDaySeparator = a.getBoolean(R.styleable.WeekView_showHourSeparator, showDaySeparator);
+            showDaySeparator = a.getBoolean(R.styleable.WeekView_showDaySeparator, showDaySeparator);
             daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, daySeparatorColor);
             daySeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, daySeparatorStrokeWidth);
 

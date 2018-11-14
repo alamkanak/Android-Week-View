@@ -831,6 +831,7 @@ public final class WeekView<T> extends View
 
     public void setDaySeparatorColor(int daySeparatorColor) {
         config.daySeparatorColor = daySeparatorColor;
+        config.drawingConfig.daySeparatorPaint.setColor(daySeparatorColor);
         invalidate();
     }
 
