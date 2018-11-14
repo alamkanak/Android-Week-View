@@ -49,8 +49,10 @@ class BackgroundGridDrawer {
     }
 
     private void drawGrid(float[] hourLines, float startX, float startPixel, Canvas canvas) {
-        drawHourLines(hourLines, startX, startPixel, canvas);
-        drawDaySeparators(startPixel, canvas);
+        if (config.showHourSeparator)
+            drawHourLines(hourLines, startX, startPixel, canvas);
+        if (config.showDaySeparator)
+            drawDaySeparators(startPixel, canvas);
     }
 
     private void drawDaySeparators(float startPixel, Canvas canvas) {
