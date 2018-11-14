@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## Version 3.1.1
+*(2018-11-14)*
+- Fix bugs related to day and hour separators (thanks [SapuSeven](https://github.com/SapuSeven)!)
+
 ## Version 3.1
 *(2018-11-13)*
 - Update naming of methods and view attributes. While this unfortunately is another breaking change, the updated naming should be more future-prove.
