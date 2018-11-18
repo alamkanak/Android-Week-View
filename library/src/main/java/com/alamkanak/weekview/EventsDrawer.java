@@ -143,7 +143,7 @@ class EventsDrawer<T> {
         return rect.left < rect.right
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
-                && rect.right > drawingConfig.headerColumnWidth
+                && rect.right > drawingConfig.timeColumnWidth
                 && rect.bottom > totalHeaderHeight;
     }
 
@@ -151,7 +151,7 @@ class EventsDrawer<T> {
         return rect.left < rect.right
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
-                && rect.right > drawingConfig.headerColumnWidth
+                && rect.right > drawingConfig.timeColumnWidth
                 && rect.bottom > 0;
     }
 

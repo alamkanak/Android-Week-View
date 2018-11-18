@@ -20,7 +20,7 @@ class DrawingContext {
         final int leftDaysWithGaps = (int) (Math.ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
         final float startPixel = drawConfig.currentOrigin.x
                 + totalDayWidth * leftDaysWithGaps
-                + drawConfig.headerColumnWidth;
+                + drawConfig.timeColumnWidth;
 
         final List<Calendar> dayRange = new ArrayList<>();
         if (config.isSingleDay()) {

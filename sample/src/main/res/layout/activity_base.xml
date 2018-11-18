@@ -28,7 +28,7 @@
         app:showNowLineDot="true"
         app:showTimeColumnSeparator="true"
         app:singleDayHorizontalMargin="8dp"
-        app:timeColumnBackground="#ffffffff"
+        app:timeColumnBackgroundColor="#ffffffff"
         app:timeColumnPadding="8dp"
         app:timeColumnSeparatorColor="@color/header_bottom_line"
         app:timeColumnSeparatorStrokeWidth="1dp"

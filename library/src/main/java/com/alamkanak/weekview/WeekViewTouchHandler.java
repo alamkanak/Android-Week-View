@@ -30,7 +30,7 @@ final class WeekViewTouchHandler {
         final float widthPerDay = drawingConfig.widthPerDay;
         final float totalDayWidth = widthPerDay + config.columnGap;
         final float originX = drawingConfig.currentOrigin.x;
-        final float timeColumnWidth = drawingConfig.headerColumnWidth;
+        final float timeColumnWidth = drawingConfig.timeColumnWidth;
 
         final int leftDaysWithGaps = (int) (Math.ceil(originX / totalDayWidth) * (-1));
         float startPixel = originX + totalDayWidth * leftDaysWithGaps + timeColumnWidth;

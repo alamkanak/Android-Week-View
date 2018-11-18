@@ -27,7 +27,7 @@ class NowLineDrawer {
 
         for (Calendar day : drawingContext.dayRange) {
             final boolean isSameDay = isSameDay(day, today);
-            final float startX = max(startPixel, drawConfig.headerColumnWidth);
+            final float startX = max(startPixel, drawConfig.timeColumnWidth);
 
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too

@@ -25,6 +25,7 @@ class WeekViewDrawingConfig {
     Paint headerTextPaint;
     float headerTextHeight;
     float headerHeight;
+    Paint todayHeaderTextPaint;
 
     PointF currentOrigin = new PointF(0f, 0f);
     Paint headerBackgroundPaint;
@@ -45,10 +46,9 @@ class WeekViewDrawingConfig {
     Paint nowLinePaint;
     Paint nowDotPaint;
 
-    Paint todayHeaderTextPaint;
-    float headerColumnWidth;
+    float timeColumnWidth;
     TextPaint eventTextPaint;
-    Paint headerColumnBackgroundPaint;
+    Paint timeColumnBackgroundPaint;
 
     int newHourHeight = -1;
 
@@ -68,9 +68,9 @@ class WeekViewDrawingConfig {
 
         // Measure settings for header row.
         headerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        headerTextPaint.setColor(config.timeColumnTextColor);
+        headerTextPaint.setColor(config.headerRowTextColor);
         headerTextPaint.setTextAlign(Paint.Align.CENTER);
-        headerTextPaint.setTextSize(config.timeColumnTextSize);
+        headerTextPaint.setTextSize(config.headerRowTextSize);
         headerTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         headerTextHeight = rect.height();
         headerTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
@@ -126,7 +126,7 @@ class WeekViewDrawingConfig {
         // Prepare today header text color paint.
         todayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         todayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        todayHeaderTextPaint.setTextSize(config.timeColumnTextSize);
+        todayHeaderTextPaint.setTextSize(config.headerRowTextSize);
         todayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         todayHeaderTextPaint.setColor(config.todayHeaderTextColor);
 
@@ -135,8 +135,8 @@ class WeekViewDrawingConfig {
         //eventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
 
         // Prepare header column background color.
-        headerColumnBackgroundPaint = new Paint();
-        headerColumnBackgroundPaint.setColor(config.timeColumnBackgroundColor);
+        timeColumnBackgroundPaint = new Paint();
+        timeColumnBackgroundPaint.setColor(config.timeColumnBackgroundColor);
 
         // Prepare event text size and color.
         eventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -193,9 +193,12 @@ class WeekViewDrawingConfig {
         timeTextPaint.setTextSize(textSize);
     }
 
-    void setHeaderColumnTextColor(int headerColumnTextColor) {
-        headerTextPaint.setColor(headerColumnTextColor);
-        timeTextPaint.setColor(headerColumnTextColor);
+    void setHeaderRowTextColor(int headerRowTextColor) {
+        headerTextPaint.setColor(headerRowTextColor);
+    }
+
+    void setTimeColumnTextColor(int timeColumnTextColor) {
+        timeTextPaint.setColor(timeColumnTextColor);
     }
 
     void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter, Context context) {

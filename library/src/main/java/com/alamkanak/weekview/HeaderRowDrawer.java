@@ -29,7 +29,7 @@ class HeaderRowDrawer<T> {
     }
 
     private void calculateAvailableSpaceForHeader() {
-        drawConfig.headerColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
+        drawConfig.timeColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
         drawConfig.headerHeight = calculateHeaderHeight();
     }
 
@@ -96,7 +96,7 @@ class HeaderRowDrawer<T> {
         canvas.save();
 
         // Clip to paint header row only.
-        canvas.clipRect(drawConfig.headerColumnWidth, 0, width, headerHeight);
+        canvas.clipRect(drawConfig.timeColumnWidth, 0, width, headerHeight);
         canvas.drawRect(0, 0, width, headerHeight, headerBackground);
 
         canvas.restore();

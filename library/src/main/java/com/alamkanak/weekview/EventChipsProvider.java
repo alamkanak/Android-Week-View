@@ -29,6 +29,8 @@ class EventChipsProvider<T> {
     }
 
     void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
+        if (view.isInEditMode()) return;
+
         for (Calendar day : dayRange) {
             final boolean hasNoEvents = data.getAllEventChips() == null;
             final boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)

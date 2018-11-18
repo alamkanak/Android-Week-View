@@ -36,10 +36,10 @@ final class WeekViewConfig {
     int timeColumnSeparatorStrokeWidth = 1;
 
     // Header row
+    int headerRowTextSize = 12;
     int headerRowTextColor = Color.BLACK;
     int headerRowBackgroundColor = Color.WHITE;
     int headerRowPadding = 10;
-    int headerRowTextSize = 12;
     int todayHeaderTextColor = Color.rgb(39, 137, 228);
 
     // Event chips
@@ -116,7 +116,7 @@ final class WeekViewConfig {
             timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, timeColumnTextColor);
             timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, timeColumnTextSize, context.getResources().getDisplayMetrics()));
             timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, timeColumnPadding);
-            timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackground, timeColumnBackgroundColor);
+            timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, timeColumnBackgroundColor);
 
             // Time column separator
             showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, showTimeColumnSeparator);
@@ -202,8 +202,8 @@ final class WeekViewConfig {
     }
 
     void setTimeColumnTextColor(int textColor) {
-        timeColumnTextColor = textColor;
-        drawingConfig.setHeaderColumnTextColor(timeColumnTextColor);
+        this.timeColumnTextColor = textColor;
+        drawingConfig.setTimeColumnTextColor(textColor);
     }
 
     void setHeaderRowBackgroundColor(int headerRowBackgroundColor) {
@@ -243,7 +243,7 @@ final class WeekViewConfig {
 
     void setTimeColumnBackgroundColor(int timeColumnBackgroundColor) {
         this.timeColumnBackgroundColor = timeColumnBackgroundColor;
-        drawingConfig.headerColumnBackgroundPaint.setColor(timeColumnBackgroundColor);
+        drawingConfig.timeColumnBackgroundPaint.setColor(timeColumnBackgroundColor);
     }
 
     float getTotalDayWidth() {

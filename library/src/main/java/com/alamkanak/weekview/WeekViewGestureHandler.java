@@ -251,7 +251,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final float headerHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawingConfig.headerMarginBottom;
-        final float timeColumnWidth = drawingConfig.headerColumnWidth;
+        final float timeColumnWidth = drawingConfig.timeColumnWidth;
 
         if (emptyViewClickListener != null
                 && e.getX() > timeColumnWidth && e.getY() > headerHeight) {
@@ -281,7 +281,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final float headerHeight = drawingConfig.headerHeight
                 + config.headerRowPadding * 2
                 + drawingConfig.headerMarginBottom;
-        final float timeColumnWidth = drawingConfig.headerColumnWidth;
+        final float timeColumnWidth = drawingConfig.timeColumnWidth;
 
         // If the tap was on in an empty space, then trigger the callback.
         if (emptyViewLongPressListener != null

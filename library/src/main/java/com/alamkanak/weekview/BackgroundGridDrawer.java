@@ -22,7 +22,7 @@ class BackgroundGridDrawer {
         float[] hourLines;
 
         for (int i = 0; i < size; i++) {
-            float startX = max(startPixel, drawConfig.headerColumnWidth);
+            float startX = max(startPixel, drawConfig.timeColumnWidth);
             hourLines = getHourLines();
             drawGrid(hourLines, startX, startPixel, canvas);
 

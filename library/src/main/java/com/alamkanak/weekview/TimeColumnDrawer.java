@@ -20,13 +20,13 @@ class TimeColumnDrawer {
                 + config.headerRowBottomLineWidth;
         final int bottom = WeekView.getViewHeight();
 
-        // Draw the background color for the header column.
-        canvas.drawRect(0, top, drawingConfig.headerColumnWidth, bottom, drawingConfig.headerColumnBackgroundPaint);
+        // Draw the background color for the time column.
+        canvas.drawRect(0, top, drawingConfig.timeColumnWidth, bottom, drawingConfig.timeColumnBackgroundPaint);
 
         canvas.restore();
         canvas.save();
 
-        canvas.clipRect(0, top, drawingConfig.headerColumnWidth, bottom);
+        canvas.clipRect(0, top, drawingConfig.timeColumnWidth, bottom);
 
         // The original header height
         final float headerHeight = top;
@@ -52,7 +52,7 @@ class TimeColumnDrawer {
 
         // Draw the vertical time column separator
         if (config.showTimeColumnSeparator) {
-            final float lineX = drawingConfig.headerColumnWidth - config.timeColumnSeparatorStrokeWidth;
+            final float lineX = drawingConfig.timeColumnWidth - config.timeColumnSeparatorStrokeWidth;
             canvas.drawLine(lineX, headerHeight, lineX, bottom, drawingConfig.timeColumnSeparatorPaint);
         }
 

@@ -23,7 +23,7 @@
 
         <!-- Time column -->
         <attr name="timeColumnTextColor" format="color" />
-        <attr name="timeColumnBackground" format="color" />
+        <attr name="timeColumnBackgroundColor" format="color" />
         <attr name="timeColumnPadding" format="dimension" />
         <attr name="timeColumnTextSize" format="dimension" />
 
