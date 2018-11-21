@@ -128,10 +128,9 @@ public final class WeekView<T> extends View
         config.drawingConfig.updateVerticalOrigin(config);
 
         notifyScrollListeners();
-
         prepareEventDrawing(canvas);
 
-        final DrawingContext drawingContext = DrawingContext.create(config, viewState);
+        final DrawingContext drawingContext = DrawingContext.create(config);
         eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange);
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
@@ -182,7 +181,7 @@ public final class WeekView<T> extends View
         // Calculate the available width for each day
         drawConfig.widthPerDay = getWidth()
                 - drawConfig.headerColumnWidth
-                - (config.columnGap / 2) * (config.numberOfVisibleDays - 1);
+                - config.columnGap * (config.numberOfVisibleDays - 1);
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
     }
 

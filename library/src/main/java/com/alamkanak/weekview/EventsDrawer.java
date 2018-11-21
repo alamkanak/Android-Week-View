@@ -30,7 +30,7 @@ class EventsDrawer<T> {
     }
 
     void drawSingleEvents(List<EventChip<T>> eventChips,
-                                 DrawingContext drawingContext, Canvas canvas) {
+                          DrawingContext drawingContext, Canvas canvas) {
         float startPixel = drawingContext.startPixel;
 
         // Draw single events
@@ -79,7 +79,7 @@ class EventsDrawer<T> {
      * @param canvas         The canvas to draw upon.
      */
     void drawAllDayEvents(List<EventChip<T>> eventChips,
-                                 DrawingContext drawingContext, Canvas canvas) {
+                          DrawingContext drawingContext, Canvas canvas) {
         if (eventChips == null) {
             return;
         }

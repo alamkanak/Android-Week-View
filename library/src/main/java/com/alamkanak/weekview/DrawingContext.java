@@ -1,8 +1,9 @@
 package com.alamkanak.weekview;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.Math.ceil;
 
 class DrawingContext {
 
@@ -14,14 +15,20 @@ class DrawingContext {
         this.startPixel = startPixel;
     }
 
-    static DrawingContext create(WeekViewConfig config, WeekViewViewState viewState) {
+    static DrawingContext create(WeekViewConfig config) {
         final WeekViewDrawingConfig drawConfig = config.drawingConfig;
         final float totalDayWidth = config.getTotalDayWidth();
-        final int leftDaysWithGaps = (int) (Math.ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
+        final int leftDaysWithGaps = (int) (ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
         final float startPixel = drawConfig.currentOrigin.x
                 + totalDayWidth * leftDaysWithGaps
                 + drawConfig.headerColumnWidth;
 
+        final int start = leftDaysWithGaps + 1;
+        final int end = start + config.numberOfVisibleDays + 1;
+        final List<Calendar> dayRange = DateUtils.getDateRange(start, end);
+
+        // TODO
+        /*
         final List<Calendar> dayRange = new ArrayList<>();
         if (config.isSingleDay()) {
             final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
@@ -31,6 +38,7 @@ class DrawingContext {
             final int end = start + config.numberOfVisibleDays + 1;
             dayRange.addAll(DateUtils.getDateRange(start, end));
         }
+        */
 
         return new DrawingContext(dayRange, startPixel);
     }
