@@ -182,7 +182,7 @@ public final class WeekView<T> extends View
         // Calculate the available width for each day
         drawConfig.widthPerDay = getWidth()
                 - drawConfig.headerColumnWidth
-                - config.columnGap * (config.numberOfVisibleDays - 1);
+                - (config.columnGap / 2) * (config.numberOfVisibleDays - 1);
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
     }
 
