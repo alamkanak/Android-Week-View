@@ -37,15 +37,15 @@ implementation 'com.github.thellmund:Android-Week-View:3.1.1'
     app:eventTextColor="@color/white"
     app:timeColumnTextSize="12sp"
     app:hourHeight="60dp"
-    app:headerColumnPadding="8dp"
-    app:headerColumnTextColor="@color/light_blue"
+    app:timeColumnPadding="8dp"
+    app:timeColumnTextColor="@color/light_blue"
+    app:timeColumnBackgroundColor="@color/white"
     app:headerRowPadding="12dp"
     app:columnGap="8dp"
     app:noOfVisibleDays="3"
     app:headerRowBackgroundColor="@color/light_gray"
     app:dayBackgroundColor="@color/white"
-    app:todayBackgroundColor="@color/light_blue"
-    app:headerColumnBackground="@color/white"/>
+    app:todayBackgroundColor="@color/light_blue"/>
 ```
 
 3. Prepare the class of objects that you want to display in `WeekView` by implementing `WeekViewDisplayable<T>`.

@@ -21,7 +21,7 @@ class DrawingContext {
         final int leftDaysWithGaps = (int) (ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1);
         final float startPixel = drawConfig.currentOrigin.x
                 + totalDayWidth * leftDaysWithGaps
-                + drawConfig.headerColumnWidth;
+                + drawConfig.timeColumnWidth;
 
         final int start = leftDaysWithGaps + 1;
         final int end = start + config.numberOfVisibleDays + 1;

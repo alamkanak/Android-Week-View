@@ -89,7 +89,6 @@ public final class WeekView<T> extends View
         return height;
     }
 
-    @Nullable
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -180,7 +179,7 @@ public final class WeekView<T> extends View
     private void calculateWidthPerDay() {
         // Calculate the available width for each day
         drawConfig.widthPerDay = getWidth()
-                - drawConfig.headerColumnWidth
+                - drawConfig.timeColumnWidth
                 - config.columnGap * (config.numberOfVisibleDays - 1);
         drawConfig.widthPerDay = drawConfig.widthPerDay / config.numberOfVisibleDays;
     }
@@ -194,7 +193,7 @@ public final class WeekView<T> extends View
                 + config.headerRowPadding * 2
                 + drawConfig.headerMarginBottom;
 
-        canvas.clipRect(drawConfig.headerColumnWidth, headerHeight, width, height);
+        canvas.clipRect(drawConfig.timeColumnWidth, headerHeight, width, height);
     }
 
     @Override
@@ -422,7 +421,7 @@ public final class WeekView<T> extends View
         return config.headerRowTextSize;
     }
 
-    public void setHeaderRownTextSize(int textSize) {
+    public void setHeaderRowTextSize(int textSize) {
         config.headerRowTextSize = textSize;
         invalidate();
     }

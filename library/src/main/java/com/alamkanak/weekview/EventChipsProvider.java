@@ -29,6 +29,10 @@ class EventChipsProvider<T> {
     }
 
     void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
+        if (view.isInEditMode()) {
+            return;
+        }
+
         if (weekViewLoader == null) {
             throw new WeekViewException("No WeekViewLoader or MonthChangeListener provided. " +
                     "This is necessary to load new events");
