@@ -29,9 +29,16 @@ class EventChipsProvider<T> {
     }
 
     void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
+        if (weekViewLoader == null) {
+            throw new WeekViewException("No WeekViewLoader or MonthChangeListener provided. " +
+                    "This is necessary to load new events");
+        }
+
         for (Calendar day : dayRange) {
             final boolean hasNoEvents = data.getAllEventChips() == null;
-            final boolean needsToFetchPeriod = data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
+
+            final boolean needsToFetchPeriod =
+                    data.fetchedPeriod != weekViewLoader.toWeekViewPeriodIndex(day)
                     && abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
