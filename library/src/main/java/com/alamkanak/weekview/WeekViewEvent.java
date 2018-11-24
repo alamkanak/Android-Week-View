@@ -198,16 +198,22 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     List<WeekViewEvent<T>> splitWeekViewEvents() {
         List<WeekViewEvent<T>> events = new ArrayList<>();
 
-        // The first millisecond of the next day is still the same day - no need to split events for this
-        Calendar endTime = (Calendar) this.endTime.clone();
-        endTime.add(Calendar.MILLISECOND, -1);
+        // Clone this endtime for when we need to clone events
+        Calendar clonedEndTime = (Calendar) this.endTime.clone();
 
-        if (!isSameDay(endTime)) {
-            endTime = (Calendar) startTime.clone();
-            endTime.set(Calendar.HOUR_OF_DAY, 23);
-            endTime.set(Calendar.MINUTE, 59);
+        if(DateUtils.isAtStartOfNewDay(this.getStartTime(), clonedEndTime)) {
+            // Set end time to 1 minute before midnight to ensure the EventRect will get drawn correctly
+            clonedEndTime.set(Calendar.HOUR_OF_DAY, 23);
+            clonedEndTime.set(Calendar.MINUTE, 59);
+            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, clonedEndTime, location, isAllDay);
+            event1.setColor(this.getColor());
+            events.add(event1);
+        }else if (!isSameDay(clonedEndTime)) {
+            clonedEndTime = (Calendar) startTime.clone();
+            clonedEndTime.set(Calendar.HOUR_OF_DAY, 23);
+            clonedEndTime.set(Calendar.MINUTE, 59);
 
-            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, endTime, location, isAllDay);
+            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, clonedEndTime, location, isAllDay);
             event1.setColor(color);
             events.add(event1);
 
