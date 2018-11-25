@@ -25,7 +25,7 @@ allprojects {
 }
 
 // build.gradle (app-level)
-implementation 'com.github.thellmund:Android-Week-View:3.1.1'
+implementation 'com.github.thellmund:Android-Week-View:3.1.2'
 ```
 
 2. Add `WeekView` in your XML layout.
