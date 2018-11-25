@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static com.alamkanak.weekview.DateUtils.isAtStartOfNewDay;
+import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfDay;
+
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
@@ -198,54 +201,15 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     List<WeekViewEvent<T>> splitWeekViewEvents() {
         List<WeekViewEvent<T>> events = new ArrayList<>();
 
-        // Clone this endtime for when we need to clone events
-        Calendar clonedEndTime = (Calendar) this.endTime.clone();
+        // Clone this end time for when we need to clone events
+        Calendar newEndTime = (Calendar) this.endTime.clone();
 
-        if(DateUtils.isAtStartOfNewDay(this.getStartTime(), clonedEndTime)) {
-            // Set end time to 1 minute before midnight to ensure the EventRect will get drawn correctly
-            clonedEndTime.set(Calendar.HOUR_OF_DAY, 23);
-            clonedEndTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, clonedEndTime, location, isAllDay);
-            event1.setColor(this.getColor());
-            events.add(event1);
-        }else if (!isSameDay(clonedEndTime)) {
-            clonedEndTime = (Calendar) startTime.clone();
-            clonedEndTime.set(Calendar.HOUR_OF_DAY, 23);
-            clonedEndTime.set(Calendar.MINUTE, 59);
-
-            WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title, startTime, clonedEndTime, location, isAllDay);
-            event1.setColor(color);
-            events.add(event1);
-
-            // Add other days.
-            Calendar otherDay = (Calendar) startTime.clone();
-            otherDay.add(Calendar.DATE, 1);
-
-            while (!DateUtils.isSameDay(otherDay, this.endTime)) {
-                Calendar overDay = (Calendar) otherDay.clone();
-                overDay.set(Calendar.HOUR_OF_DAY, 0);
-                overDay.set(Calendar.MINUTE, 0);
-
-                Calendar endOfOverDay = (Calendar) overDay.clone();
-                endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
-                endOfOverDay.set(Calendar.MINUTE, 59);
-
-                WeekViewEvent<T> eventMore = new WeekViewEvent<>(id, title, overDay, endOfOverDay, location, isAllDay);
-                eventMore.setColor(color);
-                events.add(eventMore);
-
-                // Add next day.
-                otherDay.add(Calendar.DATE, 1);
-            }
-
-            // Add last day.
-            Calendar startTime = (Calendar) this.endTime.clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-
-            WeekViewEvent<T> event2 = new WeekViewEvent<>(id, title, startTime, this.endTime, location, isAllDay);
-            event2.setColor(color);
-            events.add(event2);
+        if (isAtStartOfNewDay(startTime, newEndTime)) {
+            // Set end time to 1ms before midnight to ensure the EventRect will get drawn correctly
+            WeekViewEvent<T> shortenedEvent = shortenTooLongAllDayEvent(newEndTime);
+            events.add(shortenedEvent);
+        } else if (!isSameDay(newEndTime)) {
+            events = splitEventByDays(newEndTime);
         } else {
             events.add(this);
         }
@@ -253,8 +217,54 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return events;
     }
 
+    private WeekViewEvent<T> shortenTooLongAllDayEvent(Calendar newEndTime) {
+        return new WeekViewEvent<>(id, title, startTime,
+                withTimeAtEndOfDay(newEndTime), location, color, isAllDay, data);
+    }
+
+    private List<WeekViewEvent<T>> splitEventByDays(Calendar newEndTime) {
+        List<WeekViewEvent<T>> results = new ArrayList<>();
+        newEndTime = withTimeAtEndOfDay(newEndTime);
+
+        WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title,
+                startTime, newEndTime, location, color, isAllDay, data);
+        results.add(event1);
+
+        // Add other days.
+        Calendar otherDay = (Calendar) startTime.clone();
+        otherDay.add(Calendar.DATE, 1);
+
+        while (!DateUtils.isSameDay(otherDay, this.endTime)) {
+            Calendar overDay = (Calendar) otherDay.clone();
+            overDay.set(Calendar.HOUR_OF_DAY, 0);
+            overDay.set(Calendar.MINUTE, 0);
+
+            Calendar endOfOverDay = (Calendar) overDay.clone();
+            endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
+            endOfOverDay.set(Calendar.MINUTE, 59);
+
+            WeekViewEvent<T> eventMore = new WeekViewEvent<>(id, title,
+                    overDay, endOfOverDay, location, color, isAllDay, data);
+            results.add(eventMore);
+
+            // Add next day.
+            otherDay.add(Calendar.DATE, 1);
+        }
+
+        // Add last day.
+        Calendar startTime = (Calendar) this.endTime.clone();
+        startTime.set(Calendar.HOUR_OF_DAY, 0);
+        startTime.set(Calendar.MINUTE, 0);
+
+        WeekViewEvent<T> event2 = new WeekViewEvent<>(id, title,
+                startTime, this.endTime, location, color, isAllDay, data);
+        results.add(event2);
+
+        return results;
+    }
+
     @Override
-    public WeekViewEvent toWeekViewEvent() {
+    public WeekViewEvent<T> toWeekViewEvent() {
         return this;
     }
 

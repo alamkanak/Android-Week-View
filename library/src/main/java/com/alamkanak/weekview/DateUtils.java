@@ -30,19 +30,21 @@ class DateUtils {
     }
 
     static Calendar withTimeAtStartOfDay(Calendar date) {
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        return date;
+        Calendar newDate = (Calendar) date.clone();
+        newDate.set(Calendar.HOUR_OF_DAY, 0);
+        newDate.set(Calendar.MINUTE, 0);
+        newDate.set(Calendar.SECOND, 0);
+        newDate.set(Calendar.MILLISECOND, 0);
+        return newDate;
     }
 
     static Calendar withTimeAtEndOfDay(Calendar date) {
-        date.set(Calendar.HOUR_OF_DAY, 23);
-        date.set(Calendar.MINUTE, 59);
-        date.set(Calendar.SECOND, 59);
-        date.set(Calendar.MILLISECOND, 999);
-        return date;
+        Calendar newDate = (Calendar) date.clone();
+        newDate.set(Calendar.HOUR_OF_DAY, 23);
+        newDate.set(Calendar.MINUTE, 59);
+        newDate.set(Calendar.SECOND, 59);
+        newDate.set(Calendar.MILLISECOND, 999);
+        return newDate;
     }
 
     static int getDaysUntilDate(Calendar date) {
@@ -71,11 +73,8 @@ class DateUtils {
      * @param date2 The second date
      * @return Whether or not date2 is at the start of the day after date1
      */
-    public static boolean isAtStartOfNewDay(Calendar date1, Calendar date2){
-        if(date2.get(Calendar.HOUR) == 0 &&
-                date2.get(Calendar.MINUTE) == 0 &&
-                date2.get(Calendar.SECOND) == 0 &&
-                date2.get(Calendar.MILLISECOND) == 0){
+    static boolean isAtStartOfNewDay(Calendar date1, Calendar date2) {
+        if (date2 == withTimeAtStartOfDay(date2)) {
             date2.add(Calendar.MILLISECOND, -1);
             return isSameDay(date1, date2);
         }
