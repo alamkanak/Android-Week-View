@@ -3,7 +3,7 @@ Changelog
 
 ## Version 3.1.2
 *(2018-11-25)*
-- Fix issue where a day’s events weren’t displayed until the user finished scrolling.
+- Fix issue where a day’s events weren’t displayed until the user finished scrolling
 - Fix bug where events longer than one day weren’t drawn (thanks for the fix, [Menthuss](https://github.com/Menthuss)!)
 
 ## Version 3.1.1
