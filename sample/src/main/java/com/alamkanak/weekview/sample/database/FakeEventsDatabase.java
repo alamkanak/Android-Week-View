@@ -35,11 +35,11 @@ public class FakeEventsDatabase implements EventsDatabase {
         Calendar startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth - 1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         Calendar endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.MINUTE, 30);
-        endTime.set(Calendar.MONTH, newMonth - 1);
+        endTime.set(Calendar.MONTH, newMonth);
 
         event = new Event(1, getEventTitle(startTime), startTime, endTime, null, color1, false);
         events.add(event);
@@ -48,13 +48,13 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 30);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.DAY_OF_MONTH, 2);
         endTime.set(Calendar.HOUR_OF_DAY, 4);
         endTime.set(Calendar.MINUTE, 30);
-        endTime.set(Calendar.MONTH, newMonth-1);
+        endTime.set(Calendar.MONTH, newMonth);
 
         event = new Event(123, getEventTitle(startTime), startTime, endTime, null, color4, false);
         events.add(event);
@@ -62,12 +62,12 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 30);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.HOUR_OF_DAY, 4);
         endTime.set(Calendar.MINUTE, 30);
-        endTime.set(Calendar.MONTH, newMonth-1);
+        endTime.set(Calendar.MONTH, newMonth);
 
         event = new Event(10, getEventTitle(startTime), startTime, endTime, null, color2, false);
         events.add(event);
@@ -75,7 +75,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 4);
         startTime.set(Calendar.MINUTE, 30);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.HOUR_OF_DAY, 5);
@@ -87,11 +87,11 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 5);
         startTime.set(Calendar.MINUTE, 30);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 2);
-        endTime.set(Calendar.MONTH, newMonth-1);
+        endTime.set(Calendar.MONTH, newMonth);
 
         event = new Event(2, getEventTitle(startTime), startTime, endTime, null, color2, false);
         events.add(event);
@@ -99,12 +99,12 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 5);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth - 1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         startTime.add(Calendar.DATE, 1);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
-        endTime.set(Calendar.MONTH, newMonth - 1);
+        endTime.set(Calendar.MONTH, newMonth);
 
         event = new Event(3, getEventTitle(startTime), startTime, endTime, null, color3, false);
         events.add(event);
@@ -113,7 +113,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime.set(Calendar.DAY_OF_MONTH, 15);
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
@@ -125,7 +125,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime.set(Calendar.DAY_OF_MONTH, 1);
         startTime.set(Calendar.HOUR_OF_DAY, 3);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
@@ -137,7 +137,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH));
         startTime.set(Calendar.HOUR_OF_DAY, 15);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
@@ -149,7 +149,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 0);
         startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 23);
@@ -165,7 +165,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.SECOND, 0);
         startTime.set(Calendar.MILLISECOND, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.DAY_OF_MONTH, 11);

@@ -30,7 +30,7 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
     @Override
     public List<WeekViewEvent<T>> onLoad(int periodIndex) {
         final int year = periodIndex / 12;
-        final int month = periodIndex % 12 + 1;
+        final int month = periodIndex % 12;
 
         final Calendar startDate = DateUtils.withTimeAtStartOfDay(today());
         startDate.set(Calendar.YEAR, year);
