@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## Version 3.1.3
+*(2018-12-01)*
+- Fix bug where `onMonthChange` was called with the wrong month (thanks for submitting the issue, [tylermarien](https://github.com/tylermarien)!)
+
 ## Version 3.1.2
 *(2018-11-25)*
 - Fix issue where a day’s events weren’t displayed until the user finished scrolling
