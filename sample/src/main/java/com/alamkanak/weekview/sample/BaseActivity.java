@@ -2,6 +2,7 @@ package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -168,22 +169,23 @@ public class BaseActivity extends AppCompatActivity
     }
 
     @Override
-    public List<WeekViewDisplayable<Event>> onMonthChange(Calendar startDate, Calendar endDate) {
+    public List<WeekViewDisplayable<Event>> onMonthChange(@NonNull Calendar startDate,
+                                                          @NonNull Calendar endDate) {
         return mDatabase.getEventsInRange(startDate, endDate);
     }
 
     @Override
-    public void onEventClick(Event event, RectF eventRect) {
+    public void onEventClick(@NonNull Event event, @NonNull RectF eventRect) {
         Toast.makeText(this, "Clicked " + event.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onEventLongPress(Event event, RectF eventRect) {
+    public void onEventLongPress(@NonNull Event event, @NonNull RectF eventRect) {
         Toast.makeText(this, "Long pressed event: " + event.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onEmptyViewLongPress(Calendar time) {
+    public void onEmptyViewLongPress(@NonNull Calendar time) {
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
     }
 

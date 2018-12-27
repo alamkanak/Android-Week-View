@@ -1,6 +1,7 @@
 package com.alamkanak.weekview;
 
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 
 public interface EventLongPressListener<T> {
 
@@ -10,6 +11,6 @@ public interface EventLongPressListener<T> {
      * @param data:     event clicked.
      * @param eventRect: view containing the clicked event.
      */
-    void onEventLongPress(T data, RectF eventRect);
+    void onEventLongPress(@NonNull T data, @NonNull RectF eventRect);
 
 }

@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 
 public interface EmptyViewClickListener {
@@ -9,6 +11,6 @@ public interface EmptyViewClickListener {
      *
      * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
      */
-    void onEmptyViewClicked(Calendar time);
+    void onEmptyViewClicked(@NonNull Calendar time);
 
 }

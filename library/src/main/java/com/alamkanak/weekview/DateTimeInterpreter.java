@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Calendar;
  */
 public interface DateTimeInterpreter {
 
-    String interpretDate(Calendar date);
+    String interpretDate(@NonNull Calendar date);
     String interpretTime(int hour);
 
 }

@@ -1,6 +1,7 @@
 package com.alamkanak.weekview;
 
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 
 public interface EventClickListener<T> {
 
@@ -10,6 +11,6 @@ public interface EventClickListener<T> {
      * @param data:     event clicked.
      * @param eventRect: view containing the clicked event.
      */
-    void onEventClick(T data, RectF eventRect);
+    void onEventClick(@NonNull T data, @NonNull RectF eventRect);
 
 }

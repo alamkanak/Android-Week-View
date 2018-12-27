@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 
 public interface EmptyViewLongPressListener {
@@ -9,6 +11,6 @@ public interface EmptyViewLongPressListener {
      *
      * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
      */
-    void onEmptyViewLongPress(Calendar time);
+    void onEmptyViewLongPress(@NonNull Calendar time);
 
 }

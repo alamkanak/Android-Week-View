@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -21,7 +23,7 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
     }
 
     @Override
-    public double toWeekViewPeriodIndex(Calendar instance) {
+    public double toWeekViewPeriodIndex(@NonNull Calendar instance) {
         return instance.get(Calendar.YEAR) * 12
                 + instance.get(Calendar.MONTH)
                 + (instance.get(Calendar.DAY_OF_MONTH) - 1) / 30.0;
@@ -71,7 +73,8 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
          * @param endDate A {@link Calendar} representing the end date of the month
          * @return The list of {@link WeekViewDisplayable} of the provided month
          */
-        List<WeekViewDisplayable<T>> onMonthChange(Calendar startDate, Calendar endDate);
+        List<WeekViewDisplayable<T>> onMonthChange(@NonNull Calendar startDate,
+                                                   @NonNull Calendar endDate);
 
     }
 }

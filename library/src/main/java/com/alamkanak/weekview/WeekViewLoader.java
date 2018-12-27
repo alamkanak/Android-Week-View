@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface WeekViewLoader<T> {
      * @param instance the date
      * @return The period index in which the date falls (floating point number).
      */
-    double toWeekViewPeriodIndex(Calendar instance);
+    double toWeekViewPeriodIndex(@NonNull Calendar instance);
 
     /**
      * Load the events within the period
