@@ -3,12 +3,17 @@ package com.alamkanak.weekview;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 import static com.alamkanak.weekview.DateUtils.isAtStartOfNewDay;
 import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfDay;
+import static com.alamkanak.weekview.DateUtils.withTimeAtStartOfDay;
+import static java.util.Calendar.DATE;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -125,7 +130,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.color = color;
     }
 
-    public boolean isAllDay() {
+    boolean isAllDay() {
         return isAllDay;
     }
 
@@ -149,15 +154,15 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.data = data;
     }
 
-    public boolean isSameDay(Calendar other) {
+    boolean isSameDay(Calendar other) {
         return DateUtils.isSameDay(startTime, other);
     }
 
-    public boolean isSameDay(WeekViewEvent other) {
+    boolean isSameDay(WeekViewEvent other) {
         return DateUtils.isSameDay(startTime, other.startTime);
     }
 
-    public boolean collidesWith(WeekViewEvent other) {
+    boolean collidesWith(WeekViewEvent other) {
         long thisStart = startTime.getTimeInMillis();
         long thisEnd = endTime.getTimeInMillis();
         long otherStart = other.getStartTime().getTimeInMillis();
@@ -209,7 +214,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
             WeekViewEvent<T> shortenedEvent = shortenTooLongAllDayEvent(newEndTime);
             events.add(shortenedEvent);
         } else if (!isSameDay(newEndTime)) {
-            events = splitEventByDays(newEndTime);
+            events = splitEventsByDays();
         } else {
             events.add(this);
         }
@@ -217,52 +222,85 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return events;
     }
 
+    boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
+        return getEndTime() == originalEvent.getEndTime()
+                && getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE);
+    }
+
+    boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
+        return getStartTime() == originalEvent.getStartTime()
+                && getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
+    }
+
+    boolean startsOnEarlierDayAndEndsOnLaterDay(WeekViewEvent<T> originalEvent) {
+        return getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE)
+                && getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
+    }
+
     private WeekViewEvent<T> shortenTooLongAllDayEvent(Calendar newEndTime) {
         return new WeekViewEvent<>(id, title, startTime,
                 withTimeAtEndOfDay(newEndTime), location, color, isAllDay, data);
     }
 
-    private List<WeekViewEvent<T>> splitEventByDays(Calendar newEndTime) {
+    private List<WeekViewEvent<T>> splitEventsByDays() {
         List<WeekViewEvent<T>> results = new ArrayList<>();
-        newEndTime = withTimeAtEndOfDay(newEndTime);
 
-        WeekViewEvent<T> event1 = new WeekViewEvent<>(id, title,
-                startTime, newEndTime, location, color, isAllDay, data);
-        results.add(event1);
+        // Get event for first day
+        Calendar firstEventEnd = (Calendar) startTime.clone();
+        firstEventEnd = withTimeAtEndOfDay(firstEventEnd);
 
-        // Add other days.
-        Calendar otherDay = (Calendar) startTime.clone();
-        otherDay.add(Calendar.DATE, 1);
+        WeekViewEvent<T> firstEvent = new WeekViewEvent<>(id, title,
+                startTime, firstEventEnd, location, color, isAllDay, data);
+        results.add(firstEvent);
 
-        while (!DateUtils.isSameDay(otherDay, this.endTime)) {
-            Calendar overDay = (Calendar) otherDay.clone();
-            overDay.set(Calendar.HOUR_OF_DAY, 0);
-            overDay.set(Calendar.MINUTE, 0);
+        // Get event for last day
+        Calendar lastEventStart = (Calendar) endTime.clone();
+        lastEventStart = withTimeAtStartOfDay(lastEventStart);
 
-            Calendar endOfOverDay = (Calendar) overDay.clone();
-            endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
-            endOfOverDay.set(Calendar.MINUTE, 59);
+        WeekViewEvent<T> lastEvent = new WeekViewEvent<>(id, title,
+                lastEventStart, endTime, location, color, isAllDay, data);
+        results.add(lastEvent);
 
-            WeekViewEvent<T> eventMore = new WeekViewEvent<>(id, title,
-                    overDay, endOfOverDay, location, color, isAllDay, data);
-            results.add(eventMore);
+        // Get events for all days in-between
+        long diff = lastEvent.getStartTime().getTimeInMillis() - firstEvent.getStartTime().getTimeInMillis();
+        int daysInBetween = (int) (diff / Constants.DAY_IN_MILLIS);
 
-            // Add next day.
-            otherDay.add(Calendar.DATE, 1);
+        if (daysInBetween > 0) {
+            // Get second day with time at start of day
+            Calendar start = (Calendar) firstEventEnd.clone();
+            start = withTimeAtStartOfDay(start);
+            start.add(DATE, 1);
+
+            while (!DateUtils.isSameDay(start, lastEventStart)) {
+                Calendar intermediateStart = (Calendar) start.clone();
+                intermediateStart = withTimeAtStartOfDay(intermediateStart);
+
+                Calendar intermediateEnd = (Calendar) start.clone();
+                intermediateEnd = withTimeAtEndOfDay(intermediateEnd);
+
+                WeekViewEvent<T> intermediateEvent = new WeekViewEvent<>(id, title,
+                        intermediateStart, intermediateEnd, location, color, isAllDay, data);
+                results.add(intermediateEvent);
+
+                start.add(DATE, 1);
+            }
         }
 
-        // Add last day.
-        Calendar startTime = (Calendar) this.endTime.clone();
-        startTime.set(Calendar.HOUR_OF_DAY, 0);
-        startTime.set(Calendar.MINUTE, 0);
-
-        WeekViewEvent<T> event2 = new WeekViewEvent<>(id, title,
-                startTime, this.endTime, location, color, isAllDay, data);
-        results.add(event2);
-
+        Collections.sort(results);
         return results;
     }
 
+    @Override
+    public String toString() {
+        DateFormat sdf = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        return "WeekViewEvent{" +
+                "title='" + title + '\'' +
+                ", startTime=" + sdf.format(startTime.getTime()) +
+                ", endTime=" + sdf.format(endTime.getTime()) +
+                '}';
+    }
+
+    @NonNull
     @Override
     public WeekViewEvent<T> toWeekViewEvent() {
         return this;

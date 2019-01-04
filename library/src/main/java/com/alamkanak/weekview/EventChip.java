@@ -60,6 +60,20 @@ class EventChip<T> {
         final Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
+        if (event.startsOnEarlierDay(originalEvent)) {
+            RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
+            canvas.drawRect(topRect, backgroundPaint);
+        } else if (event.endsOnLaterDay(originalEvent)) {
+            RectF bottomRect = new RectF(rect.left, rect.bottom - cornerRadius, rect.right, rect.bottom);
+            canvas.drawRect(bottomRect, backgroundPaint);
+        } else if (event.startsOnEarlierDayAndEndsOnLaterDay(originalEvent)) {
+            RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
+            canvas.drawRect(topRect, backgroundPaint);
+
+            RectF bottomRect = new RectF(rect.left, rect.bottom - cornerRadius, rect.right, rect.bottom);
+            canvas.drawRect(bottomRect, backgroundPaint);
+        }
+
         if (textLayout != null) {
             // The text height has already been calculated
             drawEventTitle(config, textLayout, canvas);
