@@ -29,6 +29,7 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
                 + (instance.get(Calendar.DAY_OF_MONTH) - 1) / 30.0;
     }
 
+    @NonNull
     @Override
     public List<WeekViewEvent<T>> onLoad(int periodIndex) {
         final int year = periodIndex / 12;
@@ -65,16 +66,4 @@ public class MonthLoader<T> implements WeekViewLoader<T> {
         this.onMonthChangeListener = onMonthChangeListener;
     }
 
-    public interface MonthChangeListener<T> {
-
-        /**
-         * Called when the month displayed in the {@link WeekView} changes.
-         * @param startDate A {@link Calendar} representing the start date of the month
-         * @param endDate A {@link Calendar} representing the end date of the month
-         * @return The list of {@link WeekViewDisplayable} of the provided month
-         */
-        List<WeekViewDisplayable<T>> onMonthChange(@NonNull Calendar startDate,
-                                                   @NonNull Calendar endDate);
-
-    }
 }

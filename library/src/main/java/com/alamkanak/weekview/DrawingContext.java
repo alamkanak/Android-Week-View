@@ -27,19 +27,6 @@ class DrawingContext {
         final int end = start + config.numberOfVisibleDays + 1;
         final List<Calendar> dayRange = DateUtils.getDateRange(start, end);
 
-        // TODO
-        /*
-        final List<Calendar> dayRange = new ArrayList<>();
-        if (config.isSingleDay()) {
-            final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
-            dayRange.add(day);
-        } else {
-            final int start = leftDaysWithGaps + 1;
-            final int end = start + config.numberOfVisibleDays + 1;
-            dayRange.addAll(DateUtils.getDateRange(start, end));
-        }
-        */
-
         return new DrawingContext(dayRange, startPixel);
     }
 

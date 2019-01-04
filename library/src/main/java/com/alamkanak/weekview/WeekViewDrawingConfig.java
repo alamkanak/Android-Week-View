@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
 import java.text.SimpleDateFormat;
@@ -249,8 +250,9 @@ class WeekViewDrawingConfig {
             private SimpleDateFormat sdfTime = DateUtils.getTimeFormat(context);
             private Calendar calendar = Calendar.getInstance();
 
+            @NonNull
             @Override
-            public String interpretDate(Calendar date) {
+            public String interpretDate(@NonNull Calendar date) {
                 try {
                     return sdfDate.format(date.getTime()).toUpperCase();
                 } catch (Exception e) {
@@ -259,6 +261,7 @@ class WeekViewDrawingConfig {
                 }
             }
 
+            @NonNull
             @Override
             public String interpretTime(int hour) {
                 calendar.set(Calendar.HOUR_OF_DAY, hour);

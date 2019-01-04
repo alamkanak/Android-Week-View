@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.round;
@@ -197,7 +196,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int minX = Integer.MIN_VALUE;
         final int maxX = Integer.MAX_VALUE;
 
-        final int dayHeight = config.hourHeight * HOURS_PER_DAY;
+        final int dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
         final int viewHeight = WeekView.getViewHeight();
 
         final float headerHeight = drawingConfig.headerHeight
@@ -220,7 +219,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int minX = Integer.MIN_VALUE;
         final int maxX = Integer.MAX_VALUE;
 
-        final int dayHeight = config.hourHeight * HOURS_PER_DAY;
+        final int dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
         final int viewHeight = WeekView.getViewHeight();
 
         final float headerHeight = drawingConfig.headerHeight

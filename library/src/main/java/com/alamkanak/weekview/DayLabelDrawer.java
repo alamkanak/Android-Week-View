@@ -38,9 +38,6 @@ class DayLabelDrawer {
 
         // Draw the day labels.
         final String dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day);
-        if (dayLabel == null) {
-            throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-        }
 
         final float x = startPixel + drawingConfig.widthPerDay / 2;
         final float y = drawingConfig.headerTextHeight + config.headerRowPadding;

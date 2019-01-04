@@ -8,8 +8,6 @@ import android.util.TypedValue;
 
 import java.util.Calendar;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
-
 final class WeekViewConfig {
 
     WeekViewDrawingConfig drawingConfig;
@@ -251,7 +249,7 @@ final class WeekViewConfig {
     }
 
     float getTotalDayHeight() {
-        float dayHeight = hourHeight * HOURS_PER_DAY;
+        float dayHeight = hourHeight * Constants.HOURS_PER_DAY;
         float headerHeight = drawingConfig.headerHeight;
         float totalHeaderPadding = headerRowPadding * 2;
         float headerBottomMargin = drawingConfig.headerMarginBottom;
@@ -260,10 +258,6 @@ final class WeekViewConfig {
 
     boolean isSingleDay() {
         return numberOfVisibleDays == 1;
-    }
-
-    boolean isWeek() {
-        return numberOfVisibleDays == 7;
     }
 
 }

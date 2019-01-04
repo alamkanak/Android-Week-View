@@ -15,7 +15,7 @@ class BackgroundGridDrawer {
         this.drawConfig = config.drawingConfig;
     }
 
-    public void draw(DrawingContext drawingContext, Canvas canvas) {
+    void draw(DrawingContext drawingContext, Canvas canvas) {
         final int size = drawingContext.dayRange.size();
 
         float startPixel = drawingContext.startPixel;

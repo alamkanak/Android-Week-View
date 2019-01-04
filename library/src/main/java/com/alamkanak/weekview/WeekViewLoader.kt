@@ -1,11 +1,8 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview
 
-import android.support.annotation.NonNull;
+import java.util.*
 
-import java.util.Calendar;
-import java.util.List;
-
-public interface WeekViewLoader<T> {
+interface WeekViewLoader<T> {
 
     /**
      * Convert a date into a double that will be used to reference when you're loading data.
@@ -16,13 +13,13 @@ public interface WeekViewLoader<T> {
      * @param instance the date
      * @return The period index in which the date falls (floating point number).
      */
-    double toWeekViewPeriodIndex(@NonNull Calendar instance);
+    fun toWeekViewPeriodIndex(instance: Calendar): Double
 
     /**
      * Load the events within the period
      * @param periodIndex the period to load
      * @return A list with the events of this period
      */
-    List<WeekViewEvent<T>> onLoad(int periodIndex);
+    fun onLoad(periodIndex: Int): List<WeekViewEvent<T>>
 
 }

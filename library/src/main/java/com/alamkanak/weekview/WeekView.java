@@ -1069,14 +1069,14 @@ public final class WeekView<T> extends View
     }
 
     @Nullable
-    public MonthLoader.MonthChangeListener getMonthChangeListener() {
+    public MonthChangeListener getMonthChangeListener() {
         if (gestureHandler.getWeekViewLoader() instanceof MonthLoader) {
             return ((MonthLoader) gestureHandler.getWeekViewLoader()).getOnMonthChangeListener();
         }
         return null;
     }
 
-    public void setMonthChangeListener(@Nullable MonthLoader.MonthChangeListener<T> monthChangeListener) {
+    public void setMonthChangeListener(@Nullable MonthChangeListener<T> monthChangeListener) {
         WeekViewLoader<T> weekViewLoader = new MonthLoader<>(monthChangeListener);
         gestureHandler.setWeekViewLoader(weekViewLoader);
         eventChipsProvider.setWeekViewLoader(weekViewLoader);

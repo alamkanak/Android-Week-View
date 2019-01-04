@@ -2,8 +2,6 @@ package com.alamkanak.weekview;
 
 import android.graphics.Canvas;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
-
 class TimeColumnDrawer {
 
     private WeekViewConfig config;
@@ -31,7 +29,7 @@ class TimeColumnDrawer {
         // The original header height
         final float headerHeight = top;
 
-        for (int i = 1; i < HOURS_PER_DAY; i++) {
+        for (int i = 1; i < Constants.HOURS_PER_DAY; i++) {
             final float headerBottomMargin = drawingConfig.headerMarginBottom;
             final float heightOfHour = config.hourHeight * i;
             top = headerHeight + drawingConfig.currentOrigin.y + heightOfHour + headerBottomMargin;
@@ -39,9 +37,6 @@ class TimeColumnDrawer {
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
             final String time = drawingConfig.dateTimeInterpreter.interpretTime(i);
-            if (time == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            }
 
             if (top < bottom) {
                 final float x = drawingConfig.timeTextWidth + config.timeColumnPadding;

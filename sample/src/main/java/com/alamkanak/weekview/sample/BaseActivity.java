@@ -13,7 +13,7 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.EmptyViewLongPressListener;
 import com.alamkanak.weekview.EventClickListener;
 import com.alamkanak.weekview.EventLongPressListener;
-import com.alamkanak.weekview.MonthLoader;
+import com.alamkanak.weekview.MonthChangeListener;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
@@ -32,7 +32,7 @@ import java.util.Locale;
  * Website: http://alamkanak.github.io
  */
 public class BaseActivity extends AppCompatActivity
-        implements EventClickListener<Event>, MonthLoader.MonthChangeListener<Event>,
+        implements EventClickListener<Event>, MonthChangeListener<Event>,
         EventLongPressListener<Event>, EmptyViewLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;

@@ -6,16 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.MonthLoader;
+import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.EmptyViewLongPressListener;
 import com.alamkanak.weekview.EventClickListener;
 import com.alamkanak.weekview.EventLongPressListener;
+import com.alamkanak.weekview.MonthChangeListener;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.database.EventsDatabase;
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
-import com.alamkanak.weekview.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class StaticActivity extends AppCompatActivity
-        implements EventClickListener<Event>, MonthLoader.MonthChangeListener<Event>,
+        implements EventClickListener<Event>, MonthChangeListener<Event>,
         EventLongPressListener<Event>, EmptyViewLongPressListener {
 
     private WeekView<Event> mWeekView;

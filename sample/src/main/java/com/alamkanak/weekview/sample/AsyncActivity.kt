@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
-        MonthLoader.MonthChangeListener<ApiEvent>, EventLongPressListener<ApiEvent>,
+        MonthChangeListener<ApiEvent>, EventLongPressListener<ApiEvent>,
         EmptyViewLongPressListener, Callback<List<ApiEvent>> {
 
     private val events = arrayListOf<WeekViewDisplayable<ApiEvent>>()

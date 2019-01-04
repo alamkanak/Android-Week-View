@@ -2,7 +2,6 @@ package com.alamkanak.weekview;
 
 import java.util.Calendar;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static java.lang.Math.max;
 
 final class WeekViewViewState {
@@ -31,7 +30,7 @@ final class WeekViewViewState {
 
         config.effectiveMinHourHeight = max(
                 config.minHourHeight,
-                (int) ((height - totalHeaderHeight) / HOURS_PER_DAY)
+                (int) ((height - totalHeaderHeight) / Constants.HOURS_PER_DAY)
         );
 
         areDimensionsInvalid = false;
