@@ -118,16 +118,16 @@ public final class WeekView<T> extends View
 
         viewState.update(config, this);
 
-        if (viewState.isFirstDraw) {
-            viewState.isFirstDraw = false;
-            config.drawingConfig.moveCurrentOriginIfFirstDraw(config);
-        }
-
         config.drawingConfig.refreshAfterZooming(config);
         config.drawingConfig.updateVerticalOrigin(config);
 
         notifyScrollListeners();
         prepareEventDrawing(canvas);
+
+        if (viewState.isFirstDraw) {
+            viewState.isFirstDraw = false;
+            config.drawingConfig.moveCurrentOriginIfFirstDraw(config);
+        }
 
         final DrawingContext drawingContext = DrawingContext.create(config);
         eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange);
@@ -177,6 +177,10 @@ public final class WeekView<T> extends View
     }
 
     private void calculateWidthPerDay() {
+        // Initialize drawConfig.timeColumnWidth at first call
+        if (drawConfig.timeColumnWidth == 0) {
+            drawConfig.timeColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
+        }
         // Calculate the available width for each day
         drawConfig.widthPerDay = getWidth()
                 - drawConfig.timeColumnWidth

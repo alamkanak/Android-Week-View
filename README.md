@@ -42,7 +42,7 @@ implementation 'com.github.thellmund:Android-Week-View:3.1.3'
     app:timeColumnBackgroundColor="@color/white"
     app:headerRowPadding="12dp"
     app:columnGap="8dp"
-    app:noOfVisibleDays="3"
+    app:numberOfVisibleDays="3"
     app:headerRowBackgroundColor="@color/light_gray"
     app:dayBackgroundColor="@color/white"
     app:todayBackgroundColor="@color/light_blue"/>
