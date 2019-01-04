@@ -134,6 +134,10 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return isAllDay;
     }
 
+    boolean isNotAllDay() {
+        return !isAllDay;
+    }
+
     public void setIsAllDay(boolean allDay) {
         this.isAllDay = allDay;
     }

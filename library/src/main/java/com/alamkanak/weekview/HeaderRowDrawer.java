@@ -35,7 +35,7 @@ class HeaderRowDrawer<T> {
 
     private float calculateHeaderHeight() {
         final List<EventChip<T>> eventChips = data.getAllDayEventChips();
-        if (eventChips == null || eventChips.isEmpty()) {
+        if (eventChips.isEmpty()) {
             return drawConfig.headerTextHeight;
         }
 

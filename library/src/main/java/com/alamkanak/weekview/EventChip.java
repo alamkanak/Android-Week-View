@@ -60,13 +60,13 @@ class EventChip<T> {
         final Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
-        if (event.startsOnEarlierDay(originalEvent)) {
+        if (event.isNotAllDay() && event.startsOnEarlierDay(originalEvent)) {
             RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
             canvas.drawRect(topRect, backgroundPaint);
-        } else if (event.endsOnLaterDay(originalEvent)) {
+        } else if (event.isNotAllDay() && event.endsOnLaterDay(originalEvent)) {
             RectF bottomRect = new RectF(rect.left, rect.bottom - cornerRadius, rect.right, rect.bottom);
             canvas.drawRect(bottomRect, backgroundPaint);
-        } else if (event.startsOnEarlierDayAndEndsOnLaterDay(originalEvent)) {
+        } else if (event.isNotAllDay() && event.startsOnEarlierDayAndEndsOnLaterDay(originalEvent)) {
             RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
             canvas.drawRect(topRect, backgroundPaint);
 
