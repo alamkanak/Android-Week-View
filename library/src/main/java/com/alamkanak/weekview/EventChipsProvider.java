@@ -46,9 +46,9 @@ class EventChipsProvider<T> {
                     && abs(data.fetchedPeriod - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
-            if (hasNoEvents || viewState.shouldRefreshEvents || needsToFetchPeriod) {
+            if (hasNoEvents || viewState.getShouldRefreshEvents() || needsToFetchPeriod) {
                 loadEventsAndCalculateEventChipPositions(view, day);
-                viewState.shouldRefreshEvents = false;
+                viewState.setShouldRefreshEvents(false);
             }
         }
     }
@@ -71,7 +71,7 @@ class EventChipsProvider<T> {
         }
 
         // If a refresh was requested then reset some variables.
-        if (viewState.shouldRefreshEvents) {
+        if (viewState.getShouldRefreshEvents()) {
             data.clear();
         }
 
@@ -87,7 +87,7 @@ class EventChipsProvider<T> {
         final int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
         final boolean isRefreshEligible = data.fetchedPeriod < 0
                 || data.fetchedPeriod != periodToFetch
-                || viewState.shouldRefreshEvents;
+                || viewState.getShouldRefreshEvents();
 
         if (!isRefreshEligible) {
             return;
@@ -262,8 +262,6 @@ class EventChipsProvider<T> {
                         eventChip.top = 0;
                         eventChip.bottom = config.allDayEventHeight;
                     }
-
-                    // data.getAllEventChips().add(eventChip);
                 }
                 j++;
             }

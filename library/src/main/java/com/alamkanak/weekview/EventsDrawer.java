@@ -31,10 +31,10 @@ class EventsDrawer<T> {
 
     void drawSingleEvents(List<EventChip<T>> eventChips,
                           DrawingContext drawingContext, Canvas canvas) {
-        float startPixel = drawingContext.startPixel;
+        float startPixel = drawingContext.getStartPixel();
 
         // Draw single events
-        for (Calendar day : drawingContext.dayRange) {
+        for (Calendar day : drawingContext.getDayRange()) {
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
@@ -84,9 +84,9 @@ class EventsDrawer<T> {
             return;
         }
 
-        float startPixel = drawingContext.startPixel;
+        float startPixel = drawingContext.getStartPixel();
 
-        for (Calendar day : drawingContext.dayRange) {
+        for (Calendar day : drawingContext.getDayRange()) {
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }

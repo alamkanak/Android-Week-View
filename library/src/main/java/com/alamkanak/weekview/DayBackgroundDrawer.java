@@ -24,9 +24,9 @@ class DayBackgroundDrawer {
     }
 
     void draw(DrawingContext drawingContext, Canvas canvas) {
-        float startPixel = drawingContext.startPixel;
+        float startPixel = drawingContext.getStartPixel();
 
-        for (Calendar day : drawingContext.dayRange) {
+        for (Calendar day : drawingContext.getDayRange()) {
             float startX = max(startPixel, drawConfig.timeColumnWidth);
             drawDayBackground(day, startX, startPixel, canvas);
 

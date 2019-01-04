@@ -16,9 +16,9 @@ class BackgroundGridDrawer {
     }
 
     void draw(DrawingContext drawingContext, Canvas canvas) {
-        final int size = drawingContext.dayRange.size();
+        final int size = drawingContext.getDayRange().size();
 
-        float startPixel = drawingContext.startPixel;
+        float startPixel = drawingContext.getStartPixel();
         float[] hourLines;
 
         for (int i = 0; i < size; i++) {

@@ -19,9 +19,9 @@ class DayLabelDrawer {
     }
 
     void draw(DrawingContext drawingContext, Canvas canvas) {
-        float startPixel = drawingContext.startPixel;
+        float startPixel = drawingContext.getStartPixel();
 
-        for (Calendar day : drawingContext.dayRange) {
+        for (Calendar day : drawingContext.getDayRange()) {
             drawLabel(day, startPixel, canvas);
 
             if (config.isSingleDay()) {

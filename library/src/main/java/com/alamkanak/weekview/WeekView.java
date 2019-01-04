@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -114,7 +115,7 @@ public final class WeekView<T> extends View
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        final boolean isFirstDraw = viewState.isFirstDraw;
+        final boolean isFirstDraw = viewState.isFirstDraw();
 
         viewState.update(config, this);
 
@@ -124,13 +125,13 @@ public final class WeekView<T> extends View
         notifyScrollListeners();
         prepareEventDrawing(canvas);
 
-        if (viewState.isFirstDraw) {
-            viewState.isFirstDraw = false;
+        if (viewState.isFirstDraw()) {
+            viewState.setFirstDraw(false);
             config.drawingConfig.moveCurrentOriginIfFirstDraw(config);
         }
 
         final DrawingContext drawingContext = DrawingContext.create(config);
-        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.dayRange);
+        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.getDayRange());
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
         backgroundGridDrawer.draw(drawingContext, canvas);
@@ -153,18 +154,18 @@ public final class WeekView<T> extends View
 
     private void notifyScrollListeners() {
         // Iterate through each day.
-        final Calendar oldFirstVisibleDay = viewState.firstVisibleDay;
+        final Calendar oldFirstVisibleDay = viewState.getFirstVisibleDay();
         final Calendar today = today();
 
-        viewState.firstVisibleDay = (Calendar) today.clone();
+        viewState.setFirstVisibleDay((Calendar) today.clone());
 
         final float totalDayWidth = config.getTotalDayWidth();
         final int delta = (int) ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1;
-        viewState.firstVisibleDay.add(DATE, delta);
+        viewState.getFirstVisibleDay().add(DATE, delta);
 
-        final boolean hasFirstVisibleDayChanged = !viewState.firstVisibleDay.equals(oldFirstVisibleDay);
+        final boolean hasFirstVisibleDayChanged = !viewState.getFirstVisibleDay().equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
-            getScrollListener().onFirstVisibleDayChanged(viewState.firstVisibleDay, oldFirstVisibleDay);
+            getScrollListener().onFirstVisibleDayChanged(viewState.getFirstVisibleDay(), oldFirstVisibleDay);
         }
     }
 
@@ -967,7 +968,7 @@ public final class WeekView<T> extends View
      * @return The first visible day in the week view.
      */
     public Calendar getFirstVisibleDay() {
-        return viewState.firstVisibleDay;
+        return viewState.getFirstVisibleDay();
     }
 
     /**
@@ -976,7 +977,7 @@ public final class WeekView<T> extends View
      * @return The last visible day in the week view.
      */
     public Calendar getLastVisibleDay() {
-        return viewState.lastVisibleDay;
+        return viewState.getLastVisibleDay();
     }
 
     /**
@@ -998,15 +999,15 @@ public final class WeekView<T> extends View
      *
      * @param date The date to show.
      */
-    public void goToDate(Calendar date) {
+    public void goToDate(@NonNull Calendar date) {
         gestureHandler.forceScrollFinished();
 
         if (viewState.areDimensionsInvalid) {
-            viewState.scrollToDay = date;
+            viewState.setScrollToDay(date);
             return;
         }
 
-        viewState.shouldRefreshEvents = true;
+        viewState.setShouldRefreshEvents(true);
 
         final int diff = DateUtils.getDaysUntilDate(date);
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
@@ -1017,7 +1018,7 @@ public final class WeekView<T> extends View
      * Refreshes the view and loads the events again.
      */
     public void notifyDataSetChanged() {
-        viewState.shouldRefreshEvents = true;
+        viewState.setShouldRefreshEvents(true);
         invalidate();
     }
 
@@ -1028,7 +1029,7 @@ public final class WeekView<T> extends View
      */
     public void goToHour(int hour) {
         if (viewState.areDimensionsInvalid) {
-            viewState.scrollToHour = hour;
+            viewState.setScrollToHour(hour);
             return;
         }
 

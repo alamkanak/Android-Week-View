@@ -14,7 +14,7 @@ class HeaderRowDrawer<T> {
     private WeekViewDrawingConfig drawConfig;
 
     private WeekViewData<T> data;
-    private WeekViewViewState viewState;
+        private WeekViewViewState viewState;
 
     HeaderRowDrawer(WeekViewConfig config, WeekViewData<T> data, WeekViewViewState viewState) {
         this.config = config;
@@ -42,7 +42,7 @@ class HeaderRowDrawer<T> {
         // Make sure the header is the right size (depends on AllDay events)
         boolean containsAllDayEvent = false;
         for (int i = 0; i < config.numberOfVisibleDays; i++) {
-            final Calendar day = (Calendar) viewState.firstVisibleDay.clone();
+            final Calendar day = (Calendar) viewState.getFirstVisibleDay().clone();
             day.add(DATE, i);
 
             for (int j = 0; j < eventChips.size(); j++) {

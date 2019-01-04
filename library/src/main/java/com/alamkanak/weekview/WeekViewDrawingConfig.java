@@ -228,9 +228,6 @@ class WeekViewDrawingConfig {
 
         for (int i = 0; i < HOUR_OF_DAY; i++) {
             final String time = interpreter.interpretTime(i);
-            if (time == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            }
             timeTextWidth = max(timeTextWidth, timeTextPaint.measureText(time));
         }
     }

@@ -8,7 +8,7 @@ import android.util.TypedValue;
 
 import java.util.Calendar;
 
-final class WeekViewConfig {
+public class WeekViewConfig {
 
     WeekViewDrawingConfig drawingConfig;
 
