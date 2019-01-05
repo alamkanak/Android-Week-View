@@ -18,7 +18,7 @@ class EventChipsProvider<T> {
     private WeekViewViewState viewState;
 
     EventChipsProvider(WeekViewConfig config,
-                              WeekViewData<T> data, WeekViewViewState viewState) {
+                       WeekViewData<T> data, WeekViewViewState viewState) {
         this.config = config;
         this.data = data;
         this.viewState = viewState;
@@ -62,12 +62,6 @@ class EventChipsProvider<T> {
      */
     private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
         // Get more events if the month is changed.
-        /*
-        if (data.getAllEventChips() == null) {
-            data.setEventChips(new ArrayList<EventChip<T>>());
-        }
-        */
-
         if (weekViewLoader == null && !view.isInEditMode()) {
             throw new IllegalStateException("You must provide a MonthChangeListener");
         }
