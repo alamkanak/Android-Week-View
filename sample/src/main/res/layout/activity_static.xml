@@ -21,6 +21,7 @@
         app:nowLineDotColor="@color/accent"
         app:nowLineDotRadius="5dp"
         app:nowLineStrokeWidth="1dp"
+        app:firstDayOfWeek="sunday"
         app:numberOfVisibleDays="7"
         app:overlappingEventGap="1dp"
         app:showFirstDayOfWeekFirst="true"

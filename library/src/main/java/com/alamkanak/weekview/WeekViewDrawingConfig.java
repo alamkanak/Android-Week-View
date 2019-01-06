@@ -16,6 +16,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MONDAY;
+import static java.util.Calendar.SUNDAY;
 
 class WeekViewDrawingConfig {
 
@@ -151,8 +153,18 @@ class WeekViewDrawingConfig {
         final Calendar today = today();
         final boolean isWeekView = config.numberOfVisibleDays >= 7;
         final boolean currentDayIsNotToday = today.get(DAY_OF_WEEK) != config.firstDayOfWeek;
+
         if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
-            int difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
+            int currentDay = today.get(DAY_OF_WEEK);
+            int difference;
+
+            if (config.firstDayOfWeek == MONDAY && currentDay == SUNDAY) {
+                // Special case, because Sunday (1) has a lower index than Monday (2)
+                difference = 6;
+            } else {
+                difference = today.get(DAY_OF_WEEK) - config.firstDayOfWeek;
+            }
+
             currentOrigin.x += (widthPerDay + config.columnGap) * difference;
         }
     }
