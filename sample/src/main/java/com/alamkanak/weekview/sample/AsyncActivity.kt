@@ -40,14 +40,14 @@ class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
 
-        progressDialog.show()
-        setupDateTimeInterpreter()
-
         weekView = findViewById(R.id.weekView)
         weekView.setOnEventClickListener(this)
         weekView.setMonthChangeListener(this)
         weekView.setEventLongPressListener(this)
         weekView.emptyViewLongPressListener = this
+
+        progressDialog.show()
+        setupDateTimeInterpreter()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
