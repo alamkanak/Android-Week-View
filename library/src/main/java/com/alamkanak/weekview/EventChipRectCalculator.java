@@ -32,16 +32,17 @@ class EventChipRectCalculator {
         final float verticalDistanceFromBottom = config.hourHeight * HOURS_PER_DAY * eventChip.bottom / MINUTES_PER_DAY;
         final float bottom = verticalDistanceFromBottom + verticalOrigin + totalHeaderHeight - eventMargin;
 
-        // Calculate left
+        // Calculate left and right
         float left = startFromPixel + eventChip.left * widthPerDay;
-        if (left < startFromPixel) {
-            left += config.overlappingEventGap;
+        float right = left + eventChip.width * widthPerDay;
+
+        // Adjust left and right with overlappingEventGap
+        if (left > startFromPixel) {
+            left += config.overlappingEventGap / 2;
         }
 
-        // Calculate right
-        float right = left + eventChip.width * widthPerDay;
         if (right < startFromPixel + widthPerDay) {
-            right -= config.overlappingEventGap;
+            right -= config.overlappingEventGap / 2;
         }
 
         boolean hasNoOverlaps = (right == startFromPixel + widthPerDay);
@@ -53,26 +54,26 @@ class EventChipRectCalculator {
     }
 
     RectF calculateAllDayEvent(EventChip eventChip, float startFromPixel) {
-        final float headerHeight = config.headerRowPadding * 2 + config.drawingConfig.headerMarginBottom;
+        final float headerHeight = config.headerRowPadding + config.headerRowPadding / 2
+            + config.drawingConfig.headerMarginBottom;
         final float widthPerDay = config.drawingConfig.widthPerDay;
-        final float halfTextHeight = config.drawingConfig.timeTextHeight / 2;
-
         // Calculate top
-        final float top = headerHeight + halfTextHeight + config.eventMarginVertical;
+        final float top = headerHeight + config.drawingConfig.headerTextHeight + config.eventMarginVertical;
 
         // Calculate bottom
         final float bottom = top + eventChip.bottom;
 
-        // Calculate left
+        // Calculate left & right
         float left = startFromPixel + eventChip.left * widthPerDay;
-        if (left < startFromPixel) {
-            left += config.overlappingEventGap;
+        float right = left + eventChip.width * widthPerDay;
+
+        // Adjust left and right with overlappingEventGap
+        if (left > startFromPixel) {
+            left += config.overlappingEventGap / 2;
         }
 
-        // Calculate right
-        float right = left + eventChip.width * widthPerDay;
         if (right < startFromPixel + widthPerDay) {
-            right -= config.overlappingEventGap;
+            right -= config.overlappingEventGap / 2;
         }
 
         boolean hasNoOverlaps = (right == startFromPixel + widthPerDay);

@@ -66,11 +66,9 @@ class HeaderRowDrawer<T> {
         if (containsAllDayEvent) {
             final float headerTextSize = drawConfig.eventTextPaint.getTextSize();
             final float totalEventPadding = config.eventPadding * 2;
-            final float eventChipBottomPadding = config.timeColumnTextSize / 4;
 
             return drawConfig.headerTextHeight + (headerTextSize
-                    + totalEventPadding + eventChipBottomPadding
-                    + headerRowBottomLine + drawConfig.headerMarginBottom);
+                    + totalEventPadding + headerRowBottomLine + drawConfig.headerMarginBottom);
         } else {
             return drawConfig.headerTextHeight + headerRowBottomLine;
         }

@@ -182,7 +182,6 @@ class EventsDrawer<T> {
             stringBuilder.append(event.getLocation());
         }
 
-        final int availableHeight = (int) (bottom - top - config.eventPadding * 2);
         final int availableWidth = (int) (right - left - config.eventPadding * 2);
 
         // Get text dimensions.
@@ -191,6 +190,12 @@ class EventsDrawer<T> {
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+
+        // For an all day event, we display just one line
+        final int chipHeight = lineHeight + (config.eventPadding * 2);
+        eventChip.rect.bottom = eventChip.rect.top + chipHeight;
+        // Compute the available height on the right size of the chip
+        final int availableHeight = (int) (eventChip.rect.bottom - top - config.eventPadding * 2);
 
         if (availableHeight >= lineHeight) {
             int availableLineCount = availableHeight / lineHeight;
@@ -209,8 +214,6 @@ class EventsDrawer<T> {
             } while (textLayout.getHeight() > availableHeight);
         }
 
-        final int chipHeight = lineHeight + (config.eventPadding * 2);
-        eventChip.rect.bottom = eventChip.rect.top + chipHeight;
         return textLayout;
     }
 
