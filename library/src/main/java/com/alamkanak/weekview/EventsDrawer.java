@@ -186,6 +186,7 @@ class EventsDrawer<T> {
 
         // Get text dimensions.
         final TextPaint textPaint = drawingConfig.eventTextPaint;
+        textPaint.setColor(event.getTextColorOrDefault(config));
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
