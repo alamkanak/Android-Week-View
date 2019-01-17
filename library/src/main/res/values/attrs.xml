@@ -26,6 +26,9 @@
         <attr name="timeColumnBackgroundColor" format="color" />
         <attr name="timeColumnPadding" format="dimension" />
         <attr name="timeColumnTextSize" format="dimension" />
+        <attr name="showMidnightHour" format="boolean" />
+        <attr name="showTimeColumnHourSeparator" format="boolean" />
+        <attr name="timeColumnHoursInterval" format="integer" />
 
         <!-- Time column separator -->
         <attr name="showTimeColumnSeparator" format="boolean" />

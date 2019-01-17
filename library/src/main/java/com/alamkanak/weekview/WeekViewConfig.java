@@ -27,6 +27,9 @@ public class WeekViewConfig {
     int timeColumnBackgroundColor = Color.WHITE;
     int timeColumnPadding = 10;
     int timeColumnTextSize = 12;
+    boolean showMidnightHour = false;
+    boolean showTimeColumnHourSeparator = false;
+    int timeColumnHoursInterval = 1;
 
     // Time column separator
     boolean showTimeColumnSeparator = false;
@@ -115,6 +118,9 @@ public class WeekViewConfig {
             timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, timeColumnTextSize, context.getResources().getDisplayMetrics()));
             timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, timeColumnPadding);
             timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, timeColumnBackgroundColor);
+            showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, showMidnightHour);
+            showTimeColumnHourSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, showTimeColumnHourSeparator);
+            timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, timeColumnHoursInterval);
 
             // Time column separator
             showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, showTimeColumnSeparator);
@@ -258,6 +264,10 @@ public class WeekViewConfig {
 
     boolean isSingleDay() {
         return numberOfVisibleDays == 1;
+    }
+
+    int getStartHour() {
+      return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
     }
 
 }
