@@ -4,192 +4,195 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
 import java.util.Calendar;
+
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 public class WeekViewConfig {
 
     WeekViewDrawingConfig drawingConfig;
 
     // Calendar configuration
-    int firstDayOfWeek = Calendar.MONDAY;
-    int numberOfVisibleDays = 3;
-    boolean showFirstDayOfWeekFirst = false;
+    int firstDayOfWeek;
+    int numberOfVisibleDays;
+    boolean showFirstDayOfWeekFirst;
 
     // Header bottom line
-    boolean showHeaderRowBottomLine = false;
-    int headerRowBottomLineColor = Color.rgb(102, 102, 102);
-    int headerRowBottomLineWidth = 1;
+    boolean showHeaderRowBottomLine;
+    int headerRowBottomLineColor;
+    int headerRowBottomLineWidth;
 
     // Time column
-    int timeColumnTextColor = Color.BLACK;
-    int timeColumnBackgroundColor = Color.WHITE;
-    int timeColumnPadding = 10;
-    int timeColumnTextSize = 12;
-    boolean showMidnightHour = false;
-    boolean showTimeColumnHourSeparator = false;
-    int timeColumnHoursInterval = 1;
+    int timeColumnTextColor;
+    int timeColumnBackgroundColor;
+    int timeColumnPadding;
+    int timeColumnTextSize;
+    private boolean showMidnightHour;
+    boolean showTimeColumnHourSeparator;
+    int timeColumnHoursInterval;
 
     // Time column separator
-    boolean showTimeColumnSeparator = false;
-    int timeColumnSeparatorColor = Color.rgb(102, 102, 102);
-    int timeColumnSeparatorStrokeWidth = 1;
+    boolean showTimeColumnSeparator;
+    int timeColumnSeparatorColor;
+    int timeColumnSeparatorStrokeWidth;
 
     // Header row
-    int headerRowTextSize = 12;
-    int headerRowTextColor = Color.BLACK;
-    int headerRowBackgroundColor = Color.WHITE;
-    int headerRowPadding = 10;
-    int todayHeaderTextColor = Color.rgb(39, 137, 228);
+    int headerRowTextColor;
+    int headerRowBackgroundColor;
+    int headerRowTextSize;
+    int headerRowPadding;
+    int todayHeaderTextColor;
 
     // Event chips
-    int allDayEventHeight = 100;
-    int eventCornerRadius = 0;
-    int eventTextSize = 12;
-    int eventTextColor = Color.BLACK;
-    int eventPadding = 8;
-    int defaultEventColor = Color.parseColor("#9fc6e7");
+    int allDayEventHeight;
+    int eventCornerRadius;
+    int eventTextSize;
+    int eventTextColor;
+    int eventPadding;
+    int defaultEventColor;
 
     // Event margins
-    int columnGap = 10;
-    int overlappingEventGap = 0;
-    int eventMarginVertical = 3;
-    int eventMarginHorizontal = 0;
+    int columnGap;
+    int overlappingEventGap;
+    int eventMarginVertical;
+    int eventMarginHorizontal;
 
     // Colors
-    int dayBackgroundColor = Color.rgb(255, 255, 255);
-    int todayBackgroundColor = Color.rgb(255, 255, 255);
-    boolean showDistinctWeekendColor = false;
-    boolean showDistinctPastFutureColor = false;
-    int pastBackgroundColor = Color.rgb(227, 227, 227);
-    int futureBackgroundColor = Color.rgb(245, 245, 245);
-    int pastWeekendBackgroundColor = 0;
-    int futureWeekendBackgroundColor = 0;
+    int dayBackgroundColor;
+    int todayBackgroundColor;
+    boolean showDistinctWeekendColor;
+    boolean showDistinctPastFutureColor;
+    int pastBackgroundColor;
+    int futureBackgroundColor;
+    int pastWeekendBackgroundColor;
+    int futureWeekendBackgroundColor;
 
     // Hour height
-    int hourHeight = 50;
-    int minHourHeight = 0; // no minimum specified (will be dynamic, based on screen)
-    int maxHourHeight = 250;
-    int effectiveMinHourHeight = minHourHeight; // compensates for the fact that you can't keep zooming out.
+    int hourHeight;
+    int minHourHeight;
+    int maxHourHeight;
+    int effectiveMinHourHeight;
 
     // Now line
-    boolean showNowLine = false;
-    int nowLineColor = Color.rgb(102, 102, 102);
-    int nowLineStrokeWidth = 5;
+    boolean showNowLine;
+    int nowLineColor;
+    int nowLineStrokeWidth;
 
     // Now line dot
-    boolean showNowLineDot = false;
-    int nowLineDotColor = Color.rgb(102, 102, 102);
-    int nowLineDotRadius = 16;
+    boolean showNowLineDot;
+    int nowLineDotColor;
+    int nowLineDotRadius;
 
     // Hour separators
-    boolean showHourSeparator = true;
-    int hourSeparatorColor = Color.rgb(230, 230, 230);
-    int hourSeparatorStrokeWidth = 2;
+    boolean showHourSeparator;
+    int hourSeparatorColor;
+    int hourSeparatorStrokeWidth;
 
     // Day separators
-    boolean showDaySeparator = true;
-    int daySeparatorColor = Color.rgb(230, 230, 230);
-    int daySeparatorStrokeWidth = 2;
+    boolean showDaySeparator;
+    int daySeparatorColor;
+    int daySeparatorStrokeWidth;
 
     // Scrolling
-    float xScrollingSpeed = 1f;
-    boolean verticalFlingEnabled = true;
-    boolean horizontalFlingEnabled = true;
-    boolean horizontalScrollingEnabled = true;
-    int scrollDuration = 250;
+    float xScrollingSpeed;
+    boolean verticalFlingEnabled;
+    boolean horizontalFlingEnabled;
+    boolean horizontalScrollingEnabled;
+    int scrollDuration;
 
     WeekViewConfig(Context context, AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
         try {
             // Calendar configuration
-            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, firstDayOfWeek);
-            numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, numberOfVisibleDays);
-            showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, showFirstDayOfWeekFirst);
+            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, Calendar.MONDAY);
+            numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3);
+            showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false);
 
             // Header bottom line
-            showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, showHeaderRowBottomLine);
-            headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, headerRowBottomLineColor);
-            headerRowBottomLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, headerRowBottomLineWidth);
+            showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false);
+            headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, Defaults.GRID_COLOR);
+            headerRowBottomLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, 1);
 
             // Time column
-            timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, timeColumnTextColor);
-            timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, timeColumnTextSize, context.getResources().getDisplayMetrics()));
-            timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, timeColumnPadding);
-            timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, timeColumnBackgroundColor);
-            showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, showMidnightHour);
-            showTimeColumnHourSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, showTimeColumnHourSeparator);
-            timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, timeColumnHoursInterval);
+            timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK);
+            timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, Color.WHITE);
+            timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10);
+            timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, Defaults.textSize(context));
+            showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, false);
+            showTimeColumnHourSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false);
+            timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1);
 
             // Time column separator
-            showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, showTimeColumnSeparator);
-            timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, timeColumnSeparatorColor);
-            timeColumnSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, timeColumnSeparatorStrokeWidth);
+            showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false);
+            timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, Defaults.GRID_COLOR);
+            timeColumnSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1);
 
             // Header row
-            headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, headerRowTextColor);
-            headerRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, headerRowBackgroundColor);
-            headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, headerRowTextSize, context.getResources().getDisplayMetrics()));
-            headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, headerRowPadding);
-            todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, todayHeaderTextColor);
+            headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, Color.BLACK);
+            headerRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, Color.WHITE);
+            headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context));
+            headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10);
+            todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR);
 
             // Event chips
-            allDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, allDayEventHeight);
-            eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, eventCornerRadius);
-            eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, eventTextSize, context.getResources().getDisplayMetrics()));
-            eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, eventTextColor);
-            eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, eventPadding);
-            defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, defaultEventColor);
+            allDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, 100);
+            eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0);
+            eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context));
+            eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK);
+            eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, 8);
+            defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR);
 
             // Event margins
-            columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, columnGap);
-            overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, overlappingEventGap);
-            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, eventMarginVertical);
-            eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, eventMarginHorizontal);
+            columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10);
+            overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0);
+            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 3);
+            eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0);
 
             // Colors
-            dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, dayBackgroundColor);
-            todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, todayBackgroundColor);
-            showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, showDistinctPastFutureColor);
-            showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, showDistinctWeekendColor);
-            pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, pastBackgroundColor);
-            futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, futureBackgroundColor);
+            dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Defaults.BACKGROUND_COLOR);
+            todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, Defaults.BACKGROUND_COLOR);
+            showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false);
+            showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, false);
+            pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, Defaults.PAST_BACKGROUND_COLOR);
+            futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, Defaults.FUTURE_BACKGROUND_COLOR);
             pastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, pastBackgroundColor);
-            futureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor); // If not set, use the same color as in the week
+            futureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor);
 
             // Hour height
-            hourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, hourHeight);
-            minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, minHourHeight);
-            maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, maxHourHeight);
+            hourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, 50);
+            minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0);
+            maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 250);
             effectiveMinHourHeight = minHourHeight;
 
             // Now line
-            showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, showNowLine);
-            nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, nowLineColor);
-            nowLineStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_nowLineStrokeWidth, nowLineStrokeWidth);
+            showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, false);
+            nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, Defaults.NOW_COLOR);
+            nowLineStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_nowLineStrokeWidth, 5);
 
             // Now line dot
-            showNowLineDot = a.getBoolean(R.styleable.WeekView_showNowLineDot, showNowLineDot);
-            nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, nowLineDotColor);
-            nowLineDotRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, nowLineDotRadius);
+            showNowLineDot = a.getBoolean(R.styleable.WeekView_showNowLineDot, false);
+            nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, Defaults.NOW_COLOR);
+            nowLineDotRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, 16);
 
             // Hour separators
-            showHourSeparator = a.getBoolean(R.styleable.WeekView_showHourSeparator, showHourSeparator);
-            hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, hourSeparatorColor);
-            hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, hourSeparatorStrokeWidth);
+            showHourSeparator = a.getBoolean(R.styleable.WeekView_showHourSeparator, true);
+            hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, Defaults.SEPARATOR_COLOR);
+            hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, 2);
 
             // Day separators
-            showDaySeparator = a.getBoolean(R.styleable.WeekView_showDaySeparator, showDaySeparator);
-            daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, daySeparatorColor);
-            daySeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, daySeparatorStrokeWidth);
+            showDaySeparator = a.getBoolean(R.styleable.WeekView_showDaySeparator, true);
+            daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, Defaults.SEPARATOR_COLOR);
+            daySeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, 2);
 
             // Scrolling
-            xScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, xScrollingSpeed);
-            horizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, horizontalFlingEnabled);
-            horizontalScrollingEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, horizontalScrollingEnabled);
-            verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, verticalFlingEnabled);
-            scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, scrollDuration);
+            xScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, 1f);
+            horizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, true);
+            horizontalScrollingEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, true);
+            verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, true);
+            scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, 250);
         } finally {
             a.recycle();
         }
@@ -268,6 +271,28 @@ public class WeekViewConfig {
 
     int getStartHour() {
       return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
+    }
+
+    private static class Defaults {
+
+        static final int BACKGROUND_COLOR = Color.WHITE;
+        static final int PAST_BACKGROUND_COLOR = Color.rgb(227, 227, 227);
+        static final int FUTURE_BACKGROUND_COLOR = Color.rgb(245, 245, 245);
+        static final int EVENT_COLOR = Color.rgb(159, 198, 231);
+        static final int GRID_COLOR = Color.rgb(102, 102, 102);
+        static final int NOW_COLOR = Color.BLACK;
+        static final int SEPARATOR_COLOR = Color.rgb(230, 230, 230);
+        static final int HIGHLIGHT_COLOR = Color.rgb(39, 137, 228);
+
+        static int textSize(Context context) {
+            return convertTextDimension(context, 12);
+        }
+
+        private static int convertTextDimension(Context context, int textSize) {
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+            return (int) TypedValue.applyDimension(COMPLEX_UNIT_SP, textSize, displayMetrics);
+        }
+
     }
 
 }
