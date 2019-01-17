@@ -36,6 +36,7 @@ internal class WeekViewViewState {
 
         areDimensionsInvalid = false
         scrollToDay?.let {
+            isFirstDraw = false
             listener.goToDate(it)
         }
 

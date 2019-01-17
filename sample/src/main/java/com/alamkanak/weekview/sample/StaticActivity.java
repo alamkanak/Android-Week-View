@@ -2,11 +2,17 @@ package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.DateUtils;
 import com.alamkanak.weekview.EmptyViewLongPressListener;
 import com.alamkanak.weekview.EventClickListener;
 import com.alamkanak.weekview.EventLongPressListener;
@@ -29,12 +35,16 @@ public class StaticActivity extends AppCompatActivity
     private WeekView<Event> mWeekView;
     private EventsDatabase mDatabase;
 
+    private TextView mDateTV;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_static);
 
         mDatabase = new FakeEventsDatabase(this);
+
+        mDateTV = findViewById(R.id.dates);
 
         mWeekView = findViewById(R.id.weekView);
         mWeekView.setOnEventClickListener(this);
@@ -43,6 +53,30 @@ public class StaticActivity extends AppCompatActivity
         mWeekView.setEmptyViewLongPressListener(this);
 
         setupDateTimeInterpreter();
+
+        ImageView left = findViewById(R.id.left_arrow);
+        left.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = mWeekView.getFirstVisibleDay();
+                cal.add(Calendar.DAY_OF_MONTH, -7);
+                mWeekView.goToDate(cal);
+                refreshText();
+            }
+        });
+
+        ImageView right = findViewById(R.id.right_arrow);
+        right.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = mWeekView.getFirstVisibleDay();
+                cal.add(Calendar.DAY_OF_MONTH, 7);
+                mWeekView.goToDate(cal);
+                refreshText();
+            }
+        });
+
+        refreshText();
     }
 
     /**
@@ -99,4 +133,19 @@ public class StaticActivity extends AppCompatActivity
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
     }
 
+    private void refreshText() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateDateText();
+            }
+        }, 100);
+    }
+
+    private void updateDateText() {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        mDateTV.setText(getString(R.string.date_infos
+            , format.format(mWeekView.getFirstVisibleDay().getTime())
+            , format.format(mWeekView.getLastVisibleDay().getTime())));
+    }
 }

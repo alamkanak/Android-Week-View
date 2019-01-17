@@ -48,7 +48,7 @@ internal object DateUtils {
 
     @JvmStatic
     fun getDaysUntilDate(date: Calendar): Int {
-        val dateInMillis = date.timeInMillis
+        val dateInMillis = date.withTimeAtStartOfDay().timeInMillis
         val todayInMillis = today().timeInMillis
         val diff = dateInMillis - todayInMillis
         return (diff / Constants.DAY_IN_MILLIS).toInt()
