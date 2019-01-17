@@ -17,7 +17,6 @@ import static java.util.Calendar.DATE;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://april-shower.com
  */
 public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekViewEvent> {
 
