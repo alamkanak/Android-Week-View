@@ -19,9 +19,7 @@ import retrofit.client.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
-        MonthChangeListener<ApiEvent>, EventLongPressListener<ApiEvent>,
-        EmptyViewLongPressListener, Callback<List<ApiEvent>> {
+class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
 
     private val events = arrayListOf<WeekViewDisplayable<ApiEvent>>()
     private var calledNetwork = false
@@ -41,10 +39,10 @@ class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
         setContentView(R.layout.activity_base)
 
         weekView = findViewById(R.id.weekView)
-        weekView.setOnEventClickListener(this)
-        weekView.setMonthChangeListener(this)
-        weekView.setEventLongPressListener(this)
-        weekView.emptyViewLongPressListener = this
+        weekView.setOnEventClickListener(this::onEventClick)
+        weekView.setEventLongPressListener(this::onEventLongPress)
+        weekView.setMonthChangeListener(this::onMonthChange)
+        weekView.setEmptyViewLongPressListener(this::onEmptyViewLongPress)
 
         progressDialog.show()
         setupDateTimeInterpreter()
@@ -156,7 +154,10 @@ class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
         return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth)
     }
 
-    override fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<ApiEvent>> {
+    private fun onMonthChange(
+            startDate: Calendar,
+            endDate: Calendar
+    ): List<WeekViewDisplayable<ApiEvent>> {
         val newYear = startDate.get(Calendar.YEAR)
         val newMonth = startDate.get(Calendar.MONTH)
 
@@ -203,15 +204,15 @@ class AsyncActivity : AppCompatActivity(), EventClickListener<ApiEvent>,
         Toast.makeText(this, R.string.async_error, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEventClick(event: ApiEvent, eventRect: RectF) {
+    private fun onEventClick(event: ApiEvent, eventRect: RectF) {
         Toast.makeText(this, "Clicked " + event.name, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEventLongPress(event: ApiEvent, eventRect: RectF) {
+    private fun onEventLongPress(event: ApiEvent, eventRect: RectF) {
         Toast.makeText(this, "Long pressed event: " + event.name, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEmptyViewLongPress(time: Calendar) {
+    private fun onEmptyViewLongPress(time: Calendar) {
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
     }
 
