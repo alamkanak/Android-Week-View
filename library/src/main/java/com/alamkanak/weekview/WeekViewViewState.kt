@@ -18,6 +18,9 @@ internal class WeekViewViewState {
 
     var shouldRefreshEvents: Boolean = false
 
+    @JvmField
+    var requiresPostInvalidateOnAnimation: Boolean = false
+
     fun update(config: WeekViewConfig, listener: UpdateListener) {
         if (!areDimensionsInvalid) {
             return

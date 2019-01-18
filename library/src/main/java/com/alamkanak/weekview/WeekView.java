@@ -19,7 +19,6 @@ import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.util.Calendar.DATE;
-import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
 
 /**
@@ -152,6 +151,10 @@ public final class WeekView<T> extends View
         if (isFirstDraw) {
             // Temporary workaround to make sure that the events are actually being displayed
             invalidate();
+        }
+
+        if (viewState.requiresPostInvalidateOnAnimation) {
+            ViewCompat.postInvalidateOnAnimation(this);
         }
     }
 
@@ -1020,6 +1023,7 @@ public final class WeekView<T> extends View
         }
 
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
+        viewState.requiresPostInvalidateOnAnimation = true;
         invalidate();
     }
 
