@@ -154,6 +154,7 @@ public final class WeekView<T> extends View
         }
 
         if (viewState.requiresPostInvalidateOnAnimation) {
+            viewState.requiresPostInvalidateOnAnimation = false;
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
@@ -1019,7 +1020,7 @@ public final class WeekView<T> extends View
         int diff = DateUtils.getDaysUntilDate(date);
 
         if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
-                diff -= config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
+            diff -= config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
         }
 
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
