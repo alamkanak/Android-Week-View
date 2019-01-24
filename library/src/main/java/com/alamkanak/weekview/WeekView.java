@@ -16,7 +16,7 @@ import java.util.Calendar;
 
 import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
-import static java.lang.Math.ceil;
+import static java.lang.Math.round;
 import static java.lang.Math.min;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -168,7 +168,7 @@ public final class WeekView<T> extends View
         viewState.setLastVisibleDay((Calendar) today.clone());
 
         final float totalDayWidth = config.getTotalDayWidth();
-        final int delta = (int) ceil(drawConfig.currentOrigin.x / totalDayWidth) * -1;
+        final int delta = round(drawConfig.currentOrigin.x / totalDayWidth) * -1;
         viewState.getFirstVisibleDay().add(DATE, delta);
         viewState.getLastVisibleDay().add(DATE, config.numberOfVisibleDays - 1 + delta);
 

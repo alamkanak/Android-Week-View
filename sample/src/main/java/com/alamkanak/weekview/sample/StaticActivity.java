@@ -2,8 +2,8 @@ package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -61,7 +61,7 @@ public class StaticActivity extends AppCompatActivity
                 Calendar cal = mWeekView.getFirstVisibleDay();
                 cal.add(Calendar.DAY_OF_MONTH, -7);
                 mWeekView.goToDate(cal);
-                refreshText();
+                updateDateText();
             }
         });
 
@@ -72,11 +72,16 @@ public class StaticActivity extends AppCompatActivity
                 Calendar cal = mWeekView.getFirstVisibleDay();
                 cal.add(Calendar.DAY_OF_MONTH, 7);
                 mWeekView.goToDate(cal);
-                refreshText();
+                updateDateText();
             }
         });
 
-        refreshText();
+        mWeekView.setScrollListener(new ScrollListener() {
+            @Override
+            public void onFirstVisibleDayChanged(@NonNull Calendar newFirstVisibleDay, @Nullable Calendar oldFirstVisibleDay) {
+                updateDateText();
+            }
+        });
     }
 
     /**
@@ -133,19 +138,10 @@ public class StaticActivity extends AppCompatActivity
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
     }
 
-    private void refreshText() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateDateText();
-            }
-        }, 100);
-    }
-
     private void updateDateText() {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         mDateTV.setText(getString(R.string.date_infos
-            , format.format(mWeekView.getFirstVisibleDay().getTime())
-            , format.format(mWeekView.getLastVisibleDay().getTime())));
+                , format.format(mWeekView.getFirstVisibleDay().getTime())
+                , format.format(mWeekView.getLastVisibleDay().getTime())));
     }
 }
