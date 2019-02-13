@@ -13,10 +13,10 @@ class HeaderRowDrawer<T> {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    private WeekViewData<T> data;
+    private WeekViewCache<T> data;
     private WeekViewViewState viewState;
 
-    HeaderRowDrawer(WeekViewConfig config, WeekViewData<T> data, WeekViewViewState viewState) {
+    HeaderRowDrawer(WeekViewConfig config, WeekViewCache<T> data, WeekViewViewState viewState) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
         this.data = data;

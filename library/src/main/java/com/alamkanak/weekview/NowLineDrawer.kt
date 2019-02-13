@@ -35,14 +35,17 @@ private class NowLineDrawer(
         canvas.drawLine(startX, lineStartY, lineStopX, lineStartY, drawConfig.nowLinePaint)
 
         if (config.showNowLineDot) {
-            // Draw dot at the beginning of the line
-            val dotRadius = drawConfig.nowDotPaint.strokeWidth
-            val dotMargin = 32f
-
-            // We use startPixel to prevent the dot from sticking on the left side of the screen
-            canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint)
+            drawDot(startPixel, lineStartY, canvas)
         }
+    }
 
+    private fun drawDot(startPixel: Float, lineStartY: Float, canvas: Canvas) {
+        // Draw dot at the beginning of the line
+        val dotRadius = drawConfig.nowDotPaint.strokeWidth
+        val dotMargin = 32f
+
+        // We use startPixel to prevent the dot from sticking on the left side of the screen
+        canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, drawConfig.nowDotPaint)
     }
 
 }

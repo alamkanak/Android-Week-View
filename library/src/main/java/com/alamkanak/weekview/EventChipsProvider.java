@@ -13,12 +13,12 @@ import static java.util.Calendar.MINUTE;
 class EventChipsProvider<T> {
 
     private WeekViewConfig config;
-    private WeekViewData<T> data;
+    private WeekViewCache<T> data;
     private WeekViewLoader<T> weekViewLoader;
     private WeekViewViewState viewState;
 
     EventChipsProvider(WeekViewConfig config,
-                       WeekViewData<T> data, WeekViewViewState viewState) {
+                       WeekViewCache<T> data, WeekViewViewState viewState) {
         this.config = config;
         this.data = data;
         this.viewState = viewState;
@@ -162,7 +162,7 @@ class EventChipsProvider<T> {
             results.addAll(eventChips);
         }
 
-        data.setEventChips(results);
+        data.put(results);
     }
 
     /**

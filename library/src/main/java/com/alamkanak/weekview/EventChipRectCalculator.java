@@ -49,12 +49,10 @@ class EventChipRectCalculator {
     }
 
     RectF calculateAllDayEvent(EventChip eventChip, float startFromPixel) {
-        final float endTextHeaderHeight = config.headerRowPadding * 1.5f
-            + config.drawingConfig.headerTextHeight;
+        final float top = config.headerRowPadding * 1.5f + config.drawingConfig.headerTextHeight;
         final float widthPerDay = config.drawingConfig.widthPerDay;
 
         // Calculate top
-        final float top = endTextHeaderHeight;
 
         // Calculate bottom
         final float bottom = top + eventChip.bottom;

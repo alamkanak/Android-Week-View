@@ -25,7 +25,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 
     private Listener listener;
 
-    private WeekViewData<T> data;
+    private WeekViewCache<T> data;
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
 
@@ -52,7 +52,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     private ScrollListener scrollListener;
 
     WeekViewGestureHandler(Context context, View view,
-                           WeekViewConfig config, WeekViewData<T> data) {
+                           WeekViewConfig config, WeekViewCache<T> data) {
         this.listener = (Listener) view;
 
         this.data = data;

@@ -276,7 +276,7 @@ public class WeekViewConfig {
         return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
     }
 
-    private static class Defaults {
+    static class Defaults {
 
         static final int BACKGROUND_COLOR = Color.WHITE;
         static final int PAST_BACKGROUND_COLOR = Color.rgb(227, 227, 227);

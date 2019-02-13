@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-internal class WeekViewData<T> {
+internal class WeekViewCache<T> {
 
     var allEventChips = mutableListOf<EventChip<T>>()
     var normalEventChips = mutableListOf<EventChip<T>>()
@@ -12,15 +12,17 @@ internal class WeekViewData<T> {
 
     var fetchedPeriod = -1 // The middle period the calendar has fetched.
 
-    fun setEventChips(newChips: List<EventChip<T>>) {
+    fun put(newChips: List<EventChip<T>>) {
         allEventChips.clear()
         allEventChips.addAll(newChips)
 
+        val (allDay, normal) = newChips.partition { it.event.isAllDay }
+
         normalEventChips.clear()
-        normalEventChips.addAll(newChips.filterNot { it.event.isAllDay })
+        normalEventChips.addAll(normal)
 
         allDayEventChips.clear()
-        allDayEventChips.addAll(newChips.filter { it.event.isAllDay })
+        allDayEventChips.addAll(allDay)
     }
 
     fun clearEventChipsCache() {

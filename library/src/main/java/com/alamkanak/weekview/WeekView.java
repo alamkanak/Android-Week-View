@@ -37,7 +37,7 @@ public final class WeekView<T> extends View
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
-    private WeekViewData<T> data;
+    private WeekViewCache<T> data;
 
     private WeekViewViewState viewState;
     private WeekViewGestureHandler<T> gestureHandler;
@@ -67,7 +67,7 @@ public final class WeekView<T> extends View
         drawConfig = new WeekViewDrawingConfig(context, config);
         config.drawingConfig = drawConfig;
 
-        data = new WeekViewData<>();
+        data = new WeekViewCache<>();
         viewState = new WeekViewViewState();
 
         gestureHandler = new WeekViewGestureHandler<>(context, this, config, data);
@@ -188,9 +188,9 @@ public final class WeekView<T> extends View
         viewState.setFirstVisibleDay(firstVisibleDay);
         viewState.setLastVisibleDay(lastVisibleDay);
 
-        final boolean hasFirstVisibleDayChanged = !viewState.getFirstVisibleDay().equals(oldFirstVisibleDay);
+        final boolean hasFirstVisibleDayChanged = !firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
-            getScrollListener().onFirstVisibleDayChanged(viewState.getFirstVisibleDay(), oldFirstVisibleDay);
+            getScrollListener().onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay);
         }
     }
 

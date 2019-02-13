@@ -1,6 +1,5 @@
 package com.alamkanak.weekview;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
@@ -19,8 +18,6 @@ import static java.util.Calendar.DATE;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  */
 public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekViewEvent> {
-
-    private static final int DEFAULT_COLOR = Color.parseColor("#9fc6e7");
 
     private long id;
     private String title;
@@ -123,7 +120,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     public int getColorOrDefault() {
-        return (color != 0) ? color : DEFAULT_COLOR;
+        return (color != 0) ? color : WeekViewConfig.Defaults.EVENT_COLOR;
     }
 
     public void setColor(int color) {
