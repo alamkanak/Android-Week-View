@@ -9,40 +9,34 @@ internal class BackgroundGridDrawer(
 ) {
 
     private val drawConfig: WeekViewDrawingConfig = config.drawingConfig
+    private lateinit var hourLines: FloatArray
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        val size = drawingContext.dayRange.size
+        val startPixels = drawingContext.getStartPixels(config)
 
-        var startPixel = drawingContext.startPixel
-        var hourLines: FloatArray
-
-        for (i in 0 until size) {
+        for (startPixel in startPixels) {
             val startX = max(startPixel, drawConfig.timeColumnWidth)
             hourLines = createHourLines()
-            drawGrid(hourLines, startX, startPixel, canvas)
-
-            if (config.isSingleDay) {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                startPixel += config.eventMarginHorizontal.toFloat()
-            }
-
-            // In the next iteration, start from the next day.
-            startPixel += config.totalDayWidth
+            drawGrid(startX, startPixel, canvas)
         }
     }
 
     private fun createHourLines(): FloatArray {
         val drawConfig = config.drawingConfig
         val height = WeekView.getViewHeight()
-        var lineCount = ((height - drawConfig.headerHeight) / config.hourHeight).toInt() + 1
-        lineCount *= (config.numberOfVisibleDays + 1)
-        return FloatArray(lineCount * 4)
+
+        val headerHeight = drawConfig.getTotalHeaderHeight(config)
+        val gridHeight = height - headerHeight.toInt()
+
+        val linesPerDay = (gridHeight / config.hourHeight) + 1
+        val overallLines = (linesPerDay * (config.numberOfVisibleDays + 1)).toInt()
+
+        return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
     }
 
-    private fun drawGrid(hourLines: FloatArray, startX: Float, startPixel: Float, canvas: Canvas) {
+    private fun drawGrid(startX: Float, startPixel: Float, canvas: Canvas) {
         if (config.showHourSeparator) {
-            drawHourLines(hourLines, startX, startPixel, canvas)
+            drawHourLines(startX, startPixel, canvas)
         }
 
         if (config.showDaySeparator) {
@@ -54,45 +48,41 @@ internal class BackgroundGridDrawer(
         val days = config.numberOfVisibleDays
         val widthPerDay = config.totalDayWidth
 
-        val top = drawConfig.headerHeight
+        val top = drawConfig.getTotalHeaderHeight(config)
         val height = WeekView.getViewHeight()
 
-        for (i in 0 until days) {
-            val start = startPixel + widthPerDay * (i + 1)
+        for (day in 1..days) {
+            val start = startPixel + widthPerDay * (day)
             canvas.drawLine(start, top, start, top + height, drawConfig.daySeparatorPaint)
         }
     }
 
-    private fun drawHourLines(hourLines: FloatArray,
-                              startX: Float, startPixel: Float, canvas: Canvas) {
+    private fun drawHourLines(startX: Float, startPixel: Float, canvas: Canvas) {
         val height = WeekView.getViewHeight()
+        val headerHeight = drawConfig.getTotalHeaderHeight(config)
 
         val hourStep = config.timeColumnHoursInterval
 
-        var i = 0
         for (hour in hourStep until HOURS_PER_DAY step hourStep) {
-            val heightOfHour = (config.hourHeight * hour)
-            val top = drawConfig.headerHeight + drawConfig.currentOrigin.y + heightOfHour
+            val heightOfHour = config.hourHeight * hour
+            val top = headerHeight + drawConfig.currentOrigin.y + heightOfHour
 
             val widthPerDay = config.totalDayWidth
-            val separatorWidth = config.hourSeparatorStrokeWidth.toFloat()
+            val separatorWidth = config.hourSeparatorStrokeWidth
 
-            val isNotHiddenByHeader = top > drawConfig.headerHeight - separatorWidth
+            val isNotHiddenByHeader = top > headerHeight - separatorWidth
             val isWithinVisibleRange = top < height
             val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
             if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
-                hourLines[i * 4] = startX
-                hourLines[i * 4 + 1] = top
-                hourLines[i * 4 + 2] = startPixel + widthPerDay
-                hourLines[i * 4 + 3] = top
-                i++
+                hourLines[hour * 4] = startX
+                hourLines[hour * 4 + 1] = top
+                hourLines[hour * 4 + 2] = startPixel + widthPerDay
+                hourLines[hour * 4 + 3] = top
             }
         }
 
         canvas.drawLines(hourLines, drawConfig.hourSeparatorPaint)
     }
-
-
 
 }

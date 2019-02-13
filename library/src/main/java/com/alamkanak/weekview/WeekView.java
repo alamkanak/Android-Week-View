@@ -141,7 +141,7 @@ public final class WeekView<T> extends View
         }
 
         final DrawingContext drawingContext = DrawingContext.create(config);
-        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.getDayRange());
+        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.getDateRange());
 
         List<Pair<EventChip<T>, StaticLayout>> allDayEvents =
                 eventsDrawer.prepareDrawAllDayEvents(data.getAllDayEventChips(), drawingContext);

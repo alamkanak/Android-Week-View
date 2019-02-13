@@ -10,32 +10,24 @@ internal class DayLabelDrawer(
     private val drawingConfig: WeekViewDrawingConfig = config.drawingConfig
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        var startPixel = drawingContext.startPixel
-
-        for (day in drawingContext.dayRange) {
-            drawLabel(day, startPixel, canvas)
-
-            if (config.isSingleDay) {
-                startPixel += config.eventMarginHorizontal.toFloat()
-            }
-
-            startPixel += config.totalDayWidth
-        }
+        drawingContext
+                .getDateRangeWithStartPixels(config)
+                .forEach { (date, startPixel) ->
+                    drawLabel(date, startPixel, canvas)
+                }
     }
 
     private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
         val dayLabel = drawingConfig.dateTimeInterpreter.interpretDate(day)
 
         val x = startPixel + drawingConfig.widthPerDay / 2
+        val y = drawingConfig.headerTextHeight + config.headerRowPadding
 
         val textPaint = if (day.isToday) {
             drawingConfig.todayHeaderTextPaint
         } else {
             drawingConfig.headerTextPaint
         }
-
-        val y = config.headerRowPadding - textPaint.ascent()
-
         canvas.drawText(dayLabel, x, y, textPaint)
     }
 

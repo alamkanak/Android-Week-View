@@ -74,6 +74,4 @@ private class TimeColumnDrawer(
         canvas.restore()
     }
 
-
-
 }

@@ -20,6 +20,8 @@ import com.alamkanak.weekview.sample.apiclient.Event;
 import com.alamkanak.weekview.sample.database.EventsDatabase;
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -144,8 +146,9 @@ public class BaseActivity extends AppCompatActivity
             SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
             SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
 
+            @NotNull
             @Override
-            public String interpretDate(Calendar date) {
+            public String interpretDate(@NotNull Calendar date) {
                 String weekday = weekdayNameFormat.format(date.getTime());
                 if (mWeekView.getNumberOfVisibleDays() == 7) {
                     weekday = String.valueOf(weekday.charAt(0));
@@ -153,9 +156,16 @@ public class BaseActivity extends AppCompatActivity
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
 
+            @NotNull
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                if (hour == 12) {
+                    return "12 PM";
+                } else if (hour > 12) {
+                    return (hour - 12) + " PM";
+                } else {
+                    return (hour == 0 ? "12 AM" : hour + " AM");
+                }
             }
         });
     }

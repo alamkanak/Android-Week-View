@@ -231,6 +231,20 @@ class WeekViewDrawingConfig {
         currentOrigin.y = min(currentOrigin.y, 0);
     }
 
+    float getHeaderBottomPosition(WeekViewConfig config) {
+        return currentOrigin.y + getTotalHeaderHeight(config);
+    }
+
+    float getTotalHeaderHeight(WeekViewConfig config) {
+        return headerHeight
+                + (config.headerRowPadding * 2f)
+                + headerMarginBottom;
+    }
+
+    float getTotalTimeColumnWidth(WeekViewConfig config) {
+        return timeTextWidth + config.timeColumnPadding * 2;
+    }
+
     void resetOrigin() {
         currentOrigin = new PointF(0, 0);
     }

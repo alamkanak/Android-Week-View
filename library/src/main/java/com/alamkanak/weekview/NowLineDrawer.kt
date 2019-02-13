@@ -13,26 +13,14 @@ private class NowLineDrawer(
     private val drawConfig: WeekViewDrawingConfig = config.drawingConfig
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        var startPixel = drawingContext.startPixel
+        val startPixel = drawingContext
+                .getDateRangeWithStartPixels(config)
+                .filter { it.first.isToday }
+                .map { it.second }
+                .firstOrNull() ?: return
 
-        for (day in drawingContext.dayRange) {
-            val isSameDay = day.isToday
-            val startX = max(startPixel, drawConfig.timeColumnWidth)
-
-            if (config.isSingleDay) {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                startPixel += config.eventMarginHorizontal
-            }
-
-            // Draw the line at the current time.
-            if (config.showNowLine && isSameDay) {
-                drawLine(startX, startPixel, canvas)
-            }
-
-            // In the next iteration, start from the next day.
-            startPixel += config.totalDayWidth
-        }
+        val startX = max(startPixel, drawConfig.timeColumnWidth)
+        drawLine(startX, startPixel, canvas)
     }
 
     private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {

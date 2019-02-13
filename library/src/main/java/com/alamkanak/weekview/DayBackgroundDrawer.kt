@@ -13,21 +13,12 @@ internal class DayBackgroundDrawer(
     private val drawConfig: WeekViewDrawingConfig = config.drawingConfig
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        var startPixel = drawingContext.startPixel
-
-        for (day in drawingContext.dayRange) {
-            val startX = max(startPixel, drawConfig.timeColumnWidth)
-            drawDayBackground(day, startX, startPixel, canvas)
-
-            if (config.isSingleDay) {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                startPixel += config.eventMarginHorizontal.toFloat()
-            }
-
-            // In the next iteration, start from the next day.
-            startPixel += config.totalDayWidth
-        }
+        drawingContext
+                .getDateRangeWithStartPixels(config)
+                .forEach { (date, startPixel) ->
+                    val startX = max(startPixel, drawConfig.timeColumnWidth)
+                    drawDayBackground(date, startX, startPixel, canvas)
+                }
     }
 
     private fun drawDayBackground(day: Calendar, startX: Float, startPixel: Float, canvas: Canvas) {
@@ -40,7 +31,6 @@ internal class DayBackgroundDrawer(
 
         if (config.showDistinctPastFutureColor) {
             val useWeekendColor = day.isWeekend && config.showDistinctWeekendColor
-
             val pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor)
             val futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor)
 
