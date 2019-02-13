@@ -22,10 +22,6 @@ internal class WeekViewViewState {
     var requiresPostInvalidateOnAnimation: Boolean = false
 
     fun update(config: WeekViewConfig, listener: UpdateListener) {
-        if (!areDimensionsInvalid) {
-            return
-        }
-
         val height = WeekView.getViewHeight()
 
         config.effectiveMinHourHeight = max(

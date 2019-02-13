@@ -276,6 +276,17 @@ public final class WeekView<T> extends View
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
         config.setNumberOfVisibleDays(numberOfVisibleDays);
+
+        Calendar firstVisibleDay = viewState.getFirstVisibleDay();
+        if (firstVisibleDay != null) {
+            viewState.setScrollToDay(firstVisibleDay);
+        }
+
+        Integer hour = viewState.getScrollToHour();
+        if (hour != null) {
+            viewState.setScrollToHour(hour);
+        }
+
         invalidate();
     }
 
