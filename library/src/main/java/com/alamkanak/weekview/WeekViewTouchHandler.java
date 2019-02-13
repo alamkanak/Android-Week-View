@@ -49,12 +49,9 @@ final class WeekViewTouchHandler {
                 day.add(Calendar.DATE, dayNumber - 1);
 
                 final float originY = drawingConfig.currentOrigin.y;
-                final float headerHeight = drawingConfig.headerHeight
-                        + config.headerRowPadding * 2
-                        + drawingConfig.headerMarginBottom;
                 final float hourHeight = config.hourHeight;
 
-                final float pixelsFromZero = touchY - originY - headerHeight;
+                final float pixelsFromZero = touchY - originY - drawingConfig.headerHeight;
                 final int hour = (int) (pixelsFromZero / hourHeight);
                 final int minute = (int) (60 * (pixelsFromZero - hour * hourHeight) / hourHeight);
                 day.add(Calendar.HOUR, hour);

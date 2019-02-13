@@ -36,10 +36,7 @@ private class NowLineDrawer(
     }
 
     private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {
-        val headerHeight = (drawConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + drawConfig.headerMarginBottom)
-        val startY = headerHeight + drawConfig.currentOrigin.y
+        val startY = drawConfig.headerHeight + drawConfig.currentOrigin.y
         val now = Calendar.getInstance()
 
         // Draw line

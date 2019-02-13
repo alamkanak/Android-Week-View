@@ -26,15 +26,11 @@ internal class WeekViewViewState {
             return
         }
 
-        val totalHeaderHeight = (config.drawingConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + config.drawingConfig.headerMarginBottom)
-
         val height = WeekView.getViewHeight()
 
         config.effectiveMinHourHeight = max(
                 config.minHourHeight,
-                ((height - totalHeaderHeight) / Constants.HOURS_PER_DAY).toInt()
+                ((height - config.drawingConfig.headerHeight) / Constants.HOURS_PER_DAY).toInt()
         )
 
         areDimensionsInvalid = false

@@ -8,10 +8,10 @@ import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.text.TextUtils;
-import android.text.TextUtils.TruncateAt;
 import android.text.style.StyleSpan;
+import android.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -72,18 +72,20 @@ class EventsDrawer<T> {
     }
 
     /**
-     * Draw all the all-day events of a particular day.
+     * Compute the StaticLayout for all-day events to update the header height
      *
      * @param eventChips The list of {@link EventChip}s to draw
      * @param drawingContext The {@link DrawingContext} to use for drawing
-     * @param canvas         The canvas to draw upon.
+     * @return The association of {@link EventChip}s with his StaticLayout
      */
-    void drawAllDayEvents(List<EventChip<T>> eventChips,
-                          DrawingContext drawingContext, Canvas canvas) {
+    List<Pair<EventChip<T>, StaticLayout>> prepareDrawAllDayEvents(List<EventChip<T>> eventChips,
+                                                                   DrawingContext drawingContext) {
+        drawingConfig.setCurrentAllDayEventHeight(0, config);
         if (eventChips == null) {
-            return;
+            return null;
         }
 
+        List<Pair<EventChip<T>, StaticLayout>> result = new ArrayList<>();
         float startPixel = drawingContext.getStartPixel();
 
         for (Calendar day : drawingContext.getDayRange()) {
@@ -91,27 +93,61 @@ class EventsDrawer<T> {
                 startPixel = startPixel + config.eventMarginHorizontal;
             }
 
-            for (EventChip eventChip : eventChips) {
+            for (EventChip<T> eventChip : eventChips) {
                 final WeekViewEvent event = eventChip.event;
                 if (!event.isSameDay(day)) {
                     continue;
                 }
 
-                drawAllDayEvent(eventChip, startPixel, canvas);
+                StaticLayout layout = prepareDrawAllDayEvent(eventChip, startPixel);
+                if (layout != null) {
+                    result.add(new Pair<>(eventChip, layout));
+                }
             }
 
             startPixel += config.getTotalDayWidth();
         }
 
+        return result;
+    }
+
+    private StaticLayout prepareDrawAllDayEvent(EventChip eventChip, float startFromPixel) {
+        final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
+        if (isValidAllDayEventRect(chipRect)) {
+            eventChip.rect = chipRect;
+
+            return calculateChipTextLayout(eventChip);
+
+        } else {
+            eventChip.rect = null;
+        }
+        return null;
+    }
+
+    /**
+     * Draw all the all-day events of a particular day.
+     *
+     * @param eventChips The list of Pair<{@link EventChip}, StaticLayout>s to draw
+     * @param canvas         The canvas to draw upon.
+     */
+    void drawAllDayEvents(List<Pair<EventChip<T>, StaticLayout>> eventChips,
+                          Canvas canvas) {
+        if (eventChips == null) {
+            return;
+        }
+
+        for (Pair<EventChip<T>, StaticLayout> pair : eventChips) {
+            EventChip<T> eventChip = pair.first;
+            StaticLayout layout = pair.second;
+            eventChip.draw(config, layout, canvas);
+        }
+
         // Hide events when they are in the top left corner
         final Paint headerBackground = drawingConfig.headerBackgroundPaint;
 
-        float headerRowBottomLine = 0;
-        if (config.showHeaderRowBottomLine) {
-            headerRowBottomLine = config.headerRowBottomLineWidth;
-        }
+        float headerRowBottomLine = config.showHeaderRowBottomLine ? config.headerRowBottomLineWidth : 0;
 
-        final float height = drawingConfig.headerHeight + config.headerRowPadding * 2 - headerRowBottomLine;
+        final float height = drawingConfig.headerHeight - headerRowBottomLine;
         final float width = drawingConfig.timeTextWidth + config.timeColumnPadding * 2;
 
         canvas.clipRect(0, 0, width, height);
@@ -121,30 +157,12 @@ class EventsDrawer<T> {
         canvas.save();
     }
 
-    private void drawAllDayEvent(EventChip eventChip, float startFromPixel, Canvas canvas) {
-        final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
-        if (isValidAllDayEventRect(chipRect)) {
-            eventChip.rect = chipRect;
-
-            final StaticLayout textLayout = calculateChipTextLayout(eventChip);
-            if (textLayout != null) {
-                eventChip.draw(config, textLayout, canvas);
-            }
-        } else {
-            eventChip.rect = null;
-        }
-    }
-
     private boolean isValidSingleEventRect(RectF rect) {
-        final float totalHeaderHeight = drawingConfig.headerHeight
-                + config.headerRowPadding * 2
-                + drawingConfig.headerMarginBottom;
-
         return rect.left < rect.right
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
                 && rect.right > drawingConfig.timeColumnWidth
-                && rect.bottom > totalHeaderHeight;
+                && rect.bottom > drawingConfig.headerHeight;
     }
 
     private boolean isValidAllDayEventRect(RectF rect) {
@@ -185,34 +203,34 @@ class EventsDrawer<T> {
         final int availableWidth = (int) (right - left - config.eventPadding * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = drawingConfig.eventTextPaint;
+        final TextPaint textPaint = drawingConfig.allDayEventTextPaint;
         textPaint.setColor(event.getTextColorOrDefault(config));
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-        final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+        if ((textLayout.getHeight() + config.eventPadding * 2) > config.maxAllDayEventHeight) {
+            final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+            final int maxLines = (config.maxAllDayEventHeight - config.eventPadding * 2)  / lineHeight;
 
-        // For an all day event, we display just one line
-        final int chipHeight = lineHeight + (config.eventPadding * 2);
+            CharSequence ellipsized = "";
+            if (maxLines > 0) {
+                int endOffset = textLayout.getLineEnd(maxLines-1);
+                if (endOffset > 3) {
+                    ellipsized = stringBuilder.subSequence(0, endOffset - 3) + "...";
+                } else if (endOffset > 0) {
+                    ellipsized = "...".subSequence(0, endOffset);
+                }
+            }
+            textLayout = new StaticLayout(
+                    ellipsized, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
+        }
+
+        final int chipHeight = textLayout.getHeight() + (config.eventPadding * 2);
         eventChip.rect.bottom = eventChip.rect.top + chipHeight;
-        // Compute the available height on the right size of the chip
-        final int availableHeight = (int) (eventChip.rect.bottom - top - config.eventPadding * 2);
 
-        if (availableHeight >= lineHeight) {
-            int availableLineCount = availableHeight / lineHeight;
-            do {
-                // Ellipsize text to fit into event rect.
-                final int availableArea = availableLineCount * availableWidth;
-                final CharSequence ellipsized =
-                        TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TruncateAt.END);
-                final int width = (int) (right - left - config.eventPadding * 2);
-                textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
-
-                // Reduce line count.
-                availableLineCount--;
-
-                // Repeat until text is short enough.
-            } while (textLayout.getHeight() > availableHeight);
+        // Refresh the header height
+        if (chipHeight > drawingConfig.getCurrentAllDayEventHeight()) {
+            drawingConfig.setCurrentAllDayEventHeight(chipHeight, config);
         }
 
         return textLayout;

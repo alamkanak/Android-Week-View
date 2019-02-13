@@ -35,10 +35,7 @@ internal class BackgroundGridDrawer(
     private fun createHourLines(): FloatArray {
         val drawConfig = config.drawingConfig
         val height = WeekView.getViewHeight()
-        val headerHeight = (drawConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + drawConfig.headerMarginBottom)
-        var lineCount = ((height - headerHeight) / config.hourHeight).toInt() + 1
+        var lineCount = ((height - drawConfig.headerHeight) / config.hourHeight).toInt() + 1
         lineCount *= (config.numberOfVisibleDays + 1)
         return FloatArray(lineCount * 4)
     }
@@ -57,9 +54,7 @@ internal class BackgroundGridDrawer(
         val days = config.numberOfVisibleDays
         val widthPerDay = config.totalDayWidth
 
-        val top = (drawConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + drawConfig.headerMarginBottom)
+        val top = drawConfig.headerHeight
         val height = WeekView.getViewHeight()
 
         for (i in 0 until days) {
@@ -71,29 +66,28 @@ internal class BackgroundGridDrawer(
     private fun drawHourLines(hourLines: FloatArray,
                               startX: Float, startPixel: Float, canvas: Canvas) {
         val height = WeekView.getViewHeight()
-        val headerHeight = drawConfig.headerHeight + config.headerRowPadding * 2
 
         val hourStep = config.timeColumnHoursInterval
 
         var i = 0
         for (hour in hourStep until HOURS_PER_DAY step hourStep) {
-                val heightOfHour = (config.hourHeight * hour).toFloat()
-                val top = headerHeight + drawConfig.currentOrigin.y + heightOfHour
+            val heightOfHour = (config.hourHeight * hour)
+            val top = drawConfig.headerHeight + drawConfig.currentOrigin.y + heightOfHour
 
-                val widthPerDay = config.totalDayWidth
-                val separatorWidth = config.hourSeparatorStrokeWidth.toFloat()
+            val widthPerDay = config.totalDayWidth
+            val separatorWidth = config.hourSeparatorStrokeWidth.toFloat()
 
-                val isNotHiddenByHeader = top > headerHeight - separatorWidth
-                val isWithinVisibleRange = top < height
-                val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
+            val isNotHiddenByHeader = top > drawConfig.headerHeight - separatorWidth
+            val isWithinVisibleRange = top < height
+            val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
-                if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
-                    hourLines[i * 4] = startX
-                    hourLines[i * 4 + 1] = top
-                    hourLines[i * 4 + 2] = startPixel + widthPerDay
-                    hourLines[i * 4 + 3] = top
-                    i++
-                }
+            if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
+                hourLines[i * 4] = startX
+                hourLines[i * 4 + 1] = top
+                hourLines[i * 4 + 2] = startPixel + widthPerDay
+                hourLines[i * 4 + 3] = top
+                i++
+            }
         }
 
         canvas.drawLines(hourLines, drawConfig.hourSeparatorPaint)

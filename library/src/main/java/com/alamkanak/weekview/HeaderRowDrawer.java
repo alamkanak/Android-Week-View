@@ -30,13 +30,14 @@ class HeaderRowDrawer<T> {
 
     private void calculateAvailableSpaceForHeader() {
         drawConfig.timeColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
-        drawConfig.headerHeight = calculateHeaderHeight();
+        refreshHeaderHeight();
     }
 
-    private float calculateHeaderHeight() {
+    private void refreshHeaderHeight() {
         final List<EventChip<T>> eventChips = data.getAllDayEventChips();
         if (eventChips.isEmpty()) {
-            return drawConfig.headerTextHeight;
+            drawConfig.hasEventInHeader = false;
+            drawConfig.refreshHeaderHeight(config);
         }
 
         // Make sure the header is the right size (depends on AllDay events)
@@ -57,21 +58,8 @@ class HeaderRowDrawer<T> {
                 break;
             }
         }
-
-        int headerRowBottomLine = 0;
-        if (config.showHeaderRowBottomLine) {
-            headerRowBottomLine = config.headerRowBottomLineWidth;
-        }
-
-        if (containsAllDayEvent) {
-            final float headerTextSize = drawConfig.eventTextPaint.getTextSize();
-            final float totalEventPadding = config.eventPadding * 2;
-
-            return drawConfig.headerTextHeight + (headerTextSize
-                    + totalEventPadding + headerRowBottomLine + drawConfig.headerMarginBottom);
-        } else {
-            return drawConfig.headerTextHeight + headerRowBottomLine;
-        }
+        drawConfig.hasEventInHeader = containsAllDayEvent;
+        drawConfig.refreshHeaderHeight(config);
     }
 
     private void drawHeaderRow(Canvas canvas) {
@@ -81,33 +69,30 @@ class HeaderRowDrawer<T> {
         canvas.save();
 
         final Paint headerBackground = drawConfig.headerBackgroundPaint;
-        final float headerHeight = drawConfig.headerHeight
-                + config.headerRowPadding * 2
-                + config.headerRowBottomLineWidth;
 
         // Hide everything in the top left corner
         final float topLeftCornerWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
-        canvas.clipRect(0, 0, topLeftCornerWidth, headerHeight);
-        canvas.drawRect(0, 0, topLeftCornerWidth, headerHeight, headerBackground);
+        canvas.clipRect(0, 0, topLeftCornerWidth, drawConfig.headerHeight);
+        canvas.drawRect(0, 0, topLeftCornerWidth, drawConfig.headerHeight, headerBackground);
 
         canvas.restore();
         canvas.save();
 
         // Clip to paint header row only.
-        canvas.clipRect(drawConfig.timeColumnWidth, 0, width, headerHeight);
-        canvas.drawRect(0, 0, width, headerHeight, headerBackground);
+        canvas.clipRect(drawConfig.timeColumnWidth, 0, width, drawConfig.headerHeight);
+        canvas.drawRect(0, 0, width, drawConfig.headerHeight, headerBackground);
 
         canvas.restore();
         canvas.save();
 
         if (config.showHeaderRowBottomLine) {
-            drawHeaderBottomLine(headerHeight, width, canvas);
+            drawHeaderBottomLine(width, canvas);
         }
     }
 
-    private void drawHeaderBottomLine(float headerHeight, int width, Canvas canvas) {
+    private void drawHeaderBottomLine(int width, Canvas canvas) {
         final int headerRowBottomLineWidth = config.headerRowBottomLineWidth;
-        final float topMargin = headerHeight - headerRowBottomLineWidth;
+        final float topMargin = drawConfig.headerHeight - headerRowBottomLineWidth;
 
         final Paint paint = new Paint();
         paint.setStrokeWidth(headerRowBottomLineWidth);

@@ -41,14 +41,16 @@
         <attr name="headerRowPadding" format="dimension" />
         <attr name="headerRowTextSize" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
+        <attr name="headerMarginBottom" format="dimension" />
 
         <!-- Event chips -->
-        <attr name="allDayEventHeight" format="dimension" />
+        <attr name="maxAllDayEventHeight" format="dimension" />
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventTextSize" format="dimension" />
         <attr name="eventTextColor" format="color" />
         <attr name="eventPadding" format="dimension" />
         <attr name="defaultEventColor" format="color" />
+        <attr name="allDayEventTextSize" format="dimension" />
 
         <!-- Event margins -->
         <attr name="columnGap" format="dimension" />
@@ -70,6 +72,7 @@
         <attr name="hourHeight" format="dimension" />
         <attr name="minHourHeight" format="dimension" />
         <attr name="maxHourHeight" format="dimension" />
+        <attr name="showCompleteDay" format="boolean" />
 
         <!-- Now line -->
         <attr name="showNowLine" format="boolean" />

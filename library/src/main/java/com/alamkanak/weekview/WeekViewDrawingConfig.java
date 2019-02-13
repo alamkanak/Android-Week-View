@@ -11,13 +11,12 @@ import android.text.TextPaint;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MONDAY;
-import static java.util.Calendar.SUNDAY;
 
 class WeekViewDrawingConfig {
 
@@ -27,8 +26,12 @@ class WeekViewDrawingConfig {
 
     Paint headerTextPaint;
     float headerTextHeight;
+    // headerHeight = config.headerRowPadding * 2 + headerTextHeight
+    // + config.eventPadding * 2 + currentAllDayEventHeight
+    // + headerMarginBottom + config.headerRowBottomLineWidth
     float headerHeight;
     Paint todayHeaderTextPaint;
+    private int currentAllDayEventHeight;
 
     PointF currentOrigin = new PointF(0f, 0f);
     Paint headerBackgroundPaint;
@@ -36,7 +39,7 @@ class WeekViewDrawingConfig {
     Paint dayBackgroundPaint;
     Paint hourSeparatorPaint;
     Paint daySeparatorPaint;
-    float headerMarginBottom;
+    private float headerMarginBottom;
 
     Paint todayBackgroundPaint;
     private Paint futureBackgroundPaint;
@@ -51,9 +54,11 @@ class WeekViewDrawingConfig {
 
     float timeColumnWidth;
     TextPaint eventTextPaint;
+    TextPaint allDayEventTextPaint;
     Paint timeColumnBackgroundPaint;
+    boolean hasEventInHeader;
 
-    int newHourHeight = -1;
+    float newHourHeight = -1;
 
     DateTimeInterpreter dateTimeInterpreter;
 
@@ -74,9 +79,8 @@ class WeekViewDrawingConfig {
         headerTextPaint.setColor(config.headerRowTextColor);
         headerTextPaint.setTextAlign(Paint.Align.CENTER);
         headerTextPaint.setTextSize(config.headerRowTextSize);
-        headerTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
-        headerTextHeight = rect.height();
         headerTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        headerTextHeight = headerTextPaint.descent() - headerTextPaint.ascent();
 
         // Prepare header background paint.
         headerBackgroundPaint = new Paint();
@@ -146,6 +150,42 @@ class WeekViewDrawingConfig {
         eventTextPaint.setStyle(Paint.Style.FILL);
         eventTextPaint.setColor(config.eventTextColor);
         eventTextPaint.setTextSize(config.eventTextSize);
+
+        // Prepare event text size and color.
+        allDayEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        allDayEventTextPaint.setStyle(Paint.Style.FILL);
+        allDayEventTextPaint.setColor(config.eventTextColor);
+        allDayEventTextPaint.setTextSize(config.allDayEventTextSize);
+
+        headerMarginBottom = config.headerMarginBottom;
+
+        currentAllDayEventHeight = 0;
+        hasEventInHeader = false;
+        refreshHeaderHeight(config);
+    }
+
+  void refreshHeaderHeight(WeekViewConfig config) {
+      headerHeight = config.headerRowPadding * 2 + headerTextHeight + headerMarginBottom;
+      if (config.showHeaderRowBottomLine) {
+          headerHeight += config.headerRowBottomLineWidth;
+      }
+      if (hasEventInHeader) {
+          headerHeight += currentAllDayEventHeight;
+      }
+
+      if (config.showCompleteDay) {
+          config.hourHeight = (WeekView.getViewHeight() - headerHeight) / HOURS_PER_DAY;
+          newHourHeight = config.hourHeight;
+      }
+  }
+
+  void setCurrentAllDayEventHeight(int height, WeekViewConfig config) {
+      currentAllDayEventHeight = height;
+      refreshHeaderHeight(config);
+  }
+
+    int getCurrentAllDayEventHeight() {
+        return currentAllDayEventHeight;
     }
 
     void moveCurrentOriginIfFirstDraw(WeekViewConfig config) {
@@ -166,7 +206,7 @@ class WeekViewDrawingConfig {
     }
 
     void refreshAfterZooming(WeekViewConfig config) {
-        if (newHourHeight > 0) {
+        if (newHourHeight > 0 && !config.showCompleteDay) {
             if (newHourHeight < config.effectiveMinHourHeight) {
                 newHourHeight = config.effectiveMinHourHeight;
             } else if (newHourHeight > config.maxHourHeight) {
@@ -184,7 +224,6 @@ class WeekViewDrawingConfig {
 
         // If the new currentOrigin.y is invalid, make it valid.
         final float dayHeight = config.hourHeight * 24;
-        final float headerHeight = this.headerHeight + config.headerRowPadding * 2 + headerMarginBottom;
 
         final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight);
 

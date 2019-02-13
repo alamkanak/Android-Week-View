@@ -45,14 +45,16 @@ public class WeekViewConfig {
     int headerRowTextSize;
     int headerRowPadding;
     int todayHeaderTextColor;
+    int headerMarginBottom;
 
     // Event chips
-    int allDayEventHeight;
+    int maxAllDayEventHeight;
     int eventCornerRadius;
     int eventTextSize;
     int eventTextColor;
     int eventPadding;
     int defaultEventColor;
+    int allDayEventTextSize;
 
     // Event margins
     int columnGap;
@@ -71,10 +73,11 @@ public class WeekViewConfig {
     int futureWeekendBackgroundColor;
 
     // Hour height
-    int hourHeight;
+    float hourHeight;
     int minHourHeight;
     int maxHourHeight;
     int effectiveMinHourHeight;
+    boolean showCompleteDay;
 
     // Now line
     boolean showNowLine;
@@ -136,14 +139,16 @@ public class WeekViewConfig {
             headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context));
             headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10);
             todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR);
+            headerMarginBottom = a.getDimensionPixelSize(R.styleable.WeekView_headerMarginBottom, 0);
 
             // Event chips
-            allDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, 100);
+            maxAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxAllDayEventHeight, 100);
             eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0);
             eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context));
             eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK);
             eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, 8);
             defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR);
+            allDayEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventTextSize, eventTextSize);
 
             // Event margins
             columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10);
@@ -166,6 +171,7 @@ public class WeekViewConfig {
             minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0);
             maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 250);
             effectiveMinHourHeight = minHourHeight;
+            showCompleteDay = a.getBoolean(R.styleable.WeekView_showCompleteDay, false);
 
             // Now line
             showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, false);
@@ -259,10 +265,7 @@ public class WeekViewConfig {
 
     float getTotalDayHeight() {
         float dayHeight = hourHeight * Constants.HOURS_PER_DAY;
-        float headerHeight = drawingConfig.headerHeight;
-        float totalHeaderPadding = headerRowPadding * 2;
-        float headerBottomMargin = drawingConfig.headerMarginBottom;
-        return dayHeight + headerHeight + totalHeaderPadding + headerBottomMargin;
+        return dayHeight + drawingConfig.headerHeight;
     }
 
     boolean isSingleDay() {

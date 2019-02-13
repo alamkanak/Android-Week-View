@@ -35,10 +35,6 @@ internal class DayBackgroundDrawer(
             return
         }
 
-        val headerHeight = (drawConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + drawConfig.headerMarginBottom)
-
         val height = WeekView.getViewHeight()
         val isToday = day.isToday
 
@@ -48,7 +44,7 @@ internal class DayBackgroundDrawer(
             val pastPaint = drawConfig.getPastBackgroundPaint(useWeekendColor)
             val futurePaint = drawConfig.getFutureBackgroundPaint(useWeekendColor)
 
-            val startY = headerHeight + drawConfig.currentOrigin.y
+            val startY = drawConfig.headerHeight + drawConfig.currentOrigin.y
             val endX = startPixel + drawConfig.widthPerDay
 
             if (isToday) {
@@ -64,7 +60,7 @@ internal class DayBackgroundDrawer(
         } else {
             val todayPaint = drawConfig.getTodayBackgroundPaint(isToday)
             val right = startPixel + drawConfig.widthPerDay
-            canvas.drawRect(startX, headerHeight, right, height.toFloat(), todayPaint)
+            canvas.drawRect(startX, drawConfig.headerHeight, right, height.toFloat(), todayPaint)
         }
     }
 

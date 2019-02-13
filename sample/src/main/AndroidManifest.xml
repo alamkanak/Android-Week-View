@@ -29,6 +29,9 @@
         <activity
             android:name=".AsyncActivity"
             android:label="@string/week_view" />
+        <activity
+            android:name=".ConstraintActivity"
+            android:label="@string/week_view" />
     </application>
 
 </manifest>

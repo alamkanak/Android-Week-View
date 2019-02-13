@@ -10,9 +10,7 @@ private class TimeColumnDrawer(
     private val drawingConfig: WeekViewDrawingConfig = config.drawingConfig
 
     fun drawTimeColumn(canvas: Canvas) {
-        var top = (drawingConfig.headerHeight
-                + (config.headerRowPadding * 2).toFloat()
-                + config.headerRowBottomLineWidth.toFloat())
+        var top = drawingConfig.headerHeight
         val bottom = WeekView.getViewHeight()
 
         // Draw the background color for the time column.
@@ -25,8 +23,6 @@ private class TimeColumnDrawer(
         canvas.clipRect(0f, top, drawingConfig.timeColumnWidth, bottom.toFloat())
 
         // The original header height
-        val headerHeight = top
-
         val startHour = config.startHour
 
         val hourLines = FloatArray(HOURS_PER_DAY * 4)
@@ -34,9 +30,8 @@ private class TimeColumnDrawer(
         val hourStep = config.timeColumnHoursInterval
 
         for (i in startHour..HOURS_PER_DAY step hourStep) {
-            val headerBottomMargin = drawingConfig.headerMarginBottom
-            val heightOfHour = (config.hourHeight * i).toFloat()
-            top = headerHeight + drawingConfig.currentOrigin.y + heightOfHour + headerBottomMargin
+            val heightOfHour = (config.hourHeight * i)
+            top = drawingConfig.headerHeight + drawingConfig.currentOrigin.y + heightOfHour
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
@@ -68,7 +63,7 @@ private class TimeColumnDrawer(
         // Draw the vertical time column separator
         if (config.showTimeColumnSeparator) {
             val lineX = drawingConfig.timeColumnWidth - config.timeColumnSeparatorStrokeWidth
-            canvas.drawLine(lineX, headerHeight, lineX, bottom.toFloat(), drawingConfig.timeColumnSeparatorPaint)
+            canvas.drawLine(lineX, drawingConfig.headerHeight, lineX, bottom.toFloat(), drawingConfig.timeColumnSeparatorPaint)
         }
 
         // Draw the hour separator inside the time column
