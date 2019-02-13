@@ -44,7 +44,6 @@
         <attr name="headerMarginBottom" format="dimension" />
 
         <!-- Event chips -->
-        <attr name="maxAllDayEventHeight" format="dimension" />
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventTextSize" format="dimension" />
         <attr name="eventTextColor" format="color" />

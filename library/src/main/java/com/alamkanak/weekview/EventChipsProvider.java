@@ -256,7 +256,7 @@ class EventChipsProvider<T> {
                                 + eventChip.event.getEndTime().get(MINUTE);
                     } else {
                         eventChip.top = 0;
-                        eventChip.bottom = config.maxAllDayEventHeight;
+                        eventChip.bottom = 100; // config.maxAllDayEventHeight;
                     }
                 }
                 j++;

@@ -14,7 +14,7 @@ class HeaderRowDrawer<T> {
     private WeekViewDrawingConfig drawConfig;
 
     private WeekViewData<T> data;
-        private WeekViewViewState viewState;
+    private WeekViewViewState viewState;
 
     HeaderRowDrawer(WeekViewConfig config, WeekViewData<T> data, WeekViewViewState viewState) {
         this.config = config;
@@ -58,6 +58,7 @@ class HeaderRowDrawer<T> {
                 break;
             }
         }
+
         drawConfig.hasEventInHeader = containsAllDayEvent;
         drawConfig.refreshHeaderHeight(config);
     }

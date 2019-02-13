@@ -48,7 +48,7 @@ public class WeekViewConfig {
     int headerMarginBottom;
 
     // Event chips
-    int maxAllDayEventHeight;
+    //int maxAllDayEventHeight;
     int eventCornerRadius;
     int eventTextSize;
     int eventTextColor;
@@ -142,7 +142,7 @@ public class WeekViewConfig {
             headerMarginBottom = a.getDimensionPixelSize(R.styleable.WeekView_headerMarginBottom, 0);
 
             // Event chips
-            maxAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxAllDayEventHeight, 100);
+            //maxAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxAllDayEventHeight, 100);
             eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0);
             eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context));
             eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK);
@@ -273,7 +273,7 @@ public class WeekViewConfig {
     }
 
     int getStartHour() {
-      return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
+        return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
     }
 
     private static class Defaults {

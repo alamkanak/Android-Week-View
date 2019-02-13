@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.util.Pair;
 
@@ -203,30 +204,36 @@ class EventsDrawer<T> {
         final int availableWidth = (int) (right - left - config.eventPadding * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = drawingConfig.allDayEventTextPaint;
+        final TextPaint textPaint = drawingConfig.eventTextPaint;
         textPaint.setColor(event.getTextColorOrDefault(config));
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
-        if ((textLayout.getHeight() + config.eventPadding * 2) > config.maxAllDayEventHeight) {
-            final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
-            final int maxLines = (config.maxAllDayEventHeight - config.eventPadding * 2)  / lineHeight;
+        final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
-            CharSequence ellipsized = "";
-            if (maxLines > 0) {
-                int endOffset = textLayout.getLineEnd(maxLines-1);
-                if (endOffset > 3) {
-                    ellipsized = stringBuilder.subSequence(0, endOffset - 3) + "...";
-                } else if (endOffset > 0) {
-                    ellipsized = "...".subSequence(0, endOffset);
-                }
-            }
-            textLayout = new StaticLayout(
-                    ellipsized, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
-        }
-
-        final int chipHeight = textLayout.getHeight() + (config.eventPadding * 2);
+        // For an all day event, we display just one line
+        final int chipHeight = lineHeight + (config.eventPadding * 2);
         eventChip.rect.bottom = eventChip.rect.top + chipHeight;
+
+        // Compute the available height on the right size of the chip
+        final int availableHeight = (int) (eventChip.rect.bottom - top - config.eventPadding * 2);
+
+        if (availableHeight >= lineHeight) {
+            int availableLineCount = availableHeight / lineHeight;
+            do {
+                // Ellipsize text to fit into event rect.
+                final int availableArea = availableLineCount * availableWidth;
+                final CharSequence ellipsized =
+                        TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TextUtils.TruncateAt.END);
+                final int width = (int) (right - left - config.eventPadding * 2);
+                textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
+
+                // Reduce line count.
+                availableLineCount--;
+
+                // Repeat until text is short enough.
+            } while (textLayout.getHeight() > availableHeight);
+        }
 
         // Refresh the header height
         if (chipHeight > drawingConfig.getCurrentAllDayEventHeight()) {

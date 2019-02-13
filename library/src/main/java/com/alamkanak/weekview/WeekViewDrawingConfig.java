@@ -54,7 +54,7 @@ class WeekViewDrawingConfig {
 
     float timeColumnWidth;
     TextPaint eventTextPaint;
-    TextPaint allDayEventTextPaint;
+    private TextPaint allDayEventTextPaint;
     Paint timeColumnBackgroundPaint;
     boolean hasEventInHeader;
 

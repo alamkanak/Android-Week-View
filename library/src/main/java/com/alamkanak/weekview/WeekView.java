@@ -452,22 +452,6 @@ public final class WeekView<T> extends View
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Get the max height of all-day events.
-     *
-     * @return max Height of all-day events.
-     */
-    public int getMaxAllDayEventHeight() {
-        return config.maxAllDayEventHeight;
-    }
-
-    /**
-     * Set the height of AllDay-events.
-     */
-    public void setMaxAllDayEventHeight(int height) {
-        config.maxAllDayEventHeight = height;
-    }
-
     public int getEventCornerRadius() {
         return config.eventCornerRadius;
     }
