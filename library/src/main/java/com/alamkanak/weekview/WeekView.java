@@ -19,6 +19,7 @@ import java.util.List;
 
 import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
+import static java.lang.Math.ceil;
 import static java.lang.Math.round;
 import static java.lang.Math.min;
 import static java.util.Calendar.DATE;
@@ -175,13 +176,17 @@ public final class WeekView<T> extends View
         final Calendar oldFirstVisibleDay = viewState.getFirstVisibleDay();
         final Calendar today = today();
 
-        viewState.setFirstVisibleDay((Calendar) today.clone());
-        viewState.setLastVisibleDay((Calendar) today.clone());
+        Calendar firstVisibleDay = (Calendar) today.clone();
+        Calendar lastVisibleDay = (Calendar) today.clone();
 
         final float totalDayWidth = config.getTotalDayWidth();
-        final int delta = round(drawConfig.currentOrigin.x / totalDayWidth) * -1;
-        viewState.getFirstVisibleDay().add(DATE, delta);
-        viewState.getLastVisibleDay().add(DATE, config.numberOfVisibleDays - 1 + delta);
+        final int delta = (int) round(ceil(drawConfig.currentOrigin.x / totalDayWidth)) * -1;
+
+        firstVisibleDay.add(DATE, delta);
+        lastVisibleDay.add(DATE, config.numberOfVisibleDays - 1 + delta);
+
+        viewState.setFirstVisibleDay(firstVisibleDay);
+        viewState.setLastVisibleDay(lastVisibleDay);
 
         final boolean hasFirstVisibleDayChanged = !viewState.getFirstVisibleDay().equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {

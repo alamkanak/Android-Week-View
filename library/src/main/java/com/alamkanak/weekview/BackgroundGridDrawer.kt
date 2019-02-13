@@ -3,6 +3,7 @@ package com.alamkanak.weekview
 import android.graphics.Canvas
 import com.alamkanak.weekview.Constants.HOURS_PER_DAY
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 internal class BackgroundGridDrawer(
         private val config: WeekViewConfig
@@ -24,9 +25,14 @@ internal class BackgroundGridDrawer(
     private fun createHourLines(): FloatArray {
         val drawConfig = config.drawingConfig
         val height = WeekView.getViewHeight()
-        var lineCount = ((height - drawConfig.headerHeight) / config.hourHeight).toInt() + 1
-        lineCount *= (config.numberOfVisibleDays + 1)
-        return FloatArray(lineCount * 4)
+
+        val headerHeight = drawConfig.getTotalHeaderHeight(config)
+        val gridHeight = height - headerHeight.toInt()
+
+        val linesPerDay = (gridHeight / config.hourHeight) + 1
+        val overallLines = linesPerDay.roundToInt() * (config.numberOfVisibleDays + 1)
+
+        return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
     }
 
     private fun drawGrid(startX: Float, startPixel: Float, canvas: Canvas) {

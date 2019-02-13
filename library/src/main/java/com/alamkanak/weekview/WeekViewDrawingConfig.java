@@ -8,7 +8,6 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
@@ -26,9 +25,6 @@ class WeekViewDrawingConfig {
 
     Paint headerTextPaint;
     float headerTextHeight;
-    // headerHeight = config.headerRowPadding * 2 + headerTextHeight
-    // + config.eventPadding * 2 + currentAllDayEventHeight
-    // + headerMarginBottom + config.headerRowBottomLineWidth
     float headerHeight;
     Paint todayHeaderTextPaint;
     private int currentAllDayEventHeight;
@@ -295,44 +291,10 @@ class WeekViewDrawingConfig {
 
     DateTimeInterpreter getDateTimeInterpreter(Context context) {
         if (dateTimeInterpreter == null) {
-            dateTimeInterpreter = buildDefaultDateTimeInterpreter(context);
+            dateTimeInterpreter = new DefaultDateTimeInterpreter(context);
         }
 
         return dateTimeInterpreter;
-    }
-
-    private DateTimeInterpreter buildDefaultDateTimeInterpreter(final Context context) {
-        return new DateTimeInterpreter() {
-
-            private SimpleDateFormat sdfDate = DateUtils.getDateFormat();
-            private SimpleDateFormat sdfTime = DateUtils.getTimeFormat(context);
-            private Calendar calendar = Calendar.getInstance();
-
-            @NonNull
-            @Override
-            public String interpretDate(@NonNull Calendar date) {
-                try {
-                    return sdfDate.format(date.getTime()).toUpperCase();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return "";
-                }
-            }
-
-            @NonNull
-            @Override
-            public String interpretTime(int hour) {
-                calendar.set(Calendar.HOUR_OF_DAY, hour);
-                calendar.set(Calendar.MINUTE, 0);
-
-                try {
-                    return sdfTime.format(calendar.getTime());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return "";
-                }
-            }
-        };
     }
 
 }
