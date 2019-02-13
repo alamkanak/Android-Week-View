@@ -22,16 +22,13 @@ internal class WeekViewViewState {
     var requiresPostInvalidateOnAnimation: Boolean = false
 
     fun update(config: WeekViewConfig, listener: UpdateListener) {
-        if (!areDimensionsInvalid) {
-            return
-        }
+        val drawingConfig = config.drawingConfig
+        val totalHeaderHeight = drawingConfig.getTotalHeaderHeight(config)
 
-        val height = WeekView.getViewHeight()
+        val totalHeight = WeekView.getViewHeight()
+        val dynamicHourHeight = ((totalHeight - totalHeaderHeight) / Constants.HOURS_PER_DAY).toInt()
 
-        config.effectiveMinHourHeight = max(
-                config.minHourHeight,
-                ((height - config.drawingConfig.headerHeight) / Constants.HOURS_PER_DAY).toInt()
-        )
+        config.effectiveMinHourHeight = max(config.minHourHeight, dynamicHourHeight)
 
         areDimensionsInvalid = false
         scrollToDay?.let {
@@ -45,7 +42,7 @@ internal class WeekViewViewState {
         }
 
         scrollToDay = null
-        scrollToHour = -1
+        scrollToHour = null
         areDimensionsInvalid = false
     }
 
