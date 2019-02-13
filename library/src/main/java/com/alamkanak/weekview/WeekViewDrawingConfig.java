@@ -50,7 +50,7 @@ class WeekViewDrawingConfig {
 
     float timeColumnWidth;
     TextPaint eventTextPaint;
-    private TextPaint allDayEventTextPaint;
+    TextPaint allDayEventTextPaint;
     Paint timeColumnBackgroundPaint;
     boolean hasEventInHeader;
 
@@ -132,10 +132,6 @@ class WeekViewDrawingConfig {
         todayHeaderTextPaint.setTextSize(config.headerRowTextSize);
         todayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         todayHeaderTextPaint.setColor(config.todayHeaderTextColor);
-
-        // Prepare event background color.
-        //eventBackgroundPaint = new Paint();
-        //eventBackgroundPaint.setColor(Color.rgb(174, 208, 238));
 
         // Prepare header column background color.
         timeColumnBackgroundPaint = new Paint();

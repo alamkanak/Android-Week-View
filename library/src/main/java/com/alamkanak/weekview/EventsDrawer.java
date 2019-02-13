@@ -204,7 +204,8 @@ class EventsDrawer<T> {
         final int availableWidth = (int) (right - left - config.eventPadding * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = drawingConfig.eventTextPaint;
+        final TextPaint textPaint = (event.isAllDay()) ? drawingConfig.allDayEventTextPaint
+                                                       : drawingConfig.eventTextPaint;
         textPaint.setColor(event.getTextColorOrDefault(config));
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
