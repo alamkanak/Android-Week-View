@@ -52,8 +52,6 @@ class EventChipRectCalculator {
         final float top = config.headerRowPadding * 1.5f + config.drawingConfig.headerTextHeight;
         final float widthPerDay = config.drawingConfig.widthPerDay;
 
-        // Calculate top
-
         // Calculate bottom
         final float bottom = top + eventChip.bottom;
 

@@ -116,9 +116,7 @@ class EventsDrawer<T> {
         final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
         if (isValidAllDayEventRect(chipRect)) {
             eventChip.rect = chipRect;
-
             return calculateChipTextLayout(eventChip);
-
         } else {
             eventChip.rect = null;
         }
