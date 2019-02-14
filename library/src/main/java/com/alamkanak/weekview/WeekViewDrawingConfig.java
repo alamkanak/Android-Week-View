@@ -29,6 +29,12 @@ class WeekViewDrawingConfig {
     Paint todayHeaderTextPaint;
     private int currentAllDayEventHeight;
 
+
+    /**
+     * dates in the past have origin.x > 0
+     * dates in the future have origin.x < 0
+     * relative to today()
+     */
     PointF currentOrigin = new PointF(0f, 0f);
     Paint headerBackgroundPaint;
     float widthPerDay;
@@ -191,6 +197,12 @@ class WeekViewDrawingConfig {
 
             currentOrigin.x += (widthPerDay + config.columnGap) * difference;
         }
+
+        // Overwrites the origin when today is out of date range
+        float minX = config.getMinX();
+        float maxX = config.getMaxX();
+        currentOrigin.x = Math.min(currentOrigin.x,maxX);
+        currentOrigin.x = Math.max(currentOrigin.x,minX);
     }
 
     int computeDifferenceWithFirstDayOfWeek(@NonNull WeekViewConfig config ,@NonNull Calendar date) {

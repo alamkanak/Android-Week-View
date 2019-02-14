@@ -147,6 +147,12 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
             case LEFT:
             case RIGHT:
                 drawingConfig.currentOrigin.x -= distanceX * config.xScrollingSpeed;
+
+                float minX = config.getMinX();
+                float maxX = config.getMaxX();
+                drawingConfig.currentOrigin.x = Math.min(drawingConfig.currentOrigin.x,maxX);
+                drawingConfig.currentOrigin.x = Math.max(drawingConfig.currentOrigin.x,minX);
+
                 listener.onScrolled();
                 break;
             case VERTICAL:
@@ -193,8 +199,8 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int velocityX = (int) (originalVelocityX * config.xScrollingSpeed);
         final int velocityY = 0;
 
-        final int minX = Integer.MIN_VALUE;
-        final int maxX = Integer.MAX_VALUE;
+        final int minX = (int) config.getMinX();
+        final int maxX = (int) config.getMaxX();
 
         final float dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
         final int viewHeight = WeekView.getViewHeight();

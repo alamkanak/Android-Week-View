@@ -864,6 +864,30 @@ public final class WeekView<T> extends View
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
+    //  Min Max Date
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public Calendar getMinDate() {
+        return config.minDate;
+    }
+
+    public void setMinDate(Calendar minDate) {
+        config.minDate = DateExtKt.withTimeAtStartOfDay(minDate);
+        invalidate();
+    }
+
+    public Calendar getMaxDate() {
+        return config.maxDate;
+    }
+
+    public void setMaxDate(Calendar maxDate) {
+        config.maxDate = DateExtKt.withTimeAtEndOfDay(maxDate);
+        invalidate();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     //  Scrolling
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1015,6 +1039,20 @@ public final class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(@NonNull Calendar date) {
+        //permits to move programmatically beyond the range border
+        // e.g goToDate(today()) shouldn't allow to jump out of the range
+        //forces to lower/upper limit of date range
+        if (config.minDate != null && date.before(config.minDate)) {
+            date = (Calendar) config.minDate.clone();
+        }else if (config.maxDate != null && date.after(config.maxDate)) {
+            date = (Calendar) config.maxDate.clone();
+            date.add(Calendar.DAY_OF_YEAR,1-config.numberOfVisibleDays);
+        }else if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
+            date = (Calendar) date.clone();
+            int diffFirst = config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
+            date.add(Calendar.DAY_OF_YEAR, (-1) * diffFirst);
+        }
+
         gestureHandler.forceScrollFinished();
 
         if (viewState.areDimensionsInvalid) {
@@ -1025,10 +1063,6 @@ public final class WeekView<T> extends View
         viewState.setShouldRefreshEvents(true);
 
         int diff = DateUtils.getDaysUntilDate(date);
-
-        if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
-            diff -= config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
-        }
 
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
         viewState.requiresPostInvalidateOnAnimation = true;

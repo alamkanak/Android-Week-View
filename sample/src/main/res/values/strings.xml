@@ -10,6 +10,7 @@
     <string name="title_activity_static">Basic Example (with static WeekView)</string>
     <string name="title_activity_asynchronous">Asynchronous Events</string>
     <string name="title_activity_constraint">Basic Example (showing complete day)</string>
+    <string name="title_activity_limited">Basic Example (with limited date range)</string>
     <string name="async_error">Could not download events from the internet</string>
     <string name="date_infos">From %1$s to %2$s</string>
 </resources>

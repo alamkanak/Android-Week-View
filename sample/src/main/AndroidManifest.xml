@@ -32,6 +32,9 @@
         <activity
             android:name=".ConstraintActivity"
             android:label="@string/week_view" />
+        <activity
+            android:name=".LimitedActivity"
+            android:label="@string/week_view" />
     </application>
 
 </manifest>
