@@ -153,7 +153,7 @@ public final class WeekView<T> extends View
         eventsDrawer.drawSingleEvents(data.getNormalEventChips(), drawingContext, canvas);
 
         nowLineDrawer.draw(drawingContext, canvas);
-        headerRowDrawer.draw(canvas);
+        headerRowDrawer.draw(drawingContext, canvas);
         dayLabelDrawer.draw(drawingContext, canvas);
 
         eventsDrawer.drawAllDayEvents(allDayEvents, canvas);

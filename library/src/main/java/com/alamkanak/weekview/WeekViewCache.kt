@@ -1,5 +1,7 @@
 package com.alamkanak.weekview
 
+import java.util.*
+
 internal class WeekViewCache<T> {
 
     var allEventChips = mutableListOf<EventChip<T>>()
@@ -23,6 +25,23 @@ internal class WeekViewCache<T> {
 
         allDayEventChips.clear()
         allDayEventChips.addAll(allDay)
+    }
+
+    private fun getEventChipsInRange(
+            eventChips: List<EventChip<T>>,
+            dateRange: List<Calendar>
+    ): List<WeekViewEvent<T>> {
+        val results = mutableListOf<WeekViewEvent<T>>()
+        for (date in dateRange) {
+            results += eventChips
+                    .filter { it.event.isSameDay(date) }
+                    .map { it.event }
+        }
+        return results
+    }
+
+    fun getAllDayEventsInRange(dateRange: List<Calendar>): List<WeekViewEvent<T>> {
+        return getEventChipsInRange(allDayEventChips, dateRange).filter { it.isAllDay }
     }
 
     fun clearEventChipsCache() {

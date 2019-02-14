@@ -6,8 +6,6 @@ import android.graphics.Paint;
 import java.util.Calendar;
 import java.util.List;
 
-import static java.util.Calendar.DATE;
-
 class HeaderRowDrawer<T> {
 
     private WeekViewConfig config;
@@ -23,38 +21,35 @@ class HeaderRowDrawer<T> {
         this.viewState = viewState;
     }
 
-    void draw(Canvas canvas) {
-        calculateAvailableSpaceForHeader();
+    void draw(DrawingContext drawingContext, Canvas canvas) {
+        calculateAvailableSpaceForHeader(drawingContext);
         drawHeaderRow(canvas);
     }
 
-    private void calculateAvailableSpaceForHeader() {
+    private void calculateAvailableSpaceForHeader(DrawingContext drawingContext) {
         drawConfig.timeColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
-        refreshHeaderHeight();
+        refreshHeaderHeight(drawingContext);
     }
 
-    private void refreshHeaderHeight() {
+    private void refreshHeaderHeight(DrawingContext drawingContext) {
         final List<EventChip<T>> eventChips = data.getAllDayEventChips();
         if (eventChips.isEmpty()) {
             drawConfig.hasEventInHeader = false;
             drawConfig.refreshHeaderHeight(config);
         }
 
-        // Make sure the header is the right size (depends on AllDay events)
+        Calendar firstVisibleDay = viewState.getFirstVisibleDay();
+        if (firstVisibleDay == null) {
+            return;
+        }
+
+        List<Calendar> dateRange = drawingContext.getVisibleDateRange(firstVisibleDay, config);
+        List<WeekViewEvent<T>> visibleEvents = data.getAllDayEventsInRange(dateRange);
+
         boolean containsAllDayEvent = false;
-        for (int i = 0; i < config.numberOfVisibleDays; i++) {
-            final Calendar day = (Calendar) viewState.getFirstVisibleDay().clone();
-            day.add(DATE, i);
-
-            for (int j = 0; j < eventChips.size(); j++) {
-                final WeekViewEvent event = eventChips.get(j).event;
-                if (event.isSameDay(day) && event.isAllDay()) {
-                    containsAllDayEvent = true;
-                    break;
-                }
-            }
-
-            if (containsAllDayEvent) {
+        for (WeekViewEvent<T> event : visibleEvents) {
+            if (event.isAllDay()) {
+                containsAllDayEvent = true;
                 break;
             }
         }
