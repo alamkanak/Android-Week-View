@@ -2,33 +2,11 @@ package com.alamkanak.weekview
 
 import java.lang.Math.ceil
 import java.util.*
-import java.util.Calendar.DATE
 
 class DrawingContext(
         val dateRange: List<Calendar>,
         val startPixel: Float
 ) {
-
-    /**
-     * Returns the actually visible date range. This can be different from [dateRange] if the user
-     * is currently scrolling.
-     *
-     * @param firstVisibleDate The first visible date
-     * @param config The [WeekViewConfig]
-     *
-     * @return The list of currently visible dates
-     */
-    fun getVisibleDateRange(firstVisibleDate: Calendar, config: WeekViewConfig): List<Calendar> {
-        val result = dateRange as MutableList
-        val isScrolling = config.drawingConfig.currentOrigin.x % config.totalDayWidth != 0f
-        if (isScrolling) {
-            // If the user is scrolling, a new view becomes partially visible
-            val lastVisibleDay = firstVisibleDate.clone() as Calendar
-            lastVisibleDay.add(DATE, config.numberOfVisibleDays)
-            dateRange.add(lastVisibleDay)
-        }
-        return result
-    }
 
     fun getDateRangeWithStartPixels(config: WeekViewConfig): List<Pair<Calendar, Float>> {
         return dateRange.zip(getStartPixels(config))
@@ -67,9 +45,14 @@ class DrawingContext(
                     + drawConfig.timeColumnWidth)
 
             val start = leftDaysWithGaps + 1
-            val end = start + config.numberOfVisibleDays + 1
-            val dayRange = DateUtils.getDateRange(start, end)
+            val end = start + config.numberOfVisibleDays
 
+            // If the user is scrolling, a new view becomes partially visible, so we must add an
+            // additional date to the date range
+            val isNotScrolling = config.drawingConfig.currentOrigin.x % config.totalDayWidth == 0f
+            val modifiedEnd = if (isNotScrolling) end - 1 else end
+
+            val dayRange = DateUtils.getDateRange(start, modifiedEnd)
             return DrawingContext(dayRange, startPixel)
         }
     }

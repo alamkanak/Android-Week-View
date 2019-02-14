@@ -43,7 +43,7 @@ class HeaderRowDrawer<T> {
             return;
         }
 
-        List<Calendar> dateRange = drawingContext.getVisibleDateRange(firstVisibleDay, config);
+        List<Calendar> dateRange = drawingContext.getDateRange();
         List<WeekViewEvent<T>> visibleEvents = cache.getAllDayEventsInRange(dateRange);
 
         boolean containsAllDayEvent = false;
