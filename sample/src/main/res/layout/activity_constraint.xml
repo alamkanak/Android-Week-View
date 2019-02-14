@@ -48,6 +48,11 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="match_parent"

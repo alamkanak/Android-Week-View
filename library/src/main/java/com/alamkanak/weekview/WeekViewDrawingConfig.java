@@ -74,7 +74,7 @@ class WeekViewDrawingConfig {
         final Rect rect = new Rect();
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         timeTextHeight = rect.height();
-        initTextTimeWidth(context);
+        initTextTimeWidth(context, config);
 
         // Measure settings for header row.
         headerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -267,9 +267,10 @@ class WeekViewDrawingConfig {
         timeTextPaint.setColor(timeColumnTextColor);
     }
 
-    void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter, Context context) {
+    void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter,
+                                Context context, WeekViewConfig config) {
         this.dateTimeInterpreter = dateTimeInterpreter;
-        initTextTimeWidth(context);
+        initTextTimeWidth(context, config);
     }
 
     Paint getPastBackgroundPaint(boolean useWeekendColor) {
@@ -287,8 +288,8 @@ class WeekViewDrawingConfig {
     /**
      * Initialize time column width. Calculate value with all possible hours (supposed widest text).
      */
-    private void initTextTimeWidth(Context context) {
-        final DateTimeInterpreter interpreter = getDateTimeInterpreter(context);
+    private void initTextTimeWidth(Context context, WeekViewConfig config) {
+        final DateTimeInterpreter interpreter = getDateTimeInterpreter(context, config);
         timeTextWidth = 0;
 
         for (int i = 0; i < HOUR_OF_DAY; i++) {
@@ -297,9 +298,9 @@ class WeekViewDrawingConfig {
         }
     }
 
-    DateTimeInterpreter getDateTimeInterpreter(Context context) {
+    DateTimeInterpreter getDateTimeInterpreter(Context context, WeekViewConfig config) {
         if (dateTimeInterpreter == null) {
-            dateTimeInterpreter = new DefaultDateTimeInterpreter(context);
+            dateTimeInterpreter = new DefaultDateTimeInterpreter(context, config.numberOfVisibleDays);
         }
 
         return dateTimeInterpreter;

@@ -9,10 +9,6 @@ import java.util.Calendar.DATE
 internal object DateUtils {
 
     @JvmStatic
-    val dateFormat: SimpleDateFormat
-        get() = SimpleDateFormat("EEEEE M/dd", Locale.getDefault())
-
-    @JvmStatic
     fun getDateRange(daysSinceToday: Int, size: Int): List<Calendar> {
         val days = ArrayList<Calendar>()
         var day: Calendar
@@ -95,8 +91,16 @@ internal object DateUtils {
         return Calendar.getInstance().withTimeAtStartOfDay()
     }
 
+    fun getDefaultDateFormat(isWeek: Boolean): SimpleDateFormat {
+        return if (isWeek) {
+            SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display only the first character
+        } else {
+            SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display the first three characters
+        }
+    }
+
     @JvmStatic
-    fun getTimeFormat(context: Context): SimpleDateFormat {
+    fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
         return if (DateFormat.is24HourFormat(context)) {
             SimpleDateFormat("HH:mm", Locale.getDefault())
         } else {

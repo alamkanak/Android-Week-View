@@ -2,43 +2,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    android:background="#fff"
     android:orientation="vertical"
-    android:background="#fff">
+    tools:context=".MainActivity">
 
     <Button
         android:id="@+id/buttonBasic"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_activity_basic"
-        style="@style/Button"/>
+        android:text="@string/title_activity_basic" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
     <Button
         android:id="@+id/buttonStatic"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_activity_static"
-        style="@style/Button"/>
+        android:text="@string/title_activity_static" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
     <Button
         android:id="@+id/buttonLimited"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_activity_limited"
-        style="@style/Button"/>
+        android:text="@string/title_activity_limited" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
     <Button
-      android:id="@+id/buttonConstraint"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/title_activity_constraint"
-      style="@style/Button"/>
+        android:id="@+id/buttonConstraint"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_activity_constraint" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
     <Button
         android:id="@+id/buttonAsynchronous"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/title_activity_asynchronous"
-        style="@style/Button"/>
+        android:text="@string/title_activity_asynchronous" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
 
 </LinearLayout>

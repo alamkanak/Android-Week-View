@@ -4,8 +4,6 @@ import android.app.ProgressDialog
 import android.graphics.RectF
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.TypedValue
-import android.util.TypedValue.*
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -16,7 +14,6 @@ import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
 import retrofit.client.Response
-import java.text.SimpleDateFormat
 import java.util.*
 
 class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
@@ -45,7 +42,6 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
         weekView.setEmptyViewLongPressListener(this::onEmptyViewLongPress)
 
         progressDialog.show()
-        setupDateTimeInterpreter()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -54,27 +50,14 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        setupDateTimeInterpreter()
-
-        return when (item.itemId) {
-            R.id.action_today -> {
-                weekView.goToToday()
-                true
-            }
-            R.id.action_day_view -> {
-                openDayView(item)
-                true
-            }
-            R.id.action_three_day_view -> {
-                openThreeDayView(item)
-                true
-            }
-            R.id.action_week_view -> {
-                openWeekView(item)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.action_today -> weekView.goToToday()
+            R.id.action_day_view -> openDayView(item)
+            R.id.action_three_day_view -> openThreeDayView(item)
+            R.id.action_week_view -> openWeekView(item)
         }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun openDayView(item: MenuItem) {
@@ -85,11 +68,6 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
         item.isChecked = item.isChecked.not()
         weekViewType = TYPE_DAY_VIEW
         weekView.numberOfVisibleDays = 1
-
-        // Lets change some dimensions to best fit the view.
-        weekView.columnGap = applyDimension(COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
-        weekView.setTimeColumnTextSize(applyDimension(COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt())
-        weekView.eventTextSize = applyDimension(COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
     }
 
     private fun openThreeDayView(item: MenuItem) {
@@ -100,11 +78,6 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
         item.isChecked = item.isChecked.not()
         weekViewType = TYPE_THREE_DAY_VIEW
         weekView.numberOfVisibleDays = 3
-
-        // Lets change some dimensions to best fit the view.
-        weekView.columnGap = applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
-        weekView.setTimeColumnTextSize(applyDimension(COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt())
-        weekView.eventTextSize = applyDimension(COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()
     }
 
     private fun openWeekView(item: MenuItem) {
@@ -115,35 +88,6 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
         item.isChecked = item.isChecked.not()
         weekViewType = TYPE_WEEK_VIEW
         weekView.numberOfVisibleDays = 7
-
-        // Lets change some dimensions to best fit the view.
-        weekView.columnGap = applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, resources.displayMetrics).toInt()
-        weekView.setTimeColumnTextSize(applyDimension(COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt())
-        weekView.eventTextSize = applyDimension(COMPLEX_UNIT_SP, 10f, resources.displayMetrics).toInt()
-    }
-
-    private fun setupDateTimeInterpreter() {
-        weekView.dateTimeInterpreter = object : DateTimeInterpreter {
-
-            private val weekdayNameFormat = SimpleDateFormat("EEE", Locale.getDefault())
-            private val format = SimpleDateFormat(" M/d", Locale.getDefault())
-
-            override fun interpretDate(date: Calendar): String {
-                var weekday = weekdayNameFormat.format(date.time)
-                if (weekView.numberOfVisibleDays == 7) {
-                    weekday = weekday[0].toString()
-                }
-                return weekday.toUpperCase() + format.format(date.time)
-            }
-
-            override fun interpretTime(hour: Int): String {
-                return when {
-                    hour > 11 -> "${hour - 12} PM"
-                    hour == 0 -> "12 AM"
-                    else -> "$hour AM"
-                }
-            }
-        }
     }
 
     private fun getEventTitle(time: Calendar): String {

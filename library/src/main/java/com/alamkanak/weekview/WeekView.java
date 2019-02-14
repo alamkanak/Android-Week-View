@@ -282,6 +282,13 @@ public final class WeekView<T> extends View
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
         config.setNumberOfVisibleDays(numberOfVisibleDays);
 
+        DateTimeInterpreter interpreter = getDateTimeInterpreter();
+        if (interpreter instanceof DefaultDateTimeInterpreter) {
+            DefaultDateTimeInterpreter defaultInterpreter =
+                    (DefaultDateTimeInterpreter) getDateTimeInterpreter();
+            defaultInterpreter.setNumberOfDays(numberOfVisibleDays);
+        }
+
         Calendar firstVisibleDay = viewState.getFirstVisibleDay();
         if (firstVisibleDay != null) {
             viewState.setScrollToDay(firstVisibleDay);
@@ -1208,7 +1215,7 @@ public final class WeekView<T> extends View
      * @return The date, time interpreter.
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
-        return config.drawingConfig.getDateTimeInterpreter(getContext());
+        return config.drawingConfig.getDateTimeInterpreter(getContext(), config);
     }
 
     /**
@@ -1217,7 +1224,7 @@ public final class WeekView<T> extends View
      * @param dateTimeInterpreter The date, time interpreter.
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
-        config.drawingConfig.setDateTimeInterpreter(dateTimeInterpreter, getContext());
+        config.drawingConfig.setDateTimeInterpreter(dateTimeInterpreter, getContext(), config);
     }
 
     protected static class SavedState extends BaseSavedState {

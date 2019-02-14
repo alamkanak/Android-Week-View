@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.EmptyViewLongPressListener;
 import com.alamkanak.weekview.EventClickListener;
 import com.alamkanak.weekview.EventLongPressListener;
@@ -21,7 +20,6 @@ import com.alamkanak.weekview.sample.database.FakeEventsDatabase;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -57,8 +55,6 @@ public class BaseActivity extends AppCompatActivity
         mWeekView.setMonthChangeListener(this);
         mWeekView.setEventLongPressListener(this);
         mWeekView.setEmptyViewLongPressListener(this);
-
-        setupDateTimeInterpreter();
     }
 
     @Override
@@ -70,8 +66,6 @@ public class BaseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        setupDateTimeInterpreter();
-
         switch (id) {
             case R.id.action_today:
                 mWeekView.goToToday();
@@ -120,40 +114,6 @@ public class BaseActivity extends AppCompatActivity
         mWeekView.setNumberOfVisibleDays(7);
     }
 
-    /**
-     * Set up a date time interpreter which will show short date values when in week view and long
-     * date values otherwise.
-     */
-    private void setupDateTimeInterpreter() {
-        mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
-
-            SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-            SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
-
-            @NotNull
-            @Override
-            public String interpretDate(@NotNull Calendar date) {
-                String weekday = weekdayNameFormat.format(date.getTime());
-                if (mWeekView.getNumberOfVisibleDays() == 7) {
-                    weekday = String.valueOf(weekday.charAt(0));
-                }
-                return weekday.toUpperCase() + format.format(date.getTime());
-            }
-
-            @NotNull
-            @Override
-            public String interpretTime(int hour) {
-                if (hour == 12) {
-                    return "12 PM";
-                } else if (hour > 12) {
-                    return (hour - 12) + " PM";
-                } else {
-                    return (hour == 0 ? "12 AM" : hour + " AM");
-                }
-            }
-        });
-    }
-
     protected String getEventTitle(Calendar time) {
         int hour = time.get(Calendar.HOUR_OF_DAY);
         int minute = time.get(Calendar.MINUTE);
@@ -162,6 +122,7 @@ public class BaseActivity extends AppCompatActivity
         return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth);
     }
 
+    @NotNull
     @Override
     public List<WeekViewDisplayable<Event>> onMonthChange(@NonNull Calendar startDate,
                                                           @NonNull Calendar endDate) {

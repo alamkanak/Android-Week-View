@@ -12,12 +12,17 @@ interface DateTimeInterpreter {
 }
 
 class DefaultDateTimeInterpreter(
-        context: Context
+        context: Context,
+        numberOfDays: Int
 ) : DateTimeInterpreter {
 
-    private val sdfDate = DateUtils.dateFormat
-    private val sdfTime = DateUtils.getTimeFormat(context)
+    private var sdfDate = DateUtils.getDefaultDateFormat(numberOfDays == 7)
+    private val sdfTime = DateUtils.getDefaultTimeFormat(context)
     private val calendar = Calendar.getInstance()
+
+    fun setNumberOfDays(numberOfDays: Int) {
+        sdfDate = DateUtils.getDefaultDateFormat(numberOfDays == 7)
+    }
 
     override fun interpretDate(date: Calendar): String {
         return sdfDate.format(date.time).toUpperCase()
