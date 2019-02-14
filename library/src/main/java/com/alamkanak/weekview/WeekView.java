@@ -20,8 +20,8 @@ import java.util.List;
 import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
-import static java.lang.Math.round;
 import static java.lang.Math.min;
+import static java.lang.Math.round;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
 
@@ -868,21 +868,31 @@ public final class WeekView<T> extends View
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Nullable
     public Calendar getMinDate() {
         return config.minDate;
     }
 
     public void setMinDate(Calendar minDate) {
-        config.minDate = DateExtKt.withTimeAtStartOfDay(minDate);
+        if (config.maxDate != null && config.maxDate.before(minDate)) {
+            throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
+        }
+
+        config.minDate = DateUtils.withTimeAtStartOfDay(minDate);
         invalidate();
     }
 
+    @Nullable
     public Calendar getMaxDate() {
         return config.maxDate;
     }
 
     public void setMaxDate(Calendar maxDate) {
-        config.maxDate = DateExtKt.withTimeAtEndOfDay(maxDate);
+        if (config.minDate != null && config.minDate.after(maxDate)) {
+            throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
+        }
+
+        config.maxDate = DateUtils.withTimeAtEndOfDay(maxDate);
         invalidate();
     }
 
@@ -1039,30 +1049,29 @@ public final class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(@NonNull Calendar date) {
-        //permits to move programmatically beyond the range border
-        // e.g goToDate(today()) shouldn't allow to jump out of the range
-        //forces to lower/upper limit of date range
-        if (config.minDate != null && date.before(config.minDate)) {
-            date = (Calendar) config.minDate.clone();
-        }else if (config.maxDate != null && date.after(config.maxDate)) {
-            date = (Calendar) config.maxDate.clone();
-            date.add(Calendar.DAY_OF_YEAR,1-config.numberOfVisibleDays);
-        }else if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
-            date = (Calendar) date.clone();
-            int diffFirst = config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
-            date.add(Calendar.DAY_OF_YEAR, (-1) * diffFirst);
+        Calendar modifiedDate = (Calendar) date.clone();
+
+        // If a minimum or maximum date is set, don't allow to go beyond them.
+        if (config.minDate != null && modifiedDate.before(config.minDate)) {
+            modifiedDate = (Calendar) config.minDate.clone();
+        } else if (config.maxDate != null && modifiedDate.after(config.maxDate)) {
+            modifiedDate = (Calendar) config.maxDate.clone();
+            modifiedDate.add(Calendar.DAY_OF_YEAR, 1 - config.numberOfVisibleDays);
+        } else if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
+            final int diff = config.drawingConfig.computeDifferenceWithFirstDayOfWeek(config, date);
+            modifiedDate.add(Calendar.DAY_OF_YEAR, (-1) * diff);
         }
 
         gestureHandler.forceScrollFinished();
 
         if (viewState.areDimensionsInvalid) {
-            viewState.setScrollToDay(date);
+            viewState.setScrollToDay(modifiedDate);
             return;
         }
 
         viewState.setShouldRefreshEvents(true);
 
-        int diff = DateUtils.getDaysUntilDate(date);
+        int diff = DateUtils.getDaysUntilDate(modifiedDate);
 
         config.drawingConfig.currentOrigin.x = diff * (-1) * config.getTotalDayWidth();
         viewState.requiresPostInvalidateOnAnimation = true;

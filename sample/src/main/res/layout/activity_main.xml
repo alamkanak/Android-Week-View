@@ -21,13 +21,6 @@
         style="@style/Button"/>
 
     <Button
-        android:id="@+id/buttonAsynchronous"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/title_activity_asynchronous"
-        style="@style/Button"/>
-
-    <Button
         android:id="@+id/buttonLimited"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,5 +33,12 @@
       android:layout_height="wrap_content"
       android:text="@string/title_activity_constraint"
       style="@style/Button"/>
+
+    <Button
+        android:id="@+id/buttonAsynchronous"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_activity_asynchronous"
+        style="@style/Button"/>
 
 </LinearLayout>
