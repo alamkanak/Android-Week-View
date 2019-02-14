@@ -32,7 +32,7 @@ internal class BackgroundGridDrawer(
         val linesPerDay = (gridHeight / config.hourHeight) + 1
         val overallLines = linesPerDay.roundToInt() * (config.numberOfVisibleDays + 1)
 
-        return FloatArray(max(overallLines, 0) * 4) // 4 lines make a cube in the grid
+        return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
     }
 
     private fun drawGrid(startX: Float, startPixel: Float, canvas: Canvas) {
