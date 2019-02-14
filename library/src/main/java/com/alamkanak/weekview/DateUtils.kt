@@ -62,7 +62,8 @@ internal object DateUtils {
      */
     @JvmStatic
     fun isSameDay(dayOne: Calendar, dayTwo: Calendar): Boolean {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR)
+        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR)
+                && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR)
     }
 
     /**

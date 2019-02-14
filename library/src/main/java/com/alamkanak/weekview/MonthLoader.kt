@@ -14,7 +14,7 @@ private class MonthLoader<T>(
 ) : WeekViewLoader<T> {
 
     override fun toWeekViewPeriodIndex(instance: Calendar): Double {
-        return ((instance.get(Calendar.YEAR) * 12).toDouble()
+        return (instance.get(Calendar.YEAR) * 12.0
                 + instance.get(Calendar.MONTH).toDouble()
                 + (instance.get(Calendar.DAY_OF_MONTH) - 1) / 30.0)
     }
@@ -37,8 +37,9 @@ private class MonthLoader<T>(
             set(Calendar.DAY_OF_MONTH, maxDays)
         }
 
-        return onMonthChangeListener?.onMonthChange(startDate, endDate).orEmpty()
-                .map { it.toWeekViewEvent() }
+        return onMonthChangeListener?.let {
+            it.onMonthChange(startDate, endDate).map { it.toWeekViewEvent() }
+        } ?: emptyList()
     }
 
 }

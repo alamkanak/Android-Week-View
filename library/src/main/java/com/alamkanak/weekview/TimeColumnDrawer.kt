@@ -22,11 +22,8 @@ private class TimeColumnDrawer(
 
         canvas.clipRect(0f, top, drawingConfig.timeColumnWidth, bottom.toFloat())
 
-        // The original header height
         val startHour = config.startHour
-
         val hourLines = FloatArray(HOURS_PER_DAY * 4)
-
         val hourStep = config.timeColumnHoursInterval
 
         for (i in startHour..HOURS_PER_DAY step hourStep) {
@@ -41,8 +38,7 @@ private class TimeColumnDrawer(
                 val x = drawingConfig.timeTextWidth + config.timeColumnPadding
                 var y = top + drawingConfig.timeTextHeight / 2
 
-                // if we show the hour separator in the time column, we move the time label below
-                // the separator
+                // If the hour separator is shown in the time column, move the time label below it
                 if (config.showTimeColumnHourSeparator) {
                     y += drawingConfig.timeTextHeight / 2 + config.hourSeparatorStrokeWidth + config.timeColumnPadding
                 }
