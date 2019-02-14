@@ -1,41 +1,38 @@
 package com.alamkanak.weekview.sample
 
 import android.graphics.RectF
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.constraint.Guideline
+import android.support.v7.app.AppCompatActivity
 import android.widget.SeekBar
 import android.widget.Toast
 import com.alamkanak.weekview.*
 import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.database.EventsDatabase
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase
+import kotlinx.android.synthetic.main.activity_constraint.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, MonthChangeListener<Event>,
         EventLongPressListener<Event>, EmptyViewLongPressListener {
 
-    lateinit var mWeekView: WeekView<Event>
-    var mDatabase: EventsDatabase? = null
+    private val weekView: WeekView<Event> by lazy { findViewById<WeekView<Event>>(R.id.weekView) }
+    private val database: EventsDatabase by lazy { FakeEventsDatabase(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_constraint)
 
-        mDatabase = FakeEventsDatabase(this)
-
-        mWeekView = findViewById(R.id.weekView)
-        mWeekView.setOnEventClickListener(this)
-        mWeekView.setMonthChangeListener(this)
-        mWeekView.setEventLongPressListener(this)
-        mWeekView.emptyViewLongPressListener = this
+        weekView.setOnEventClickListener(this)
+        weekView.setMonthChangeListener(this)
+        weekView.setEventLongPressListener(this)
+        weekView.emptyViewLongPressListener = this
 
         setupDateTimeInterpreter()
-        setupSeekbarAction()
+        setupSeekBarAction()
     }
 
-    fun getEventTitle(time: Calendar): String {
+    private fun getEventTitle(time: Calendar): String {
         val hour = time.get(Calendar.HOUR_OF_DAY)
         val minute = time.get(Calendar.MINUTE)
         val month = time.get(Calendar.MONTH) + 1
@@ -44,35 +41,29 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
     }
 
     override fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<Event>> {
-        return mDatabase!!.getEventsInRange(startDate, endDate)
+        return database.getEventsInRange(startDate, endDate)
     }
 
-    override fun onEventClick(event: Event, eventRect: RectF) {
-        Toast.makeText(this, "Clicked " + event.title, Toast.LENGTH_SHORT).show()
+    override fun onEventClick(data: Event, eventRect: RectF) {
+        Toast.makeText(this, "Clicked " + data.title, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEventLongPress(event: Event, eventRect: RectF) {
-        Toast.makeText(this, "Long pressed event: " + event.title, Toast.LENGTH_SHORT).show()
+    override fun onEventLongPress(data: Event, eventRect: RectF) {
+        Toast.makeText(this, "Long pressed event: " + data.title, Toast.LENGTH_SHORT).show()
     }
 
     override fun onEmptyViewLongPress(time: Calendar) {
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
     }
 
-    fun setupDateTimeInterpreter() {
-        mWeekView.dateTimeInterpreter = object : DateTimeInterpreter {
+    private fun setupDateTimeInterpreter() {
+        weekView.dateTimeInterpreter = object : DateTimeInterpreter {
+
+            private val sdfDate = SimpleDateFormat("E dd", Locale.getDefault())
 
             override fun interpretDate(date: Calendar): String {
-                val sdfDate = SimpleDateFormat("E dd", Locale.getDefault())
-                try {
-                    var result = sdfDate.format(date.time).replace(". ".toRegex(), "\n")
-                    result = result.substring(0, 1).toUpperCase() + result.substring(1)
-                    return result
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return ""
-                }
-
+                val result = sdfDate.format(date.time).replace(". ".toRegex(), "\n")
+                return result.substring(0, 1).toUpperCase() + result.substring(1)
             }
 
             override fun interpretTime(hour: Int): String {
@@ -80,34 +71,27 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
                 calendar.set(Calendar.HOUR_OF_DAY, hour)
                 calendar.set(Calendar.MINUTE, 0)
 
-                try {
-                    val sdfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                    return sdfTime.format(calendar.time)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return ""
-                }
-
+                val sdfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                return sdfTime.format(calendar.time)
             }
         }
     }
 
-    private fun setupSeekbarAction() {
-        val seekBar = findViewById<SeekBar>(R.id.seekBar)
-        seekBar.progress = 75
-        val guideline = findViewById<Guideline>(R.id.calendar_guideline)
+    private fun setupSeekBarAction() {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                // Nothing to do
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
 
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // Nothing to do
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                guideline.setGuidelinePercent(progress / 100f)
+                val adjustedProgress = SEEKBAR_MIN_VALUE + progress
+                guideline.setGuidelinePercent(adjustedProgress / 100f)
             }
         })
     }
+
+    companion object {
+        private const val SEEKBAR_MIN_VALUE = 50
+    }
+
 }
