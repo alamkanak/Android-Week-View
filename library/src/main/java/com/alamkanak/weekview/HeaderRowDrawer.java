@@ -11,13 +11,13 @@ class HeaderRowDrawer<T> {
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
 
-    private WeekViewCache<T> data;
+    private WeekViewCache<T> cache;
     private WeekViewViewState viewState;
 
-    HeaderRowDrawer(WeekViewConfig config, WeekViewCache<T> data, WeekViewViewState viewState) {
+    HeaderRowDrawer(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
         this.config = config;
         this.drawConfig = config.drawingConfig;
-        this.data = data;
+        this.cache = cache;
         this.viewState = viewState;
     }
 
@@ -32,7 +32,7 @@ class HeaderRowDrawer<T> {
     }
 
     private void refreshHeaderHeight(DrawingContext drawingContext) {
-        final List<EventChip<T>> eventChips = data.getAllDayEventChips();
+        final List<EventChip<T>> eventChips = cache.getAllDayEventChips();
         if (eventChips.isEmpty()) {
             drawConfig.hasEventInHeader = false;
             drawConfig.refreshHeaderHeight(config);
@@ -44,7 +44,7 @@ class HeaderRowDrawer<T> {
         }
 
         List<Calendar> dateRange = drawingContext.getVisibleDateRange(firstVisibleDay, config);
-        List<WeekViewEvent<T>> visibleEvents = data.getAllDayEventsInRange(dateRange);
+        List<WeekViewEvent<T>> visibleEvents = cache.getAllDayEventsInRange(dateRange);
 
         boolean containsAllDayEvent = false;
         for (WeekViewEvent<T> event : visibleEvents) {

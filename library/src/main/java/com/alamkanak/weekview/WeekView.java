@@ -37,7 +37,7 @@ public final class WeekView<T> extends View
 
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawConfig;
-    private WeekViewCache<T> data;
+    private WeekViewCache<T> cache;
 
     private WeekViewViewState viewState;
     private WeekViewGestureHandler<T> gestureHandler;
@@ -67,22 +67,22 @@ public final class WeekView<T> extends View
         drawConfig = new WeekViewDrawingConfig(context, config);
         config.drawingConfig = drawConfig;
 
-        data = new WeekViewCache<>();
+        cache = new WeekViewCache<>();
         viewState = new WeekViewViewState();
 
-        gestureHandler = new WeekViewGestureHandler<>(context, this, config, data);
+        gestureHandler = new WeekViewGestureHandler<>(context, this, config, cache);
 
         eventsDrawer = new EventsDrawer<>(config);
         timeColumnDrawer = new TimeColumnDrawer(config);
 
-        headerRowDrawer = new HeaderRowDrawer<>(config, data, viewState);
+        headerRowDrawer = new HeaderRowDrawer<>(config, cache, viewState);
         dayLabelDrawer = new DayLabelDrawer(config);
 
         dayBackgroundDrawer = new DayBackgroundDrawer(config);
         backgroundGridDrawer = new BackgroundGridDrawer(config);
         nowLineDrawer = new NowLineDrawer(config);
 
-        eventChipsProvider = new EventChipsProvider<>(config, data, viewState);
+        eventChipsProvider = new EventChipsProvider<>(cache, viewState);
         eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
     }
 
@@ -145,12 +145,12 @@ public final class WeekView<T> extends View
         eventChipsProvider.loadEventsIfNecessary(this, drawingContext.getDateRange());
 
         List<Pair<EventChip<T>, StaticLayout>> allDayEvents =
-                eventsDrawer.prepareDrawAllDayEvents(data.getAllDayEventChips(), drawingContext);
+                eventsDrawer.prepareDrawAllDayEvents(cache.getAllDayEventChips(), drawingContext);
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
         backgroundGridDrawer.draw(drawingContext, canvas);
 
-        eventsDrawer.drawSingleEvents(data.getNormalEventChips(), drawingContext, canvas);
+        eventsDrawer.drawSingleEvents(cache.getNormalEventChips(), drawingContext, canvas);
 
         nowLineDrawer.draw(drawingContext, canvas);
         headerRowDrawer.draw(drawingContext, canvas);
@@ -196,7 +196,7 @@ public final class WeekView<T> extends View
 
     private void prepareEventDrawing(Canvas canvas) {
         // Clear the cache for event rectangles.
-        data.clearEventChipsCache();
+        cache.clearEventChipsCache();
         canvas.save();
         clipEventsRect(canvas);
     }

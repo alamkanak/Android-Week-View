@@ -12,15 +12,12 @@ import static java.util.Calendar.MINUTE;
 
 class EventChipsProvider<T> {
 
-    private WeekViewConfig config;
-    private WeekViewCache<T> data;
+    private WeekViewCache<T> cache;
     private WeekViewLoader<T> weekViewLoader;
     private WeekViewViewState viewState;
 
-    EventChipsProvider(WeekViewConfig config,
-                       WeekViewCache<T> data, WeekViewViewState viewState) {
-        this.config = config;
-        this.data = data;
+    EventChipsProvider(WeekViewCache<T> cache, WeekViewViewState viewState) {
+        this.cache = cache;
         this.viewState = viewState;
     }
 
@@ -39,11 +36,11 @@ class EventChipsProvider<T> {
         }
 
         for (Calendar day : dayRange) {
-            final boolean hasNoEvents = data.getAllEventChips().isEmpty();
+            final boolean hasNoEvents = cache.getAllEventChips().isEmpty();
 
             final boolean needsToFetchPeriod =
-                    data.getFetchedPeriod() != weekViewLoader.toWeekViewPeriodIndex(day)
-                    && abs(data.getFetchedPeriod() - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
+                    cache.getFetchedPeriod() != weekViewLoader.toWeekViewPeriodIndex(day)
+                    && abs(cache.getFetchedPeriod() - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
             if (hasNoEvents || viewState.getShouldRefreshEvents() || needsToFetchPeriod) {
@@ -68,7 +65,7 @@ class EventChipsProvider<T> {
 
         // If a refresh was requested then reset some variables.
         if (viewState.getShouldRefreshEvents()) {
-            data.clear();
+            cache.clear();
         }
 
         if (weekViewLoader != null) {
@@ -81,8 +78,8 @@ class EventChipsProvider<T> {
 
     private void loadEvents(Calendar day) {
         final int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
-        final boolean isRefreshEligible = data.getFetchedPeriod() < 0
-                || data.getFetchedPeriod() != periodToFetch
+        final boolean isRefreshEligible = cache.getFetchedPeriod() < 0
+                || cache.getFetchedPeriod() != periodToFetch
                 || viewState.getShouldRefreshEvents();
 
         if (!isRefreshEligible) {
@@ -93,18 +90,18 @@ class EventChipsProvider<T> {
         List<WeekViewEvent<T>> currentPeriodEvents = null;
         List<WeekViewEvent<T>> nextPeriodEvents = null;
 
-        if (data.getPreviousPeriodEvents() != null
-                && data.getCurrentPeriodEvents() != null && data.getNextPeriodEvents() != null) {
-            if (periodToFetch == data.getFetchedPeriod() - 1) {
-                currentPeriodEvents = data.getPreviousPeriodEvents();
-                nextPeriodEvents = data.getCurrentPeriodEvents();
-            } else if (periodToFetch == data.getFetchedPeriod()) {
-                previousPeriodEvents = data.getPreviousPeriodEvents();
-                currentPeriodEvents = data.getCurrentPeriodEvents();
-                nextPeriodEvents = data.getNextPeriodEvents();
-            } else if (periodToFetch == data.getFetchedPeriod() + 1) {
-                previousPeriodEvents = data.getCurrentPeriodEvents();
-                currentPeriodEvents = data.getNextPeriodEvents();
+        if (cache.getPreviousPeriodEvents() != null
+                && cache.getCurrentPeriodEvents() != null && cache.getNextPeriodEvents() != null) {
+            if (periodToFetch == cache.getFetchedPeriod() - 1) {
+                currentPeriodEvents = cache.getPreviousPeriodEvents();
+                nextPeriodEvents = cache.getCurrentPeriodEvents();
+            } else if (periodToFetch == cache.getFetchedPeriod()) {
+                previousPeriodEvents = cache.getPreviousPeriodEvents();
+                currentPeriodEvents = cache.getCurrentPeriodEvents();
+                nextPeriodEvents = cache.getNextPeriodEvents();
+            } else if (periodToFetch == cache.getFetchedPeriod() + 1) {
+                previousPeriodEvents = cache.getCurrentPeriodEvents();
+                currentPeriodEvents = cache.getNextPeriodEvents();
             }
         }
 
@@ -121,20 +118,20 @@ class EventChipsProvider<T> {
         }
 
         // Clear events.
-        data.getAllEventChips().clear();
-        data.sortAndCacheEvents(previousPeriodEvents);
-        data.sortAndCacheEvents(currentPeriodEvents);
-        data.sortAndCacheEvents(nextPeriodEvents);
+        cache.getAllEventChips().clear();
+        cache.sortAndCacheEvents(previousPeriodEvents);
+        cache.sortAndCacheEvents(currentPeriodEvents);
+        cache.sortAndCacheEvents(nextPeriodEvents);
 
-        data.setPreviousPeriodEvents(previousPeriodEvents);
-        data.setCurrentPeriodEvents(currentPeriodEvents);
-        data.setNextPeriodEvents(nextPeriodEvents);
-        data.setFetchedPeriod(periodToFetch);
+        cache.setPreviousPeriodEvents(previousPeriodEvents);
+        cache.setCurrentPeriodEvents(currentPeriodEvents);
+        cache.setNextPeriodEvents(nextPeriodEvents);
+        cache.setFetchedPeriod(periodToFetch);
     }
 
     private void calculateEventChipPositions() {
         // Prepare to calculate positions of each events.
-        final List<EventChip<T>> tempEvents = data.getAllEventChips();
+        final List<EventChip<T>> tempEvents = cache.getAllEventChips();
         final List<EventChip<T>> results = new ArrayList<>();
 
         // Iterate through each day with events to calculate the position of the events.
@@ -162,7 +159,7 @@ class EventChipsProvider<T> {
             results.addAll(eventChips);
         }
 
-        data.put(results);
+        cache.put(results);
     }
 
     /**

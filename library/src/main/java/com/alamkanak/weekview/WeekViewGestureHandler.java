@@ -25,7 +25,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 
     private Listener listener;
 
-    private WeekViewCache<T> data;
+    private WeekViewCache<T> cache;
     private WeekViewConfig config;
     private WeekViewDrawingConfig drawingConfig;
 
@@ -52,10 +52,10 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     private ScrollListener scrollListener;
 
     WeekViewGestureHandler(Context context, View view,
-                           WeekViewConfig config, WeekViewCache<T> data) {
+                           WeekViewConfig config, WeekViewCache<T> cache) {
         this.listener = (Listener) view;
 
-        this.data = data;
+        this.cache = cache;
         this.config = config;
         this.drawingConfig = config.drawingConfig;
 
@@ -279,7 +279,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     }
 
     private EventChip<T> findHitEvent(MotionEvent e) {
-        final List<EventChip<T>> eventChips = data.getAllEventChips();
+        final List<EventChip<T>> eventChips = cache.getAllEventChips();
         for (EventChip<T> eventChip : eventChips) {
             if (eventChip.isHit(e)) {
                 return eventChip;
