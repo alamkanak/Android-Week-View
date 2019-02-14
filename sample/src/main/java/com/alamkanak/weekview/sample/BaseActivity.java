@@ -4,7 +4,6 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -99,11 +98,6 @@ public class BaseActivity extends AppCompatActivity
         item.setChecked(!item.isChecked());
         mWeekViewType = TYPE_DAY_VIEW;
         mWeekView.setNumberOfVisibleDays(1);
-
-        // Lets change some dimensions to best fit the view.
-        mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
-        mWeekView.setTimeColumnTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-        mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
     }
 
     private void openThreeDayView(MenuItem item) {
@@ -114,11 +108,6 @@ public class BaseActivity extends AppCompatActivity
         item.setChecked(!item.isChecked());
         mWeekViewType = TYPE_THREE_DAY_VIEW;
         mWeekView.setNumberOfVisibleDays(3);
-
-        // Lets change some dimensions to best fit the view.
-        mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
-        mWeekView.setTimeColumnTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-        mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
     }
 
     private void openWeekView(MenuItem item) {
@@ -129,11 +118,6 @@ public class BaseActivity extends AppCompatActivity
         item.setChecked(!item.isChecked());
         mWeekViewType = TYPE_WEEK_VIEW;
         mWeekView.setNumberOfVisibleDays(7);
-
-        // Lets change some dimensions to best fit the view.
-        mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
-        mWeekView.setTimeColumnTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
-        mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
     }
 
     /**

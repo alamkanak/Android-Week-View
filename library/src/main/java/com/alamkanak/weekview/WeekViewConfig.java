@@ -206,7 +206,6 @@ public class WeekViewConfig {
 
     void setNumberOfVisibleDays(int numberOfVisibleDays) {
         this.numberOfVisibleDays = numberOfVisibleDays;
-        drawingConfig.resetOrigin();
     }
 
     void setTimeColumnTextSize(int timeColumnTextSize) {
