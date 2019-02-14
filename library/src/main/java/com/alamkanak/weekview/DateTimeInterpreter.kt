@@ -16,12 +16,12 @@ class DefaultDateTimeInterpreter(
         numberOfDays: Int
 ) : DateTimeInterpreter {
 
-    private var sdfDate = DateUtils.getDefaultDateFormat(numberOfDays == 7)
+    private var sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)
     private val sdfTime = DateUtils.getDefaultTimeFormat(context)
     private val calendar = Calendar.getInstance()
 
     fun setNumberOfDays(numberOfDays: Int) {
-        sdfDate = DateUtils.getDefaultDateFormat(numberOfDays == 7)
+        sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)
     }
 
     override fun interpretDate(date: Calendar): String {

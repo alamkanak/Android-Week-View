@@ -91,11 +91,11 @@ internal object DateUtils {
         return Calendar.getInstance().withTimeAtStartOfDay()
     }
 
-    fun getDefaultDateFormat(isWeek: Boolean): SimpleDateFormat {
-        return if (isWeek) {
-            SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display only the first character
-        } else {
-            SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display the first three characters
+    fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
+        return when (numberOfDays) {
+            7 -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character
+            1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // display full weekday
+            else -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display first three characters
         }
     }
 
