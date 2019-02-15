@@ -1,6 +1,27 @@
 Changelog
 =========
 
+## Version 3.2.1
+*(2019-02-15)*
+- This release fixes a JitPack build error, which caused an exception when adding this library to a project. 
+
+## Version 3.2
+*(2019-02-15)*
+- New: Better interoperability with Kotlin by adding nullability information and lambda methods to WeekView
+- New: You can limit the date range of the calendar via `weekView.setMinDate(date)` and `weekView.setMaxDate(date)`.
+- New: You can customize the interval of hours displayed in the time column.
+- New: You can choose to display the hour separators in the time column.
+- New: You can set a custom text color for individual events, via `weekViewEvent.setTextColor(int textColor)`.
+- New: The text size of all-day events can now be set via `allDayEventTextSize`. The height of all-day event chips will adapt accordingly. In the same breath, this release deprecates `allDayEventHeight`.
+- Improved: Events that span multiple days no longer show a corner radius at the end of a day if they continue on the next day, or at the beginning of a day if they began on the previous day.
+- Improved: The paddings in the header have been tweaked to be more consistent.
+- Fixed: Events after the change to daylight saving time were displayed on the wrong date.
+- Fixed: Changing the number of days no longer scrolls the calendar back to the current date.
+- Fixed: When `showFirstDayOfWeekFirst` is set, WeekView now displays the correct day, depending on your setting of `firstDayOfWeek`.
+- Fixed: While scrolling, the header would sometimes shrink even if all-day events were visible. This is no longer the case.
+
+Thanks [Bwaim](https://github.com/Bwaim) and [cs8898](https://github.com/cs8898) for contributing to this release!
+
 ## Version 3.1.3
 *(2018-12-01)*
 - Fix bug where `onMonthChange` was called with the wrong month (thanks for submitting the issue, [tylermarien](https://github.com/tylermarien)!)
