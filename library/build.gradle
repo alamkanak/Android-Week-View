@@ -10,9 +10,6 @@ repositories {
     }
 }
 
-group='com.github.thellmund'
-version='3.2'
-
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
@@ -29,4 +26,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'https://raw.githubusercontent.com/Commit451/gradle-android-javadocs/1.0.0/gradle-android-javadocs.gradle'
+//apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
