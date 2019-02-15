@@ -21,6 +21,7 @@
         app:nowLineDotColor="@color/accent"
         app:nowLineDotRadius="5dp"
         app:nowLineStrokeWidth="1dp"
+        app:showCurrentTimeFirst="true"
         app:numberOfVisibleDays="3"
         app:overlappingEventGap="1dp"
         app:showHeaderRowBottomLine="true"

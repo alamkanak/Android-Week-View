@@ -137,8 +137,8 @@ public final class WeekView<T> extends View
         prepareEventDrawing(canvas);
 
         if (viewState.isFirstDraw()) {
-            viewState.setFirstDraw(false);
             config.drawingConfig.moveCurrentOriginIfFirstDraw(config);
+            viewState.setFirstDraw(false);
         }
 
         final DrawingContext drawingContext = DrawingContext.create(config);

@@ -19,6 +19,7 @@ public class WeekViewConfig {
     int firstDayOfWeek;
     int numberOfVisibleDays;
     boolean showFirstDayOfWeekFirst;
+    boolean showCurrentTimeFirst;
 
     // Header bottom line
     boolean showHeaderRowBottomLine;
@@ -115,6 +116,7 @@ public class WeekViewConfig {
             firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, Calendar.MONDAY);
             numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3);
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false);
+            showCurrentTimeFirst = a.getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false);
 
             // Header bottom line
             showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false);

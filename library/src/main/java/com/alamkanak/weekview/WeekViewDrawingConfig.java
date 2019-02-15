@@ -16,6 +16,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.Calendar.DAY_OF_WEEK;
 import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MINUTE;
 
 class WeekViewDrawingConfig {
 
@@ -191,8 +192,11 @@ class WeekViewDrawingConfig {
 
         if (isWeekView && currentDayIsNotToday && config.showFirstDayOfWeekFirst) {
             int difference = computeDifferenceWithFirstDayOfWeek(config, today);
-
             currentOrigin.x += (widthPerDay + config.columnGap) * difference;
+        }
+
+        if (config.showCurrentTimeFirst) {
+            computeDifferenceWithCurrentTime(config);
         }
 
         // Overwrites the origin when today is out of date range
@@ -200,6 +204,29 @@ class WeekViewDrawingConfig {
         float maxX = config.getMaxX();
         currentOrigin.x = Math.min(currentOrigin.x,maxX);
         currentOrigin.x = Math.max(currentOrigin.x,minX);
+    }
+
+    private void computeDifferenceWithCurrentTime(WeekViewConfig config) {
+        final Calendar desired = Calendar.getInstance();
+
+        if (desired.get(HOUR_OF_DAY) > 0) {
+            // Add some padding above the current time (and thus: the now line)
+            desired.add(HOUR_OF_DAY, -1);
+        }
+
+        final int hour = desired.get(HOUR_OF_DAY);
+        final int minutes = desired.get(MINUTE);
+        final float fraction = (float) minutes / Constants.MINUTES_PER_HOUR;
+
+        float verticalOffset = config.hourHeight * (hour + fraction);
+
+        final float dayHeight = config.getTotalDayHeight();
+        final double viewHeight = WeekView.getViewHeight();
+
+        final double desiredOffset = dayHeight - viewHeight;
+        verticalOffset = min((float) desiredOffset, verticalOffset);
+
+        config.drawingConfig.currentOrigin.y = verticalOffset * (-1);
     }
 
     int computeDifferenceWithFirstDayOfWeek(@NonNull WeekViewConfig config ,@NonNull Calendar date) {

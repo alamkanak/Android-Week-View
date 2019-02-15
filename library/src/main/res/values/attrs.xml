@@ -15,6 +15,7 @@
         </attr>
         <attr name="numberOfVisibleDays" format="integer" />
         <attr name="showFirstDayOfWeekFirst" format="boolean" />
+        <attr name="showCurrentTimeFirst" format="boolean" />
 
         <!-- Header bottom line -->
         <attr name="showHeaderRowBottomLine" format="boolean" />
