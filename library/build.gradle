@@ -10,6 +10,9 @@ repositories {
     }
 }
 
+group='com.github.thellmund'
+version='3.2'
+
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
