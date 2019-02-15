@@ -86,11 +86,11 @@ public final class WeekView<T> extends View
         eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
     }
 
-    public static int getViewWidth() {
+    static int getViewWidth() {
         return width;
     }
 
-    public static int getViewHeight() {
+    static int getViewHeight() {
         return height;
     }
 
@@ -394,6 +394,33 @@ public final class WeekView<T> extends View
         invalidate();
     }
 
+    public boolean isShowMidnightHour() {
+        return config.showMidnightHour;
+    }
+
+    public void setShowMidnightHour(boolean showMidnightHour) {
+        config.showMidnightHour = showMidnightHour;
+        invalidate();
+    }
+
+    public boolean showTimeColumnHourSeparator() {
+        return config.showTimeColumnHourSeparator;
+    }
+
+    public void setShowTimeColumnHourSeparator(boolean show) {
+        config.showTimeColumnHourSeparator = show;
+        invalidate();
+    }
+
+    public int getTimeColumnHoursInterval() {
+        return config.timeColumnHoursInterval;
+    }
+
+    public void setTimeColumnHoursInterval(int interval) {
+        config.timeColumnHoursInterval = interval;
+        invalidate();
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //  Time column separator
@@ -423,7 +450,7 @@ public final class WeekView<T> extends View
     }
 
     public void setTimeColumnSeparatorWidth(int timeColumnSeparatorStrokeWidth) {
-        config.timeColumnSeparatorStrokeWidth= timeColumnSeparatorStrokeWidth;
+        config.timeColumnSeparatorStrokeWidth = timeColumnSeparatorStrokeWidth;
         invalidate();
     }
 
@@ -492,8 +519,17 @@ public final class WeekView<T> extends View
         return config.eventTextSize;
     }
 
+    public int getAllDayEventTextSize() {
+        return config.allDayEventTextSize;
+    }
+
     public void setEventTextSize(int eventTextSize) {
         config.setEventTextSize(eventTextSize);
+        invalidate();
+    }
+
+    public void setAllDayEventTextSize(int allDayEventTextSize) {
+        config.setAllDayEventTextSize(allDayEventTextSize);
         invalidate();
     }
 
@@ -671,7 +707,32 @@ public final class WeekView<T> extends View
         invalidate();
     }
 
-    // TODO: Min/max hour height
+    public int getMinHourHeight() {
+        return config.minHourHeight;
+    }
+
+    public void setMinHourHeight(int minHourHeight) {
+        config.minHourHeight = minHourHeight;
+        invalidate();
+    }
+
+    public int getMaxHourHeight() {
+        return config.maxHourHeight;
+    }
+
+    public void setMaxHourHeight(int maxHourHeight) {
+        config.maxHourHeight = maxHourHeight;
+        invalidate();
+    }
+
+    public boolean isShowCompleteDay() {
+        return config.showCompleteDay;
+    }
+
+    public void setShowCompleteDay(boolean showCompleteDay) {
+        config.showCompleteDay = true;
+        invalidate();
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -871,7 +932,7 @@ public final class WeekView<T> extends View
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
-    //  Min Max Date
+    //  Date range
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

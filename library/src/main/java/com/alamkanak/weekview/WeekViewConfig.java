@@ -30,7 +30,7 @@ public class WeekViewConfig {
     int timeColumnBackgroundColor;
     int timeColumnPadding;
     int timeColumnTextSize;
-    private boolean showMidnightHour;
+    boolean showMidnightHour;
     boolean showTimeColumnHourSeparator;
     int timeColumnHoursInterval;
 
@@ -45,7 +45,6 @@ public class WeekViewConfig {
     int headerRowTextSize;
     int headerRowPadding;
     int todayHeaderTextColor;
-    int headerMarginBottom;
 
     // Event chips
     int eventCornerRadius;
@@ -142,7 +141,6 @@ public class WeekViewConfig {
             headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context));
             headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10);
             todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR);
-            headerMarginBottom = a.getDimensionPixelSize(R.styleable.WeekView_headerMarginBottom, 0);
 
             // Event chips
             eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0);
@@ -248,6 +246,11 @@ public class WeekViewConfig {
     void setEventTextSize(int eventTextSize) {
         this.eventTextSize = eventTextSize;
         drawingConfig.eventTextPaint.setTextSize(eventTextSize);
+    }
+
+    void setAllDayEventTextSize(int allDayEventTextSize) {
+        this.allDayEventTextSize = allDayEventTextSize;
+        drawingConfig.allDayEventTextPaint.setTextSize(allDayEventTextSize);
     }
 
     void setEventTextColor(int eventTextColor) {

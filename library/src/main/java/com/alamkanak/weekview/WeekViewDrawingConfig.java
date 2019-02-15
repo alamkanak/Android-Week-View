@@ -41,7 +41,6 @@ class WeekViewDrawingConfig {
     Paint dayBackgroundPaint;
     Paint hourSeparatorPaint;
     Paint daySeparatorPaint;
-    private float headerMarginBottom;
 
     Paint todayBackgroundPaint;
     private Paint futureBackgroundPaint;
@@ -155,15 +154,13 @@ class WeekViewDrawingConfig {
         allDayEventTextPaint.setColor(config.eventTextColor);
         allDayEventTextPaint.setTextSize(config.allDayEventTextSize);
 
-        headerMarginBottom = config.headerMarginBottom;
-
         currentAllDayEventHeight = 0;
         hasEventInHeader = false;
         refreshHeaderHeight(config);
     }
 
   void refreshHeaderHeight(WeekViewConfig config) {
-      headerHeight = config.headerRowPadding * 2 + headerTextHeight + headerMarginBottom;
+      headerHeight = config.headerRowPadding * 2 + headerTextHeight;
       if (config.showHeaderRowBottomLine) {
           headerHeight += config.headerRowBottomLineWidth;
       }
@@ -244,9 +241,7 @@ class WeekViewDrawingConfig {
     }
 
     float getTotalHeaderHeight(WeekViewConfig config) {
-        return headerHeight
-                + (config.headerRowPadding * 2f)
-                + headerMarginBottom;
+        return headerHeight + (config.headerRowPadding * 2f);
     }
 
     float getTotalTimeColumnWidth(WeekViewConfig config) {

@@ -41,7 +41,6 @@
         <attr name="headerRowPadding" format="dimension" />
         <attr name="headerRowTextSize" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
-        <attr name="headerMarginBottom" format="dimension" />
 
         <!-- Event chips -->
         <attr name="eventCornerRadius" format="dimension" />
