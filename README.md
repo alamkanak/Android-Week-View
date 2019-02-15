@@ -11,6 +11,7 @@ Features
 * Extensive styling customization possible
 * Infinite horizontal scrolling
 * Interactive via event click listeners
+* Interoperable with Kotlin
 
 Usage
 ---------
