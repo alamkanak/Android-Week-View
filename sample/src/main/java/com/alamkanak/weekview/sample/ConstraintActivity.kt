@@ -10,6 +10,7 @@ import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.database.EventsDatabase
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase
 import kotlinx.android.synthetic.main.activity_constraint.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, MonthChangeListener<Event>,
@@ -28,6 +29,7 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
         weekView.emptyViewLongPressListener = this
 
         setupSeekBarAction()
+        setupDateTimeInterpreter()
     }
 
     private fun getEventTitle(time: Calendar): String {
@@ -65,6 +67,27 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
                 guideline.setGuidelinePercent(adjustedProgress / 100f)
             }
         })
+    }
+
+    private fun setupDateTimeInterpreter() {
+        weekView.dateTimeInterpreter = object : DateTimeInterpreter {
+
+            private val sdfDate = SimpleDateFormat("E dd", Locale.getDefault())
+
+            override fun interpretDate(date: Calendar): String {
+                val result = sdfDate.format(date.time).replace(" ".toRegex(), "\n")
+                return result.substring(0, 1).toUpperCase() + result.substring(1)
+            }
+
+            override fun interpretTime(hour: Int): String {
+                val calendar = Calendar.getInstance()
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, 0)
+
+                val sdfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+                return sdfTime.format(calendar.time)
+            }
+        }
     }
 
     companion object {
