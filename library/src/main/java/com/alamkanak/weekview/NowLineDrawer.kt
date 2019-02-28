@@ -28,7 +28,7 @@ private class NowLineDrawer(
         val now = Calendar.getInstance()
 
         // Draw line
-        val portionOfDay = now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f
+        val portionOfDay = (now.get(HOUR_OF_DAY) - config.minHour) + now.get(MINUTE) / 60.0f
         val beforeNow = portionOfDay * config.hourHeight
         val lineStartY = startY + beforeNow
         val lineStopX = startPixel + drawConfig.widthPerDay
