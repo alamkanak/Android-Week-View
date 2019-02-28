@@ -9,12 +9,14 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import static com.alamkanak.weekview.Constants.MINUTES_PER_HOUR;
 import static com.alamkanak.weekview.DateUtils.isAtStartOfNewDay;
 import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfDay;
 import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfPeriod;
 import static com.alamkanak.weekview.DateUtils.withTimeAtStartOfPeriod;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
+import static java.util.Calendar.MINUTE;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -93,12 +95,22 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.startTime = startTime;
     }
 
+    int getEffectiveStartMinutes(WeekViewConfig config) {
+        final int startHour = startTime.get(HOUR_OF_DAY) - config.minHour;
+        return startHour * MINUTES_PER_HOUR + startTime.get(MINUTE);
+    }
+
     public Calendar getEndTime() {
         return endTime;
     }
 
     public void setEndTime(Calendar endTime) {
         this.endTime = endTime;
+    }
+
+    int getEffectiveEndMinutes(WeekViewConfig config) {
+        final int endHour = endTime.get(HOUR_OF_DAY) - config.minHour;
+        return endHour * MINUTES_PER_HOUR + endTime.get(MINUTE);
     }
 
     public String getTitle() {
@@ -231,7 +243,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         boolean isAtStartOfNewPeriod = config.minHour == 0 && isAtStartOfNewDay(startTime, newEndTime);
 
         if (isAtStartOfNewPeriod) {
-            // Set end time to 1ms before midnight to ensure the EventRect will get drawn correctly
+            // Set end time to 1ms before midnight to ensure the event rect will get drawn correctly
             WeekViewEvent<T> shortenedEvent = shortenTooLongAllDayEvent(newEndTime);
             events.add(shortenedEvent);
         } else if (!isSameDay(newEndTime)) {

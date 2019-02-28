@@ -7,8 +7,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import static java.lang.Math.abs;
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MINUTE;
 
 class EventChipsProvider<T> {
 
@@ -249,14 +247,11 @@ class EventChipsProvider<T> {
                     eventChip.left = j / columns.size();
 
                     if (!eventChip.event.isAllDay()) {
-                        int realStartHour = eventChip.event.getStartTime().get(HOUR_OF_DAY) - config.minHour;
-                        eventChip.top = realStartHour * 60 + eventChip.event.getStartTime().get(MINUTE);
-
-                        int realEndHour = eventChip.event.getEndTime().get(HOUR_OF_DAY) - config.minHour;
-                        eventChip.bottom = realEndHour * 60 + eventChip.event.getEndTime().get(MINUTE);
+                        eventChip.top = eventChip.event.getEffectiveStartMinutes(config);
+                        eventChip.bottom = eventChip.event.getEffectiveEndMinutes(config);
                     } else {
                         eventChip.top = 0;
-                        eventChip.bottom = 100; // TODO
+                        eventChip.bottom = 100;
                     }
                 }
                 j++;
