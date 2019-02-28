@@ -54,7 +54,7 @@ final class WeekViewTouchHandler {
                 final float pixelsFromZero = touchY - originY - drawingConfig.headerHeight;
                 final int hour = (int) (pixelsFromZero / hourHeight);
                 final int minute = (int) (60 * (pixelsFromZero - hour * hourHeight) / hourHeight);
-                day.add(Calendar.HOUR, hour);
+                day.add(Calendar.HOUR, hour + config.minHour);
                 day.set(Calendar.MINUTE, minute);
                 return day;
             }
