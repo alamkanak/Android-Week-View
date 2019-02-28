@@ -13,14 +13,16 @@ private class NowLineDrawer(
     private val drawConfig: WeekViewDrawingConfig = config.drawingConfig
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        val startPixel = drawingContext
+        if (config.showNowLine) {
+              val startPixel = drawingContext
                 .getDateRangeWithStartPixels(config)
                 .filter { it.first.isToday }
                 .map { it.second }
                 .firstOrNull() ?: return
 
-        val startX = max(startPixel, drawConfig.timeColumnWidth)
-        drawLine(startX, startPixel, canvas)
+                val startX = max(startPixel, drawConfig.timeColumnWidth)
+                drawLine(startX, startPixel, canvas)
+        }
     }
 
     private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {
