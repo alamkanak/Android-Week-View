@@ -12,11 +12,13 @@ import static java.util.Calendar.MINUTE;
 
 class EventChipsProvider<T> {
 
+    private WeekViewConfig config;
     private WeekViewCache<T> cache;
     private WeekViewLoader<T> weekViewLoader;
     private WeekViewViewState viewState;
 
-    EventChipsProvider(WeekViewCache<T> cache, WeekViewViewState viewState) {
+    EventChipsProvider(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
+        this.config = config;
         this.cache = cache;
         this.viewState = viewState;
     }
@@ -25,7 +27,7 @@ class EventChipsProvider<T> {
         this.weekViewLoader = weekViewLoader;
     }
 
-    void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
+    void loadEventsIfNecessary(View view, WeekViewConfig config, List<Calendar> dayRange) {
         if (view.isInEditMode()) {
             return;
         }
@@ -37,14 +39,13 @@ class EventChipsProvider<T> {
 
         for (Calendar day : dayRange) {
             final boolean hasNoEvents = cache.getAllEventChips().isEmpty();
-
             final boolean needsToFetchPeriod =
                     cache.getFetchedPeriod() != weekViewLoader.toWeekViewPeriodIndex(day)
                     && abs(cache.getFetchedPeriod() - weekViewLoader.toWeekViewPeriodIndex(day)) > 0.5;
 
             // Check if this particular day has been fetched
             if (hasNoEvents || viewState.getShouldRefreshEvents() || needsToFetchPeriod) {
-                loadEventsAndCalculateEventChipPositions(view, day);
+                loadEventsAndCalculateEventChipPositions(view, config, day);
                 viewState.setShouldRefreshEvents(false);
             }
         }
@@ -57,7 +58,8 @@ class EventChipsProvider<T> {
      *
      * @param day The day the user is currently in.
      */
-    private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
+    private void loadEventsAndCalculateEventChipPositions(View view,
+                                                          WeekViewConfig config, Calendar day) {
         // Get more events if the month is changed.
         if (weekViewLoader == null && !view.isInEditMode()) {
             throw new IllegalStateException("You must provide a MonthChangeListener");
@@ -69,14 +71,14 @@ class EventChipsProvider<T> {
         }
 
         if (weekViewLoader != null) {
-            loadEvents(day);
+            loadEvents(config, day);
         }
 
         // Prepare to calculate positions of each events.
         calculateEventChipPositions();
     }
 
-    private void loadEvents(Calendar day) {
+    private void loadEvents(WeekViewConfig config, Calendar day) {
         final int periodToFetch = (int) weekViewLoader.toWeekViewPeriodIndex(day);
         final boolean isRefreshEligible = cache.getFetchedPeriod() < 0
                 || cache.getFetchedPeriod() != periodToFetch
@@ -119,9 +121,9 @@ class EventChipsProvider<T> {
 
         // Clear events.
         cache.getAllEventChips().clear();
-        cache.sortAndCacheEvents(previousPeriodEvents);
-        cache.sortAndCacheEvents(currentPeriodEvents);
-        cache.sortAndCacheEvents(nextPeriodEvents);
+        cache.sortAndCacheEvents(config, previousPeriodEvents);
+        cache.sortAndCacheEvents(config, currentPeriodEvents);
+        cache.sortAndCacheEvents(config, nextPeriodEvents);
 
         cache.setPreviousPeriodEvents(previousPeriodEvents);
         cache.setCurrentPeriodEvents(currentPeriodEvents);
@@ -247,13 +249,14 @@ class EventChipsProvider<T> {
                     eventChip.left = j / columns.size();
 
                     if (!eventChip.event.isAllDay()) {
-                        eventChip.top = eventChip.event.getStartTime().get(HOUR_OF_DAY) * 60
-                                + eventChip.event.getStartTime().get(MINUTE);
-                        eventChip.bottom = eventChip.event.getEndTime().get(HOUR_OF_DAY) * 60
-                                + eventChip.event.getEndTime().get(MINUTE);
+                        int realStartHour = eventChip.event.getStartTime().get(HOUR_OF_DAY) - config.minHour;
+                        eventChip.top = realStartHour * 60 + eventChip.event.getStartTime().get(MINUTE);
+
+                        int realEndHour = eventChip.event.getEndTime().get(HOUR_OF_DAY) - config.minHour;
+                        eventChip.bottom = realEndHour * 60 + eventChip.event.getEndTime().get(MINUTE);
                     } else {
                         eventChip.top = 0;
-                        eventChip.bottom = 100; // config.maxAllDayEventHeight;
+                        eventChip.bottom = 100; // TODO
                     }
                 }
                 j++;

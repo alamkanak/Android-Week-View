@@ -106,9 +106,13 @@ public class WeekViewConfig {
     boolean horizontalScrollingEnabled;
     int scrollDuration;
 
-    // Min Max Date
+    // Date range
     Calendar minDate;
     Calendar maxDate;
+
+    // Time range
+    int minHour;
+    int maxHour;
 
     WeekViewConfig(Context context, AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
@@ -137,6 +141,10 @@ public class WeekViewConfig {
             showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false);
             timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, Defaults.GRID_COLOR);
             timeColumnSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1);
+
+            // Time range
+            minHour = a.getInt(R.styleable.WeekView_minHour, 0);
+            maxHour = a.getInt(R.styleable.WeekView_maxHour, 24);
 
             // Header row
             headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, Color.BLACK);
@@ -296,7 +304,7 @@ public class WeekViewConfig {
     }
 
     float getTotalDayHeight() {
-        float dayHeight = hourHeight * Constants.HOURS_PER_DAY;
+        float dayHeight = hourHeight * getHoursPerDay();
         return dayHeight + drawingConfig.headerHeight;
     }
 
@@ -305,10 +313,18 @@ public class WeekViewConfig {
     }
 
     int getStartHour() {
-        return (showMidnightHour && showTimeColumnHourSeparator) ? 0 : timeColumnHoursInterval;
+        return (showMidnightHour && showTimeColumnHourSeparator) ? minHour : timeColumnHoursInterval;
     }
 
-    float getXOriginForDate(Calendar date) {
+    int getHoursPerDay() {
+        return maxHour - minHour;
+    }
+
+    int getMinutesPerDay() {
+        return getHoursPerDay() * Constants.MINUTES_PER_HOUR;
+    }
+
+    private float getXOriginForDate(Calendar date) {
         return (-1f) * DateUtils.getDaysUntilDate(date) * getTotalDayWidth();
     }
 

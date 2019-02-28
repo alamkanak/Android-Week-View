@@ -58,7 +58,7 @@ class EventsDrawer<T> {
         for (int i = 0; i < eventChips.size(); i++) {
             final EventChip eventChip = eventChips.get(i);
             final WeekViewEvent event = eventChip.event;
-            if (!event.isSameDay(date)) {
+            if (!event.isSameDay(date) || !event.isWithin(config.minHour, config.maxHour)) {
                 continue;
             }
 

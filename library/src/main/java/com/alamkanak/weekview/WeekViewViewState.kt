@@ -26,7 +26,7 @@ internal class WeekViewViewState {
         val totalHeaderHeight = drawingConfig.getTotalHeaderHeight(config)
 
         val totalHeight = WeekView.getViewHeight()
-        val dynamicHourHeight = ((totalHeight - totalHeaderHeight) / Constants.HOURS_PER_DAY).toInt()
+        val dynamicHourHeight = ((totalHeight - totalHeaderHeight) / config.hoursPerDay).toInt()
 
         config.effectiveMinHourHeight = max(config.minHourHeight, dynamicHourHeight)
 

@@ -24,8 +24,13 @@ internal object DateUtils {
 
     @JvmStatic
     fun withTimeAtStartOfDay(date: Calendar): Calendar {
+        return withTimeAtStartOfPeriod(date, 0)
+    }
+
+    @JvmStatic
+    fun withTimeAtStartOfPeriod(date: Calendar, hour: Int): Calendar {
         val newDate = date.clone() as Calendar
-        newDate.set(Calendar.HOUR_OF_DAY, 0)
+        newDate.set(Calendar.HOUR_OF_DAY, hour)
         newDate.set(Calendar.MINUTE, 0)
         newDate.set(Calendar.SECOND, 0)
         newDate.set(Calendar.MILLISECOND, 0)
@@ -34,8 +39,13 @@ internal object DateUtils {
 
     @JvmStatic
     fun withTimeAtEndOfDay(date: Calendar): Calendar {
+        return withTimeAtEndOfPeriod(date, 24)
+    }
+
+    @JvmStatic
+    fun withTimeAtEndOfPeriod(date: Calendar, hour: Int): Calendar {
         val newDate = date.clone() as Calendar
-        newDate.set(Calendar.HOUR_OF_DAY, 23)
+        newDate.set(Calendar.HOUR_OF_DAY, hour - 1)
         newDate.set(Calendar.MINUTE, 59)
         newDate.set(Calendar.SECOND, 59)
         newDate.set(Calendar.MILLISECOND, 999)

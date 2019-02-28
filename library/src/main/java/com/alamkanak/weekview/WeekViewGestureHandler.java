@@ -202,7 +202,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int minX = (int) config.getMinX();
         final int maxX = (int) config.getMaxX();
 
-        final float dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
+        final float dayHeight = config.hourHeight * config.getHoursPerDay();
         final int viewHeight = WeekView.getViewHeight();
 
         final int minY = (int) (dayHeight + drawingConfig.headerHeight - viewHeight) * (-1);
@@ -221,7 +221,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final int minX = Integer.MIN_VALUE;
         final int maxX = Integer.MAX_VALUE;
 
-        final float dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
+        final float dayHeight = config.hourHeight * config.getHoursPerDay();
         final int viewHeight = WeekView.getViewHeight();
 
         final int minY = (int) (dayHeight + drawingConfig.headerHeight - viewHeight) * (-1);

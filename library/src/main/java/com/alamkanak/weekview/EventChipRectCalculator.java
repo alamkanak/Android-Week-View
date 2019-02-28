@@ -2,9 +2,6 @@ package com.alamkanak.weekview;
 
 import android.graphics.RectF;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
-import static com.alamkanak.weekview.Constants.MINUTES_PER_DAY;
-
 class EventChipRectCalculator {
 
     private WeekViewConfig config;
@@ -20,12 +17,12 @@ class EventChipRectCalculator {
         final float widthPerDay = config.drawingConfig.widthPerDay;
 
         // Calculate top
-        final float verticalDistanceFromTop = config.hourHeight * HOURS_PER_DAY * eventChip.top / MINUTES_PER_DAY;
+        final float verticalDistanceFromTop = config.hourHeight * config.getHoursPerDay() * eventChip.top / config.getMinutesPerDay();
         final float top = verticalDistanceFromTop + verticalOrigin + config.drawingConfig.headerHeight + eventMargin;
 
         // Calculate bottom
-        final float verticalDistanceFromBottom = config.hourHeight * HOURS_PER_DAY * eventChip.bottom / MINUTES_PER_DAY;
-        final float bottom = verticalDistanceFromBottom + verticalOrigin + config.drawingConfig.headerHeight - eventMargin;
+        final float verticalDistanceFromBottom = config.hourHeight * config.getHoursPerDay() * eventChip.bottom / config.getMinutesPerDay();
+        final float bottom = verticalOrigin + config.drawingConfig.headerHeight + verticalDistanceFromBottom - eventMargin;
 
         // Calculate left and right
         float left = startFromPixel + eventChip.left * widthPerDay;

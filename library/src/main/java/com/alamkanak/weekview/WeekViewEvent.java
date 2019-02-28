@@ -11,8 +11,10 @@ import java.util.List;
 
 import static com.alamkanak.weekview.DateUtils.isAtStartOfNewDay;
 import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfDay;
-import static com.alamkanak.weekview.DateUtils.withTimeAtStartOfDay;
+import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfPeriod;
+import static com.alamkanak.weekview.DateUtils.withTimeAtStartOfPeriod;
 import static java.util.Calendar.DATE;
+import static java.util.Calendar.HOUR_OF_DAY;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -163,6 +165,10 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return DateUtils.isSameDay(startTime, other.startTime);
     }
 
+    boolean isWithin(int minHour, int maxHour) {
+        return startTime.get(HOUR_OF_DAY) >= minHour && endTime.get(HOUR_OF_DAY) <= maxHour;
+    }
+
     public int getTextColor() {
         return textColor;
     }
@@ -216,18 +222,20 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
      * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}s
      * @return A list of {@link WeekViewEvent}
      */
-    List<WeekViewEvent<T>> splitWeekViewEvents() {
+    List<WeekViewEvent<T>> splitWeekViewEvents(WeekViewConfig config) {
         List<WeekViewEvent<T>> events = new ArrayList<>();
 
         // Clone this end time for when we need to clone events
         Calendar newEndTime = (Calendar) this.endTime.clone();
 
-        if (isAtStartOfNewDay(startTime, newEndTime)) {
+        boolean isAtStartOfNewPeriod = config.minHour == 0 && isAtStartOfNewDay(startTime, newEndTime);
+
+        if (isAtStartOfNewPeriod) {
             // Set end time to 1ms before midnight to ensure the EventRect will get drawn correctly
             WeekViewEvent<T> shortenedEvent = shortenTooLongAllDayEvent(newEndTime);
             events.add(shortenedEvent);
         } else if (!isSameDay(newEndTime)) {
-            events = splitEventsByDays();
+            events = splitEventsByDays(config);
         } else {
             events.add(this);
         }
@@ -255,12 +263,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
                 withTimeAtEndOfDay(newEndTime), location, color, isAllDay, data);
     }
 
-    private List<WeekViewEvent<T>> splitEventsByDays() {
+    private List<WeekViewEvent<T>> splitEventsByDays(WeekViewConfig config) {
         List<WeekViewEvent<T>> results = new ArrayList<>();
 
         // Get event for first day
         Calendar firstEventEnd = (Calendar) startTime.clone();
-        firstEventEnd = withTimeAtEndOfDay(firstEventEnd);
+        firstEventEnd = withTimeAtEndOfPeriod(firstEventEnd, config.maxHour);
 
         WeekViewEvent<T> firstEvent = new WeekViewEvent<>(id, title,
                 startTime, firstEventEnd, location, color, isAllDay, data);
@@ -269,7 +277,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
         // Get event for last day
         Calendar lastEventStart = (Calendar) endTime.clone();
-        lastEventStart = withTimeAtStartOfDay(lastEventStart);
+        lastEventStart = withTimeAtStartOfPeriod(lastEventStart, config.minHour);
 
         WeekViewEvent<T> lastEvent = new WeekViewEvent<>(id, title,
                 lastEventStart, endTime, location, color, isAllDay, data);
@@ -283,15 +291,15 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         if (daysInBetween > 0) {
             // Get second day with time at start of day
             Calendar start = (Calendar) firstEventEnd.clone();
-            start = withTimeAtStartOfDay(start);
+            start = withTimeAtStartOfPeriod(start, config.minHour);
             start.add(DATE, 1);
 
             while (!DateUtils.isSameDay(start, lastEventStart)) {
                 Calendar intermediateStart = (Calendar) start.clone();
-                intermediateStart = withTimeAtStartOfDay(intermediateStart);
+                intermediateStart = withTimeAtStartOfPeriod(intermediateStart, config.minHour);
 
                 Calendar intermediateEnd = (Calendar) start.clone();
-                intermediateEnd = withTimeAtEndOfDay(intermediateEnd);
+                intermediateEnd = withTimeAtEndOfPeriod(intermediateEnd, config.maxHour);
 
                 WeekViewEvent<T> intermediateEvent = new WeekViewEvent<>(id, title,
                         intermediateStart, intermediateEnd, location, color, isAllDay, data);

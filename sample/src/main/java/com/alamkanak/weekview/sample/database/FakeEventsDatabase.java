@@ -33,7 +33,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         Event event;
 
         Calendar startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, 3);
+        startTime.set(Calendar.HOUR_OF_DAY, 8);
         startTime.set(Calendar.MINUTE, 0);
         startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);

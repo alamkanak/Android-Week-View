@@ -61,8 +61,8 @@ internal class WeekViewCache<T> {
      *
      * @param events The events to be sorted and cached.
      */
-    fun sortAndCacheEvents(events: List<WeekViewEvent<T>>) {
-        events.sorted().forEach { cacheEvent(it) }
+    fun sortAndCacheEvents(config: WeekViewConfig, events: List<WeekViewEvent<T>>) {
+        events.sorted().forEach { cacheEvent(config, it) }
     }
 
     /**
@@ -70,12 +70,12 @@ internal class WeekViewCache<T> {
      *
      * @param event The event to cache.
      */
-    private fun cacheEvent(event: WeekViewEvent<T>) {
+    private fun cacheEvent(config: WeekViewConfig, event: WeekViewEvent<T>) {
         if (event.startTime >= event.endTime) {
             return
         }
 
-        val newChips = event.splitWeekViewEvents().map { EventChip(it, event, null) }
+        val newChips = event.splitWeekViewEvents(config).map { EventChip(it, event, null) }
         allEventChips.addAll(newChips)
     }
 

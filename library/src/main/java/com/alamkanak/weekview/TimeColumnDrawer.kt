@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import com.alamkanak.weekview.Constants.HOURS_PER_DAY
 
 private class TimeColumnDrawer(
         private val config: WeekViewConfig
@@ -23,16 +22,16 @@ private class TimeColumnDrawer(
         canvas.clipRect(0f, top, drawingConfig.timeColumnWidth, bottom.toFloat())
 
         val startHour = config.startHour
-        val hourLines = FloatArray(HOURS_PER_DAY * 4)
+        val hourLines = FloatArray(config.hoursPerDay * 4)
         val hourStep = config.timeColumnHoursInterval
 
-        for (i in startHour..HOURS_PER_DAY step hourStep) {
+        for (i in startHour until config.hoursPerDay step hourStep) {
             val heightOfHour = (config.hourHeight * i)
             top = drawingConfig.headerHeight + drawingConfig.currentOrigin.y + heightOfHour
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
-            val time = drawingConfig.dateTimeInterpreter.interpretTime(i)
+            val time = drawingConfig.dateTimeInterpreter.interpretTime(i + config.minHour)
 
             if (top < bottom) {
                 val x = drawingConfig.timeTextWidth + config.timeColumnPadding

@@ -17,7 +17,6 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
@@ -82,7 +81,7 @@ public final class WeekView<T> extends View
         backgroundGridDrawer = new BackgroundGridDrawer(config);
         nowLineDrawer = new NowLineDrawer(config);
 
-        eventChipsProvider = new EventChipsProvider<>(cache, viewState);
+        eventChipsProvider = new EventChipsProvider<>(config, cache, viewState);
         eventChipsProvider.setWeekViewLoader(getWeekViewLoader());
     }
 
@@ -116,7 +115,7 @@ public final class WeekView<T> extends View
         WeekView.height = height;
 
         if (config.showCompleteDay) {
-          config.hourHeight = (height - drawConfig.headerHeight) / HOURS_PER_DAY;
+          config.hourHeight = (height - drawConfig.headerHeight) / config.getHoursPerDay();
           drawConfig.newHourHeight = config.hourHeight;
         }
     }
@@ -142,7 +141,7 @@ public final class WeekView<T> extends View
         }
 
         final DrawingContext drawingContext = DrawingContext.create(config);
-        eventChipsProvider.loadEventsIfNecessary(this, drawingContext.getDateRange());
+        eventChipsProvider.loadEventsIfNecessary(this, config, drawingContext.getDateRange());
 
         List<Pair<EventChip<T>, StaticLayout>> allDayEvents =
                 eventsDrawer.prepareDrawAllDayEvents(cache.getAllDayEventChips(), drawingContext);
@@ -157,7 +156,6 @@ public final class WeekView<T> extends View
         dayLabelDrawer.draw(drawingContext, canvas);
 
         eventsDrawer.drawAllDayEvents(allDayEvents, canvas);
-
         timeColumnDrawer.drawTimeColumn(canvas);
 
         if (isFirstDraw) {
@@ -966,6 +964,38 @@ public final class WeekView<T> extends View
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
+    //  Time range
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public int getMinHour() {
+        return config.minHour;
+    }
+
+    public void setMinHour(int minHour) {
+        if (minHour < 0 || minHour > config.maxHour) {
+            throw new IllegalArgumentException("minHour must be larger than 0 and smaller than maxHour.");
+        }
+
+        config.minHour = minHour;
+        invalidate();
+    }
+
+    public int getMaxHour() {
+        return config.maxHour;
+    }
+
+    public void setMaxHour(int maxHour) {
+        if (maxHour > 24 || maxHour < config.minHour) {
+            throw new IllegalArgumentException("maxHour must be smaller than 24 and larger than minHour.");
+        }
+
+        config.maxHour = maxHour;
+        invalidate();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     //  Scrolling
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1165,7 +1195,7 @@ public final class WeekView<T> extends View
             return;
         }
 
-        hour = min(hour, HOURS_PER_DAY);
+        hour = min(hour, config.getHoursPerDay());
         float verticalOffset = config.hourHeight * hour;
 
         final float dayHeight = config.getTotalDayHeight();

@@ -10,7 +10,6 @@ import android.text.TextPaint;
 
 import java.util.Calendar;
 
-import static com.alamkanak.weekview.Constants.HOURS_PER_DAY;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -170,7 +169,7 @@ class WeekViewDrawingConfig {
       }
 
       if (config.showCompleteDay) {
-          config.hourHeight = (WeekView.getViewHeight() - headerHeight) / HOURS_PER_DAY;
+          config.hourHeight = (WeekView.getViewHeight() - headerHeight) / config.getHoursPerDay();
           newHourHeight = config.hourHeight;
       }
   }
@@ -242,7 +241,7 @@ class WeekViewDrawingConfig {
             // the minimal height of an hour when zoomed completely out
             // needed to suppress the zooming below 24:00
             final int height = WeekView.getViewHeight();
-            float potentialMinHourHeight = (height - headerHeight) / Constants.HOURS_PER_DAY;
+            float potentialMinHourHeight = (height - headerHeight) / config.getHoursPerDay();
             newHourHeight = Math.max(newHourHeight, potentialMinHourHeight);
 
             currentOrigin.y = (currentOrigin.y / config.hourHeight) * newHourHeight;
@@ -255,7 +254,7 @@ class WeekViewDrawingConfig {
         final int height = WeekView.getViewHeight();
 
         // If the new currentOrigin.y is invalid, make it valid.
-        final float dayHeight = config.hourHeight * Constants.HOURS_PER_DAY;
+        final float dayHeight = config.hourHeight * config.getHoursPerDay();
 
         final float potentialNewVerticalOrigin = height - (dayHeight + headerHeight);
 

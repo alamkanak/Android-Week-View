@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import com.alamkanak.weekview.Constants.HOURS_PER_DAY
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -63,7 +62,7 @@ internal class BackgroundGridDrawer(
         val hourStep = config.timeColumnHoursInterval
 
         var i = 0
-        for (hour in hourStep until HOURS_PER_DAY step hourStep) {
+        for (hour in hourStep until config.hoursPerDay step hourStep) {
             val heightOfHour = (config.hourHeight * hour)
             val top = drawConfig.headerHeight + drawConfig.currentOrigin.y + heightOfHour
 
