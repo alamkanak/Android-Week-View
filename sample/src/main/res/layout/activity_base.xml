@@ -17,8 +17,6 @@
         app:headerRowBottomLineWidth="1dp"
         app:headerRowPadding="12dp"
         app:hourHeight="60dp"
-        app:maxHour="20"
-        app:minHour="8"
         app:nowLineColor="@color/accent"
         app:nowLineDotColor="@color/accent"
         app:nowLineDotRadius="5dp"
