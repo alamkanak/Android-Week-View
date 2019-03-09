@@ -12,7 +12,10 @@ internal class WeekViewCache<T> {
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
     var nextPeriodEvents: List<WeekViewEvent<T>>? = null
 
-    var fetchedPeriod = -1 // The middle period the calendar has fetched.
+    var fetchedPeriods: FetchedPeriods? = null
+
+    val hasEvents: Boolean
+        get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
 
     fun put(newChips: List<EventChip<T>>) {
         allEventChips.clear()
@@ -25,6 +28,12 @@ internal class WeekViewCache<T> {
 
         allDayEventChips.clear()
         allDayEventChips.addAll(allDay)
+    }
+
+    fun contains(period: Period): Boolean {
+        return fetchedPeriods?.let {
+            it.previous == period || it.current == period || it.next == period
+        } ?: false
     }
 
     private fun getEventChipsInRange(
@@ -53,7 +62,7 @@ internal class WeekViewCache<T> {
         previousPeriodEvents = null
         currentPeriodEvents = null
         nextPeriodEvents = null
-        fetchedPeriod = -1
+        fetchedPeriods = null
     }
 
     /**

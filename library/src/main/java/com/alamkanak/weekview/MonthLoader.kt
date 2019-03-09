@@ -13,15 +13,14 @@ private class MonthLoader<T>(
         var onMonthChangeListener: MonthChangeListener<T>?
 ) : WeekViewLoader<T> {
 
-    override fun toWeekViewPeriodIndex(instance: Calendar): Double {
-        return (instance.get(Calendar.YEAR) * 12.0
-                + instance.get(Calendar.MONTH).toDouble()
-                + (instance.get(Calendar.DAY_OF_MONTH) - 1) / 30.0)
+    override fun toPeriod(instance: Calendar): Period {
+        val month = instance.get(Calendar.MONTH)
+        val year = instance.get(Calendar.YEAR)
+        return Period(month, year)
     }
 
-    override fun onLoad(periodIndex: Int): List<WeekViewEvent<T>> {
-        val year = periodIndex / 12
-        val month = periodIndex % 12
+    override fun onLoad(period: Period): List<WeekViewEvent<T>> {
+        val (month, year) = period
 
         val startDate = today().withTimeAtStartOfDay().apply {
             set(Calendar.YEAR, year)
