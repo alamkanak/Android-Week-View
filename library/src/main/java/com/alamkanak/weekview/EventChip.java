@@ -24,8 +24,8 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
  */
 class EventChip<T> {
 
-    WeekViewEvent<T> event;
-    WeekViewEvent<T> originalEvent;
+    final WeekViewEvent<T> event;
+    final WeekViewEvent<T> originalEvent;
 
     RectF rect;
     float left;

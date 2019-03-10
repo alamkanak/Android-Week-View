@@ -23,24 +23,24 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         NONE, LEFT, RIGHT, VERTICAL
     }
 
-    private Listener listener;
+    private final Listener listener;
 
-    private WeekViewCache<T> cache;
-    private WeekViewConfig config;
-    private WeekViewDrawingConfig drawingConfig;
+    private final WeekViewCache<T> cache;
+    private final WeekViewConfig config;
+    private final WeekViewDrawingConfig drawingConfig;
 
-    private WeekViewTouchHandler touchHandler;
+    private final WeekViewTouchHandler touchHandler;
 
-    private OverScroller scroller;
+    private final OverScroller scroller;
     private Direction currentScrollDirection = Direction.NONE;
     private Direction currentFlingDirection = Direction.NONE;
 
-    private GestureDetector gestureDetector;
-    private ScaleGestureDetector scaleDetector;
+    private final GestureDetector gestureDetector;
+    private final ScaleGestureDetector scaleDetector;
     private boolean isZooming;
 
-    private int minimumFlingVelocity;
-    private int scaledTouchSlop;
+    private final int minimumFlingVelocity;
+    private final int scaledTouchSlop;
 
     private EventClickListener<T> eventClickListener;
     private EventLongPressListener<T> eventLongPressListener;
@@ -238,7 +238,8 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
             if (data != null) {
                 eventClickListener.onEventClick(data, eventChip.rect);
             } else {
-                throw new WeekViewException("No data to show. Did you pass the original object into the constructor of WeekViewEvent?");
+                throw new IllegalStateException("No data to show. Did you pass the original " +
+                        "object into the constructor of WeekViewEvent?");
             }
 
             return super.onSingleTapConfirmed(e);
@@ -268,7 +269,8 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
             if (data != null) {
                 eventLongPressListener.onEventLongPress(data, eventChip.rect);
             } else {
-                throw new WeekViewException("No data to show. Did you pass the original object into the constructor of WeekViewEvent?");
+                throw new IllegalStateException("No data to show. Did you pass the original " +
+                        "object into the constructor of WeekViewEvent?");
             }
         }
 

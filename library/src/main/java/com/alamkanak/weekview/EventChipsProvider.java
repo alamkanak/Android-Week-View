@@ -8,10 +8,11 @@ import java.util.List;
 
 class EventChipsProvider<T> {
 
-    private WeekViewConfig config;
-    private WeekViewCache<T> cache;
+    private final WeekViewConfig config;
+    private final WeekViewCache<T> cache;
+    private final WeekViewViewState viewState;
+
     private WeekViewLoader<T> weekViewLoader;
-    private WeekViewViewState viewState;
 
     EventChipsProvider(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
         this.config = config;
@@ -29,7 +30,7 @@ class EventChipsProvider<T> {
         }
 
         if (weekViewLoader == null) {
-            throw new WeekViewException("No WeekViewLoader or MonthChangeListener provided. " +
+            throw new IllegalStateException("No WeekViewLoader or MonthChangeListener provided. " +
                     "This is necessary to load new events");
         }
 

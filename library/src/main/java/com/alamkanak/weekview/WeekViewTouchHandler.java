@@ -9,8 +9,8 @@ import static java.lang.Math.max;
 
 final class WeekViewTouchHandler {
 
-    private WeekViewConfig config;
-    private WeekViewDrawingConfig drawingConfig;
+    private final WeekViewConfig config;
+    private final WeekViewDrawingConfig drawingConfig;
 
     WeekViewTouchHandler(WeekViewConfig config) {
         this.config = config;

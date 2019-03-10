@@ -29,7 +29,6 @@ class WeekViewDrawingConfig {
     Paint todayHeaderTextPaint;
     private int currentAllDayEventHeight;
 
-
     /**
      * dates in the past have origin.x > 0
      * dates in the future have origin.x < 0

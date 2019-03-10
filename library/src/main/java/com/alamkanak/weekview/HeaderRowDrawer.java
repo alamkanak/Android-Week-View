@@ -8,11 +8,11 @@ import java.util.List;
 
 class HeaderRowDrawer<T> {
 
-    private WeekViewConfig config;
-    private WeekViewDrawingConfig drawConfig;
+    private final WeekViewConfig config;
+    private final WeekViewDrawingConfig drawConfig;
 
-    private WeekViewCache<T> cache;
-    private WeekViewViewState viewState;
+    private final WeekViewCache<T> cache;
+    private final WeekViewViewState viewState;
 
     HeaderRowDrawer(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
         this.config = config;

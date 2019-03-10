@@ -34,22 +34,22 @@ public final class WeekView<T> extends View
     private static int width;
     private static int height;
 
-    private WeekViewConfig config;
-    private WeekViewDrawingConfig drawConfig;
-    private WeekViewCache<T> cache;
+    private final WeekViewConfig config;
+    private final WeekViewDrawingConfig drawConfig;
+    private final WeekViewCache<T> cache;
 
-    private WeekViewViewState viewState;
-    private WeekViewGestureHandler<T> gestureHandler;
+    private final WeekViewViewState viewState;
+    private final WeekViewGestureHandler<T> gestureHandler;
 
-    private HeaderRowDrawer<T> headerRowDrawer;
-    private DayLabelDrawer dayLabelDrawer;
-    private EventsDrawer<T> eventsDrawer;
-    private TimeColumnDrawer timeColumnDrawer;
-    private DayBackgroundDrawer dayBackgroundDrawer;
-    private BackgroundGridDrawer backgroundGridDrawer;
-    private NowLineDrawer nowLineDrawer;
+    private final HeaderRowDrawer<T> headerRowDrawer;
+    private final DayLabelDrawer dayLabelDrawer;
+    private final EventsDrawer<T> eventsDrawer;
+    private final TimeColumnDrawer timeColumnDrawer;
+    private final DayBackgroundDrawer dayBackgroundDrawer;
+    private final BackgroundGridDrawer backgroundGridDrawer;
+    private final NowLineDrawer nowLineDrawer;
 
-    private EventChipsProvider<T> eventChipsProvider;
+    private final EventChipsProvider<T> eventChipsProvider;
 
     public WeekView(Context context) {
         this(context, null);

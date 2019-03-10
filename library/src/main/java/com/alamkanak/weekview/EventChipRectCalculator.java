@@ -4,7 +4,7 @@ import android.graphics.RectF;
 
 class EventChipRectCalculator {
 
-    private WeekViewConfig config;
+    private final WeekViewConfig config;
 
     EventChipRectCalculator(WeekViewConfig config) {
         this.config = config;

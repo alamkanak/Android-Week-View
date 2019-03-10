@@ -20,9 +20,9 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
 
 class EventsDrawer<T> {
 
-    private WeekViewConfig config;
-    private WeekViewDrawingConfig drawingConfig;
-    private EventChipRectCalculator rectCalculator;
+    private final WeekViewConfig config;
+    private final WeekViewDrawingConfig drawingConfig;
+    private final EventChipRectCalculator rectCalculator;
 
     EventsDrawer(WeekViewConfig config) {
         this.config = config;

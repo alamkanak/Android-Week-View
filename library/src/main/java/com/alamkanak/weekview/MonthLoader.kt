@@ -36,9 +36,8 @@ private class MonthLoader<T>(
             set(Calendar.DAY_OF_MONTH, maxDays)
         }
 
-        return onMonthChangeListener?.let {
-            it.onMonthChange(startDate, endDate).map { it.toWeekViewEvent() }
-        } ?: emptyList()
+        val listener = onMonthChangeListener ?: return emptyList()
+        return listener.onMonthChange(startDate, endDate).map { it.toWeekViewEvent() }
     }
 
 }
