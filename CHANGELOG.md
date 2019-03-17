@@ -1,6 +1,15 @@
 Changelog
 =========
 
+## Version 3.3
+*(2019-03-17)*
+- New: You can now define the time range to be displayed for each day by setting `minHour` and `maxHour` in your layout XML, or by calling `weekView.setMinHour()` and `weekView.setMaxHour()` in your code.
+- New: You can now add the option to automatically scroll to the current time when `WeekView` is first displayed by setting `showCurrentTimeFirst` to `true`.
+- New: You can opt to use a multi-line date header by setting `singleLineHeader` to `false`.
+- Fix: The attribute `showNowLine` is no longer ignored.
+
+Thanks to [Bwaim](https://github.com/Bwaim) and [Mauker1](https://github.com/Mauker1) for contributing to this release!
+
 ## Version 3.2.1
 *(2019-02-15)*
 - This release fixes a JitPack build error, which caused an exception when adding this library to a project. 
