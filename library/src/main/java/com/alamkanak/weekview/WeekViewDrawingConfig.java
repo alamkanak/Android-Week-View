@@ -287,6 +287,11 @@ class WeekViewDrawingConfig {
         headerTextPaint.setColor(headerRowTextColor);
     }
 
+    void setHeaderRowTextSize(int size) {
+        headerTextPaint.setTextSize(size);
+        todayHeaderTextPaint.setTextSize(size);
+    }
+
     void setTimeColumnTextColor(int timeColumnTextColor) {
         timeTextPaint.setColor(timeColumnTextColor);
     }

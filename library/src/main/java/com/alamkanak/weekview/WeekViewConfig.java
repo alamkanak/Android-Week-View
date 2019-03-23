@@ -235,6 +235,16 @@ public class WeekViewConfig {
         drawingConfig.headerBackgroundPaint.setColor(headerRowBackgroundColor);
     }
 
+    void setHeaderRowTextColor(int color) {
+        headerRowTextColor = color;
+        drawingConfig.setHeaderRowTextColor(color);
+    }
+
+    void setHeaderRowTextSize(int size) {
+        headerRowTextSize = size;
+        drawingConfig.setHeaderRowTextSize(size);
+    }
+
     void setDayBackgroundColor(int dayBackgroundColor) {
         this.dayBackgroundColor = dayBackgroundColor;
         drawingConfig.dayBackgroundPaint.setColor(dayBackgroundColor);
