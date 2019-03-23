@@ -8,15 +8,13 @@ import java.util.List;
 
 class HeaderRowDrawer<T> {
 
-    private final WeekViewConfig config;
-    private final WeekViewDrawingConfig drawConfig;
+    private final WeekViewConfigWrapper config;
 
     private final WeekViewCache<T> cache;
     private final WeekViewViewState viewState;
 
-    HeaderRowDrawer(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
+    HeaderRowDrawer(WeekViewConfigWrapper config, WeekViewCache<T> cache, WeekViewViewState viewState) {
         this.config = config;
-        this.drawConfig = config.drawingConfig;
         this.cache = cache;
         this.viewState = viewState;
     }
@@ -27,15 +25,15 @@ class HeaderRowDrawer<T> {
     }
 
     private void calculateAvailableSpaceForHeader(DrawingContext drawingContext) {
-        drawConfig.timeColumnWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
+        config.setTimeColumnWidth(config.getTimeTextWidth() + config.getTimeColumnPadding() * 2);
         refreshHeaderHeight(drawingContext);
     }
 
     private void refreshHeaderHeight(DrawingContext drawingContext) {
         final List<EventChip<T>> eventChips = cache.getAllDayEventChips();
         if (eventChips.isEmpty()) {
-            drawConfig.hasEventInHeader = false;
-            drawConfig.refreshHeaderHeight(config);
+            config.setHasEventInHeader(false);
+            config.refreshHeaderHeight();
         }
 
         Calendar firstVisibleDay = viewState.getFirstVisibleDay();
@@ -54,8 +52,8 @@ class HeaderRowDrawer<T> {
             }
         }
 
-        drawConfig.hasEventInHeader = containsAllDayEvent;
-        drawConfig.refreshHeaderHeight(config);
+        config.setHasEventInHeader(containsAllDayEvent);
+        config.refreshHeaderHeight();
     }
 
     private void drawHeaderRow(Canvas canvas) {
@@ -64,35 +62,35 @@ class HeaderRowDrawer<T> {
         canvas.restore();
         canvas.save();
 
-        final Paint headerBackground = drawConfig.headerBackgroundPaint;
+        final Paint headerBackground = config.getHeaderBackgroundPaint();
 
         // Hide everything in the top left corner
-        final float topLeftCornerWidth = drawConfig.timeTextWidth + config.timeColumnPadding * 2;
-        canvas.clipRect(0, 0, topLeftCornerWidth, drawConfig.headerHeight);
-        canvas.drawRect(0, 0, topLeftCornerWidth, drawConfig.headerHeight, headerBackground);
+        final float topLeftCornerWidth = config.getTimeTextWidth() + config.getTimeColumnPadding() * 2;
+        canvas.clipRect(0, 0, topLeftCornerWidth, config.getHeaderHeight());
+        canvas.drawRect(0, 0, topLeftCornerWidth, config.getHeaderHeight(), headerBackground);
 
         canvas.restore();
         canvas.save();
 
         // Clip to paint header row only.
-        canvas.clipRect(drawConfig.timeColumnWidth, 0, width, drawConfig.headerHeight);
-        canvas.drawRect(0, 0, width, drawConfig.headerHeight, headerBackground);
+        canvas.clipRect(config.getTimeColumnWidth(), 0, width, config.getHeaderHeight());
+        canvas.drawRect(0, 0, width, config.getHeaderHeight(), headerBackground);
 
         canvas.restore();
         canvas.save();
 
-        if (config.showHeaderRowBottomLine) {
+        if (config.getShowHeaderRowBottomLine()) {
             drawHeaderBottomLine(width, canvas);
         }
     }
 
     private void drawHeaderBottomLine(int width, Canvas canvas) {
-        final int headerRowBottomLineWidth = config.headerRowBottomLineWidth;
-        final float topMargin = drawConfig.headerHeight - headerRowBottomLineWidth;
+        final int headerRowBottomLineWidth = config.getHeaderRowBottomLineWidth();
+        final float topMargin = config.getHeaderHeight() - headerRowBottomLineWidth;
 
         final Paint paint = new Paint();
         paint.setStrokeWidth(headerRowBottomLineWidth);
-        paint.setColor(config.headerRowBottomLineColor);
+        paint.setColor(config.getHeaderRowBottomLineColor());
 
         canvas.drawLine(0, topMargin, width, topMargin, paint);
     }

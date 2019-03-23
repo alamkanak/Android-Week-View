@@ -51,12 +51,12 @@ class EventChip<T> {
         this.originalEvent = originalEvent;
     }
 
-    void draw(WeekViewConfig config, Canvas canvas) {
+    void draw(WeekViewConfigWrapper config, Canvas canvas) {
         draw(config, null, canvas);
     }
 
-    void draw(WeekViewConfig config, @Nullable StaticLayout textLayout, Canvas canvas) {
-        final float cornerRadius = config.eventCornerRadius;
+    void draw(WeekViewConfigWrapper config, @Nullable StaticLayout textLayout, Canvas canvas) {
+        final float cornerRadius = config.getEventCornerRadius();
         final Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
@@ -95,9 +95,9 @@ class EventChip<T> {
         return paint;
     }
 
-    private void calculateTextHeightAndDrawTitle(WeekViewConfig config, Canvas canvas) {
-        final boolean negativeWidth = (rect.right - rect.left - config.eventPadding * 2) < 0;
-        final boolean negativeHeight = (rect.bottom - rect.top - config.eventPadding * 2) < 0;
+    private void calculateTextHeightAndDrawTitle(WeekViewConfigWrapper config, Canvas canvas) {
+        final boolean negativeWidth = (rect.right - rect.left - config.getEventPadding() * 2) < 0;
+        final boolean negativeHeight = (rect.bottom - rect.top - config.getEventPadding() * 2) < 0;
         if (negativeWidth || negativeHeight) {
             return;
         }
@@ -115,11 +115,11 @@ class EventChip<T> {
             stringBuilder.append(event.getLocation());
         }
 
-        final int availableHeight = (int) (rect.bottom - rect.top - config.eventPadding * 2);
-        final int availableWidth = (int) (rect.right - rect.left - config.eventPadding * 2);
+        final int availableHeight = (int) (rect.bottom - rect.top - config.getEventPadding() * 2);
+        final int availableWidth = (int) (rect.right - rect.left - config.getEventPadding() * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = config.drawingConfig.eventTextPaint;
+        final TextPaint textPaint = config.getEventTextPaint();
 
         textPaint.setColor(event.getTextColorOrDefault(config));
 
@@ -137,7 +137,7 @@ class EventChip<T> {
                 final CharSequence ellipsized = TextUtils.ellipsize(stringBuilder,
                         textPaint, availableArea, TextUtils.TruncateAt.END);
 
-                final int width = (int) (rect.right - rect.left - config.eventPadding * 2);
+                final int width = (int) (rect.right - rect.left - config.getEventPadding() * 2);
                 textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Repeat until text is short enough.
@@ -149,9 +149,9 @@ class EventChip<T> {
         }
     }
 
-    private void drawEventTitle(WeekViewConfig config, StaticLayout textLayout, Canvas canvas) {
+    private void drawEventTitle(WeekViewConfigWrapper config, StaticLayout textLayout, Canvas canvas) {
         canvas.save();
-        canvas.translate(rect.left + config.eventPadding, rect.top + config.eventPadding);
+        canvas.translate(rect.left + config.getEventPadding(), rect.top + config.getEventPadding());
         textLayout.draw(canvas);
         canvas.restore();
     }

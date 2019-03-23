@@ -20,13 +20,11 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
 
 class EventsDrawer<T> {
 
-    private final WeekViewConfig config;
-    private final WeekViewDrawingConfig drawingConfig;
+    private final WeekViewConfigWrapper config;
     private final EventChipRectCalculator rectCalculator;
 
-    EventsDrawer(WeekViewConfig config) {
+    EventsDrawer(WeekViewConfigWrapper config) {
         this.config = config;
-        this.drawingConfig = config.drawingConfig;
         this.rectCalculator = new EventChipRectCalculator(config);
     }
 
@@ -39,7 +37,7 @@ class EventsDrawer<T> {
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
-                startPixel = startPixel + config.eventMarginHorizontal;
+                startPixel = startPixel + config.getEventMarginHorizontal();
             }
 
             drawEventsForDate(eventChips, day, startPixel, canvas);
@@ -58,7 +56,7 @@ class EventsDrawer<T> {
         for (int i = 0; i < eventChips.size(); i++) {
             final EventChip eventChip = eventChips.get(i);
             final WeekViewEvent event = eventChip.event;
-            if (!event.isSameDay(date) || !event.isWithin(config.minHour, config.maxHour)) {
+            if (!event.isSameDay(date) || !event.isWithin(config.getMinHour(), config.getMaxHour())) {
                 continue;
             }
 
@@ -81,7 +79,7 @@ class EventsDrawer<T> {
      */
     List<Pair<EventChip<T>, StaticLayout>> prepareDrawAllDayEvents(List<EventChip<T>> eventChips,
                                                                    DrawingContext drawingContext) {
-        drawingConfig.setCurrentAllDayEventHeight(0, config);
+        config.setCurrentAllDayEventHeight(0);
         if (eventChips == null) {
             return null;
         }
@@ -91,7 +89,7 @@ class EventsDrawer<T> {
 
         for (Calendar day : drawingContext.getDateRange()) {
             if (config.isSingleDay()) {
-                startPixel = startPixel + config.eventMarginHorizontal;
+                startPixel = startPixel + config.getEventMarginHorizontal();
             }
 
             for (EventChip<T> eventChip : eventChips) {
@@ -142,12 +140,12 @@ class EventsDrawer<T> {
         }
 
         // Hide events when they are in the top left corner
-        final Paint headerBackground = drawingConfig.headerBackgroundPaint;
+        final Paint headerBackground = config.getHeaderBackgroundPaint();
 
-        float headerRowBottomLine = config.showHeaderRowBottomLine ? config.headerRowBottomLineWidth : 0;
+        float headerRowBottomLine = config.getShowHeaderRowBottomLine() ? config.getHeaderRowBottomLineWidth() : 0;
 
-        final float height = drawingConfig.headerHeight - headerRowBottomLine;
-        final float width = drawingConfig.timeTextWidth + config.timeColumnPadding * 2;
+        final float height = config.getHeaderHeight() - headerRowBottomLine;
+        final float width = config.getTimeTextWidth() + config.getTimeColumnPadding() * 2;
 
         canvas.clipRect(0, 0, width, height);
         canvas.drawRect(0, 0, width, height, headerBackground);
@@ -160,15 +158,15 @@ class EventsDrawer<T> {
         return rect.left < rect.right
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
-                && rect.right > drawingConfig.timeColumnWidth
-                && rect.bottom > drawingConfig.headerHeight;
+                && rect.right > config.getTimeColumnWidth()
+                && rect.bottom > config.getHeaderHeight();
     }
 
     private boolean isValidAllDayEventRect(RectF rect) {
         return rect.left < rect.right
                 && rect.left < WeekView.getViewWidth()
                 && rect.top < WeekView.getViewHeight()
-                && rect.right > drawingConfig.timeColumnWidth
+                && rect.right > config.getTimeColumnWidth()
                 && rect.bottom > 0;
     }
 
@@ -180,8 +178,8 @@ class EventsDrawer<T> {
         final float right = eventChip.rect.right;
         final float bottom = eventChip.rect.bottom;
 
-        final boolean negativeWidth = (right - left - config.eventPadding * 2) < 0;
-        final boolean negativeHeight = (bottom - top - config.eventPadding * 2) < 0;
+        final boolean negativeWidth = (right - left - config.getEventPadding() * 2) < 0;
+        final boolean negativeHeight = (bottom - top - config.getEventPadding() * 2) < 0;
         if (negativeWidth || negativeHeight) {
             return null;
         }
@@ -199,11 +197,11 @@ class EventsDrawer<T> {
             stringBuilder.append(event.getLocation());
         }
 
-        final int availableWidth = (int) (right - left - config.eventPadding * 2);
+        final int availableWidth = (int) (right - left - config.getEventPadding() * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = (event.isAllDay()) ? drawingConfig.allDayEventTextPaint
-                                                       : drawingConfig.eventTextPaint;
+        final TextPaint textPaint = (event.isAllDay()) ? config.getAllDayEventTextPaint()
+                                                       : config.getEventTextPaint();
         textPaint.setColor(event.getTextColorOrDefault(config));
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
@@ -211,11 +209,11 @@ class EventsDrawer<T> {
         final int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         // For an all day event, we display just one line
-        final int chipHeight = lineHeight + (config.eventPadding * 2);
+        final int chipHeight = lineHeight + (config.getEventPadding() * 2);
         eventChip.rect.bottom = eventChip.rect.top + chipHeight;
 
         // Compute the available height on the right size of the chip
-        final int availableHeight = (int) (eventChip.rect.bottom - top - config.eventPadding * 2);
+        final int availableHeight = (int) (eventChip.rect.bottom - top - config.getEventPadding() * 2);
 
         if (availableHeight >= lineHeight) {
             int availableLineCount = availableHeight / lineHeight;
@@ -224,7 +222,7 @@ class EventsDrawer<T> {
                 final int availableArea = availableLineCount * availableWidth;
                 final CharSequence ellipsized =
                         TextUtils.ellipsize(stringBuilder, textPaint, availableArea, TextUtils.TruncateAt.END);
-                final int width = (int) (right - left - config.eventPadding * 2);
+                final int width = (int) (right - left - config.getEventPadding() * 2);
                 textLayout = new StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
@@ -235,8 +233,8 @@ class EventsDrawer<T> {
         }
 
         // Refresh the header height
-        if (chipHeight > drawingConfig.getCurrentAllDayEventHeight()) {
-            drawingConfig.setCurrentAllDayEventHeight(chipHeight, config);
+        if (chipHeight > config.getCurrentAllDayEventHeight()) {
+            config.setCurrentAllDayEventHeight(chipHeight);
         }
 
         return textLayout;

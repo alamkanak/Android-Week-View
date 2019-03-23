@@ -95,8 +95,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.startTime = startTime;
     }
 
-    int getEffectiveStartMinutes(WeekViewConfig config) {
-        final int startHour = startTime.get(HOUR_OF_DAY) - config.minHour;
+    int getEffectiveStartMinutes(WeekViewConfigWrapper config) {
+        final int startHour = startTime.get(HOUR_OF_DAY) - config.getMinHour();
         return startHour * MINUTES_PER_HOUR + startTime.get(MINUTE);
     }
 
@@ -108,8 +108,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.endTime = endTime;
     }
 
-    int getEffectiveEndMinutes(WeekViewConfig config) {
-        final int endHour = endTime.get(HOUR_OF_DAY) - config.minHour;
+    int getEffectiveEndMinutes(WeekViewConfigWrapper config) {
+        final int endHour = endTime.get(HOUR_OF_DAY) - config.getMinHour();
         return endHour * MINUTES_PER_HOUR + endTime.get(MINUTE);
     }
 
@@ -134,7 +134,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     public int getColorOrDefault() {
-        return (color != 0) ? color : WeekViewConfig.Defaults.EVENT_COLOR;
+        return (color != 0) ? color : Defaults.EVENT_COLOR;
     }
 
     public void setColor(int color) {
@@ -189,8 +189,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.textColor = textColor;
     }
 
-    public int getTextColorOrDefault(WeekViewConfig config) {
-        return (textColor != 0) ? textColor : config.eventTextColor;
+    public int getTextColorOrDefault(WeekViewConfigWrapper config) {
+        return (textColor != 0) ? textColor : config.getEventTextPaint().getColor();
     }
 
     boolean collidesWith(WeekViewEvent other) {
@@ -234,13 +234,13 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
      * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}s
      * @return A list of {@link WeekViewEvent}
      */
-    List<WeekViewEvent<T>> splitWeekViewEvents(WeekViewConfig config) {
+    List<WeekViewEvent<T>> splitWeekViewEvents(WeekViewConfigWrapper config) {
         List<WeekViewEvent<T>> events = new ArrayList<>();
 
         // Clone this end time for when we need to clone events
         Calendar newEndTime = (Calendar) this.endTime.clone();
 
-        boolean isAtStartOfNewPeriod = config.minHour == 0 && isAtStartOfNewDay(startTime, newEndTime);
+        boolean isAtStartOfNewPeriod = config.getMinHour() == 0 && isAtStartOfNewDay(startTime, newEndTime);
 
         if (isAtStartOfNewPeriod) {
             // Set end time to 1ms before midnight to ensure the event rect will get drawn correctly
@@ -275,12 +275,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
                 withTimeAtEndOfDay(newEndTime), location, color, isAllDay, data);
     }
 
-    private List<WeekViewEvent<T>> splitEventsByDays(WeekViewConfig config) {
+    private List<WeekViewEvent<T>> splitEventsByDays(WeekViewConfigWrapper config) {
         List<WeekViewEvent<T>> results = new ArrayList<>();
 
         // Get event for first day
         Calendar firstEventEnd = (Calendar) startTime.clone();
-        firstEventEnd = withTimeAtEndOfPeriod(firstEventEnd, config.maxHour);
+        firstEventEnd = withTimeAtEndOfPeriod(firstEventEnd, config.getMaxHour());
 
         WeekViewEvent<T> firstEvent = new WeekViewEvent<>(id, title,
                 startTime, firstEventEnd, location, color, isAllDay, data);
@@ -289,7 +289,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
         // Get event for last day
         Calendar lastEventStart = (Calendar) endTime.clone();
-        lastEventStart = withTimeAtStartOfPeriod(lastEventStart, config.minHour);
+        lastEventStart = withTimeAtStartOfPeriod(lastEventStart, config.getMinHour());
 
         WeekViewEvent<T> lastEvent = new WeekViewEvent<>(id, title,
                 lastEventStart, endTime, location, color, isAllDay, data);
@@ -303,15 +303,15 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         if (daysInBetween > 0) {
             // Get second day with time at start of day
             Calendar start = (Calendar) firstEventEnd.clone();
-            start = withTimeAtStartOfPeriod(start, config.minHour);
+            start = withTimeAtStartOfPeriod(start, config.getMinHour());
             start.add(DATE, 1);
 
             while (!DateUtils.isSameDay(start, lastEventStart)) {
                 Calendar intermediateStart = (Calendar) start.clone();
-                intermediateStart = withTimeAtStartOfPeriod(intermediateStart, config.minHour);
+                intermediateStart = withTimeAtStartOfPeriod(intermediateStart, config.getMinHour());
 
                 Calendar intermediateEnd = (Calendar) start.clone();
-                intermediateEnd = withTimeAtEndOfPeriod(intermediateEnd, config.maxHour);
+                intermediateEnd = withTimeAtEndOfPeriod(intermediateEnd, config.getMaxHour());
 
                 WeekViewEvent<T> intermediateEvent = new WeekViewEvent<>(id, title,
                         intermediateStart, intermediateEnd, location, color, isAllDay, data);

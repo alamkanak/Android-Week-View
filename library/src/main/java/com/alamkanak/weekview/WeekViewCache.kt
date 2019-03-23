@@ -70,7 +70,7 @@ internal class WeekViewCache<T> {
      *
      * @param events The events to be sorted and cached.
      */
-    fun sortAndCacheEvents(config: WeekViewConfig, events: List<WeekViewEvent<T>>) {
+    fun sortAndCacheEvents(config: WeekViewConfigWrapper, events: List<WeekViewEvent<T>>) {
         events.sorted().forEach { cacheEvent(config, it) }
     }
 
@@ -79,7 +79,7 @@ internal class WeekViewCache<T> {
      *
      * @param event The event to cache.
      */
-    private fun cacheEvent(config: WeekViewConfig, event: WeekViewEvent<T>) {
+    private fun cacheEvent(config: WeekViewConfigWrapper, event: WeekViewEvent<T>) {
         if (event.startTime >= event.endTime) {
             return
         }

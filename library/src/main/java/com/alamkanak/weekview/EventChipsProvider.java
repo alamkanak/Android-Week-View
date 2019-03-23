@@ -8,13 +8,14 @@ import java.util.List;
 
 class EventChipsProvider<T> {
 
-    private final WeekViewConfig config;
+    private final WeekViewConfigWrapper config;
     private final WeekViewCache<T> cache;
     private final WeekViewViewState viewState;
 
     private WeekViewLoader<T> weekViewLoader;
 
-    EventChipsProvider(WeekViewConfig config, WeekViewCache<T> cache, WeekViewViewState viewState) {
+    EventChipsProvider(WeekViewConfigWrapper config,
+                       WeekViewCache<T> cache, WeekViewViewState viewState) {
         this.config = config;
         this.cache = cache;
         this.viewState = viewState;
@@ -24,7 +25,7 @@ class EventChipsProvider<T> {
         this.weekViewLoader = weekViewLoader;
     }
 
-    void loadEventsIfNecessary(View view, WeekViewConfig config, List<Calendar> dayRange) {
+    void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
         if (view.isInEditMode()) {
             return;
         }
@@ -41,7 +42,7 @@ class EventChipsProvider<T> {
 
             // Check if this particular day has been fetched
             if (hasNoEvents || viewState.getShouldRefreshEvents() || needsToFetchPeriod) {
-                loadEventsAndCalculateEventChipPositions(view, config, day);
+                loadEventsAndCalculateEventChipPositions(view, day);
                 viewState.setShouldRefreshEvents(false);
             }
         }
@@ -54,8 +55,7 @@ class EventChipsProvider<T> {
      *
      * @param day The day the user is currently in.
      */
-    private void loadEventsAndCalculateEventChipPositions(View view,
-                                                          WeekViewConfig config, Calendar day) {
+    private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
         // Get more events if the month is changed.
         if (weekViewLoader == null && !view.isInEditMode()) {
             throw new IllegalStateException("You must provide a MonthChangeListener");
@@ -67,14 +67,14 @@ class EventChipsProvider<T> {
         }
 
         if (weekViewLoader != null) {
-            loadEvents(config, day);
+            loadEvents(day);
         }
 
         // Prepare to calculate positions of each events.
         calculateEventChipPositions();
     }
 
-    private void loadEvents(WeekViewConfig config, Calendar day) {
+    private void loadEvents(Calendar day) {
         final Period periodToFetch = weekViewLoader.toPeriod(day);
         FetchedPeriods fetchedPeriods = cache.getFetchedPeriods();
         final boolean needsRefresh = fetchedPeriods != null || !cache.contains(periodToFetch);
