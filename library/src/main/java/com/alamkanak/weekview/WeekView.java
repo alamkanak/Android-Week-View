@@ -86,8 +86,7 @@ public final class WeekView<T> extends View
         return width;
     }
 
-    // TODO Public
-    public static int getViewHeight() {
+    static int getViewHeight() {
         return height;
     }
 
@@ -940,7 +939,7 @@ public final class WeekView<T> extends View
     }
 
     public void setMinDate(Calendar minDate) {
-        if (configWrapper.getMinDate() != null && configWrapper.getMaxDate().before(minDate)) {
+        if (configWrapper.getMaxDate() != null && configWrapper.getMaxDate().before(minDate)) {
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
@@ -1210,7 +1209,7 @@ public final class WeekView<T> extends View
         final double viewHeight = getHeight();
 
         final double desiredOffset = dayHeight - viewHeight;
-        verticalOffset = min((float)desiredOffset, verticalOffset);
+        verticalOffset = min((float) desiredOffset, verticalOffset);
 
         configWrapper.getCurrentOrigin().y = -verticalOffset;
         invalidate();

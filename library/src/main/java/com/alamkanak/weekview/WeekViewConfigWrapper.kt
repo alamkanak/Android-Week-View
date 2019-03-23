@@ -198,13 +198,23 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         }
 
     val minX: Float
-        get() = config.minX
+        get() {
+            return maxDate?.let {
+                val date = it.clone() as Calendar
+                date.add(Calendar.DAY_OF_YEAR, 1 - numberOfVisibleDays)
+                getXOriginForDate(date)
+            } ?: Float.NEGATIVE_INFINITY
+        }
 
     val maxX: Float
-        get() = config.maxX
+        get() = minDate?.let { getXOriginForDate(it) } ?: Float.POSITIVE_INFINITY
+
+    private fun getXOriginForDate(date: Calendar): Float {
+        return -1f * DateUtils.getDaysUntilDate(date).toFloat() * totalDayWidth
+    }
 
     val isSingleDay: Boolean
-        get() = config.isSingleDay
+        get() = numberOfVisibleDays == 1
 
     var minDate: Calendar?
         get() = config.minDate
@@ -404,7 +414,7 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         }
 
     val hoursPerDay: Int
-        get() = config.hoursPerDay
+        get() = config.maxHour - config.minHour
 
     val minutesPerDay: Int
         get() = hoursPerDay * Constants.MINUTES_PER_HOUR

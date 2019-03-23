@@ -150,10 +150,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 
                 float minX = config.getMinX();
                 float maxX = config.getMaxX();
+
                 config.getCurrentOrigin().x = min(config.getCurrentOrigin().x, maxX);
                 config.getCurrentOrigin().x = max(config.getCurrentOrigin().x, minX);
-                // drawingConfig.currentOrigin.x = Math.min(drawingConfig.currentOrigin.x, maxX);
-                // drawingConfig.currentOrigin.x = Math.max(drawingConfig.currentOrigin.x, minX);
 
                 listener.onScrolled();
                 break;

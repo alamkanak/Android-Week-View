@@ -106,8 +106,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet) {
     var minHour: Int = 0
     var maxHour: Int = 0
 
-
-
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
         try {
@@ -209,32 +207,5 @@ class WeekViewConfig(context: Context, attrs: AttributeSet) {
             a.recycle()
         }
     }
-
-    val minX: Float
-        get() {
-            return maxDate?.let {
-                val date = it.clone() as Calendar
-                date.add(Calendar.DAY_OF_YEAR, 1 - numberOfVisibleDays)
-                getXOriginForDate(date)
-            } ?: Float.NEGATIVE_INFINITY
-        }
-
-    val isSingleDay: Boolean
-        get() = numberOfVisibleDays == 1
-
-    private fun getXOriginForDate(date: Calendar): Float {
-        return -1f * DateUtils.getDaysUntilDate(date).toFloat() * totalDayWidth
-    }
-
-    var widthPerDay: Float = 0f
-
-    val totalDayWidth: Float
-        get() = widthPerDay + columnGap
-
-    val maxX: Float
-        get() = minDate?.let { getXOriginForDate(it) } ?: Float.POSITIVE_INFINITY
-
-    val hoursPerDay: Int
-        get() = maxHour - minHour
 
 }
