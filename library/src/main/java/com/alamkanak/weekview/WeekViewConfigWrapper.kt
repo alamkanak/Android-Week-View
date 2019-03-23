@@ -15,40 +15,120 @@ import kotlin.math.min
 
 class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig) {
 
-    var timeTextPaint: Paint
+    var timeTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.RIGHT
+        textSize = config.timeColumnTextSize.toFloat()
+        color = config.timeColumnTextColor
+    }
+
     var timeTextWidth: Float = 0.toFloat()
+
     var timeTextHeight: Float = 0.toFloat()
 
-    var headerTextPaint: Paint
-    var headerTextHeight: Float = 0.toFloat()
+    val headerTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = config.headerRowTextColor
+        textAlign = Paint.Align.CENTER
+        textSize = config.headerRowTextSize.toFloat()
+        typeface = Typeface.DEFAULT_BOLD
+    }
+
+    val headerRowBottomLinePaint: Paint = Paint().apply {
+        color = config.headerRowBottomLineColor
+        strokeWidth = config.headerRowBottomLineWidth.toFloat()
+    }
+
+    var headerTextHeight: Float = headerTextPaint.descent() - headerTextPaint.ascent()
+
     var headerHeight: Float = 0.toFloat()
-    var todayHeaderTextPaint: Paint
+
+    val todayHeaderTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+        textSize = config.headerRowTextSize.toFloat()
+        typeface = Typeface.DEFAULT_BOLD
+        color = config.todayHeaderTextColor
+    }
+
     private var currentAllDayEventHeight: Int = 0
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
 
-    var headerBackgroundPaint: Paint
+    var headerBackgroundPaint: Paint = Paint().apply {
+        color = config.headerRowBackgroundColor
+    }
+
     var widthPerDay: Float = 0f
-    var dayBackgroundPaint: Paint
-    var hourSeparatorPaint: Paint
-    var daySeparatorPaint: Paint
 
-    var todayBackgroundPaint: Paint
-    private var futureBackgroundPaint: Paint
-    private var pastBackgroundPaint: Paint
-    private var futureWeekendBackgroundPaint: Paint
-    private var pastWeekendBackgroundPaint: Paint
+    var dayBackgroundPaint: Paint = Paint().apply {
+        color = config.dayBackgroundColor
+    }
 
-    var timeColumnSeparatorPaint: Paint
+    val hourSeparatorPaint: Paint = Paint().apply {
+        style = Paint.Style.STROKE
+        strokeWidth = config.hourSeparatorStrokeWidth.toFloat()
+        color = config.hourSeparatorColor
+    }
 
-    var nowLinePaint: Paint
-    var nowDotPaint: Paint
+    val daySeparatorPaint: Paint = Paint().apply {
+        style = Paint.Style.STROKE
+        strokeWidth = config.daySeparatorStrokeWidth.toFloat()
+        color = config.daySeparatorColor
+    }
+
+    val todayBackgroundPaint: Paint = Paint().apply {
+        color = config.todayBackgroundColor
+    }
+
+    private val futureBackgroundPaint: Paint  = Paint().apply {
+        color = config.futureBackgroundColor
+    }
+
+    private val pastBackgroundPaint: Paint = Paint().apply {
+        color = config.pastBackgroundColor
+    }
+
+    private val futureWeekendBackgroundPaint: Paint = Paint().apply {
+        color = config.futureWeekendBackgroundColor
+    }
+
+    private val pastWeekendBackgroundPaint: Paint = Paint().apply {
+        color = config.pastWeekendBackgroundColor
+    }
+
+    val timeColumnSeparatorPaint: Paint = Paint().apply {
+        color = config.timeColumnSeparatorColor
+        strokeWidth = config.timeColumnSeparatorStrokeWidth.toFloat()
+    }
+
+    val nowLinePaint: Paint = Paint().apply {
+        strokeWidth = config.nowLineStrokeWidth.toFloat()
+        color = config.nowLineColor
+    }
+
+    val nowDotPaint: Paint = Paint().apply {
+        style = Paint.Style.FILL
+        strokeWidth = config.nowLineDotRadius.toFloat()
+        color = config.nowLineDotColor
+    }
 
     var timeColumnWidth: Float = 0.toFloat()
-    var eventTextPaint: TextPaint
-    var allDayEventTextPaint: TextPaint
-    var timeColumnBackgroundPaint: Paint
+
+    val eventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
+        style = Paint.Style.FILL
+        color = config.eventTextColor
+        textSize = config.eventTextSize.toFloat()
+    }
+
+    val allDayEventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
+        style = Paint.Style.FILL
+        color = config.eventTextColor
+        textSize = config.allDayEventTextSize.toFloat()
+    }
+
+    val timeColumnBackgroundPaint: Paint = Paint().apply {
+        color = config.timeColumnBackgroundColor
+    }
+
     var hasEventInHeader: Boolean = false
 
     var newHourHeight = -1f
@@ -56,98 +136,10 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
     lateinit var dateTimeInterpreter: DateTimeInterpreter
 
     init {
-        // Measure settings for time column.
-        timeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        timeTextPaint.textAlign = Paint.Align.RIGHT
-        timeTextPaint.textSize = config.timeColumnTextSize.toFloat()
-        timeTextPaint.color = config.timeColumnTextColor
-
         val rect = Rect()
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
         timeTextHeight = rect.height().toFloat()
         initTextTimeWidth(context)
-
-        // Measure settings for header row.
-        headerTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        headerTextPaint.color = config.headerRowTextColor
-        headerTextPaint.textAlign = Paint.Align.CENTER
-        headerTextPaint.textSize = config.headerRowTextSize.toFloat()
-        headerTextPaint.typeface = Typeface.DEFAULT_BOLD
-        headerTextHeight = headerTextPaint.descent() - headerTextPaint.ascent()
-
-        // Prepare header background paint.
-        headerBackgroundPaint = Paint()
-        headerBackgroundPaint.color = config.headerRowBackgroundColor
-
-        // Prepare day background color paint.
-        dayBackgroundPaint = Paint()
-        dayBackgroundPaint.color = config.dayBackgroundColor
-        futureBackgroundPaint = Paint()
-        futureBackgroundPaint.color = config.futureBackgroundColor
-        pastBackgroundPaint = Paint()
-        pastBackgroundPaint.color = config.pastBackgroundColor
-        futureWeekendBackgroundPaint = Paint()
-        futureWeekendBackgroundPaint.color = config.futureWeekendBackgroundColor
-        pastWeekendBackgroundPaint = Paint()
-        pastWeekendBackgroundPaint.color = config.pastWeekendBackgroundColor
-
-        // Prepare time column separator.
-        timeColumnSeparatorPaint = Paint()
-        timeColumnSeparatorPaint.color = config.timeColumnSeparatorColor
-        timeColumnSeparatorPaint.strokeWidth = config.timeColumnSeparatorStrokeWidth.toFloat()
-
-        // Prepare hour separator color paint.
-        hourSeparatorPaint = Paint()
-        hourSeparatorPaint.style = Paint.Style.STROKE
-        hourSeparatorPaint.strokeWidth = config.hourSeparatorStrokeWidth.toFloat()
-        hourSeparatorPaint.color = config.hourSeparatorColor
-
-        // Prepare day separator color paint.
-        daySeparatorPaint = Paint()
-        daySeparatorPaint.style = Paint.Style.STROKE
-        daySeparatorPaint.strokeWidth = config.daySeparatorStrokeWidth.toFloat()
-        daySeparatorPaint.color = config.daySeparatorColor
-
-        // Prepare the "now" line color paint
-        nowLinePaint = Paint()
-        nowLinePaint.strokeWidth = config.nowLineStrokeWidth.toFloat()
-        nowLinePaint.color = config.nowLineColor
-
-        // Prepare the "now" dot paint
-        nowDotPaint = Paint()
-        nowDotPaint.style = Paint.Style.FILL
-        nowDotPaint.strokeWidth = config.nowLineDotRadius.toFloat()
-        nowDotPaint.color = config.nowLineDotColor
-
-        // Prepare today background color paint.
-        todayBackgroundPaint = Paint()
-        todayBackgroundPaint.color = config.todayBackgroundColor
-
-        // Prepare today header text color paint.
-        todayHeaderTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        todayHeaderTextPaint.textAlign = Paint.Align.CENTER
-        todayHeaderTextPaint.textSize = config.headerRowTextSize.toFloat()
-        todayHeaderTextPaint.typeface = Typeface.DEFAULT_BOLD
-        todayHeaderTextPaint.color = config.todayHeaderTextColor
-
-        // Prepare header column background color.
-        timeColumnBackgroundPaint = Paint()
-        timeColumnBackgroundPaint.color = config.timeColumnBackgroundColor
-
-        // Prepare event text size and color.
-        eventTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG)
-        eventTextPaint.style = Paint.Style.FILL
-        eventTextPaint.color = config.eventTextColor
-        eventTextPaint.textSize = config.eventTextSize.toFloat()
-
-        // Prepare event text size and color.
-        allDayEventTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG)
-        allDayEventTextPaint.style = Paint.Style.FILL
-        allDayEventTextPaint.color = config.eventTextColor
-        allDayEventTextPaint.textSize = config.allDayEventTextSize.toFloat()
-
-        currentAllDayEventHeight = 0
-        hasEventInHeader = false
         refreshHeaderHeight()
     }
 
@@ -191,19 +183,6 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         get() = config.showNowLineDot
         set(value) {
             config.showNowLineDot = value
-        }
-
-    // TODO Wrap in Paint object
-    var nowLineDotColor: Int
-        get() = config.nowLineDotColor
-        set(value) {
-            config.nowLineDotColor = value
-        }
-
-    var nowLineDotRadius: Int
-        get() = config.nowLineDotRadius
-        set(value) {
-            config.nowLineDotRadius = value
         }
 
     var showHourSeparators: Boolean
@@ -324,19 +303,6 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         get() = config.showHeaderRowBottomLine
         set(value) {
             config.showHeaderRowBottomLine = value
-        }
-
-    var headerRowBottomLineColor: Int
-        get() = config.headerRowBottomLineColor
-        set(value) {
-            config.headerRowBottomLineColor = value
-        }
-
-    // TODO: use Paint instead
-    var headerRowBottomLineWidth: Int
-        get() = config.headerRowBottomLineWidth
-        set(value) {
-            config.headerRowBottomLineWidth = value
         }
 
     val singleLineHeader: Boolean
@@ -633,7 +599,7 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
     fun refreshHeaderHeight() {
         headerHeight = headerRowPadding * 2 + headerTextHeight
         if (showHeaderRowBottomLine) {
-            headerHeight += headerRowBottomLineWidth.toFloat()
+            headerHeight += headerRowBottomLinePaint.strokeWidth
         }
         if (hasEventInHeader) {
             headerHeight += currentAllDayEventHeight.toFloat()

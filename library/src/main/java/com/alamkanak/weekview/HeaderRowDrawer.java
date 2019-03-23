@@ -85,12 +85,12 @@ class HeaderRowDrawer<T> {
     }
 
     private void drawHeaderBottomLine(int width, Canvas canvas) {
-        final int headerRowBottomLineWidth = config.getHeaderRowBottomLineWidth();
+        final float headerRowBottomLineWidth = config.getHeaderRowBottomLinePaint().getStrokeWidth();
         final float topMargin = config.getHeaderHeight() - headerRowBottomLineWidth;
 
         final Paint paint = new Paint();
         paint.setStrokeWidth(headerRowBottomLineWidth);
-        paint.setColor(config.getHeaderRowBottomLineColor());
+        paint.setColor(config.getHeaderRowBottomLinePaint().getColor());
 
         canvas.drawLine(0, topMargin, width, topMargin, paint);
     }

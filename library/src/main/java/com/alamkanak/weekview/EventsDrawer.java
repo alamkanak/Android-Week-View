@@ -142,7 +142,8 @@ class EventsDrawer<T> {
         // Hide events when they are in the top left corner
         final Paint headerBackground = config.getHeaderBackgroundPaint();
 
-        float headerRowBottomLine = config.getShowHeaderRowBottomLine() ? config.getHeaderRowBottomLineWidth() : 0;
+        float headerRowBottomLine = config.getShowHeaderRowBottomLine()
+                ? config.getHeaderRowBottomLinePaint().getStrokeWidth() : 0f;
 
         final float height = config.getHeaderHeight() - headerRowBottomLine;
         final float width = config.getTimeTextWidth() + config.getTimeColumnPadding() * 2;

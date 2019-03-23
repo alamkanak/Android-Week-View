@@ -323,20 +323,20 @@ public final class WeekView<T> extends View
     }
 
     public int getHeaderRowBottomLineColor() {
-        return configWrapper.getHeaderRowBottomLineColor();
+        return configWrapper.getHeaderRowBottomLinePaint().getColor();
     }
 
     public void setHeaderRowBottomLineColor(int color) {
-        configWrapper.setHeaderRowBottomLineColor(color);
+        configWrapper.getHeaderRowBottomLinePaint().setColor(color);
         invalidate();
     }
 
     public int getHeaderRowBottomLineWidth() {
-        return configWrapper.getHeaderRowBottomLineWidth();
+        return (int) configWrapper.getHeaderRowBottomLinePaint().getStrokeWidth();
     }
 
     public void setHeaderRowBottomLineWidth(int width) {
-        configWrapper.setHeaderRowBottomLineWidth(width);
+        configWrapper.getHeaderRowBottomLinePaint().setStrokeWidth(width);
         invalidate();
     }
 
@@ -830,7 +830,7 @@ public final class WeekView<T> extends View
      * @return The color of the "now" line dot.
      */
     public int getNowLineDotColor() {
-        return configWrapper.getNowLineDotColor();
+        return configWrapper.getNowDotPaint().getColor();
     }
 
     /**
@@ -839,7 +839,7 @@ public final class WeekView<T> extends View
      * @param color The color of the "now" line dot.
      */
     public void setNowLineDotColor(int color) {
-        configWrapper.setNowLineDotColor(color);
+        configWrapper.getNowDotPaint().setColor(color);
         invalidate();
     }
 
@@ -849,7 +849,7 @@ public final class WeekView<T> extends View
      * @return The radius of the "now" line dot.
      */
     public int getNowLineDotRadius() {
-        return configWrapper.getNowLineDotRadius();
+        return (int) configWrapper.getNowDotPaint().getStrokeWidth();
     }
 
     /**
@@ -858,7 +858,7 @@ public final class WeekView<T> extends View
      * @param radius The radius of the "now" line dot.
      */
     public void setNowLineDotRadius(int radius) {
-        configWrapper.setNowLineDotRadius(radius);
+        configWrapper.getNowDotPaint().setStrokeWidth(radius);
         invalidate();
     }
 
