@@ -98,10 +98,6 @@ class WeekViewConfig(context: Context, attrs: AttributeSet) {
     var horizontalScrollingEnabled: Boolean = false
     var scrollDuration: Int = 0
 
-    // Date range
-    var minDate: Calendar? = null
-    var maxDate: Calendar? = null
-
     // Time range
     var minHour: Int = 0
     var maxHour: Int = 0

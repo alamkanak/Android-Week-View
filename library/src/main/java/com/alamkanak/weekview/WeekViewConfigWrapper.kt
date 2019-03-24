@@ -6,6 +6,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
+import com.alamkanak.weekview.Constants.UNINITIALIZED
 import com.alamkanak.weekview.DateUtils.today
 import java.util.*
 import java.util.Calendar.*
@@ -13,7 +14,10 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig) {
+class WeekViewConfigWrapper(
+        context: Context,
+        private val config: WeekViewConfig
+) {
 
     var timeTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.RIGHT
@@ -111,7 +115,7 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         color = config.nowLineDotColor
     }
 
-    var timeColumnWidth: Float = 0.toFloat()
+    var timeColumnWidth: Float = UNINITIALIZED
 
     val eventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
         style = Paint.Style.FILL
@@ -131,9 +135,12 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
 
     var hasEventInHeader: Boolean = false
 
-    var newHourHeight = -1f
+    var newHourHeight: Float = UNINITIALIZED
 
-    lateinit var dateTimeInterpreter: DateTimeInterpreter
+    var minDate: Calendar? = null
+    var maxDate: Calendar? = null
+
+    var dateTimeInterpreter: DateTimeInterpreter = DefaultDateTimeInterpreter(context, numberOfVisibleDays)
 
     init {
         val rect = Rect()
@@ -209,24 +216,8 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
     val maxX: Float
         get() = minDate?.let { getXOriginForDate(it) } ?: Float.POSITIVE_INFINITY
 
-    private fun getXOriginForDate(date: Calendar): Float {
-        return -1f * DateUtils.getDaysUntilDate(date).toFloat() * totalDayWidth
-    }
-
     val isSingleDay: Boolean
         get() = numberOfVisibleDays == 1
-
-    var minDate: Calendar?
-        get() = config.minDate
-        set(value) {
-            config.minDate = value
-        }
-
-    var maxDate: Calendar?
-        get() = config.maxDate
-        set(value) {
-            config.maxDate = value
-        }
 
     var minHour: Int
         get() = config.minHour
@@ -470,6 +461,19 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
             config.showDistinctPastFutureColor = value
         }
 
+    fun calculateTimeColumnWidth() {
+        timeColumnWidth += timeColumnPadding * 2
+    }
+
+    fun calculateWidthPerDay(width: Int) {
+        val availableWidth = (width.toFloat() - timeColumnWidth - columnGap * (numberOfVisibleDays - 1))
+        widthPerDay = availableWidth / numberOfVisibleDays
+    }
+
+    private fun getXOriginForDate(date: Calendar): Float {
+        return -1f * DateUtils.getDaysUntilDate(date).toFloat() * totalDayWidth
+    }
+
     fun setCurrentAllDayEventHeight(height: Int) {
         currentAllDayEventHeight = height
         refreshHeaderHeight()
@@ -526,19 +530,19 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
 
     fun refreshAfterZooming() {
         if (newHourHeight > 0 && !showCompleteDay) {
-            newHourHeight = Math.max(newHourHeight, effectiveMinHourHeight.toFloat())
-            newHourHeight = Math.min(newHourHeight, maxHourHeight.toFloat())
+            newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
+            newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
 
             // potentialMinHourHeight
             // the minimal height of an hour when zoomed completely out
             // needed to suppress the zooming below 24:00
             val height = WeekView.getViewHeight()
             val potentialMinHourHeight = (height - headerHeight) / hoursPerDay
-            newHourHeight = Math.max(newHourHeight, potentialMinHourHeight)
+            newHourHeight = max(newHourHeight, potentialMinHourHeight)
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
             hourHeight = newHourHeight
-            newHourHeight = -1f
+            newHourHeight = UNINITIALIZED
         }
     }
 
@@ -576,19 +580,6 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
         timeTextPaint.textSize = textSize.toFloat()
     }
 
-    /*fun setHeaderRowTextColor(headerRowTextColor: Int) {
-        headerTextPaint.color = headerRowTextColor
-    }*/
-
-    /*fun setHeaderRowTextSize(size: Int) {
-        headerTextPaint.textSize = size.toFloat()
-        todayHeaderTextPaint.textSize = size.toFloat()
-    }*/
-
-    /*fun setTimeColumnTextColor(timeColumnTextColor: Int) {
-        timeTextPaint.color = timeColumnTextColor
-    }*/
-
     fun setDateTimeInterpreter(dateTimeInterpreter: DateTimeInterpreter, context: Context) {
         this.dateTimeInterpreter = dateTimeInterpreter
         initTextTimeWidth(context)
@@ -608,9 +599,11 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
 
     fun refreshHeaderHeight() {
         headerHeight = headerRowPadding * 2 + headerTextHeight
+
         if (showHeaderRowBottomLine) {
             headerHeight += headerRowBottomLinePaint.strokeWidth
         }
+
         if (hasEventInHeader) {
             headerHeight += currentAllDayEventHeight.toFloat()
         }
@@ -626,18 +619,16 @@ class WeekViewConfigWrapper(context: Context, private val config: WeekViewConfig
      */
     private fun initTextTimeWidth(context: Context) {
         val interpreter = getDateTimeInterpreter(context)
-        timeTextWidth = 0f
-
-        for (i in 0 until HOUR_OF_DAY) {
-            val time = interpreter.interpretTime(i)
-            timeTextWidth = max(timeTextWidth, timeTextPaint.measureText(time))
-        }
+        timeTextWidth = (0 until hoursPerDay)
+                .map { interpreter.interpretTime(it) }
+                .map { timeTextPaint.measureText(it) }
+                .max() ?: 0f
     }
 
     fun getDateTimeInterpreter(context: Context): DateTimeInterpreter {
-        if (this::dateTimeInterpreter.isInitialized.not()) {
+        /*if (this::dateTimeInterpreter.isInitialized.not()) {
             dateTimeInterpreter = DefaultDateTimeInterpreter(context, numberOfVisibleDays)
-        }
+        }*/
 
         return dateTimeInterpreter
     }

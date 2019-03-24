@@ -112,11 +112,8 @@ internal object DateUtils {
 
     @JvmStatic
     fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
-        return if (DateFormat.is24HourFormat(context)) {
-            SimpleDateFormat("HH:mm", Locale.getDefault())
-        } else {
-            SimpleDateFormat("hh a", Locale.getDefault())
-        }
+        val format = if (DateFormat.is24HourFormat(context)) "HH:mm" else "hh a"
+        return SimpleDateFormat(format, Locale.getDefault())
     }
 
 }

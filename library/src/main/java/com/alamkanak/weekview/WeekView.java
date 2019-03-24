@@ -17,6 +17,7 @@ import android.view.View;
 import java.util.Calendar;
 import java.util.List;
 
+import static com.alamkanak.weekview.Constants.UNINITIALIZED;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
@@ -60,7 +61,7 @@ public final class WeekView<T> extends View
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        WeekViewConfig config = new WeekViewConfig(context, attrs); // TODO: Don't expose WeekViewConfig2
+        WeekViewConfig config = new WeekViewConfig(context, attrs);
         configWrapper = new WeekViewConfigWrapper(context, config);
 
         cache = new WeekViewCache<>();
@@ -106,7 +107,7 @@ public final class WeekView<T> extends View
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        viewState.areDimensionsInvalid = true;
+        viewState.setAreDimensionsInvalid(true);
 
         WeekView.width = width;
         WeekView.height = height;
@@ -160,8 +161,8 @@ public final class WeekView<T> extends View
             invalidate();
         }
 
-        if (viewState.requiresPostInvalidateOnAnimation) {
-            viewState.requiresPostInvalidateOnAnimation = false;
+        if (viewState.getRequiresPostInvalidateOnAnimation()) {
+            viewState.setRequiresPostInvalidateOnAnimation(false);
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
@@ -196,19 +197,11 @@ public final class WeekView<T> extends View
     }
 
     private void calculateWidthPerDay() {
-        // Initialize drawConfig.timeColumnWidth at first call
-        if (configWrapper.getTimeColumnWidth() == 0) {
-            float newWidth = configWrapper.getTimeColumnWidth() + configWrapper.getTimeColumnPadding() * 2;
-            configWrapper.setTimeColumnWidth(newWidth);
+        if (configWrapper.getTimeColumnWidth() == UNINITIALIZED) {
+            configWrapper.calculateTimeColumnWidth();
         }
 
-        // Calculate the available width for each day
-        // TODO Single calculate() method
-        float availableWidth = getWidth()
-                - configWrapper.getTimeColumnWidth()
-                - configWrapper.getColumnGap() * (configWrapper.getNumberOfVisibleDays() - 1);
-        float dayWidth = availableWidth / configWrapper.getNumberOfVisibleDays();
-        configWrapper.setWidthPerDay(dayWidth);
+        configWrapper.calculateWidthPerDay(getWidth());
     }
 
     private void clipEventsRect(Canvas canvas) {
@@ -1154,8 +1147,6 @@ public final class WeekView<T> extends View
         final int numberOfVisibleDays = configWrapper.getNumberOfVisibleDays();
         final boolean showFirstDayOfWeekFirst = configWrapper.getShowFirstDayOfWeekFirst();
 
-
-
         // If a minimum or maximum date is set, don't allow to go beyond them.
         if (minDate != null && modifiedDate.before(minDate)) {
             modifiedDate = (Calendar) minDate.clone();
@@ -1169,17 +1160,17 @@ public final class WeekView<T> extends View
 
         gestureHandler.forceScrollFinished();
 
-        if (viewState.areDimensionsInvalid) {
+        if (viewState.getAreDimensionsInvalid()) {
             viewState.setScrollToDay(modifiedDate);
             return;
         }
 
         viewState.setShouldRefreshEvents(true);
 
-        int diff = DateUtils.getDaysUntilDate(modifiedDate);
+        final int diff = DateUtils.getDaysUntilDate(modifiedDate);
 
         configWrapper.getCurrentOrigin().x = diff * (-1) * configWrapper.getTotalDayWidth();
-        viewState.requiresPostInvalidateOnAnimation = true;
+        viewState.setRequiresPostInvalidateOnAnimation(true);
         invalidate();
     }
 
@@ -1197,7 +1188,7 @@ public final class WeekView<T> extends View
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
     public void goToHour(int hour) {
-        if (viewState.areDimensionsInvalid) {
+        if (viewState.getAreDimensionsInvalid()) {
             viewState.setScrollToHour(hour);
             return;
         }
@@ -1313,7 +1304,7 @@ public final class WeekView<T> extends View
      * @return The date, time interpreter.
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
-        return configWrapper.getDateTimeInterpreter(getContext());
+        return configWrapper.getDateTimeInterpreter(); // getDateTimeInterpreter(getContext());
     }
 
     /**

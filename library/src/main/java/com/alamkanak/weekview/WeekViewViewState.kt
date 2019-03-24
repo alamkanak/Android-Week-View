@@ -11,16 +11,12 @@ internal class WeekViewViewState(
     var scrollToHour: Int? = null
 
     var isFirstDraw = true
-
-    @JvmField
     var areDimensionsInvalid = true
 
     var firstVisibleDay: Calendar? = null
     var lastVisibleDay: Calendar? = null
 
     var shouldRefreshEvents: Boolean = false
-
-    @JvmField
     var requiresPostInvalidateOnAnimation: Boolean = false
 
     fun update(listener: UpdateListener) {
