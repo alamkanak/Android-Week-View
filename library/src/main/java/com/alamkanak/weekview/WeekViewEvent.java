@@ -1,5 +1,6 @@
 package com.alamkanak.weekview;
 
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
@@ -31,6 +32,9 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     private int color;
     private boolean isAllDay;
     private int textColor = 0;
+
+    private int borderWidth;
+    private int borderColor;
 
     private T data;
 
@@ -193,6 +197,26 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return (textColor != 0) ? textColor : config.getEventTextPaint().getColor();
     }
 
+    boolean hasBorder() {
+        return borderWidth > 0;
+    }
+
+    int getBorderWidth() {
+        return borderWidth;
+    }
+
+    public void setBorderWidth(int borderWidth) {
+        this.borderWidth = borderWidth;
+    }
+
+    int getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(int borderColor) {
+        this.borderColor = borderColor;
+    }
+
     boolean collidesWith(WeekViewEvent other) {
         long thisStart = startTime.getTimeInMillis();
         long thisEnd = endTime.getTimeInMillis();
@@ -256,18 +280,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
-        return getEndTime() == originalEvent.getEndTime()
-                && getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE);
+        return getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE);
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return getStartTime() == originalEvent.getStartTime()
-                && getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
-    }
-
-    boolean startsOnEarlierDayAndEndsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE)
-                && getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
+        return getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
     }
 
     private WeekViewEvent<T> shortenTooLongAllDayEvent(Calendar newEndTime) {
@@ -284,6 +301,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
         WeekViewEvent<T> firstEvent = new WeekViewEvent<>(id, title,
                 startTime, firstEventEnd, location, color, isAllDay, data);
+        firstEvent.setBorderWidth(borderWidth);
+        firstEvent.setBorderColor(borderColor);
         firstEvent.setTextColor(textColor);
         results.add(firstEvent);
 
@@ -293,6 +312,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
         WeekViewEvent<T> lastEvent = new WeekViewEvent<>(id, title,
                 lastEventStart, endTime, location, color, isAllDay, data);
+        lastEvent.setBorderWidth(borderWidth);
+        lastEvent.setBorderColor(borderColor);
         lastEvent.setTextColor(textColor);
         results.add(lastEvent);
 
@@ -315,6 +336,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
                 WeekViewEvent<T> intermediateEvent = new WeekViewEvent<>(id, title,
                         intermediateStart, intermediateEnd, location, color, isAllDay, data);
+                intermediateEvent.setBorderWidth(borderWidth);
+                intermediateEvent.setBorderColor(borderColor);
                 intermediateEvent.setTextColor(textColor);
                 results.add(intermediateEvent);
 
@@ -340,6 +363,106 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     @Override
     public WeekViewEvent<T> toWeekViewEvent() {
         return this;
+    }
+
+    public static class Style {
+
+        private int backgroundColor;
+        private int textColor;
+        private int borderWidth;
+        private int borderColor;
+
+        public static class Builder {
+
+            private Style style;
+
+            public Builder() {
+                style = new Style();
+            }
+
+            public Builder setBackgroundColor(@ColorInt int color) {
+                style.backgroundColor = color;
+                return this;
+            }
+
+            public Builder setTextColor(@ColorInt int color) {
+                style.textColor = color;
+                return this;
+            }
+
+            public Builder setBorderWidth(int width) {
+                style.borderWidth = width;
+                return this;
+            }
+
+            public Builder setBorderColor(@ColorInt int color) {
+                style.borderColor = color;
+                return this;
+            }
+
+            public Style build() {
+                return style;
+            }
+
+        }
+
+    }
+
+    public static class Builder<T> {
+
+        private WeekViewEvent<T> event;
+
+        public Builder() {
+            event = new WeekViewEvent<>();
+        }
+
+        public Builder<T> setId(long id) {
+            event.id = id;
+            return this;
+        }
+
+        public Builder<T> setTitle(@NonNull String title) {
+            event.title = title;
+            return this;
+        }
+
+        public Builder<T> setStartTime(@NonNull Calendar startTime) {
+            event.startTime = startTime;
+            return this;
+        }
+
+        public Builder<T> setEndTime(@NonNull Calendar endTime) {
+            event.endTime = endTime;
+            return this;
+        }
+
+        public Builder<T> setLocation(String location) {
+            event.location = location;
+            return this;
+        }
+
+        public Builder<T> setStyle(WeekViewEvent.Style style) {
+            event.color = style.backgroundColor;
+            event.textColor = style.textColor;
+            event.borderWidth = style.borderWidth;
+            event.borderColor = style.borderColor;
+            return this;
+        }
+
+        public Builder<T> setAllDay(boolean isAllDay) {
+            event.isAllDay = isAllDay;
+            return this;
+        }
+
+        public Builder<T> setData(T data) {
+            event.data = data;
+            return this;
+        }
+
+        public WeekViewEvent<T> build() {
+            return event;
+        }
+
     }
 
 }

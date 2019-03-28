@@ -60,6 +60,11 @@ class EventChip<T> {
         final Paint backgroundPaint = getBackgroundPaint();
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
+        if (event.hasBorder()) {
+            Paint borderPaint = getBorderPaint();
+            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
+        }
+
         if (event.isNotAllDay()) {
             drawCornersForMultiDayEvents(backgroundPaint, cornerRadius, canvas);
         }
@@ -77,21 +82,51 @@ class EventChip<T> {
         if (event.startsOnEarlierDay(originalEvent)) {
             RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
             canvas.drawRect(topRect, backgroundPaint);
-        } else if (event.endsOnLaterDay(originalEvent)) {
-            RectF bottomRect = new RectF(rect.left, rect.bottom - cornerRadius, rect.right, rect.bottom);
-            canvas.drawRect(bottomRect, backgroundPaint);
-        } else if (event.startsOnEarlierDayAndEndsOnLaterDay(originalEvent)) {
-            RectF topRect = new RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius);
-            canvas.drawRect(topRect, backgroundPaint);
+        }
 
+        if (event.endsOnLaterDay(originalEvent)) {
             RectF bottomRect = new RectF(rect.left, rect.bottom - cornerRadius, rect.right, rect.bottom);
             canvas.drawRect(bottomRect, backgroundPaint);
+        }
+
+        if (!event.hasBorder()) {
+            return;
+        }
+
+        final float borderWidth = event.getBorderWidth();
+        final float innerWidth = rect.width() - borderWidth * 2;
+
+        final float borderStartX = rect.left + borderWidth;
+        final float borderEndX = borderStartX + innerWidth;
+
+        if (event.startsOnEarlierDay(originalEvent)) {
+            // Remove top border stroke
+            final float borderStartY = rect.top;
+            final float borderEndY = borderStartY + borderWidth;
+            final RectF rect = new RectF(borderStartX, borderStartY, borderEndX, borderEndY);
+            canvas.drawRect(rect, backgroundPaint);
+        }
+
+        if (event.endsOnLaterDay(originalEvent)) {
+            // Remove bottom border stroke
+            final float borderEndY = rect.bottom;
+            final float borderStartY = borderEndY - borderWidth;
+            final RectF rect = new RectF(borderStartX, borderStartY, borderEndX, borderEndY);
+            canvas.drawRect(rect, backgroundPaint);
         }
     }
 
     private Paint getBackgroundPaint() {
         final Paint paint = new Paint();
         paint.setColor(event.getColorOrDefault());
+        return paint;
+    }
+
+    private Paint getBorderPaint() {
+        final Paint paint = new Paint();
+        paint.setColor(event.getBorderColor());
+        paint.setStrokeWidth(event.getBorderWidth());
+        paint.setStyle(Paint.Style.STROKE);
         return paint;
     }
 
