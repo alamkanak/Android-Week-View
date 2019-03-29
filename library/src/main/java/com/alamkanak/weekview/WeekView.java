@@ -375,7 +375,7 @@ public final class WeekView<T> extends View
         invalidate();
     }
 
-    public int getTimeColumTextSize() {
+    public int getTimeColumnTextSize() {
         return configWrapper.getTimeColumnTextSize();
     }
 
