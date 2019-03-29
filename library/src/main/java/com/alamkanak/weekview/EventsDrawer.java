@@ -21,11 +21,11 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
 class EventsDrawer<T> {
 
     private final WeekViewConfigWrapper config;
-    private final EventChipRectCalculator rectCalculator;
+    private final EventChipRectCalculator<T> rectCalculator;
 
     EventsDrawer(WeekViewConfigWrapper config) {
         this.config = config;
-        this.rectCalculator = new EventChipRectCalculator(config);
+        this.rectCalculator = new EventChipRectCalculator<>(config);
     }
 
     void drawSingleEvents(List<EventChip<T>> eventChips,
@@ -54,7 +54,7 @@ class EventsDrawer<T> {
         }
 
         for (int i = 0; i < eventChips.size(); i++) {
-            final EventChip eventChip = eventChips.get(i);
+            final EventChip<T> eventChip = eventChips.get(i);
             final WeekViewEvent event = eventChip.event;
             if (!event.isSameDay(date) || !event.isWithin(config.getMinHour(), config.getMaxHour())) {
                 continue;
@@ -110,7 +110,7 @@ class EventsDrawer<T> {
         return result;
     }
 
-    private StaticLayout prepareDrawAllDayEvent(EventChip eventChip, float startFromPixel) {
+    private StaticLayout prepareDrawAllDayEvent(EventChip<T> eventChip, float startFromPixel) {
         final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
         if (isValidAllDayEventRect(chipRect)) {
             eventChip.rect = chipRect;
