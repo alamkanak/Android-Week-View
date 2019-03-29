@@ -7,7 +7,7 @@ import java.util.Calendar;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.max;
 
-final class WeekViewTouchHandler {
+class WeekViewTouchHandler {
 
     private final WeekViewConfigWrapper config;
 

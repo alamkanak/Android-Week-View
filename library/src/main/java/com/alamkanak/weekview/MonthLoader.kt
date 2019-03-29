@@ -9,7 +9,7 @@ import java.util.*
  * an interface that can be implemented in one's actual data class and handles the conversion to a
  * [WeekViewEvent].
  */
-private class MonthLoader<T>(
+internal class MonthLoader<T>(
         var onMonthChangeListener: MonthChangeListener<T>?
 ) : WeekViewLoader<T> {
 

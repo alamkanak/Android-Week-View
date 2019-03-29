@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.util.TypedValue
 
-class Defaults {
+internal class Defaults {
 
     companion object {
 

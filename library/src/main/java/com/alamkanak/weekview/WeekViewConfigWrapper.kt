@@ -13,8 +13,7 @@ import java.util.Calendar.*
 import kotlin.math.max
 import kotlin.math.min
 
-
-class WeekViewConfigWrapper(
+internal class WeekViewConfigWrapper(
         context: Context,
         private val config: WeekViewConfig
 ) {

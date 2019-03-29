@@ -3,39 +3,39 @@ package com.alamkanak.weekview
 import java.util.*
 import java.util.Calendar.*
 
-fun Calendar.withTimeAtStartOfDay(): Calendar = DateUtils.withTimeAtStartOfDay(this)
+internal fun Calendar.withTimeAtStartOfDay(): Calendar = DateUtils.withTimeAtStartOfDay(this)
 
-fun Calendar.withTimeAtEndOfDay(): Calendar = DateUtils.withTimeAtEndOfDay(this)
+internal fun Calendar.withTimeAtEndOfDay(): Calendar = DateUtils.withTimeAtEndOfDay(this)
 
-val Calendar.isToday: Boolean
+internal val Calendar.isToday: Boolean
     get() = DateUtils.isSameDay(this, DateUtils.today())
 
-val Calendar.isWeekend: Boolean
+internal val Calendar.isWeekend: Boolean
     get() = get(DAY_OF_WEEK) == SATURDAY || get(DAY_OF_WEEK) == SUNDAY
 
-val Calendar.isBeforeToday: Boolean
+internal val Calendar.isBeforeToday: Boolean
     get() = before(DateUtils.today())
 
-fun Calendar.copy(): Calendar = clone() as Calendar
+internal fun Calendar.copy(): Calendar = clone() as Calendar
 
-fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
+internal fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
     return DateUtils.withTimeAtStartOfPeriod(this, hour)
 }
 
-fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
+internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
     return DateUtils.withTimeAtEndOfPeriod(this, hour)
 }
 
-fun Calendar.plusDays(days: Int): Calendar {
+internal fun Calendar.plusDays(days: Int): Calendar {
     return copy().apply {
         add(DATE, days)
     }
 }
 
-fun Calendar.addDays(days: Int) {
+internal fun Calendar.addDays(days: Int) {
     add(DATE, days)
 }
 
-fun Calendar.isSameDate(other: Calendar): Boolean {
+internal fun Calendar.isSameDate(other: Calendar): Boolean {
     return DateUtils.isSameDay(this, other)
 }

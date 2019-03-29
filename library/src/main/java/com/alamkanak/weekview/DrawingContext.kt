@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import java.lang.Math.ceil
 import java.util.*
 
-class DrawingContext(
+internal class DrawingContext(
         val dateRange: List<Calendar>,
         val startPixel: Float
 ) {

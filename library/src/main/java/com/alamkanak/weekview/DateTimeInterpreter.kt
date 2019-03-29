@@ -11,7 +11,7 @@ interface DateTimeInterpreter {
     fun interpretTime(hour: Int): String
 }
 
-class DefaultDateTimeInterpreter(
+internal class DefaultDateTimeInterpreter(
         context: Context,
         numberOfDays: Int
 ) : DateTimeInterpreter {

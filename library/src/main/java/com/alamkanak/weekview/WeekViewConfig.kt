@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import java.util.*
 
-class WeekViewConfig(context: Context, attrs: AttributeSet) {
+internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
 
     // Calendar configuration
     var firstDayOfWeek: Int = 0

@@ -6,7 +6,7 @@ import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
 import kotlin.math.max
 
-private class NowLineDrawer(
+internal class NowLineDrawer(
         private val config: WeekViewConfigWrapper
 ) {
 

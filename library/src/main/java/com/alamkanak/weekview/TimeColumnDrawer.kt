@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 
-private class TimeColumnDrawer(
+internal class TimeColumnDrawer(
         private val config: WeekViewConfigWrapper
 ) {
 
