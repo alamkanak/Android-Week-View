@@ -64,7 +64,8 @@ public final class WeekView<T> extends View
         WeekViewConfig config = new WeekViewConfig(context, attrs);
         configWrapper = new WeekViewConfigWrapper(context, config);
 
-        cache = new WeekViewCache<>();
+        WeekViewEventSplitter<T> eventSplitter = new WeekViewEventSplitter<>(configWrapper);
+        cache = new WeekViewCache<>(eventSplitter);
         viewState = new WeekViewViewState(configWrapper);
 
         gestureHandler = new WeekViewGestureHandler<>(context, this, configWrapper, cache);

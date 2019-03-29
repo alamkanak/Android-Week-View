@@ -2,7 +2,9 @@ package com.alamkanak.weekview
 
 import java.util.*
 
-internal class WeekViewCache<T> {
+internal class WeekViewCache<T>(
+        private val eventSplitter: WeekViewEventSplitter<T>
+) {
 
     var allEventChips = mutableListOf<EventChip<T>>()
     var normalEventChips = mutableListOf<EventChip<T>>()
@@ -70,8 +72,8 @@ internal class WeekViewCache<T> {
      *
      * @param events The events to be sorted and cached.
      */
-    fun sortAndCacheEvents(config: WeekViewConfigWrapper, events: List<WeekViewEvent<T>>) {
-        events.sorted().forEach { cacheEvent(config, it) }
+    fun sortAndCacheEvents(events: List<WeekViewEvent<T>>) {
+        events.sorted().forEach { cacheEvent(it) }
     }
 
     /**
@@ -79,12 +81,12 @@ internal class WeekViewCache<T> {
      *
      * @param event The event to cache.
      */
-    private fun cacheEvent(config: WeekViewConfigWrapper, event: WeekViewEvent<T>) {
+    private fun cacheEvent(event: WeekViewEvent<T>) {
         if (event.startTime >= event.endTime) {
             return
         }
 
-        val newChips = event.splitWeekViewEvents(config).map { EventChip(it, event, null) }
+        val newChips = eventSplitter.split(event).map { EventChip(it, event, null) }
         allEventChips.addAll(newChips)
     }
 

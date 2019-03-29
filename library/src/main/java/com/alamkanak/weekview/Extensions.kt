@@ -3,6 +3,17 @@ package com.alamkanak.weekview
 import android.graphics.RectF
 import java.util.*
 
+internal fun <T> WeekViewEvent<T>.copy(
+        startTime: Calendar = this.startTime,
+        endTime: Calendar = this.endTime
+): WeekViewEvent<T> {
+    return WeekViewEvent(id, title, startTime, endTime, location, color, isAllDay, data).apply {
+        borderWidth = this@copy.borderWidth
+        borderColor = this@copy.borderColor
+        textColor = this@copy.textColor
+    }
+}
+
 fun <T> WeekView<T>.setMonthChangeListener(
         block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
 ) {

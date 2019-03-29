@@ -120,9 +120,9 @@ class EventChipsProvider<T> {
 
         // Clear events.
         cache.getAllEventChips().clear();
-        cache.sortAndCacheEvents(config, previousPeriodEvents);
-        cache.sortAndCacheEvents(config, currentPeriodEvents);
-        cache.sortAndCacheEvents(config, nextPeriodEvents);
+        cache.sortAndCacheEvents(previousPeriodEvents);
+        cache.sortAndCacheEvents(currentPeriodEvents);
+        cache.sortAndCacheEvents(nextPeriodEvents);
 
         cache.setPreviousPeriodEvents(previousPeriodEvents);
         cache.setCurrentPeriodEvents(currentPeriodEvents);

@@ -5,16 +5,9 @@ import android.support.annotation.NonNull;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
 
 import static com.alamkanak.weekview.Constants.MINUTES_PER_HOUR;
-import static com.alamkanak.weekview.DateUtils.isAtStartOfNewDay;
-import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfDay;
-import static com.alamkanak.weekview.DateUtils.withTimeAtEndOfPeriod;
-import static com.alamkanak.weekview.DateUtils.withTimeAtStartOfPeriod;
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
@@ -254,99 +247,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return (int) (id ^ (id >>> 32));
     }
 
-    /**
-     * Splits the {@link WeekViewEvent} by day into a list of {@link WeekViewEvent}s
-     * @return A list of {@link WeekViewEvent}
-     */
-    List<WeekViewEvent<T>> splitWeekViewEvents(WeekViewConfigWrapper config) {
-        List<WeekViewEvent<T>> events = new ArrayList<>();
-
-        // Clone this end time for when we need to clone events
-        Calendar newEndTime = (Calendar) this.endTime.clone();
-
-        boolean isAtStartOfNewPeriod = config.getMinHour() == 0 && isAtStartOfNewDay(startTime, newEndTime);
-
-        if (isAtStartOfNewPeriod) {
-            // Set end time to 1ms before midnight to ensure the event rect will get drawn correctly
-            WeekViewEvent<T> shortenedEvent = shortenTooLongAllDayEvent(newEndTime);
-            events.add(shortenedEvent);
-        } else if (!isSameDay(newEndTime)) {
-            events = splitEventsByDays(config);
-        } else {
-            events.add(this);
-        }
-
-        return events;
-    }
-
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
         return getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE);
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
         return getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
-    }
-
-    private WeekViewEvent<T> shortenTooLongAllDayEvent(Calendar newEndTime) {
-        return new WeekViewEvent<>(id, title, startTime,
-                withTimeAtEndOfDay(newEndTime), location, color, isAllDay, data);
-    }
-
-    private List<WeekViewEvent<T>> splitEventsByDays(WeekViewConfigWrapper config) {
-        List<WeekViewEvent<T>> results = new ArrayList<>();
-
-        // Get event for first day
-        Calendar firstEventEnd = (Calendar) startTime.clone();
-        firstEventEnd = withTimeAtEndOfPeriod(firstEventEnd, config.getMaxHour());
-
-        WeekViewEvent<T> firstEvent = new WeekViewEvent<>(id, title,
-                startTime, firstEventEnd, location, color, isAllDay, data);
-        firstEvent.setBorderWidth(borderWidth);
-        firstEvent.setBorderColor(borderColor);
-        firstEvent.setTextColor(textColor);
-        results.add(firstEvent);
-
-        // Get event for last day
-        Calendar lastEventStart = (Calendar) endTime.clone();
-        lastEventStart = withTimeAtStartOfPeriod(lastEventStart, config.getMinHour());
-
-        WeekViewEvent<T> lastEvent = new WeekViewEvent<>(id, title,
-                lastEventStart, endTime, location, color, isAllDay, data);
-        lastEvent.setBorderWidth(borderWidth);
-        lastEvent.setBorderColor(borderColor);
-        lastEvent.setTextColor(textColor);
-        results.add(lastEvent);
-
-        // Get events for all days in-between
-        long diff = lastEvent.getStartTime().getTimeInMillis() - firstEvent.getStartTime().getTimeInMillis();
-        int daysInBetween = (int) (diff / Constants.DAY_IN_MILLIS);
-
-        if (daysInBetween > 0) {
-            // Get second day with time at start of day
-            Calendar start = (Calendar) firstEventEnd.clone();
-            start = withTimeAtStartOfPeriod(start, config.getMinHour());
-            start.add(DATE, 1);
-
-            while (!DateUtils.isSameDay(start, lastEventStart)) {
-                Calendar intermediateStart = (Calendar) start.clone();
-                intermediateStart = withTimeAtStartOfPeriod(intermediateStart, config.getMinHour());
-
-                Calendar intermediateEnd = (Calendar) start.clone();
-                intermediateEnd = withTimeAtEndOfPeriod(intermediateEnd, config.getMaxHour());
-
-                WeekViewEvent<T> intermediateEvent = new WeekViewEvent<>(id, title,
-                        intermediateStart, intermediateEnd, location, color, isAllDay, data);
-                intermediateEvent.setBorderWidth(borderWidth);
-                intermediateEvent.setBorderColor(borderColor);
-                intermediateEvent.setTextColor(textColor);
-                results.add(intermediateEvent);
-
-                start.add(DATE, 1);
-            }
-        }
-
-        Collections.sort(results);
-        return results;
     }
 
     @Override
