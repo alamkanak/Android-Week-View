@@ -155,6 +155,9 @@ class EventChip<T> {
 
         // Get text dimensions.
         final TextPaint textPaint = config.getEventTextPaint();
+        if (event.isTextStrikeThrough()) {
+            textPaint.setFlags(textPaint.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
 
         textPaint.setColor(event.getTextColorOrDefault(config));
 

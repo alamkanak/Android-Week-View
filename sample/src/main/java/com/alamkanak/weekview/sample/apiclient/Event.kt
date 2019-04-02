@@ -12,15 +12,15 @@ class Event(
         val endTime: Calendar,
         val location: String,
         val color: Int,
-        val isAllDay: Boolean
+        val isAllDay: Boolean,
+        val isCanceled: Boolean
 ) : WeekViewDisplayable<Event> {
 
     override fun toWeekViewEvent(): WeekViewEvent<Event> {
         val style = WeekViewEvent.Style.Builder()
                 .setTextColor(Color.WHITE)
                 .setBackgroundColor(color)
-                .setBorderWidth(3)
-                .setBorderColor(Color.RED)
+                .setTextStrikeThrough(isCanceled)
                 .build()
 
         return WeekViewEvent.Builder<Event>()

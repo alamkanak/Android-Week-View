@@ -7,6 +7,8 @@ import com.alamkanak.weekview.WeekViewEvent;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -75,6 +77,7 @@ public class ApiEvent implements WeekViewDisplayable<ApiEvent> {
         this.mColor = color;
     }
 
+    @NotNull
     public WeekViewEvent<ApiEvent> toWeekViewEvent() {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         Date start = new Date();
@@ -106,7 +109,20 @@ public class ApiEvent implements WeekViewDisplayable<ApiEvent> {
         endTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
         endTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
 
-        int color = Color.parseColor(getColor());
-        return new WeekViewEvent<>(0, getName(), startTime, endTime, null, color, false, this);
+        final int color = Color.parseColor(getColor());
+
+        WeekViewEvent.Style style = new WeekViewEvent.Style.Builder()
+                .setBackgroundColor(color)
+                .build();
+
+        return new WeekViewEvent.Builder<ApiEvent>()
+                .setId(0)
+                .setTitle(getName())
+                .setStartTime(startTime)
+                .setEndTime(endTime)
+                .setAllDay(false)
+                .setStyle(style)
+                .setData(this)
+                .build();
     }
 }

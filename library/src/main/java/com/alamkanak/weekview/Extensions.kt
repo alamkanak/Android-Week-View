@@ -7,11 +7,15 @@ internal fun <T> WeekViewEvent<T>.copy(
         startTime: Calendar = this.startTime,
         endTime: Calendar = this.endTime
 ): WeekViewEvent<T> {
-    return WeekViewEvent(id, title, startTime, endTime, location, color, isAllDay, data).apply {
-        borderWidth = this@copy.borderWidth
-        borderColor = this@copy.borderColor
-        textColor = this@copy.textColor
-    }
+    return WeekViewEvent.Builder<T>()
+            .setId(id)
+            .setTitle(title)
+            .setStartTime(startTime)
+            .setEndTime(endTime)
+            .setAllDay(isAllDay)
+            .setStyle(style)
+            .setData(data)
+            .build()
 }
 
 fun <T> WeekView<T>.setMonthChangeListener(

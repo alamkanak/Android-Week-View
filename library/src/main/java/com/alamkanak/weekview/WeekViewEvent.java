@@ -22,44 +22,41 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     private Calendar startTime;
     private Calendar endTime;
     private String location;
-    private int color;
     private boolean isAllDay;
-    private int textColor = 0;
-
-    private int borderWidth;
-    private int borderColor;
-
+    private Style style;
     private T data;
 
+    /**
+     * @deprecated
+     * Use {@link WeekViewEvent.Builder} instead to construct {@link WeekViewEvent}
+     */
+    @Deprecated
     public WeekViewEvent() {
         // Free ad space
     }
 
     /**
      * Initializes the event for week view.
+     *
+     * @deprecated
+     * Use {@link WeekViewEvent.Builder} instead to construct {@link WeekViewEvent}
+     *
      * @param id The id of the event.
      * @param title Name of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
+    @Deprecated
     public WeekViewEvent(long id, String title, Calendar startTime, Calendar endTime) {
         this(id, title, startTime, endTime, null, false);
     }
 
     /**
      * Initializes the event for week view.
-     * @param id The id of the event.
-     * @param title Name of the event.
-     * @param location The location of the event.
-     * @param startTime The time when the event starts.
-     * @param endTime The time when the event ends.
-     */
-    private WeekViewEvent(long id, String title, Calendar startTime, Calendar endTime, String location) {
-        this(id, title, startTime, endTime, location, false);
-    }
-
-    /**
-     * Initializes the event for week view.
+     *
+     * @deprecated
+     * Use {@link WeekViewEvent.Builder} instead to construct {@link WeekViewEvent}
+     *
      * @param id The id of the event.
      * @param title Name of the event.
      * @param location The location of the event.
@@ -67,11 +64,17 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
      * @param endTime The time when the event ends.
      * @param isAllDay Is the event an all day event.
      */
+    @Deprecated
     public WeekViewEvent(long id, String title, Calendar startTime,
                          Calendar endTime, String location, boolean isAllDay) {
         this(id, title, startTime, endTime, location, 0, isAllDay, null);
     }
 
+    /**
+     * @deprecated
+     * Use {@link WeekViewEvent.Builder} instead to construct {@link WeekViewEvent}
+     */
+    @Deprecated
     public WeekViewEvent(long id, String title, Calendar startTime, Calendar endTime,
                          String location, int color, boolean isAllDay, T data) {
         this.id = id;
@@ -79,7 +82,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.startTime = startTime;
         this.endTime = endTime;
         this.location = location;
-        this.color = color;
+        this.style = new Style.Builder().setBackgroundColor(color).build();
         this.isAllDay = isAllDay;
         this.data = data;
     }
@@ -122,20 +125,28 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return location;
     }
 
+    public Style getStyle() {
+        return style;
+    }
+
+    boolean isTextStrikeThrough() {
+        return style.textStrikeThrough;
+    }
+
     public void setLocation(String location) {
         this.location = location;
     }
 
     public int getColor() {
-        return color;
+        return style.backgroundColor;
     }
 
     public int getColorOrDefault() {
-        return (color != 0) ? color : Defaults.EVENT_COLOR;
+        return (style.backgroundColor != 0) ? style.backgroundColor : Defaults.EVENT_COLOR;
     }
 
     public void setColor(int color) {
-        this.color = color;
+        style.backgroundColor = color;
     }
 
     boolean isAllDay() {
@@ -179,35 +190,35 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     public int getTextColor() {
-        return textColor;
+        return style.textColor;
     }
 
     public void setTextColor(int textColor) {
-        this.textColor = textColor;
+        style.textColor = textColor;
     }
 
     public int getTextColorOrDefault(WeekViewConfigWrapper config) {
-        return (textColor != 0) ? textColor : config.getEventTextPaint().getColor();
+        return (style.textColor != 0) ? style.textColor : config.getEventTextPaint().getColor();
     }
 
     boolean hasBorder() {
-        return borderWidth > 0;
+        return style.borderWidth > 0;
     }
 
     int getBorderWidth() {
-        return borderWidth;
+        return style.borderWidth;
     }
 
     public void setBorderWidth(int borderWidth) {
-        this.borderWidth = borderWidth;
+        style.borderWidth = borderWidth;
     }
 
     int getBorderColor() {
-        return borderColor;
+        return style.borderColor;
     }
 
     public void setBorderColor(int borderColor) {
-        this.borderColor = borderColor;
+        style.borderColor = borderColor;
     }
 
     boolean collidesWith(WeekViewEvent other) {
@@ -275,6 +286,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
         private int backgroundColor;
         private int textColor;
+        private boolean textStrikeThrough;
         private int borderWidth;
         private int borderColor;
 
@@ -293,6 +305,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
             public Builder setTextColor(@ColorInt int color) {
                 style.textColor = color;
+                return this;
+            }
+
+            public Builder setTextStrikeThrough(boolean strikeThrough) {
+                style.textStrikeThrough = strikeThrough;
                 return this;
             }
 
@@ -348,10 +365,7 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         }
 
         public Builder<T> setStyle(WeekViewEvent.Style style) {
-            event.color = style.backgroundColor;
-            event.textColor = style.textColor;
-            event.borderWidth = style.borderWidth;
-            event.borderColor = style.borderColor;
+            event.style = style;
             return this;
         }
 
