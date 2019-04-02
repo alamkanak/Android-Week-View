@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import static com.alamkanak.weekview.Preconditions.checkNotNull;
+import static com.alamkanak.weekview.Preconditions.checkState;
+
 class EventChipsProvider<T> {
 
     private final WeekViewConfigWrapper config;
@@ -25,26 +28,20 @@ class EventChipsProvider<T> {
         this.weekViewLoader = weekViewLoader;
     }
 
-    void loadEventsIfNecessary(View view, List<Calendar> dayRange) {
+    void loadEventsIfNecessary(View view) {
         if (view.isInEditMode()) {
             return;
         }
 
-        if (weekViewLoader == null) {
-            throw new IllegalStateException("No WeekViewLoader or MonthChangeListener provided. " +
-                    "This is necessary to load new events");
-        }
+        checkState(weekViewLoader != null, "No WeekViewLoader or MonthChangeListener provided.");
+        final boolean hasNoEvents = cache.getAllEventChips().isEmpty();
 
-        for (Calendar day : dayRange) {
-            final boolean hasNoEvents = cache.getAllEventChips().isEmpty();
-            final Period periodToFetch = weekViewLoader.toPeriod(day);
-            final boolean needsToFetchPeriod = !cache.contains(periodToFetch);
+        final Calendar firstVisibleDay = checkNotNull(viewState.getFirstVisibleDay());
+        final FetchPeriods fetchPeriods = FetchPeriods.create(firstVisibleDay);
 
-            // Check if this particular day has been fetched
-            if (hasNoEvents || viewState.getShouldRefreshEvents() || needsToFetchPeriod) {
-                loadEventsAndCalculateEventChipPositions(view, day);
-                viewState.setShouldRefreshEvents(false);
-            }
+        if (hasNoEvents || !cache.covers(fetchPeriods)) {
+            loadEventsAndCalculateEventChipPositions(view, fetchPeriods);
+            viewState.setShouldRefreshEvents(false);
         }
     }
 
@@ -53,69 +50,60 @@ class EventChipsProvider<T> {
      * scrolling the week view. The week view stores the events of three months: the visible month,
      * the previous month, the next month.
      *
-     * @param day The day the user is currently in.
+     * @param fetchPeriods The FetchedPeriods for which to load events
      */
-    private void loadEventsAndCalculateEventChipPositions(View view, Calendar day) {
-        // Get more events if the month is changed.
-        if (weekViewLoader == null && !view.isInEditMode()) {
-            throw new IllegalStateException("You must provide a MonthChangeListener");
+    private void loadEventsAndCalculateEventChipPositions(View view, FetchPeriods fetchPeriods) {
+        if (!view.isInEditMode()) {
+            checkState(weekViewLoader != null, "No WeekViewLoader or MonthChangeListener provided.");
         }
 
-        // If a refresh was requested then reset some variables.
         if (viewState.getShouldRefreshEvents()) {
             cache.clear();
         }
 
         if (weekViewLoader != null) {
-            loadEvents(day);
+            loadEvents(fetchPeriods);
         }
 
-        // Prepare to calculate positions of each events.
         calculateEventChipPositions();
     }
 
-    private void loadEvents(Calendar day) {
-        final Period periodToFetch = weekViewLoader.toPeriod(day);
-        FetchedPeriods fetchedPeriods = cache.getFetchedPeriods();
-        final boolean needsRefresh = fetchedPeriods != null || !cache.contains(periodToFetch);
-        final boolean isRefreshEligible = needsRefresh || viewState.getShouldRefreshEvents();
-
-        if (!isRefreshEligible) {
-            return;
+    private void loadEvents(FetchPeriods fetchPeriods) {
+        FetchPeriods oldFetchPeriods = cache.getFetchedPeriods();
+        if (oldFetchPeriods == null) {
+            oldFetchPeriods = fetchPeriods;
         }
 
-        if (fetchedPeriods == null) {
-            fetchedPeriods = FetchedPeriods.create(periodToFetch);
-        }
+        final Period newCurrentPeriod = fetchPeriods.getCurrent();
 
         List<WeekViewEvent<T>> previousPeriodEvents = null;
         List<WeekViewEvent<T>> currentPeriodEvents = null;
         List<WeekViewEvent<T>> nextPeriodEvents = null;
 
         if (cache.getHasEvents()) {
-            if (periodToFetch == cache.getFetchedPeriods().getPrevious()) {
+            if (oldFetchPeriods.getPrevious().equals(newCurrentPeriod)) {
                 currentPeriodEvents = cache.getPreviousPeriodEvents();
                 nextPeriodEvents = cache.getCurrentPeriodEvents();
-            } else if (periodToFetch == cache.getFetchedPeriods().getCurrent()) {
+            } else if (oldFetchPeriods.getCurrent().equals(newCurrentPeriod)) {
                 previousPeriodEvents = cache.getPreviousPeriodEvents();
                 currentPeriodEvents = cache.getCurrentPeriodEvents();
                 nextPeriodEvents = cache.getNextPeriodEvents();
-            } else if (periodToFetch == cache.getFetchedPeriods().getNext()) {
+            } else if (oldFetchPeriods.getNext().equals(newCurrentPeriod)) {
                 previousPeriodEvents = cache.getCurrentPeriodEvents();
                 currentPeriodEvents = cache.getNextPeriodEvents();
             }
         }
 
         if (previousPeriodEvents == null) {
-            previousPeriodEvents = weekViewLoader.onLoad(fetchedPeriods.getPrevious());
+            previousPeriodEvents = weekViewLoader.onLoad(fetchPeriods.getPrevious());
         }
 
         if (currentPeriodEvents == null) {
-            currentPeriodEvents = weekViewLoader.onLoad(fetchedPeriods.getCurrent());
+            currentPeriodEvents = weekViewLoader.onLoad(fetchPeriods.getCurrent());
         }
 
         if (nextPeriodEvents == null) {
-            nextPeriodEvents = weekViewLoader.onLoad(fetchedPeriods.getNext());
+            nextPeriodEvents = weekViewLoader.onLoad(fetchPeriods.getNext());
         }
 
         // Clear events.
@@ -127,7 +115,7 @@ class EventChipsProvider<T> {
         cache.setPreviousPeriodEvents(previousPeriodEvents);
         cache.setCurrentPeriodEvents(currentPeriodEvents);
         cache.setNextPeriodEvents(nextPeriodEvents);
-        cache.setFetchedPeriods(fetchedPeriods);
+        cache.setFetchedPeriods(fetchPeriods);
     }
 
     private void calculateEventChipPositions() {

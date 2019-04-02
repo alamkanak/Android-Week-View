@@ -14,9 +14,7 @@ internal class MonthLoader<T>(
 ) : WeekViewLoader<T> {
 
     override fun toPeriod(instance: Calendar): Period {
-        val month = instance.get(Calendar.MONTH)
-        val year = instance.get(Calendar.YEAR)
-        return Period(month, year)
+        return Period.fromDate(instance)
     }
 
     override fun onLoad(period: Period): List<WeekViewEvent<T>> {

@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
+import static com.alamkanak.weekview.Preconditions.checkState;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
@@ -236,13 +237,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final EventChip<T> eventChip = findHitEvent(e);
         if (eventChip != null && eventClickListener != null) {
             T data = eventChip.event.getData();
-            if (data != null) {
-                eventClickListener.onEventClick(data, eventChip.rect);
-            } else {
-                throw new IllegalStateException("No data to show. Did you pass the original " +
-                        "object into the constructor of WeekViewEvent?");
-            }
-
+            checkState(data != null, "No data to show. Did you pass the " +
+                    "original object into the constructor of WeekViewEvent?");
+            eventClickListener.onEventClick(data, eventChip.rect);
             return super.onSingleTapConfirmed(e);
         }
 
@@ -267,12 +264,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         final EventChip<T> eventChip = findHitEvent(e);
         if (eventChip != null && eventLongPressListener != null) {
             final T data = eventChip.originalEvent.getData();
-            if (data != null) {
-                eventLongPressListener.onEventLongPress(data, eventChip.rect);
-            } else {
-                throw new IllegalStateException("No data to show. Did you pass the original " +
-                        "object into the constructor of WeekViewEvent?");
-            }
+            checkState(data != null, "No data to show. Did you pass the " +
+                    "original object into the constructor of WeekViewEvent?");
+            eventLongPressListener.onEventLongPress(data, eventChip.rect);
         }
 
         final float timeColumnWidth = config.getTimeColumnWidth();

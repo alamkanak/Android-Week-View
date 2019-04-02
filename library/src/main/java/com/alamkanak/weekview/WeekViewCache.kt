@@ -14,7 +14,7 @@ internal class WeekViewCache<T>(
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
     var nextPeriodEvents: List<WeekViewEvent<T>>? = null
 
-    var fetchedPeriods: FetchedPeriods? = null
+    var fetchedPeriods: FetchPeriods? = null
 
     val hasEvents: Boolean
         get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
@@ -32,9 +32,10 @@ internal class WeekViewCache<T>(
         allDayEventChips.addAll(allDay)
     }
 
-    fun contains(period: Period): Boolean {
-        return fetchedPeriods?.let {
-            it.previous == period || it.current == period || it.next == period
+    fun covers(fetchPeriods: FetchPeriods): Boolean {
+        return this.fetchedPeriods?.let {
+            it.previous == fetchPeriods.previous && it.current == fetchPeriods.current
+                    && it.next == fetchPeriods.next
         } ?: false
     }
 
