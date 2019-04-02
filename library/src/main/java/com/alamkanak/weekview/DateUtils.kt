@@ -102,6 +102,14 @@ internal object DateUtils {
         return Calendar.getInstance().withTimeAtStartOfDay()
     }
 
+    @JvmStatic
+    fun firstDayOfYear(): Calendar {
+        return Calendar.getInstance().withTimeAtStartOfDay().apply {
+            set(Calendar.MONTH, Calendar.JANUARY)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
+    }
+
     fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
         return when (numberOfDays) {
             7 -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character

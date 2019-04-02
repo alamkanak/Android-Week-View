@@ -18,7 +18,10 @@ internal class DefaultDateTimeInterpreter(
 
     private var sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)
     private val sdfTime = DateUtils.getDefaultTimeFormat(context)
-    private val calendar = Calendar.getInstance()
+
+    // This calendar is only used for interpreting the time. To avoid issues with time changes,
+    // we always use the first day of the year
+    private val calendar = DateUtils.firstDayOfYear()
 
     fun setNumberOfDays(numberOfDays: Int) {
         sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)

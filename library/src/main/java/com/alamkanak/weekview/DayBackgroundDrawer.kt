@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import com.alamkanak.weekview.DateUtils.today
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -49,7 +50,7 @@ internal class DayBackgroundDrawer(
 
     private fun drawPastAndFutureRect(startX: Float, startY: Float, endX: Float, pastPaint: Paint,
                                       futurePaint: Paint, height: Float, canvas: Canvas) {
-        val now = Calendar.getInstance()
+        val now = today()
         val beforeNow = (now.get(HOUR_OF_DAY) + now.get(MINUTE) / 60.0f) * config.hourHeight
         canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint)
         canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint)

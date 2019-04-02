@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import java.util.*
+import com.alamkanak.weekview.DateUtils.today
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
 import kotlin.math.max
@@ -25,7 +25,7 @@ internal class NowLineDrawer(
 
     private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {
         val startY = config.headerHeight + config.currentOrigin.y
-        val now = Calendar.getInstance()
+        val now = today()
 
         // Draw line
         val portionOfDay = (now.get(HOUR_OF_DAY) - config.minHour) + now.get(MINUTE) / 60.0f
