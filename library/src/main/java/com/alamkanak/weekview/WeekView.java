@@ -1128,9 +1128,9 @@ public final class WeekView<T> extends View
     }
 
     public void goToCurrentTime() {
-        final Calendar today = today();
-        final int hour = today.get(HOUR_OF_DAY);
-        goToDate(today);
+        final Calendar now = Calendar.getInstance();
+        final int hour = now.get(HOUR_OF_DAY);
+        goToDate(now);
         goToHour(hour);
     }
 
