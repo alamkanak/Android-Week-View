@@ -461,7 +461,7 @@ internal class WeekViewConfigWrapper(
         }
 
     fun calculateTimeColumnWidth() {
-        timeColumnWidth += timeColumnPadding * 2
+        timeColumnWidth = timeTextWidth + timeColumnPadding * 2
     }
 
     fun calculateWidthPerDay(width: Int) {
