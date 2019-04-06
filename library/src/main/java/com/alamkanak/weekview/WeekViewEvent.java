@@ -1,7 +1,9 @@
 package com.alamkanak.weekview;
 
+import android.graphics.Paint;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.text.TextPaint;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -219,6 +221,24 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
     public void setBorderColor(int borderColor) {
         style.borderColor = borderColor;
+    }
+
+    TextPaint getTextPaint(WeekViewConfigWrapper config) {
+        final TextPaint textPaint;
+
+        if (isAllDay) {
+            textPaint = config.getAllDayEventTextPaint();
+        } else {
+            textPaint = config.getEventTextPaint();
+        }
+
+        textPaint.setColor(getTextColorOrDefault(config));
+
+        if (style.textStrikeThrough) {
+            textPaint.setFlags(textPaint.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+
+        return textPaint;
     }
 
     boolean collidesWith(WeekViewEvent other) {

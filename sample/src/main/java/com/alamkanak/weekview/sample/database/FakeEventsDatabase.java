@@ -51,7 +51,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);
         endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.DAY_OF_MONTH, 2);
+        endTime.add(Calendar.DAY_OF_MONTH, 1);
         endTime.set(Calendar.HOUR_OF_DAY, 4);
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth);
@@ -69,7 +69,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth);
 
-        event = new Event(10, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
+        event = new Event(10, getEventTitle(startTime), startTime, endTime, "", color2, false, true);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -118,7 +118,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
 
-        event = new Event(4, getEventTitle(startTime), startTime, endTime, "Location ABC", color4, false, true);
+        event = new Event(4, getEventTitle(startTime), startTime, endTime, "Location", color4, false, true);
         events.add(event);
 
         startTime = Calendar.getInstance();

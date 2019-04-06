@@ -116,17 +116,19 @@ internal class WeekViewConfigWrapper(
 
     var timeColumnWidth: Float = UNINITIALIZED
 
-    val eventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
-        style = Paint.Style.FILL
-        color = config.eventTextColor
-        textSize = config.eventTextSize.toFloat()
-    }
+    val eventTextPaint: TextPaint
+        get() = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
+            style = Paint.Style.FILL
+            color = config.eventTextColor
+            textSize = config.eventTextSize.toFloat()
+        }
 
-    val allDayEventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
-        style = Paint.Style.FILL
-        color = config.eventTextColor
-        textSize = config.allDayEventTextSize.toFloat()
-    }
+    val allDayEventTextPaint: TextPaint
+        get() = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
+            style = Paint.Style.FILL
+            color = config.eventTextColor
+            textSize = config.allDayEventTextSize.toFloat()
+        }
 
     val timeColumnBackgroundPaint: Paint = Paint().apply {
         color = config.timeColumnBackgroundColor

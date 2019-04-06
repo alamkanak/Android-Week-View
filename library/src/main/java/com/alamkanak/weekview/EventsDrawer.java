@@ -201,13 +201,7 @@ class EventsDrawer<T> {
         final int availableWidth = (int) (right - left - config.getEventPadding() * 2);
 
         // Get text dimensions.
-        final TextPaint textPaint = event.isAllDay() ? config.getAllDayEventTextPaint()
-                                                      : config.getEventTextPaint();
-        if (event.isTextStrikeThrough()) {
-            textPaint.setFlags(textPaint.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        }
-
-        textPaint.setColor(event.getTextColorOrDefault(config));
+        final TextPaint textPaint = event.getTextPaint(config);
         StaticLayout textLayout = new StaticLayout(
                 stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false);
 

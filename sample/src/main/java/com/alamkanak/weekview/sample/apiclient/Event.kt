@@ -17,10 +17,16 @@ class Event(
 ) : WeekViewDisplayable<Event> {
 
     override fun toWeekViewEvent(): WeekViewEvent<Event> {
+        val backgroundColor = if (!isCanceled) color else Color.WHITE
+        val textColor = if (!isCanceled) Color.WHITE else color
+        val borderWidth = if (!isCanceled) 0 else 4
+
         val style = WeekViewEvent.Style.Builder()
-                .setTextColor(Color.WHITE)
-                .setBackgroundColor(color)
+                .setTextColor(textColor)
+                .setBackgroundColor(backgroundColor)
                 .setTextStrikeThrough(isCanceled)
+                .setBorderWidth(borderWidth)
+                .setBorderColor(color)
                 .build()
 
         return WeekViewEvent.Builder<Event>()
