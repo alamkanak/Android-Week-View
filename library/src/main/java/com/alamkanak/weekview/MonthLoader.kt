@@ -13,28 +13,23 @@ internal class MonthLoader<T>(
 ) : WeekViewLoader<T> {
 
     override fun toPeriod(instance: Calendar): Period {
-        return Period.fromDate(instance)
+        return Period.fromDate(instance.toLocalDate())
     }
 
     override fun onLoad(period: Period): List<WeekViewEvent<T>> {
         val (month, year) = period
 
-        val startDate = today().withTimeAtStartOfDay().apply {
-            set(Calendar.YEAR, year)
-            set(Calendar.MONTH, month)
-            set(Calendar.DAY_OF_MONTH, 1)
-        }
-
-        val maxDays = startDate.getActualMaximum(Calendar.DAY_OF_MONTH)
-
-        val endDate = today().withTimeAtEndOfDay().apply {
-            set(Calendar.YEAR, year)
-            set(Calendar.MONTH, month)
-            set(Calendar.DAY_OF_MONTH, maxDays)
-        }
+        val startDate = today()
+                .withYear(year)
+                .withMonth(month)
+                .withDayOfMonth(1)
+        val maxDays = startDate.lengthOfMonth()
+        val endDate = startDate.withDayOfMonth(maxDays)
 
         val listener = onMonthChangeListener ?: return emptyList()
-        return listener.onMonthChange(startDate, endDate).map { it.toWeekViewEvent() }
+        return listener
+                .onMonthChange(startDate.toCalendar(), endDate.toCalendar())
+                .map { it.toWeekViewEvent() }
     }
 
 }

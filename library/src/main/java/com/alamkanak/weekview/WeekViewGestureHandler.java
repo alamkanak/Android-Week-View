@@ -9,10 +9,12 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
-import java.util.Calendar;
+import org.threeten.bp.ZonedDateTime;
+
 import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
+import static com.alamkanak.weekview.DateUtils.toCalendar;
 import static com.alamkanak.weekview.Preconditions.checkState;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
@@ -248,9 +250,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 
         if (emptyViewClickListener != null
                 && e.getX() > timeColumnWidth && e.getY() > config.getHeaderHeight()) {
-            final Calendar selectedTime = touchHandler.getTimeFromPoint(e);
+            final ZonedDateTime selectedTime = touchHandler.getTimeFromPoint(e);
             if (selectedTime != null) {
-                emptyViewClickListener.onEmptyViewClicked(selectedTime);
+                emptyViewClickListener.onEmptyViewClicked(toCalendar(selectedTime));
             }
         }
 
@@ -274,9 +276,9 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         // If the tap was on in an empty space, then trigger the callback.
         if (emptyViewLongPressListener != null
                 && e.getX() > timeColumnWidth && e.getY() > config.getHeaderHeight()) {
-            final Calendar selectedTime = touchHandler.getTimeFromPoint(e);
+            final ZonedDateTime selectedTime = touchHandler.getTimeFromPoint(e);
             if (selectedTime != null) {
-                emptyViewLongPressListener.onEmptyViewLongPress(selectedTime);
+                emptyViewLongPressListener.onEmptyViewLongPress(toCalendar(selectedTime));
             }
         }
     }

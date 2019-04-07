@@ -46,7 +46,7 @@ public class FakeEventsDatabase implements EventsDatabase {
 
         // Add multi-day event
         startTime = Calendar.getInstance();
-        startTime.set(Calendar.HOUR_OF_DAY, 3);
+        startTime.set(Calendar.HOUR_OF_DAY, 17);
         startTime.set(Calendar.MINUTE, 30);
         startTime.set(Calendar.MONTH, newMonth);
         startTime.set(Calendar.YEAR, newYear);

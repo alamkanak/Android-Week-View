@@ -2,6 +2,8 @@ package com.alamkanak.weekview;
 
 import android.view.View;
 
+import org.threeten.bp.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -36,7 +38,7 @@ class EventChipsProvider<T> {
         checkState(weekViewLoader != null, "No WeekViewLoader or MonthChangeListener provided.");
         final boolean hasNoEvents = cache.getAllEventChips().isEmpty();
 
-        final Calendar firstVisibleDay = checkNotNull(viewState.getFirstVisibleDay());
+        final LocalDate firstVisibleDay = checkNotNull(viewState.getFirstVisibleDay());
         final FetchPeriods fetchPeriods = FetchPeriods.create(firstVisibleDay);
 
         if (hasNoEvents || !cache.covers(fetchPeriods)) {

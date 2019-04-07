@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import org.threeten.bp.LocalDate
 import java.util.Calendar.DECEMBER
 import java.util.Calendar.JANUARY
 
@@ -13,7 +13,7 @@ data class FetchPeriods(
     companion object {
 
         @JvmStatic
-        fun create(firstVisibleDay: Calendar): FetchPeriods {
+        fun create(firstVisibleDay: LocalDate): FetchPeriods {
             val current = Period.fromDate(firstVisibleDay)
             return FetchPeriods(current.previous(), current, current.next())
         }
@@ -38,9 +38,9 @@ data class Period(val month: Int, val year: Int) {
 
     companion object {
 
-        fun fromDate(date: Calendar): Period {
-            val month = date.get(Calendar.MONTH) + 1 // Calendar.JANUARY is 0
-            val year = date.get(Calendar.YEAR)
+        fun fromDate(date: LocalDate): Period {
+            val month = date.monthValue
+            val year = date.year
             return Period(month, year)
         }
 

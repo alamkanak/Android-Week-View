@@ -1,14 +1,14 @@
 package com.alamkanak.weekview
 
+import org.threeten.bp.LocalDate
 import java.lang.Math.ceil
-import java.util.*
 
 internal class DrawingContext(
-        val dateRange: List<Calendar>,
+        val dateRange: List<LocalDate>,
         val startPixel: Float
 ) {
 
-    fun getDateRangeWithStartPixels(config: WeekViewConfigWrapper): List<Pair<Calendar, Float>> {
+    fun getDateRangeWithStartPixels(config: WeekViewConfigWrapper): List<Pair<LocalDate, Float>> {
         return dateRange.zip(getStartPixels(config))
     }
 

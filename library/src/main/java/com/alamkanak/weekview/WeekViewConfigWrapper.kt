@@ -7,8 +7,10 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
+import org.threeten.bp.LocalDate
 import java.util.*
-import java.util.Calendar.*
+import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.MINUTE
 import kotlin.math.max
 import kotlin.math.min
 
@@ -215,14 +217,13 @@ internal class WeekViewConfigWrapper(
     val minX: Float
         get() {
             return maxDate?.let {
-                val date = it.clone() as Calendar
-                date.add(Calendar.DAY_OF_YEAR, 1 - numberOfVisibleDays)
+                val date = it.toLocalDate().plusDays(1L - numberOfVisibleDays)
                 getXOriginForDate(date)
             } ?: Float.NEGATIVE_INFINITY
         }
 
     val maxX: Float
-        get() = minDate?.let { getXOriginForDate(it) } ?: Float.POSITIVE_INFINITY
+        get() = minDate?.let { getXOriginForDate(it.toLocalDate()) } ?: Float.POSITIVE_INFINITY
 
     val isSingleDay: Boolean
         get() = numberOfVisibleDays == 1
@@ -478,7 +479,7 @@ internal class WeekViewConfigWrapper(
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
-    private fun getXOriginForDate(date: Calendar): Float {
+    private fun getXOriginForDate(date: LocalDate): Float {
         return -1f * date.daysFromToday * totalDayWidth
     }
 
@@ -495,7 +496,7 @@ internal class WeekViewConfigWrapper(
         // If the week view is being drawn for the first time, then consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
-        val currentDayIsNotToday = today.get(DAY_OF_WEEK) != firstDayOfWeek
+        val currentDayIsNotToday = today.dayOfWeek.value != firstDayOfWeek
 
         if (isWeekView && currentDayIsNotToday && showFirstDayOfWeekFirst) {
             val difference = computeDifferenceWithFirstDayOfWeek(today)
@@ -532,8 +533,8 @@ internal class WeekViewConfigWrapper(
         currentOrigin.y = verticalOffset * -1
     }
 
-    fun computeDifferenceWithFirstDayOfWeek(date: Calendar): Int {
-        return (date.get(DAY_OF_WEEK) + 7 - firstDayOfWeek) % 7
+    fun computeDifferenceWithFirstDayOfWeek(date: LocalDate): Int {
+        return (date.dayOfWeek.value + 7 - firstDayOfWeek) % 7
     }
 
     fun refreshAfterZooming() {

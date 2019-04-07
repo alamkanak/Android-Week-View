@@ -5,12 +5,12 @@ internal class WeekViewEventSplitter<T>(
 ) {
 
     fun split(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
-        val newEndTime = event.endTime.copy()
-        val isAtStartOfNewPeriod = config.minHour == 0 && newEndTime.isAtStartOfNextDay(event.startTime)
+        val newEndTime = event.endTime.toZonedDateTime()
+        val isAtStartOfNewPeriod = config.minHour == 0 && newEndTime.isAtStartOfNextDay(event.startTime.toZonedDateTime())
 
         return if (isAtStartOfNewPeriod) {
             listOf(shortenTooLongAllDayEvent(event))
-        } else if (!event.isSameDay(newEndTime)) {
+        } else if (!event.isSameDay(newEndTime.toLocalDate())) {
             splitEventByDays(event)
         } else {
             listOf(event)
@@ -20,32 +20,32 @@ internal class WeekViewEventSplitter<T>(
     private fun shortenTooLongAllDayEvent(
             event: WeekViewEvent<T>
     ): WeekViewEvent<T> {
-        val newEndTime = event.endTime.withTimeAtEndOfPeriod(config.maxHour)
-        return event.copy(endTime = newEndTime)
+        val newEndTime = event.endTime.toZonedDateTime().withTimeAtEndOfPeriod(config.maxHour)
+        return event.copy(endTime = newEndTime.toCalendar())
     }
 
     private fun splitEventByDays(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
 
-        val firstEventEnd = event.startTime.copy().withTimeAtEndOfPeriod(config.maxHour)
-        val firstEvent = event.copy(endTime = firstEventEnd)
+        val firstEventEnd = event.startTime.toZonedDateTime().withTimeAtEndOfPeriod(config.maxHour)
+        val firstEvent = event.copy(endTime = firstEventEnd.toCalendar())
         results += firstEvent
 
-        val lastEventStart = event.endTime.copy().withTimeAtStartOfPeriod(config.minHour)
-        val lastEvent = event.copy(startTime = lastEventStart)
+        val lastEventStart = event.endTime.toZonedDateTime().withTimeAtStartOfPeriod(config.minHour)
+        val lastEvent = event.copy(startTime = lastEventStart.toCalendar())
         results += lastEvent
 
         val diff = lastEvent.startTime.timeInMillis - firstEvent.startTime.timeInMillis
         val daysInBetween = diff / Constants.DAY_IN_MILLIS
 
         if (daysInBetween > 0) {
-            val start = firstEventEnd.copy().withTimeAtStartOfPeriod(config.minHour).plusDays(1)
+            var start = firstEventEnd.withTimeAtStartOfPeriod(config.minHour).plusDays(1)
 
             while (start.isSameDate(lastEventStart).not()) {
-                val intermediateStart = start.copy().withTimeAtStartOfPeriod(config.minHour)
-                val intermediateEnd = start.copy().withTimeAtEndOfPeriod(config.maxHour)
-                results += event.copy(startTime = intermediateStart, endTime = intermediateEnd)
-                start.addDays(1)
+                val intermediateStart = start.withTimeAtStartOfPeriod(config.minHour)
+                val intermediateEnd = start.withTimeAtEndOfPeriod(config.maxHour)
+                results += event.copy(startTime = intermediateStart.toCalendar(), endTime = intermediateEnd.toCalendar())
+                start = start.plusDays(1)
             }
         }
 

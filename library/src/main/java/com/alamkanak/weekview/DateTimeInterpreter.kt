@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.content.Context
+import org.threeten.bp.ZoneId
 import java.util.*
 
 /**
@@ -32,9 +33,8 @@ internal class DefaultDateTimeInterpreter(
     }
 
     override fun interpretTime(hour: Int): String {
-        calendar.set(Calendar.HOUR_OF_DAY, hour)
-        calendar.set(Calendar.MINUTE, 0)
-        return sdfTime.format(calendar.time)
+        val time = calendar.atStartOfDay(ZoneId.systemDefault()).withHour(hour).withMinute(0)
+        return sdfTime.format(time.toCalendar().time)
     }
 
 }

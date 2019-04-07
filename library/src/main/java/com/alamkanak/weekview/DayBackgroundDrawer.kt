@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import org.threeten.bp.LocalDate
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -20,7 +21,7 @@ internal class DayBackgroundDrawer(
                 }
     }
 
-    private fun drawDayBackground(day: Calendar, startX: Float, startPixel: Float, canvas: Canvas) {
+    private fun drawDayBackground(day: LocalDate, startX: Float, startPixel: Float, canvas: Canvas) {
         if (config.widthPerDay + startPixel - startX <= 0) {
             return
         }

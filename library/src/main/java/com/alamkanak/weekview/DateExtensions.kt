@@ -3,31 +3,46 @@ package com.alamkanak.weekview
 
 import android.content.Context
 import android.text.format.DateFormat
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.Calendar.*
+import java.util.Calendar.SATURDAY
+import java.util.Calendar.SUNDAY
 
-fun getDateRange(daysSinceToday: Int, size: Int): List<Calendar> {
-    val days = ArrayList<Calendar>()
-    var day: Calendar
-
-    for (dayNumber in daysSinceToday..size) {
-        day = today()
-        day.add(DATE, dayNumber - 1)
-        days.add(day)
-    }
-
-    return days
+fun Calendar.toLocalDate(): LocalDate {
+    return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
-fun today(): Calendar = Calendar.getInstance().withTimeAtStartOfDay()
-
-fun firstDayOfYear(): Calendar {
-    return Calendar.getInstance().withTimeAtStartOfDay().apply {
-        set(Calendar.MONTH, Calendar.JANUARY)
-        set(Calendar.DAY_OF_MONTH, 1)
-    }
+fun Calendar.toZonedDateTime(): ZonedDateTime {
+    val instant = Instant.ofEpochMilli(timeInMillis)
+    return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 }
+
+fun LocalDate.toCalendar(): Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = toEpochDay() * Constants.DAY_IN_MILLIS
+    return calendar
+}
+
+fun ZonedDateTime.toCalendar(): Calendar {
+    val timeZone = TimeZone.getTimeZone(zone.id)
+    val calendar = Calendar.getInstance(timeZone)
+    calendar.timeInMillis = toEpochSecond() * 1_000
+    return calendar
+}
+
+fun getDateRange(daysSinceToday: Int, size: Int): List<LocalDate> {
+    return (daysSinceToday..size).map { today().plusDays(it - 1L) }
+}
+
+fun now(): ZonedDateTime = ZonedDateTime.now()
+
+fun today(): LocalDate = LocalDate.now()
+
+fun firstDayOfYear(): LocalDate = LocalDate.of(today().year, 1, 1)
 
 fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     return when (numberOfDays) {
@@ -42,52 +57,29 @@ fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
     return SimpleDateFormat(format, Locale.getDefault())
 }
 
-internal fun Calendar.withTimeAtStartOfDay(): Calendar = withTimeAtStartOfPeriod(0)
+internal fun ZonedDateTime.withTimeAtStartOfDay(): ZonedDateTime = withTimeAtStartOfPeriod(0)
 
-internal fun Calendar.withTimeAtEndOfDay(): Calendar = withTimeAtEndOfPeriod(24)
+internal fun ZonedDateTime.withTimeAtEndOfDay(): ZonedDateTime = withTimeAtEndOfPeriod(24)
 
-internal val Calendar.isToday: Boolean
-    get() = isSameDate(today())
+internal val LocalDate.isToday: Boolean
+    get() = isEqual(today())
 
-internal val Calendar.isWeekend: Boolean
-    get() = get(DAY_OF_WEEK) == SATURDAY || get(DAY_OF_WEEK) == SUNDAY
+internal val LocalDate.isWeekend: Boolean
+    get() = dayOfWeek.value == SATURDAY || dayOfWeek.value == SUNDAY
 
-internal val Calendar.isBeforeToday: Boolean
-    get() = before(today())
+internal val LocalDate.isBeforeToday: Boolean
+    get() = isBefore(today())
 
-internal fun Calendar.copy(): Calendar = clone() as Calendar
-
-internal fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
-    return copy().apply {
-        set(Calendar.HOUR_OF_DAY, hour)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }
+internal fun ZonedDateTime.withTimeAtStartOfPeriod(hour: Int): ZonedDateTime {
+    return withHour(hour).withMinute(0).withSecond(0).withNano(0)
 }
 
-internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
-    return copy().apply {
-        set(Calendar.HOUR_OF_DAY, hour - 1)
-        set(Calendar.MINUTE, 59)
-        set(Calendar.SECOND, 59)
-        set(Calendar.MILLISECOND, 999)
-    }
+internal fun ZonedDateTime.withTimeAtEndOfPeriod(hour: Int): ZonedDateTime {
+    return withHour(hour - 1).withMinute(59).withSecond(59).withNano(999_999)
 }
 
-internal fun Calendar.plusDays(days: Int): Calendar {
-    return copy().apply {
-        add(DATE, days)
-    }
-}
-
-internal fun Calendar.addDays(days: Int) {
-    add(DATE, days)
-}
-
-internal fun Calendar.isSameDate(other: Calendar): Boolean {
-    return get(Calendar.YEAR) == other.get(Calendar.YEAR)
-            && get(Calendar.DAY_OF_YEAR) == other.get(Calendar.DAY_OF_YEAR)
+internal fun ZonedDateTime.isSameDate(other: ZonedDateTime): Boolean {
+    return toLocalDate().isEqual(other.toLocalDate())
 }
 
 /**
@@ -97,19 +89,13 @@ internal fun Calendar.isSameDate(other: Calendar): Boolean {
  * @param startDate The start date of the event
  * @return Whether or not this date is at the start of the day after startDate
  */
-internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
-    if (this === this.withTimeAtStartOfDay()) {
-        val thisCalendar = this.copy()
-        thisCalendar.add(Calendar.MILLISECOND, -1)
+internal fun ZonedDateTime.isAtStartOfNextDay(startDate: ZonedDateTime): Boolean {
+    if (isEqual(withTimeAtStartOfDay())) {
+        val thisCalendar = minusNanos(1)
         return thisCalendar.isSameDate(startDate)
     }
     return false
 }
 
-val Calendar.daysFromToday: Int
-    get() {
-        val dateCal = withTimeAtStartOfDay().apply { timeZone = TimeZone.getTimeZone("UTC") }
-        val todayCal = today().apply { timeZone = TimeZone.getTimeZone("UTC") }
-        val diff = dateCal.timeInMillis - todayCal.timeInMillis
-        return (diff / Constants.DAY_IN_MILLIS).toInt()
-    }
+val LocalDate.daysFromToday: Int
+    get() = today().until(this).days

@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import org.threeten.bp.LocalDate
 
 internal class WeekViewCache<T>(
         private val eventSplitter: WeekViewEventSplitter<T>
@@ -41,7 +41,7 @@ internal class WeekViewCache<T>(
 
     private fun getEventChipsInRange(
             eventChips: List<EventChip<T>>,
-            dateRange: List<Calendar>
+            dateRange: List<LocalDate>
     ): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
         for (date in dateRange) {
@@ -52,7 +52,7 @@ internal class WeekViewCache<T>(
         return results
     }
 
-    fun getAllDayEventsInRange(dateRange: List<Calendar>): List<WeekViewEvent<T>> {
+    fun getAllDayEventsInRange(dateRange: List<LocalDate>): List<WeekViewEvent<T>> {
         return getEventChipsInRange(allDayEventChips, dateRange).filter { it.isAllDay }
     }
 

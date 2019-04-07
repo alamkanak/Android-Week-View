@@ -14,15 +14,22 @@ import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
+
 import java.util.Calendar;
 import java.util.List;
 
 import static com.alamkanak.weekview.Constants.UNINITIALIZED;
+import static com.alamkanak.weekview.DateUtils.toCalendar;
+import static com.alamkanak.weekview.DateUtils.toLocalDate;
+import static com.alamkanak.weekview.DateUtils.toZonedDateTime;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static java.util.Calendar.DATE;
 import static java.util.Calendar.HOUR_OF_DAY;
 
 /**
@@ -60,6 +67,7 @@ public final class WeekView<T> extends View
 
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        AndroidThreeTen.init(context);
 
         WeekViewConfig config = new WeekViewConfig(context, attrs);
         configWrapper = new WeekViewConfigWrapper(context, config);
@@ -169,24 +177,26 @@ public final class WeekView<T> extends View
     }
 
     private void notifyScrollListeners() {
-        final Calendar oldFirstVisibleDay = viewState.getFirstVisibleDay();
-        final Calendar today = today();
+        final LocalDate oldFirstVisibleDay = viewState.getFirstVisibleDay();
+        // final LocalDate today = today();
 
-        Calendar firstVisibleDay = (Calendar) today.clone();
-        Calendar lastVisibleDay = (Calendar) today.clone();
+        // LocalDate firstVisibleDay = today(); // (Calendar) today.clone();
+        // LocalDate lastVisibleDay = today(); // (Calendar) today.clone();
 
         final float totalDayWidth = configWrapper.getTotalDayWidth();
         final int delta = (int) round(ceil(configWrapper.getCurrentOrigin().x / totalDayWidth)) * -1;
 
-        firstVisibleDay.add(DATE, delta);
-        lastVisibleDay.add(DATE, configWrapper.getNumberOfVisibleDays() - 1 + delta);
+        LocalDate firstVisibleDay = today().plusDays(delta);
+        LocalDate lastVisibleDay = today().plusDays(configWrapper.getNumberOfVisibleDays() - 1 + delta);
 
         viewState.setFirstVisibleDay(firstVisibleDay);
         viewState.setLastVisibleDay(lastVisibleDay);
 
         final boolean hasFirstVisibleDayChanged = !firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
-            getScrollListener().onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay);
+            Calendar oldFirstVisibleDayCalendar = null;
+            if (oldFirstVisibleDay != null) oldFirstVisibleDayCalendar = toCalendar(oldFirstVisibleDay);
+            getScrollListener().onFirstVisibleDayChanged(toCalendar(firstVisibleDay), oldFirstVisibleDayCalendar);
         }
     }
 
@@ -279,7 +289,7 @@ public final class WeekView<T> extends View
             defaultInterpreter.setNumberOfDays(numberOfVisibleDays);
         }
 
-        Calendar firstVisibleDay = viewState.getFirstVisibleDay();
+        LocalDate firstVisibleDay = viewState.getFirstVisibleDay();
         if (firstVisibleDay != null) {
             viewState.setScrollToDay(firstVisibleDay);
         }
@@ -937,7 +947,9 @@ public final class WeekView<T> extends View
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
-        configWrapper.setMinDate(DateUtils.withTimeAtStartOfDay(minDate));
+        ZonedDateTime zonedDateTime = toZonedDateTime(minDate);
+        ZonedDateTime adjustedMinDate = DateUtils.withTimeAtStartOfDay(zonedDateTime);
+        configWrapper.setMinDate(toCalendar(adjustedMinDate));
         invalidate();
     }
 
@@ -951,7 +963,9 @@ public final class WeekView<T> extends View
             throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
         }
 
-        configWrapper.setMaxDate(DateUtils.withTimeAtEndOfDay(maxDate));
+        ZonedDateTime zonedDateTime = toZonedDateTime(maxDate);
+        ZonedDateTime adjustedMaxDate = DateUtils.withTimeAtEndOfDay(zonedDateTime);
+        configWrapper.setMaxDate(toCalendar(adjustedMaxDate));
         invalidate();
     }
 
@@ -1108,7 +1122,12 @@ public final class WeekView<T> extends View
      * @return The first visible day in the week view.
      */
     public Calendar getFirstVisibleDay() {
-        return viewState.getFirstVisibleDay();
+        LocalDate firstVisibleDay = viewState.getFirstVisibleDay();
+        if (firstVisibleDay != null) {
+            return toCalendar(firstVisibleDay);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1117,14 +1136,19 @@ public final class WeekView<T> extends View
      * @return The last visible day in the week view.
      */
     public Calendar getLastVisibleDay() {
-        return viewState.getLastVisibleDay();
+        LocalDate lastVisibleDay = viewState.getLastVisibleDay();
+        if (lastVisibleDay != null) {
+            return toCalendar(lastVisibleDay);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Show today on the week view.
      */
     public void goToToday() {
-        goToDate(today());
+        goToDate(toCalendar(today()));
     }
 
     public void goToCurrentTime() {
@@ -1140,7 +1164,8 @@ public final class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(@NonNull Calendar date) {
-        Calendar modifiedDate = (Calendar) date.clone();
+        // Calendar modifiedDate = (Calendar) date.clone();
+        LocalDate modifiedDate = toLocalDate(date);
 
         final Calendar minDate = configWrapper.getMinDate();
         final Calendar maxDate = configWrapper.getMaxDate();
@@ -1149,14 +1174,13 @@ public final class WeekView<T> extends View
         final boolean showFirstDayOfWeekFirst = configWrapper.getShowFirstDayOfWeekFirst();
 
         // If a minimum or maximum date is set, don't allow to go beyond them.
-        if (minDate != null && modifiedDate.before(minDate)) {
-            modifiedDate = (Calendar) minDate.clone();
-        } else if (maxDate != null && modifiedDate.after(maxDate)) {
-            modifiedDate = (Calendar) maxDate.clone();
-            modifiedDate.add(Calendar.DAY_OF_YEAR, 1 - numberOfVisibleDays);
+        if (minDate != null && modifiedDate.isBefore(toLocalDate(minDate))) {
+            modifiedDate = toLocalDate(minDate);
+        } else if (maxDate != null && modifiedDate.isAfter(toLocalDate(maxDate))) {
+            modifiedDate = toLocalDate(maxDate).plusDays(1 - numberOfVisibleDays);
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
-            final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(date);
-            modifiedDate.add(Calendar.DAY_OF_YEAR, (-1) * diff);
+            final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(modifiedDate);
+            modifiedDate = modifiedDate.minusDays(diff);
         }
 
         gestureHandler.forceScrollFinished();
