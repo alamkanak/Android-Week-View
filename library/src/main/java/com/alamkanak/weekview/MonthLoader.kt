@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.DateUtils.today
 import java.util.*
 
 /**

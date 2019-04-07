@@ -51,7 +51,7 @@ internal class DrawingContext(
             val isNotScrolling = config.currentOrigin.x % config.totalDayWidth == 0f
             val modifiedEnd = if (isNotScrolling) end - 1 else end
 
-            val dayRange = DateUtils.getDateRange(start, modifiedEnd)
+            val dayRange = getDateRange(start, modifiedEnd)
             return DrawingContext(dayRange, startPixel)
         }
     }

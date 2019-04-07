@@ -16,15 +16,15 @@ internal class DefaultDateTimeInterpreter(
         numberOfDays: Int
 ) : DateTimeInterpreter {
 
-    private var sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)
-    private val sdfTime = DateUtils.getDefaultTimeFormat(context)
+    private var sdfDate = getDefaultDateFormat(numberOfDays)
+    private val sdfTime = getDefaultTimeFormat(context)
 
     // This calendar is only used for interpreting the time. To avoid issues with time changes,
     // we always use the first day of the year
-    private val calendar = DateUtils.firstDayOfYear()
+    private val calendar = firstDayOfYear()
 
     fun setNumberOfDays(numberOfDays: Int) {
-        sdfDate = DateUtils.getDefaultDateFormat(numberOfDays)
+        sdfDate = getDefaultDateFormat(numberOfDays)
     }
 
     override fun interpretDate(date: Calendar): String {

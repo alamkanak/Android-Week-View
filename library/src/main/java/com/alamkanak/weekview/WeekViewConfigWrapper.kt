@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
-import com.alamkanak.weekview.DateUtils.today
 import java.util.*
 import java.util.Calendar.*
 import kotlin.math.max
@@ -141,13 +140,21 @@ internal class WeekViewConfigWrapper(
     var minDate: Calendar? = null
     var maxDate: Calendar? = null
 
-    var dateTimeInterpreter: DateTimeInterpreter = DefaultDateTimeInterpreter(context, numberOfVisibleDays)
+    private var _dateTimeInterpreter: DateTimeInterpreter =
+            DefaultDateTimeInterpreter(context, numberOfVisibleDays)
+
+    var dateTimeInterpreter: DateTimeInterpreter
+        get() = _dateTimeInterpreter
+        set(value) {
+            _dateTimeInterpreter = value
+            initTextTimeWidth()
+        }
 
     init {
         val rect = Rect()
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
         timeTextHeight = rect.height().toFloat()
-        initTextTimeWidth(context)
+        initTextTimeWidth()
         refreshHeaderHeight()
     }
 
@@ -175,7 +182,7 @@ internal class WeekViewConfigWrapper(
             config.maxHourHeight = value
         }
 
-    var showCurrentTimeFirst: Boolean
+    private var showCurrentTimeFirst: Boolean
         get() = config.showCurrentTimeFirst
         set(value) {
             config.showCurrentTimeFirst = value
@@ -429,7 +436,7 @@ internal class WeekViewConfigWrapper(
     var defaultEventColor: Int
         get() = config.defaultEventColor
         set(value) {
-            config.defaultEventColor
+            config.defaultEventColor = value
         }
 
     var overlappingEventGap: Int
@@ -472,7 +479,7 @@ internal class WeekViewConfigWrapper(
     }
 
     private fun getXOriginForDate(date: Calendar): Float {
-        return -1f * DateUtils.getDaysUntilDate(date).toFloat() * totalDayWidth
+        return -1f * date.daysFromToday * totalDayWidth
     }
 
     fun setCurrentAllDayEventHeight(height: Int) {
@@ -581,11 +588,6 @@ internal class WeekViewConfigWrapper(
         timeTextPaint.textSize = textSize.toFloat()
     }
 
-    fun setDateTimeInterpreter(dateTimeInterpreter: DateTimeInterpreter, context: Context) {
-        this.dateTimeInterpreter = dateTimeInterpreter
-        initTextTimeWidth(context)
-    }
-
     fun getPastBackgroundPaint(useWeekendColor: Boolean): Paint {
         return if (useWeekendColor) pastWeekendBackgroundPaint else pastBackgroundPaint
     }
@@ -618,20 +620,11 @@ internal class WeekViewConfigWrapper(
     /**
      * Initialize time column width. Calculate value with all possible hours (supposed widest text).
      */
-    private fun initTextTimeWidth(context: Context) {
-        val interpreter = getDateTimeInterpreter(context)
+    private fun initTextTimeWidth() {
         timeTextWidth = (0 until hoursPerDay)
-                .map { interpreter.interpretTime(it) }
+                .map { dateTimeInterpreter.interpretTime(it) }
                 .map { timeTextPaint.measureText(it) }
                 .max() ?: 0f
-    }
-
-    fun getDateTimeInterpreter(context: Context): DateTimeInterpreter {
-        /*if (this::dateTimeInterpreter.isInitialized.not()) {
-            dateTimeInterpreter = DefaultDateTimeInterpreter(context, numberOfVisibleDays)
-        }*/
-
-        return dateTimeInterpreter
     }
 
 }

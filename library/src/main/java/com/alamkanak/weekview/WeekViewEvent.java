@@ -180,11 +180,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean isSameDay(Calendar other) {
-        return DateUtils.isSameDay(startTime, other);
+        return DateUtils.isSameDate(startTime, other);
     }
 
     boolean isSameDay(WeekViewEvent other) {
-        return DateUtils.isSameDay(startTime, other.startTime);
+        return DateUtils.isSameDate(startTime, other.startTime);
     }
 
     boolean isWithin(int minHour, int maxHour) {

@@ -1168,7 +1168,7 @@ public final class WeekView<T> extends View
 
         viewState.setShouldRefreshEvents(true);
 
-        final int diff = DateUtils.getDaysUntilDate(modifiedDate);
+        final int diff = DateUtils.getDaysFromToday(modifiedDate);
 
         configWrapper.getCurrentOrigin().x = diff * (-1) * configWrapper.getTotalDayWidth();
         viewState.setRequiresPostInvalidateOnAnimation(true);
@@ -1314,7 +1314,7 @@ public final class WeekView<T> extends View
      * @param dateTimeInterpreter The date, time interpreter.
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
-        configWrapper.setDateTimeInterpreter(dateTimeInterpreter, getContext());
+        configWrapper.setDateTimeInterpreter(dateTimeInterpreter);
     }
 
     protected static class SavedState extends BaseSavedState {

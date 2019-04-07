@@ -1,14 +1,12 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.DateUtils.isAtStartOfNewDay
-
 internal class WeekViewEventSplitter<T>(
         private val config: WeekViewConfigWrapper
 ) {
 
     fun split(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         val newEndTime = event.endTime.copy()
-        val isAtStartOfNewPeriod = config.minHour == 0 && isAtStartOfNewDay(event.startTime, newEndTime)
+        val isAtStartOfNewPeriod = config.minHour == 0 && newEndTime.isAtStartOfNextDay(event.startTime)
 
         return if (isAtStartOfNewPeriod) {
             listOf(shortenTooLongAllDayEvent(event))
