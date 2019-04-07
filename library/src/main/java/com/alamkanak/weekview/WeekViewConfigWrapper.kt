@@ -139,8 +139,8 @@ internal class WeekViewConfigWrapper(
 
     var newHourHeight: Float = UNINITIALIZED
 
-    var minDate: Calendar? = null
-    var maxDate: Calendar? = null
+    var minDate: LocalDate? = null
+    var maxDate: LocalDate? = null
 
     private var _dateTimeInterpreter: DateTimeInterpreter =
             DefaultDateTimeInterpreter(context, numberOfVisibleDays)
@@ -217,13 +217,13 @@ internal class WeekViewConfigWrapper(
     val minX: Float
         get() {
             return maxDate?.let {
-                val date = it.toLocalDate().plusDays(1L - numberOfVisibleDays)
+                val date = it.plusDays(1L - numberOfVisibleDays)
                 getXOriginForDate(date)
             } ?: Float.NEGATIVE_INFINITY
         }
 
     val maxX: Float
-        get() = minDate?.let { getXOriginForDate(it.toLocalDate()) } ?: Float.POSITIVE_INFINITY
+        get() = minDate?.let { getXOriginForDate(it) } ?: Float.POSITIVE_INFINITY
 
     val isSingleDay: Boolean
         get() = numberOfVisibleDays == 1

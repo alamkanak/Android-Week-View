@@ -28,6 +28,7 @@ import static com.alamkanak.weekview.DateUtils.toLocalDate;
 import static com.alamkanak.weekview.DateUtils.toZonedDateTime;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -939,33 +940,44 @@ public final class WeekView<T> extends View
 
     @Nullable
     public Calendar getMinDate() {
-        return configWrapper.getMinDate();
+        if (configWrapper.getMinDate() != null) {
+            return toCalendar(configWrapper.getMinDate());
+        } else {
+            return null;
+        }
     }
 
     public void setMinDate(Calendar minDate) {
-        if (configWrapper.getMaxDate() != null && configWrapper.getMaxDate().before(minDate)) {
+        LocalDate minLocalDate = toLocalDate(minDate);
+        if (configWrapper.getMaxDate() != null && configWrapper.getMaxDate().isBefore(minLocalDate)) {
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
-        ZonedDateTime zonedDateTime = toZonedDateTime(minDate);
-        ZonedDateTime adjustedMinDate = DateUtils.withTimeAtStartOfDay(zonedDateTime);
-        configWrapper.setMinDate(toCalendar(adjustedMinDate));
+        // ZonedDateTime zonedDateTime = toZonedDateTime(minDate);
+        // ZonedDateTime adjustedMinDate = DateUtils.withTimeAtStartOfDay(zonedDateTime);
+        configWrapper.setMinDate(minLocalDate);
+        // configWrapper.setMinDate(toCalendar(adjustedMinDate));
         invalidate();
     }
 
     @Nullable
     public Calendar getMaxDate() {
-        return configWrapper.getMaxDate();
+        if (configWrapper.getMaxDate() != null) {
+            return toCalendar(configWrapper.getMaxDate());
+        } else {
+            return null;
+        }
     }
 
     public void setMaxDate(Calendar maxDate) {
-        if (configWrapper.getMinDate() != null && configWrapper.getMinDate().after(maxDate)) {
+        LocalDate maxLocalDate = toLocalDate(maxDate);
+        if (configWrapper.getMinDate() != null && configWrapper.getMinDate().isAfter(maxLocalDate)) {
             throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
         }
 
-        ZonedDateTime zonedDateTime = toZonedDateTime(maxDate);
-        ZonedDateTime adjustedMaxDate = DateUtils.withTimeAtEndOfDay(zonedDateTime);
-        configWrapper.setMaxDate(toCalendar(adjustedMaxDate));
+        /*ZonedDateTime zonedDateTime = toZonedDateTime(maxDate);
+        ZonedDateTime adjustedMaxDate = DateUtils.withTimeAtEndOfDay(zonedDateTime);*/
+        configWrapper.setMaxDate(maxLocalDate);
         invalidate();
     }
 
@@ -1164,20 +1176,19 @@ public final class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(@NonNull Calendar date) {
-        // Calendar modifiedDate = (Calendar) date.clone();
         LocalDate modifiedDate = toLocalDate(date);
 
-        final Calendar minDate = configWrapper.getMinDate();
-        final Calendar maxDate = configWrapper.getMaxDate();
+        final LocalDate minDate = configWrapper.getMinDate();
+        final LocalDate maxDate = configWrapper.getMaxDate();
 
         final int numberOfVisibleDays = configWrapper.getNumberOfVisibleDays();
         final boolean showFirstDayOfWeekFirst = configWrapper.getShowFirstDayOfWeekFirst();
 
         // If a minimum or maximum date is set, don't allow to go beyond them.
-        if (minDate != null && modifiedDate.isBefore(toLocalDate(minDate))) {
-            modifiedDate = toLocalDate(minDate);
-        } else if (maxDate != null && modifiedDate.isAfter(toLocalDate(maxDate))) {
-            modifiedDate = toLocalDate(maxDate).plusDays(1 - numberOfVisibleDays);
+        if (minDate != null && modifiedDate.isBefore(minDate)) {
+            modifiedDate = minDate;
+        } else if (maxDate != null && modifiedDate.isAfter(maxDate)) {
+            modifiedDate = maxDate.plusDays(1 - numberOfVisibleDays);
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
             final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(modifiedDate);
             modifiedDate = modifiedDate.minusDays(diff);

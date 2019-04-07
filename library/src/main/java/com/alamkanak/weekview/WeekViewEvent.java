@@ -16,7 +16,6 @@ import java.util.Calendar;
 import static com.alamkanak.weekview.Constants.MINUTES_PER_HOUR;
 import static com.alamkanak.weekview.DateUtils.toCalendar;
 import static com.alamkanak.weekview.DateUtils.toZonedDateTime;
-import static java.util.Calendar.DATE;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -97,8 +96,16 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return toCalendar(startTime);
     }
 
+    public ZonedDateTime getStartDateTime() {
+        return startTime;
+    }
+
     public void setStartTime(Calendar startTime) {
         this.startTime = toZonedDateTime(startTime);
+    }
+
+    public void setStartDateTime(ZonedDateTime startTime) {
+        this.startTime = startTime;
     }
 
     int getEffectiveStartMinutes(WeekViewConfigWrapper config) {
@@ -110,8 +117,16 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return toCalendar(endTime);
     }
 
+    public ZonedDateTime getEndDateTime() {
+        return endTime;
+    }
+
     public void setEndTime(Calendar endTime) {
         this.endTime = toZonedDateTime(endTime);
+    }
+
+    public void setEndDateTime(ZonedDateTime endTime) {
+        this.endTime = endTime;
     }
 
     int getEffectiveEndMinutes(WeekViewConfigWrapper config) {
@@ -297,11 +312,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
-        return getStartTime().get(DATE) != originalEvent.getStartTime().get(DATE);
+        return !startTime.isEqual(originalEvent.startTime);
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return getEndTime().get(DATE) != originalEvent.getEndTime().get(DATE);
+        return !endTime.isEqual(originalEvent.endTime);
     }
 
     @Override
