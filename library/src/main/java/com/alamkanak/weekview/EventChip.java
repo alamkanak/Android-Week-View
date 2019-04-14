@@ -61,8 +61,15 @@ class EventChip<T> {
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
         if (event.hasBorder()) {
-            Paint borderPaint = getBorderPaint();
-            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
+            final Paint borderPaint = getBorderPaint();
+            final int borderWidth = event.getBorderWidth();
+
+            final RectF adjustedRect = new RectF(
+                    rect.left + borderWidth / 2f,
+                    rect.top + borderWidth / 2f,
+                    rect.right - borderWidth / 2f,
+                    rect.bottom - borderWidth / 2f);
+            canvas.drawRoundRect(adjustedRect, cornerRadius, cornerRadius, borderPaint);
         }
 
         if (event.isNotAllDay()) {
