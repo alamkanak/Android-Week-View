@@ -17,7 +17,6 @@ import android.view.View;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.ZonedDateTime;
 
 import java.util.Calendar;
 import java.util.List;
@@ -25,10 +24,8 @@ import java.util.List;
 import static com.alamkanak.weekview.Constants.UNINITIALIZED;
 import static com.alamkanak.weekview.DateUtils.toCalendar;
 import static com.alamkanak.weekview.DateUtils.toLocalDate;
-import static com.alamkanak.weekview.DateUtils.toZonedDateTime;
 import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.util.Calendar.HOUR_OF_DAY;

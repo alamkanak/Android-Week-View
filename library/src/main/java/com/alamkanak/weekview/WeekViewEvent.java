@@ -312,11 +312,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
-        return !startTime.isEqual(originalEvent.startTime);
+        return !startTime.toLocalDate().isEqual(originalEvent.startTime.toLocalDate());
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return !endTime.isEqual(originalEvent.endTime);
+        return !endTime.toLocalDate().isEqual(originalEvent.endTime.toLocalDate());
     }
 
     @Override
