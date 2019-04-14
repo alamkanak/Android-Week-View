@@ -34,7 +34,7 @@ internal class WeekViewTouchHandler(
             val start = max(startPixel, timeColumnWidth)
 
             val isVisibleHorizontally = startPixel + widthPerDay - start > 0
-            val isWithinDay = (touchX > start) and (touchX < startPixel + widthPerDay)
+            val isWithinDay = (touchX > start) and (touchX < startPixel + totalDayWidth)
 
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now().plusDays(dayNumber - 1L)
