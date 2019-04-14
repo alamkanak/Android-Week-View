@@ -7,7 +7,10 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
+import org.threeten.bp.temporal.ChronoUnit
+import org.threeten.bp.temporal.TemporalAdjusters
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -534,7 +537,9 @@ internal class WeekViewConfigWrapper(
     }
 
     fun computeDifferenceWithFirstDayOfWeek(date: LocalDate): Int {
-        return (date.dayOfWeek.value + 7 - firstDayOfWeek) % 7
+        val firstDayOfWeek = DayOfWeek.of(firstDayOfWeek)
+        val prevDate = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+        return ChronoUnit.DAYS.between(prevDate, date).toInt()
     }
 
     fun refreshAfterZooming() {
