@@ -261,16 +261,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean collidesWith(WeekViewEvent other) {
-        /*long thisStart = startTime.getTimeInMillis();
-        long thisEnd = endTime.getTimeInMillis();
-        long otherStart = other.getStartTime().getTimeInMillis();
-        long otherEnd = other.getEndTime().getTimeInMillis();*/
         if (startTime.isEqual(other.startTime) && endTime.isEqual(other.endTime)) {
             // Complete overlap
             return true;
         }
 
-        // Resolve collisions by reducing the following event by 1 ms
+        // Resolve collisions by shortening the preceding event by 1 ms
         if (endTime.isEqual(other.startTime)) {
             endTime = endTime.minus(1, ChronoUnit.MILLIS);
             return false;
@@ -279,13 +275,6 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         }
 
         return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime);
-
-        /*return startTime.toEpochSecond() <= other.endTime.toEpochSecond()
-                && endTime.toEpochSecond() >= other.startTime.toEpochSecond();*/
-
-        // return startTime.isBefore(other.endTime) || endTime.isAfter(other.startTime);
-        // return !(thisStart >= otherEnd) && !(thisEnd <= otherStart);
-        // return !((thisStart >= otherEnd) || (thisEnd <= otherStart));
     }
 
     @Override

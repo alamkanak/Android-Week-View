@@ -101,7 +101,9 @@ public final class WeekView<T> extends View
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
-        return new SavedState(superState, configWrapper.getNumberOfVisibleDays());
+        final int visibleDays = configWrapper.getNumberOfVisibleDays();
+        final LocalDate firstDate = viewState.getFirstVisibleDay();
+        return new SavedState(superState, visibleDays, firstDate);
     }
 
     @Override
@@ -109,6 +111,9 @@ public final class WeekView<T> extends View
         SavedState savedState = (SavedState) state;
         super.onRestoreInstanceState(savedState.getSuperState());
         configWrapper.setNumberOfVisibleDays(savedState.numberOfVisibleDays);
+
+        Calendar firstVisibleDay = toCalendar(savedState.firstVisibleDate);
+        goToDate(firstVisibleDay);
     }
 
     @Override
@@ -176,30 +181,35 @@ public final class WeekView<T> extends View
 
     private void notifyScrollListeners() {
         final LocalDate oldFirstVisibleDay = viewState.getFirstVisibleDay();
-        // final LocalDate today = today();
-
-        // LocalDate firstVisibleDay = today(); // (Calendar) today.clone();
-        // LocalDate lastVisibleDay = today(); // (Calendar) today.clone();
 
         final float totalDayWidth = configWrapper.getTotalDayWidth();
+        final int visibleDays = configWrapper.getNumberOfVisibleDays();
         final int delta = (int) round(ceil(configWrapper.getCurrentOrigin().x / totalDayWidth)) * -1;
 
         LocalDate firstVisibleDay = today().plusDays(delta);
-        LocalDate lastVisibleDay = today().plusDays(configWrapper.getNumberOfVisibleDays() - 1 + delta);
+        LocalDate lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1);
 
         viewState.setFirstVisibleDay(firstVisibleDay);
         viewState.setLastVisibleDay(lastVisibleDay);
 
         final boolean hasFirstVisibleDayChanged = !firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
-            Calendar oldFirstVisibleDayCalendar = null;
-            if (oldFirstVisibleDay != null) oldFirstVisibleDayCalendar = toCalendar(oldFirstVisibleDay);
-            getScrollListener().onFirstVisibleDayChanged(toCalendar(firstVisibleDay), oldFirstVisibleDayCalendar);
+            notifyVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay);
         }
     }
 
+    private void notifyVisibleDayChanged(LocalDate newLocalDate, @Nullable LocalDate oldLocalDate) {
+        Calendar newDate = toCalendar(newLocalDate);
+        Calendar oldDate = null;
+
+        if (oldLocalDate != null) {
+            oldDate = toCalendar(oldLocalDate);
+        }
+
+        getScrollListener().onFirstVisibleDayChanged(newDate, oldDate);
+    }
+
     private void prepareEventDrawing(Canvas canvas) {
-        // Clear the cache for event rectangles.
         cache.clearEventChipsCache();
         canvas.save();
         clipEventsRect(canvas);
@@ -1352,21 +1362,26 @@ public final class WeekView<T> extends View
     protected static class SavedState extends BaseSavedState {
 
         private final int numberOfVisibleDays;
+        private final LocalDate firstVisibleDate;
 
-        private SavedState(Parcelable superState, int numberOfVisibleDays) {
+        private SavedState(Parcelable superState,
+                           int numberOfVisibleDays, LocalDate firstVisibleDate) {
             super(superState);
             this.numberOfVisibleDays = numberOfVisibleDays;
+            this.firstVisibleDate = firstVisibleDate;
         }
 
         private SavedState(Parcel in) {
             super(in);
             numberOfVisibleDays = in.readInt();
+            firstVisibleDate = (LocalDate) in.readSerializable();
         }
 
         @Override
         public void writeToParcel(Parcel destination, int flags) {
             super.writeToParcel(destination, flags);
             destination.writeInt(numberOfVisibleDays);
+            destination.writeSerializable(firstVisibleDate);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
