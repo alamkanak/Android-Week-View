@@ -125,9 +125,7 @@ public final class WeekView<T> extends View
         WeekView.height = height;
 
         if (configWrapper.getShowCompleteDay()) {
-            float hourHeight = (height - configWrapper.getHeaderHeight()) / configWrapper.getHoursPerDay();
-            configWrapper.setHourHeight(hourHeight);
-            configWrapper.setNewHourHeight(configWrapper.getHourHeight());
+            configWrapper.updateHourHeight(height);
         }
     }
 
@@ -960,10 +958,7 @@ public final class WeekView<T> extends View
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
-        // ZonedDateTime zonedDateTime = toZonedDateTime(minDate);
-        // ZonedDateTime adjustedMinDate = DateUtils.withTimeAtStartOfDay(zonedDateTime);
         configWrapper.setMinDate(minLocalDate);
-        // configWrapper.setMinDate(toCalendar(adjustedMinDate));
         invalidate();
     }
 
@@ -982,8 +977,6 @@ public final class WeekView<T> extends View
             throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
         }
 
-        /*ZonedDateTime zonedDateTime = toZonedDateTime(maxDate);
-        ZonedDateTime adjustedMaxDate = DateUtils.withTimeAtEndOfDay(zonedDateTime);*/
         configWrapper.setMaxDate(maxLocalDate);
         invalidate();
     }
@@ -1121,13 +1114,11 @@ public final class WeekView<T> extends View
         return gestureHandler.onTouchEvent(event);
     }
 
-
     @Override
     public void computeScroll() {
         super.computeScroll();
         gestureHandler.computeScroll();
     }
-
 
     /////////////////////////////////////////////////////////////////
     //

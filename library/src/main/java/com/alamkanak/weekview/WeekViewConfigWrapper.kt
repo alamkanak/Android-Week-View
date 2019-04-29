@@ -606,6 +606,11 @@ internal class WeekViewConfigWrapper(
         return if (isToday) todayBackgroundPaint else dayBackgroundPaint
     }
 
+    fun updateHourHeight(viewHeight: Int) {
+        hourHeight = (viewHeight - headerHeight) / hoursPerDay
+        newHourHeight = hourHeight
+    }
+
     fun refreshHeaderHeight() {
         headerHeight = headerRowPadding * 2 + headerTextHeight
 
