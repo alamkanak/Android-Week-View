@@ -22,15 +22,16 @@ fun Calendar.toZonedDateTime(): ZonedDateTime {
 }
 
 fun LocalDate.toCalendar(): Calendar {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = toEpochDay() * Constants.DAY_IN_MILLIS
-    return calendar
+    return atStartOfDay(ZoneId.systemDefault()).toInstant().toCalendar()
 }
 
 fun ZonedDateTime.toCalendar(): Calendar {
-    val timeZone = TimeZone.getTimeZone(zone.id)
-    val calendar = Calendar.getInstance(timeZone)
-    calendar.timeInMillis = toEpochSecond() * 1_000
+    return toInstant().toCalendar()
+}
+
+fun Instant.toCalendar(): Calendar {
+    val calendar = GregorianCalendar.getInstance()
+    calendar.timeInMillis = toEpochMilli()
     return calendar
 }
 
