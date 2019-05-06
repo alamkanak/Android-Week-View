@@ -1,6 +1,18 @@
 Changelog
 =========
 
+## Version 3.4
+*(2019-05-06)*
+- New: You can now use `WeekViewEvent.Builder` to build a `WeekViewEvent`.
+- New: The styling of a `WeekViewEvent` is now done via `WeekViewEvent.Style`, which you can construct via `WeekViewEvent.Style.Builder`. You can use it to set the background color, text color, border width, border color and text strike-through of the event.
+- New: `WeekView` now restores the currently displayed date on configuration changes.
+- Fixed: Calls to `setHeaderRowTextColor()` and `setHeaderRowTextSize()` are no longer ignored.
+- Fixed: Calling `notifyDataSetChanged()` results in `onMonthChange()` being called again.
+- Fixed: On the day of a time change, 3 AM is no longer being shown twice in the time column.
+- Fixed: `onMonthChange()` is no longer called unnecessarily.
+
+Thanks to everyone who reported issues!
+
 ## Version 3.3
 *(2019-03-17)*
 - New: You can now define the time range to be displayed for each day by setting `minHour` and `maxHour` in your layout XML, or by calling `weekView.setMinHour()` and `weekView.setMaxHour()` in your code.
