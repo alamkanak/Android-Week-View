@@ -20,13 +20,13 @@ Usage
 // build.gradle (project-level)
 allprojects {
  repositories {
-  ...
+  // ...
   maven { url 'https://jitpack.io' }
  }
 }
 
 // build.gradle (app-level)
-implementation 'com.github.thellmund:Android-Week-View:3.3'
+implementation 'com.github.thellmund:Android-Week-View:3.4'
 ```
 
 2. Add `WeekView` in your XML layout.
@@ -35,6 +35,7 @@ implementation 'com.github.thellmund:Android-Week-View:3.3'
     android:id="@+id/weekView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:defaultEventColor="@color/primaryColor"
     app:eventTextColor="@color/white"
     app:timeColumnTextSize="12sp"
     app:hourHeight="60dp"
@@ -50,50 +51,52 @@ implementation 'com.github.thellmund:Android-Week-View:3.3'
 ```
 
 3. Prepare the class of objects that you want to display in `WeekView` by implementing `WeekViewDisplayable<T>`.
-```java
-public class CalendarItem implements WeekViewDisplayable<CalendarItem> {
+```kotlin
+class Event(
+        val id: Long,
+        val title: String,
+        val startTime: Calendar,
+        val endTime: Calendar,
+        val location: String,
+        val color: Int,
+        val isAllDay: Boolean,
+        val isCanceled: Boolean
+) : WeekViewDisplayable<Event> {
 
-    private long id;
-    private String title;
-    private DateTime startTime;
-    private DateTime endTime;
-    private String location;
-    private int color;
-    
-    /* ... */
-    
-    @Override
-    public WeekViewEvent<CalendarItem> toWeekViewEvent() {
-        // Note: It's important to pass "this" as the last argument to WeekViewEvent's constructor.
-        // This way, the EventClickListener can return this object in its onEventClick() method.
-        boolean isAllDay = DateUtils.isAllDay(startTime, endTime);
-        return new WeekViewEvent<>(
-            id, title, startTime.toGregorianCalendar(), 
-            endTime.toGregorianCalendar(), location, color, isAllDay, this
-        );
+    override fun toWeekViewEvent(): WeekViewEvent<Event> {
+        val style = WeekViewEvent.Style.Builder()
+                .setBackgroundColor(color)
+                .setTextStrikeThrough(isCanceled)
+                .build()
+
+        return WeekViewEvent.Builder<Event>()
+                .setId(id)
+                .setTitle(title)
+                .setStartTime(startTime)
+                .setEndTime(endTime)
+                .setLocation(location)
+                .setAllDay(isAllDay)
+                .setStyle(style)
+                .setData(this) // This is necessary for onEventClick(data) to work
+                .build()
     }
 
 }
+
 ```
 
 4. Configure `WeekView` in code.
-```java
-WeekView<CalendarItem> weekView = (WeekView) findViewById(R.id.weekView);
-weekView.setOnEventClickListener(new EventClickListener<CalendarItem>() {
-    @Override
-    public void onEventClick(CalendarItem event, RectF eventRect) {
-        // Do something with the CalendarItem
-    }
-});
+```kotlin
+val weekView = findViewById<WeekView>(R.id.weekView)
+weekView.setOnEventClickListener { calendarItem, eventRect ->
+    // ...
+}
 
 // WeekView has infinite horizontal scrolling. Therefore, you need to provide the events 
 // of a month whenever that the currently displayed month changes.
-weekView.setMonthChangeListener(new MonthLoader.MonthChangeListener<CalendarItem>() {
-    @Override
-    public List<WeekViewDisplayable<CalendarItem>> onMonthChange(Calendar startDate, Calendar endDate) {
-        return mDatabase.getCalendarItemsInRange(startDate, endDate);
-    }
-});
+weekView.setMonthChangeListener { startDate, endDate ->
+    database.getCalendarItemsInRange(startDate, endDate)
+}
 ```
 
 --- 
