@@ -478,7 +478,7 @@ internal class WeekViewConfigWrapper(
     }
 
     fun calculateWidthPerDay(width: Int) {
-        val availableWidth = (width.toFloat() - timeColumnWidth - columnGap * (numberOfVisibleDays - 1))
+        val availableWidth = width.toFloat() - timeColumnWidth - columnGap * numberOfVisibleDays
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
