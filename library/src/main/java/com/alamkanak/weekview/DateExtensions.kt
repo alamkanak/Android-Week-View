@@ -7,6 +7,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.SATURDAY
@@ -99,4 +100,4 @@ internal fun ZonedDateTime.isAtStartOfNextDay(startDate: ZonedDateTime): Boolean
 }
 
 val LocalDate.daysFromToday: Int
-    get() = today().until(this).days
+    get() = ChronoUnit.DAYS.between(today(), this).toInt()
