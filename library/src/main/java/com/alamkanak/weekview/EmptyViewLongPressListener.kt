@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import java.util.*
 
+@FunctionalInterface
 interface EmptyViewLongPressListener {
 
     /**

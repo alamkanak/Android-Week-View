@@ -4,7 +4,7 @@ import org.threeten.bp.LocalDate
 import java.util.Calendar.DECEMBER
 import java.util.Calendar.JANUARY
 
-data class FetchPeriods(
+internal data class FetchPeriods(
         val previous: Period,
         val current: Period,
         val next: Period

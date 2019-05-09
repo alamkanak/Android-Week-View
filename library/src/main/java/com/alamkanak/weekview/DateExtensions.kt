@@ -13,40 +13,40 @@ import java.util.*
 import java.util.Calendar.SATURDAY
 import java.util.Calendar.SUNDAY
 
-fun Calendar.toLocalDate(): LocalDate {
+internal fun Calendar.toLocalDate(): LocalDate {
     return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
-fun Calendar.toZonedDateTime(): ZonedDateTime {
+internal fun Calendar.toZonedDateTime(): ZonedDateTime {
     val instant = Instant.ofEpochMilli(timeInMillis)
     return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 }
 
-fun LocalDate.toCalendar(): Calendar {
+internal fun LocalDate.toCalendar(): Calendar {
     return atStartOfDay(ZoneId.systemDefault()).toInstant().toCalendar()
 }
 
-fun ZonedDateTime.toCalendar(): Calendar {
+internal fun ZonedDateTime.toCalendar(): Calendar {
     return toInstant().toCalendar()
 }
 
-fun Instant.toCalendar(): Calendar {
+internal fun Instant.toCalendar(): Calendar {
     val calendar = GregorianCalendar.getInstance()
     calendar.timeInMillis = toEpochMilli()
     return calendar
 }
 
-fun getDateRange(daysSinceToday: Int, size: Int): List<LocalDate> {
+internal fun getDateRange(daysSinceToday: Int, size: Int): List<LocalDate> {
     return (daysSinceToday..size).map { today().plusDays(it - 1L) }
 }
 
-fun now(): ZonedDateTime = ZonedDateTime.now()
+internal fun now(): ZonedDateTime = ZonedDateTime.now()
 
-fun today(): LocalDate = LocalDate.now()
+internal fun today(): LocalDate = LocalDate.now()
 
-fun firstDayOfYear(): LocalDate = LocalDate.of(today().year, 1, 1)
+internal fun firstDayOfYear(): LocalDate = LocalDate.of(today().year, 1, 1)
 
-fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
+internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     return when (numberOfDays) {
         7 -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character
         1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // display full weekday
@@ -54,7 +54,7 @@ fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     }
 }
 
-fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
+internal fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
     val format = if (DateFormat.is24HourFormat(context)) "HH:mm" else "hh a"
     return SimpleDateFormat(format, Locale.getDefault())
 }
@@ -99,5 +99,5 @@ internal fun ZonedDateTime.isAtStartOfNextDay(startDate: ZonedDateTime): Boolean
     return false
 }
 
-val LocalDate.daysFromToday: Int
+internal val LocalDate.daysFromToday: Int
     get() = ChronoUnit.DAYS.between(today(), this).toInt()

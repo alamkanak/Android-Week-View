@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-object Preconditions {
+internal object Preconditions {
 
     @JvmStatic
     fun <T> checkNotNull(value: T?): T {

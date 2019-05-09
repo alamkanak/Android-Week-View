@@ -52,3 +52,13 @@ fun <T> WeekView<T>.setEmptyViewLongPressListener(
         }
     }
 }
+
+fun <T> WeekView<T>.setScrollListener(
+        block: (newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) -> Unit
+) {
+    scrollListener = object : ScrollListener {
+        override fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) {
+            block(firstVisibleDay, oldFirstVisibleDay)
+        }
+    }
+}
