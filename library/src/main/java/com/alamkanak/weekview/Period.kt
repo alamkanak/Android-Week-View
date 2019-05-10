@@ -30,8 +30,8 @@ data class Period(val month: Int, val year: Int) {
     }
 
     fun next(): Period {
-        val month = (month + 1) % 12
-        val year = if (month == Month.JANUARY.value) year + 1 else year
+        val year = if (month == Month.DECEMBER.value) year + 1 else year
+        val month = if (month == Month.DECEMBER.value) Month.JANUARY.value else month + 1
         return Period(month, year)
     }
 
