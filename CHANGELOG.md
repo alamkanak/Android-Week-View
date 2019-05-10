@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 3.4.1
+*(2019-05-10)*
+- Changed: The `columnGap` attribute is now applied to all days currently visible. Previously, it was not applied to the last day.
+- Fixed: Calling `goToDate()` no longer scrolls `WeekView` to the wrong date.
+
+Thanks to everyone who reported issues!
+
 ## Version 3.4
 *(2019-05-06)*
 - New: You can now use `WeekViewEvent.Builder` to build a `WeekViewEvent`.
