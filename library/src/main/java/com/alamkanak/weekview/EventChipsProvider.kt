@@ -1,7 +1,5 @@
 package com.alamkanak.weekview
 
-import android.view.View
-
 internal class EventChipsProvider<T>(
         private val config: WeekViewConfigWrapper,
         private val cache: WeekViewCache<T>,
@@ -10,12 +8,7 @@ internal class EventChipsProvider<T>(
 
     var weekViewLoader: WeekViewLoader<T>? = null
 
-    fun loadEventsIfNecessary(view: View) {
-        if (view.isInEditMode) {
-            return
-        }
-
-        checkNotNull(weekViewLoader) { "No WeekViewLoader or MonthChangeListener provided." }
+    fun loadEventsIfNecessary() {
         val hasNoEvents = cache.allEventChips.isEmpty()
         val shouldRefresh = viewState.shouldRefreshEvents
 
@@ -33,9 +26,7 @@ internal class EventChipsProvider<T>(
             cache.clear()
         }
 
-        checkNotNull(weekViewLoader) { "No WeekViewLoader or MonthChangeListener provided." }
         loadEvents(fetchPeriods)
-
         calculateEventChipPositions()
     }
 
@@ -65,16 +56,18 @@ internal class EventChipsProvider<T>(
             }
         }
 
+        val loader = checkNotNull(weekViewLoader) { "No WeekViewLoader or MonthChangeListener provided." }
+
         if (previousPeriodEvents == null) {
-            previousPeriodEvents = weekViewLoader?.onLoad(fetchPeriods.previous).orEmpty()
+            previousPeriodEvents = loader.onLoad(fetchPeriods.previous)
         }
 
         if (currentPeriodEvents == null) {
-            currentPeriodEvents = weekViewLoader?.onLoad(fetchPeriods.current).orEmpty()
+            currentPeriodEvents = loader.onLoad(fetchPeriods.current)
         }
 
         if (nextPeriodEvents == null) {
-            nextPeriodEvents = weekViewLoader?.onLoad(fetchPeriods.next).orEmpty()
+            nextPeriodEvents = loader.onLoad(fetchPeriods.next)
         }
 
         cache.allEventChips.clear()
