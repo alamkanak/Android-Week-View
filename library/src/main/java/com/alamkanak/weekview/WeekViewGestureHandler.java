@@ -2,6 +2,7 @@ package com.alamkanak.weekview;
 
 import android.content.Context;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -154,8 +155,10 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
                 float minX = config.getMinX();
                 float maxX = config.getMaxX();
 
+                float currentX = config.getCurrentOrigin().x;
                 config.getCurrentOrigin().x = min(config.getCurrentOrigin().x, maxX);
                 config.getCurrentOrigin().x = max(config.getCurrentOrigin().x, minX);
+                Log.d("NearestOrigin", "updated currentOrigin.x: " + currentX + " => " + config.getCurrentOrigin().x + "(WeekViewGestureHandler.onScroll)");
 
                 listener.onScrolled();
                 break;
@@ -350,6 +353,7 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     private void goToNearestOrigin() {
         final float totalDayWidth = config.getTotalDayWidth();
         double leftDays = config.getCurrentOrigin().x / totalDayWidth;
+        Log.d("NearestOrigin", "leftDays: " + leftDays);
 
         if (currentFlingDirection != Direction.NONE) {
             // snap to nearest day
@@ -364,8 +368,11 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
             // snap to nearest day
             leftDays = round(leftDays);
         }
+        Log.d("NearestOrigin", "leftDays: " + leftDays);
 
         final int nearestOrigin = (int) (config.getCurrentOrigin().x - leftDays * totalDayWidth);
+        Log.d("NearestOrigin", "nearestOrigin = " + config.getCurrentOrigin().x + " - " + leftDays + " * " + totalDayWidth);
+        Log.d("NearestOrigin", "nearestOrigin: " + nearestOrigin);
 
         if (nearestOrigin != 0) {
             // Stop current animation
@@ -410,11 +417,18 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     }
 
     void computeScroll() {
-        if (scroller.isFinished() && currentFlingDirection != Direction.NONE) {
+        final boolean isFinished = scroller.isFinished();
+        final boolean isFlinging = currentFlingDirection != Direction.NONE;
+        final boolean isScrolling = currentScrollDirection != Direction.NONE;
+
+        if (isFinished && isFlinging) {
             // Snap to day after fling is finished
             goToNearestOrigin();
+        } else if (isFinished & !isScrolling) {
+            // Snap to day after scrolling is finished
+            goToNearestOrigin();
         } else {
-            if (currentFlingDirection != Direction.NONE && shouldForceFinishScroll()) {
+            if (isFlinging && shouldForceFinishScroll()) {
                 goToNearestOrigin();
             } else if (scroller.computeScrollOffset()) {
                 config.getCurrentOrigin().y = scroller.getCurrY();
@@ -424,11 +438,6 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
         }
     }
 
-    /**
-     * Check if scrolling should be stopped.
-     *
-     * @return true if scrolling should be stopped before reaching the end of animation.
-     */
     private boolean shouldForceFinishScroll() {
         return scroller.getCurrVelocity() <= minimumFlingVelocity;
     }

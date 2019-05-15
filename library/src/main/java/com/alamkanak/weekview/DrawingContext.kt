@@ -13,9 +13,7 @@ internal class DrawingContext(
     }
 
     fun getStartPixels(config: WeekViewConfigWrapper): List<Float> {
-        val results = mutableListOf<Float>()
-        results.add(startPixel)
-
+        val results = mutableListOf(startPixel)
         var currentStartPixel = startPixel
 
         for (day in dateRange) {
