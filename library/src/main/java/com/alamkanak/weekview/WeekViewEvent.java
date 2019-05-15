@@ -162,8 +162,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         return style.backgroundColor;
     }
 
-    public int getColorOrDefault() {
-        return (style.backgroundColor != 0) ? style.backgroundColor : Defaults.EVENT_COLOR;
+    int getColorOrDefault(WeekViewConfigWrapper config) {
+        return (style.backgroundColor != 0) ? style.backgroundColor : config.getDefaultEventColor();
     }
 
     public void setColor(int color) {

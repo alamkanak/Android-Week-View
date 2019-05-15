@@ -57,7 +57,7 @@ class EventChip<T> {
 
     void draw(WeekViewConfigWrapper config, @Nullable StaticLayout textLayout, Canvas canvas) {
         final float cornerRadius = config.getEventCornerRadius();
-        final Paint backgroundPaint = getBackgroundPaint();
+        final Paint backgroundPaint = getBackgroundPaint(config);
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint);
 
         if (event.hasBorder()) {
@@ -123,9 +123,9 @@ class EventChip<T> {
         }
     }
 
-    private Paint getBackgroundPaint() {
+    private Paint getBackgroundPaint(WeekViewConfigWrapper config) {
         final Paint paint = new Paint();
-        paint.setColor(event.getColorOrDefault());
+        paint.setColor(event.getColorOrDefault(config));
         return paint;
     }
 

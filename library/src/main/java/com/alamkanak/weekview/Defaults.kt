@@ -12,7 +12,6 @@ internal class Defaults {
         val PAST_BACKGROUND_COLOR = Color.rgb(227, 227, 227)
         val FUTURE_BACKGROUND_COLOR = Color.rgb(245, 245, 245)
 
-        @JvmField
         val EVENT_COLOR = Color.rgb(159, 198, 231)
 
         val GRID_COLOR = Color.rgb(102, 102, 102)
