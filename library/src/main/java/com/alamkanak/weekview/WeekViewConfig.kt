@@ -10,6 +10,7 @@ internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
     // Calendar configuration
     var firstDayOfWeek: Int = 0
     var numberOfVisibleDays: Int = 0
+    var restoreNumberOfVisibleDays: Boolean = true
     var showFirstDayOfWeekFirst: Boolean = false
     var showCurrentTimeFirst: Boolean = false
 
@@ -108,6 +109,7 @@ internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
             // Calendar configuration
             firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DayOfWeek.MONDAY.value)
             numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
+            restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
             showCurrentTimeFirst = a.getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false)
 

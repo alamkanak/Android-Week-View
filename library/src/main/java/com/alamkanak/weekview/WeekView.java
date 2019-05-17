@@ -110,7 +110,10 @@ public final class WeekView<T> extends View
     protected void onRestoreInstanceState(Parcelable state) {
         SavedState savedState = (SavedState) state;
         super.onRestoreInstanceState(savedState.getSuperState());
-        configWrapper.setNumberOfVisibleDays(savedState.numberOfVisibleDays);
+
+        if (configWrapper.getRestoreNumberOfVisibleDays()) {
+            configWrapper.setNumberOfVisibleDays(savedState.numberOfVisibleDays);
+        }
 
         Calendar firstVisibleDay = toCalendar(savedState.firstVisibleDate);
         goToDate(firstVisibleDay);

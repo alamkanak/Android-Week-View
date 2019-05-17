@@ -14,6 +14,7 @@
             <enum name="sunday" value="7" />
         </attr>
         <attr name="numberOfVisibleDays" format="integer" />
+        <attr name="restoreNumberOfVisibleDays" format="boolean" />
         <attr name="showFirstDayOfWeekFirst" format="boolean" />
         <attr name="showCurrentTimeFirst" format="boolean" />
 

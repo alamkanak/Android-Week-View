@@ -169,6 +169,9 @@ internal class WeekViewConfigWrapper(
             config.numberOfVisibleDays = value
         }
 
+    val restoreNumberOfVisibleDays: Boolean
+        get() = config.restoreNumberOfVisibleDays
+
     var hourHeight: Float
         get() = config.hourHeight
         set(value) {
