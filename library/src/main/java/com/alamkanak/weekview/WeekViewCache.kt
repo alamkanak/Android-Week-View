@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.support.v4.util.ArrayMap
 import org.threeten.bp.LocalDate
 
 internal class WeekViewCache<T>(
@@ -30,6 +31,36 @@ internal class WeekViewCache<T>(
 
         allDayEventChips.clear()
         allDayEventChips.addAll(allDay)
+
+        normal.forEach {
+            val key = it.event.startDateTime.toLocalDate()
+            normalEventChipsByDate.add(key, it)
+        }
+
+        allDay.forEach {
+            val key = it.event.startDateTime.toLocalDate()
+            allDayEventChipsByDate.add(key, it)
+        }
+    }
+
+    private val normalEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
+
+    fun normalEventChipsByDate(date: LocalDate): List<EventChip<T>> {
+        return normalEventChipsByDate[date].orEmpty()
+    }
+
+    fun allDayEventChipsByDate(date: LocalDate): List<EventChip<T>> {
+        return allDayEventChipsByDate[date].orEmpty()
+    }
+
+    private fun ArrayMap<LocalDate, MutableList<EventChip<T>>>.add(
+            key: LocalDate,
+            eventChip: EventChip<T>
+    ) {
+        val results = getOrElse(key) { mutableListOf() }
+        results.add(eventChip)
+        this[key] = results
     }
 
     fun covers(fetchPeriods: FetchPeriods): Boolean {

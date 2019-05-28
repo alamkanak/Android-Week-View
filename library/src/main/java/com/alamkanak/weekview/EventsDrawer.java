@@ -22,17 +22,18 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
 class EventsDrawer<T> {
 
     private final WeekViewConfigWrapper config;
+    private final WeekViewCache<T> cache;
     private final EventChipRectCalculator<T> rectCalculator;
 
     private List<Pair<EventChip<T>, StaticLayout>> staticLayoutCache = new ArrayList<>();
 
-    EventsDrawer(WeekViewConfigWrapper config) {
+    EventsDrawer(WeekViewConfigWrapper config, WeekViewCache<T> cache) {
         this.config = config;
+        this.cache = cache;
         this.rectCalculator = new EventChipRectCalculator<>(config);
     }
 
-    void drawSingleEvents(List<EventChip<T>> eventChips,
-                          DrawingContext drawingContext, Canvas canvas, Paint paint) {
+    void drawSingleEvents(DrawingContext drawingContext, Canvas canvas, Paint paint) {
         float startPixel = drawingContext.getStartPixel();
 
         // Draw single events
@@ -43,23 +44,21 @@ class EventsDrawer<T> {
                 startPixel = startPixel + config.getEventMarginHorizontal();
             }
 
-            drawEventsForDate(eventChips, date, startPixel, canvas, paint);
+            drawEventsForDate(date, startPixel, canvas, paint);
 
             // In the next iteration, start from the next day.
             startPixel += config.getTotalDayWidth();
         }
     }
 
-    private void drawEventsForDate(List<EventChip<T>> eventChips, LocalDate date,
+    private void drawEventsForDate(LocalDate date,
                                    float startFromPixel, Canvas canvas, Paint paint) {
-        if (eventChips == null) {
-            return;
-        }
+        List<EventChip<T>> eventChips = cache.normalEventChipsByDate(date);
 
         for (int i = 0; i < eventChips.size(); i++) {
             final EventChip<T> eventChip = eventChips.get(i);
             final WeekViewEvent event = eventChip.event;
-            if (!event.isSameDay(date) || !event.isWithin(config.getMinHour(), config.getMaxHour())) {
+            if (!event.isWithin(config.getMinHour(), config.getMaxHour())) {
                 continue;
             }
 
@@ -76,33 +75,25 @@ class EventsDrawer<T> {
     /**
      * Compute the StaticLayout for all-day events to update the header height
      *
-     * @param eventChips The list of {@link EventChip}s to draw
      * @param drawingContext The {@link DrawingContext} to use for drawing
      * @return The association of {@link EventChip}s with his StaticLayout
      */
-    List<Pair<EventChip<T>, StaticLayout>> prepareDrawAllDayEvents(List<EventChip<T>> eventChips,
-                                                                   DrawingContext drawingContext) {
+    List<Pair<EventChip<T>, StaticLayout>> prepareDrawAllDayEvents(DrawingContext drawingContext) {
         config.setCurrentAllDayEventHeight(0);
-        if (eventChips == null) {
-            return null;
-        }
-
         staticLayoutCache.clear();
 
         float startPixel = drawingContext.getStartPixel();
 
-        for (LocalDate day : drawingContext.getDateRange()) {
+        for (LocalDate date : drawingContext.getDateRange()) {
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.getEventMarginHorizontal();
             }
 
-            for (EventChip<T> eventChip : eventChips) {
-                final WeekViewEvent event = eventChip.event;
-                if (!event.isSameDay(day)) {
-                    continue;
-                }
+            List<EventChip<T>> eventChips = cache.allDayEventChipsByDate(date);
+            StaticLayout layout;
 
-                StaticLayout layout = prepareDrawAllDayEvent(eventChip, startPixel);
+            for (EventChip<T> eventChip : eventChips) {
+                layout = calculateLayoutForAllDayEvent(eventChip, startPixel);
                 if (layout != null) {
                     staticLayoutCache.add(new Pair<>(eventChip, layout));
                 }
@@ -114,8 +105,8 @@ class EventsDrawer<T> {
         return staticLayoutCache;
     }
 
-    private StaticLayout prepareDrawAllDayEvent(EventChip<T> eventChip, float startFromPixel) {
-        final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startFromPixel);
+    private StaticLayout calculateLayoutForAllDayEvent(EventChip<T> eventChip, float startPixel) {
+        final RectF chipRect = rectCalculator.calculateAllDayEvent(eventChip, startPixel);
         if (isValidAllDayEventRect(chipRect)) {
             eventChip.rect = chipRect;
             return calculateChipTextLayout(eventChip);

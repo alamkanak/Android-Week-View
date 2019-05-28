@@ -19,6 +19,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.LocalDate;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public final class WeekView<T> extends View
 
         gestureHandler = new WeekViewGestureHandler<>(context, this, configWrapper, cache);
 
-        eventsDrawer = new EventsDrawer<>(configWrapper);
+        eventsDrawer = new EventsDrawer<>(configWrapper, cache);
         timeColumnDrawer = new TimeColumnDrawer(configWrapper);
 
         headerRowDrawer = new HeaderRowDrawer<>(configWrapper, cache, viewState);
@@ -135,6 +136,7 @@ public final class WeekView<T> extends View
     }
 
     private final Paint paint = new Paint();
+    private final List<Pair<EventChip<T>, StaticLayout>> allDayEvents = new ArrayList<>();
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -160,13 +162,13 @@ public final class WeekView<T> extends View
             eventChipsProvider.loadEventsIfNecessary();
         }
 
-        List<Pair<EventChip<T>, StaticLayout>> allDayEvents =
-                eventsDrawer.prepareDrawAllDayEvents(cache.getAllDayEventChips(), drawingContext);
+        allDayEvents.clear();
+        allDayEvents.addAll(eventsDrawer.prepareDrawAllDayEvents(drawingContext));
 
         dayBackgroundDrawer.draw(drawingContext, canvas);
         backgroundGridDrawer.draw(drawingContext, canvas);
 
-        eventsDrawer.drawSingleEvents(cache.getNormalEventChips(), drawingContext, canvas, paint);
+        eventsDrawer.drawSingleEvents(drawingContext, canvas, paint);
 
         nowLineDrawer.draw(drawingContext, canvas);
         headerRowDrawer.draw(drawingContext, canvas, paint);
