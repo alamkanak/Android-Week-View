@@ -30,7 +30,7 @@ class EventsDrawer<T> {
     }
 
     void drawSingleEvents(List<EventChip<T>> eventChips,
-                          DrawingContext drawingContext, Canvas canvas) {
+                          DrawingContext drawingContext, Canvas canvas, Paint paint) {
         float startPixel = drawingContext.getStartPixel();
 
         // Draw single events
@@ -41,7 +41,7 @@ class EventsDrawer<T> {
                 startPixel = startPixel + config.getEventMarginHorizontal();
             }
 
-            drawEventsForDate(eventChips, date, startPixel, canvas);
+            drawEventsForDate(eventChips, date, startPixel, canvas, paint);
 
             // In the next iteration, start from the next day.
             startPixel += config.getTotalDayWidth();
@@ -49,7 +49,7 @@ class EventsDrawer<T> {
     }
 
     private void drawEventsForDate(List<EventChip<T>> eventChips, LocalDate date,
-                                   float startFromPixel, Canvas canvas) {
+                                   float startFromPixel, Canvas canvas, Paint paint) {
         if (eventChips == null) {
             return;
         }
@@ -64,7 +64,7 @@ class EventsDrawer<T> {
             final RectF chipRect = rectCalculator.calculateSingleEvent(eventChip, startFromPixel);
             if (isValidSingleEventRect(chipRect)) {
                 eventChip.rect = chipRect;
-                eventChip.draw(config, canvas);
+                eventChip.draw(config, canvas, paint);
             } else {
                 eventChip.rect = null;
             }
@@ -129,7 +129,7 @@ class EventsDrawer<T> {
      * @param canvas         The canvas to draw upon.
      */
     void drawAllDayEvents(List<Pair<EventChip<T>, StaticLayout>> eventChips,
-                          Canvas canvas) {
+                          Canvas canvas, Paint paint) {
         if (eventChips == null) {
             return;
         }
@@ -137,7 +137,7 @@ class EventsDrawer<T> {
         for (Pair<EventChip<T>, StaticLayout> pair : eventChips) {
             EventChip<T> eventChip = pair.first;
             StaticLayout layout = pair.second;
-            eventChip.draw(config, layout, canvas);
+            eventChip.draw(config, layout, canvas, paint);
         }
 
         // Hide events when they are in the top left corner

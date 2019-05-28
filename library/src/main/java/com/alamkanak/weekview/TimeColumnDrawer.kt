@@ -1,10 +1,18 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.util.SparseArray
 
 internal class TimeColumnDrawer(
         private val config: WeekViewConfigWrapper
 ) {
+    private val times = SparseArray<String>()
+
+    init {
+        for (hour in config.startHour until config.hoursPerDay step config.timeColumnHoursInterval) {
+            times.put(hour, config.dateTimeInterpreter.interpretTime(hour + config.minHour))
+        }
+    }
 
     fun drawTimeColumn(canvas: Canvas) {
         var top = config.headerHeight
@@ -23,14 +31,12 @@ internal class TimeColumnDrawer(
         val hourLines = FloatArray(config.hoursPerDay * 4)
         val hourStep = config.timeColumnHoursInterval
 
-        for (i in startHour until config.hoursPerDay step hourStep) {
-            val heightOfHour = (config.hourHeight * i)
+        for (hour in startHour until config.hoursPerDay step hourStep) {
+            val heightOfHour = (config.hourHeight * hour)
             top = config.headerHeight + config.currentOrigin.y + heightOfHour
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
-            val time = config.dateTimeInterpreter.interpretTime(i + config.minHour)
-
             if (top < bottom) {
                 val x = config.timeTextWidth + config.timeColumnPadding
                 var y = top + config.timeTextHeight / 2
@@ -40,11 +46,11 @@ internal class TimeColumnDrawer(
                     y += config.timeTextHeight / 2 + config.hourSeparatorPaint.strokeWidth + config.timeColumnPadding
                 }
 
-                canvas.drawText(time, x, y, config.timeTextPaint)
+                canvas.drawText(times[hour], x, y, config.timeTextPaint)
 
-                if (config.showTimeColumnHourSeparator && i > 0) {
-                    val j = i-1
-                    val  yHoursLines = top
+                if (config.showTimeColumnHourSeparator && hour > 0) {
+                    val j = hour - 1
+                    val yHoursLines = top
                     hourLines[j * 4] = 0f
                     hourLines[j * 4 + 1] = yHoursLines
                     hourLines[j * 4 + 2] = config.timeColumnWidth

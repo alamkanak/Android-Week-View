@@ -3,6 +3,7 @@ package com.alamkanak.weekview;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -133,6 +134,8 @@ public final class WeekView<T> extends View
         }
     }
 
+    private final Paint paint = new Paint();
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -164,13 +167,13 @@ public final class WeekView<T> extends View
         dayBackgroundDrawer.draw(drawingContext, canvas);
         backgroundGridDrawer.draw(drawingContext, canvas);
 
-        eventsDrawer.drawSingleEvents(cache.getNormalEventChips(), drawingContext, canvas);
+        eventsDrawer.drawSingleEvents(cache.getNormalEventChips(), drawingContext, canvas, paint);
 
         nowLineDrawer.draw(drawingContext, canvas);
-        headerRowDrawer.draw(drawingContext, canvas);
+        headerRowDrawer.draw(drawingContext, canvas, paint);
         dayLabelDrawer.draw(drawingContext, canvas);
 
-        eventsDrawer.drawAllDayEvents(allDayEvents, canvas);
+        eventsDrawer.drawAllDayEvents(allDayEvents, canvas, paint);
         timeColumnDrawer.drawTimeColumn(canvas);
 
         if (isFirstDraw) {
@@ -698,7 +701,7 @@ public final class WeekView<T> extends View
      * and `pastBackgroundColor`.
      *
      * @param color True if past and future should have two different
-     *                                    background colors.
+     *              background colors.
      */
     public void setShowDistinctPastFutureColor(boolean color) {
         configWrapper.setShowDistinctPastFutureColor(color);

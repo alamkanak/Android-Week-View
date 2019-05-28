@@ -9,9 +9,9 @@ internal class HeaderRowDrawer<T>(
         private val viewState: WeekViewViewState
 ) {
 
-    fun draw(drawingContext: DrawingContext, canvas: Canvas) {
+    fun draw(drawingContext: DrawingContext, canvas: Canvas, paint: Paint) {
         calculateAvailableSpaceForHeader(drawingContext)
-        drawHeaderRow(canvas)
+        drawHeaderRow(canvas, paint)
     }
 
     private fun calculateAvailableSpaceForHeader(drawingContext: DrawingContext) {
@@ -37,7 +37,7 @@ internal class HeaderRowDrawer<T>(
         config.refreshHeaderHeight()
     }
 
-    private fun drawHeaderRow(canvas: Canvas) {
+    private fun drawHeaderRow(canvas: Canvas, paint: Paint) {
         val width = WeekView.getViewWidth()
 
         canvas.restore()
@@ -61,18 +61,16 @@ internal class HeaderRowDrawer<T>(
         canvas.save()
 
         if (config.showHeaderRowBottomLine) {
-            drawHeaderBottomLine(width, canvas)
+            drawHeaderBottomLine(width, canvas, paint)
         }
     }
 
-    private fun drawHeaderBottomLine(width: Int, canvas: Canvas) {
+    private fun drawHeaderBottomLine(width: Int, canvas: Canvas, paint: Paint) {
         val headerRowBottomLineWidth = config.headerRowBottomLinePaint.strokeWidth
         val topMargin = config.headerHeight - headerRowBottomLineWidth
 
-        val paint = Paint().apply {
-            strokeWidth = headerRowBottomLineWidth
-            color = config.headerRowBottomLinePaint.color
-        }
+        paint.strokeWidth = headerRowBottomLineWidth
+        paint.color = config.headerRowBottomLinePaint.color
 
         canvas.drawLine(0f, topMargin, width.toFloat(), topMargin, paint)
     }
