@@ -6,11 +6,14 @@ import android.os.Build.VERSION_CODES.M
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.SparseArray
 import org.threeten.bp.LocalDate
 
 internal class DayLabelDrawer(
         private val config: WeekViewConfigWrapper
 ) {
+
+    private val dayLabelCache = SparseArray<String>()
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext
@@ -21,7 +24,10 @@ internal class DayLabelDrawer(
     }
 
     private fun drawLabel(day: LocalDate, startPixel: Float, canvas: Canvas) {
-        val dayLabel = config.dateTimeInterpreter.interpretDate(day.toCalendar())
+
+        val key = day.toEpochDay().toInt()
+        val dayLabel = dayLabelCache.get(key, provideDayLabel(day))
+
         val x = startPixel + config.widthPerDay / 2
 
         val textPaint = if (day.isToday) {
@@ -56,4 +62,10 @@ internal class DayLabelDrawer(
                 StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
                         Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
             }
+
+    private fun provideDayLabel(day: LocalDate): String {
+        return config.dateTimeInterpreter.interpretDate(day.toCalendar()).also {
+            dayLabelCache.put(day.toEpochDay().toInt(), it)
+        }
+    }
 }
