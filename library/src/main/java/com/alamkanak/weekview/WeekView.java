@@ -118,8 +118,10 @@ public final class WeekView<T> extends View
             configWrapper.setNumberOfVisibleDays(savedState.numberOfVisibleDays);
         }
 
-        Calendar firstVisibleDay = toCalendar(savedState.firstVisibleDate);
-        goToDate(firstVisibleDay);
+        if (savedState.firstVisibleDate != null) {
+            Calendar firstVisibleDay = toCalendar(savedState.firstVisibleDate);
+            goToDate(firstVisibleDay);
+        }
     }
 
     @Override
@@ -1349,7 +1351,7 @@ public final class WeekView<T> extends View
      * @return The date, time interpreter.
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
-        return configWrapper.getDateTimeInterpreter(); // getDateTimeInterpreter(getContext());
+        return configWrapper.getDateTimeInterpreter();
     }
 
     /**
@@ -1364,10 +1366,12 @@ public final class WeekView<T> extends View
     protected static class SavedState extends BaseSavedState {
 
         private final int numberOfVisibleDays;
+
+        @Nullable
         private final LocalDate firstVisibleDate;
 
         private SavedState(Parcelable superState,
-                           int numberOfVisibleDays, LocalDate firstVisibleDate) {
+                           int numberOfVisibleDays, @Nullable LocalDate firstVisibleDate) {
             super(superState);
             this.numberOfVisibleDays = numberOfVisibleDays;
             this.firstVisibleDate = firstVisibleDate;
