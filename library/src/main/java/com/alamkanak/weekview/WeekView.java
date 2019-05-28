@@ -155,7 +155,6 @@ public final class WeekView<T> extends View
             viewState.setFirstDraw(false);
         }
 
-        // final DrawingContext drawingContext = DrawingContext.create(configWrapper);
         drawingContext.update(configWrapper);
         if (!isInEditMode()) {
             eventChipsProvider.loadEventsIfNecessary();

@@ -24,9 +24,8 @@ internal class DayLabelDrawer(
     }
 
     private fun drawLabel(day: LocalDate, startPixel: Float, canvas: Canvas) {
-
         val key = day.toEpochDay().toInt()
-        val dayLabel = dayLabelCache.get(key, provideDayLabel(day))
+        val dayLabel = dayLabelCache.get(key) { provideDayLabel(key, day) }
 
         val x = startPixel + config.widthPerDay / 2
 
@@ -53,19 +52,25 @@ internal class DayLabelDrawer(
         }
     }
 
-    private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout =
-            if (SDK_INT >= M) {
-                StaticLayout.Builder
-                        .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
-                        .build()
-            } else {
-                StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
-                        Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
-            }
+    private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
+        return if (SDK_INT >= M) {
+            StaticLayout.Builder
+                    .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
+                    .build()
+        } else {
+            StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
+                    Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
+        }
+    }
 
-    private fun provideDayLabel(day: LocalDate): String {
+    private fun provideDayLabel(key: Int, day: LocalDate): String {
         return config.dateTimeInterpreter.interpretDate(day.toCalendar()).also {
             dayLabelCache.put(day.toEpochDay().toInt(), it)
         }
     }
+
+    private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {
+        return get(key) ?: providerIfEmpty.invoke()
+    }
+
 }

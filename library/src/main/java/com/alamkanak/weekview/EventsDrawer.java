@@ -24,6 +24,8 @@ class EventsDrawer<T> {
     private final WeekViewConfigWrapper config;
     private final EventChipRectCalculator<T> rectCalculator;
 
+    private List<Pair<EventChip<T>, StaticLayout>> staticLayoutCache = new ArrayList<>();
+
     EventsDrawer(WeekViewConfigWrapper config) {
         this.config = config;
         this.rectCalculator = new EventChipRectCalculator<>(config);
@@ -85,7 +87,8 @@ class EventsDrawer<T> {
             return null;
         }
 
-        List<Pair<EventChip<T>, StaticLayout>> result = new ArrayList<>();
+        staticLayoutCache.clear();
+
         float startPixel = drawingContext.getStartPixel();
 
         for (LocalDate day : drawingContext.getDateRange()) {
@@ -101,14 +104,14 @@ class EventsDrawer<T> {
 
                 StaticLayout layout = prepareDrawAllDayEvent(eventChip, startPixel);
                 if (layout != null) {
-                    result.add(new Pair<>(eventChip, layout));
+                    staticLayoutCache.add(new Pair<>(eventChip, layout));
                 }
             }
 
             startPixel += config.getTotalDayWidth();
         }
 
-        return result;
+        return staticLayoutCache;
     }
 
     private StaticLayout prepareDrawAllDayEvent(EventChip<T> eventChip, float startFromPixel) {
