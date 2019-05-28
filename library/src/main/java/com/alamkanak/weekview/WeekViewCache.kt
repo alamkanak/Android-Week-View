@@ -8,7 +8,6 @@ internal class WeekViewCache<T>(
 ) {
 
     var allEventChips = mutableListOf<EventChip<T>>()
-    var normalEventChips = mutableListOf<EventChip<T>>()
     var allDayEventChips = mutableListOf<EventChip<T>>()
 
     var previousPeriodEvents: List<WeekViewEvent<T>>? = null
@@ -20,14 +19,22 @@ internal class WeekViewCache<T>(
     val hasEvents: Boolean
         get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
 
+    private val normalEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
+
+    fun normalEventChipsByDate(date: LocalDate): List<EventChip<T>> {
+        return normalEventChipsByDate[date].orEmpty()
+    }
+
+    fun allDayEventChipsByDate(date: LocalDate): List<EventChip<T>> {
+        return allDayEventChipsByDate[date].orEmpty()
+    }
+
     fun put(newChips: List<EventChip<T>>) {
         allEventChips.clear()
         allEventChips.addAll(newChips)
 
         val (allDay, normal) = newChips.partition { it.event.isAllDay }
-
-        normalEventChips.clear()
-        normalEventChips.addAll(normal)
 
         allDayEventChips.clear()
         allDayEventChips.addAll(allDay)
@@ -41,26 +48,6 @@ internal class WeekViewCache<T>(
             val key = it.event.startDateTime.toLocalDate()
             allDayEventChipsByDate.add(key, it)
         }
-    }
-
-    private val normalEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
-    private val allDayEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
-
-    fun normalEventChipsByDate(date: LocalDate): List<EventChip<T>> {
-        return normalEventChipsByDate[date].orEmpty()
-    }
-
-    fun allDayEventChipsByDate(date: LocalDate): List<EventChip<T>> {
-        return allDayEventChipsByDate[date].orEmpty()
-    }
-
-    private fun ArrayMap<LocalDate, MutableList<EventChip<T>>>.add(
-            key: LocalDate,
-            eventChip: EventChip<T>
-    ) {
-        val results = getOrElse(key) { mutableListOf() }
-        results.add(eventChip)
-        this[key] = results
     }
 
     fun covers(fetchPeriods: FetchPeriods): Boolean {
@@ -120,6 +107,15 @@ internal class WeekViewCache<T>(
 
         val newChips = eventSplitter.split(event).map { EventChip(it, event, null) }
         allEventChips.addAll(newChips)
+    }
+
+    private fun ArrayMap<LocalDate, MutableList<EventChip<T>>>.add(
+            key: LocalDate,
+            eventChip: EventChip<T>
+    ) {
+        val results = getOrElse(key) { mutableListOf() }
+        results.add(eventChip)
+        this[key] = results
     }
 
 }
