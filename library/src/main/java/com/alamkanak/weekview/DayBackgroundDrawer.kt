@@ -14,7 +14,7 @@ internal class DayBackgroundDrawer(
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext
-                .getDateRangeWithStartPixels(config)
+                .dateRangeWithStartPixels
                 .forEach { (date, startPixel) ->
                     val startX = max(startPixel, config.timeColumnWidth)
                     drawDayBackground(date, startX, startPixel, canvas)

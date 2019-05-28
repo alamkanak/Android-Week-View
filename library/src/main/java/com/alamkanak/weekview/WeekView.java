@@ -45,6 +45,8 @@ public final class WeekView<T> extends View
     private final WeekViewViewState viewState;
     private final WeekViewGestureHandler<T> gestureHandler;
 
+    private final DrawingContext drawingContext = new DrawingContext();
+
     private final HeaderRowDrawer<T> headerRowDrawer;
     private final DayLabelDrawer dayLabelDrawer;
     private final EventsDrawer<T> eventsDrawer;
@@ -52,7 +54,6 @@ public final class WeekView<T> extends View
     private final DayBackgroundDrawer dayBackgroundDrawer;
     private final BackgroundGridDrawer backgroundGridDrawer;
     private final NowLineDrawer nowLineDrawer;
-
     private final EventChipsProvider<T> eventChipsProvider;
 
     public WeekView(Context context) {
@@ -151,7 +152,8 @@ public final class WeekView<T> extends View
             viewState.setFirstDraw(false);
         }
 
-        final DrawingContext drawingContext = DrawingContext.create(configWrapper);
+        // final DrawingContext drawingContext = DrawingContext.create(configWrapper);
+        drawingContext.update(configWrapper);
         if (!isInEditMode()) {
             eventChipsProvider.loadEventsIfNecessary();
         }

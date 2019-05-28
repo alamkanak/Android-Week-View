@@ -14,7 +14,7 @@ internal class DayLabelDrawer(
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext
-                .getDateRangeWithStartPixels(config)
+                .dateRangeWithStartPixels
                 .forEach { (date, startPixel) ->
                     drawLabel(date, startPixel, canvas)
                 }

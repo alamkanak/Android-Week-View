@@ -3,17 +3,42 @@ package com.alamkanak.weekview
 import org.threeten.bp.LocalDate
 import java.lang.Math.ceil
 
-internal class DrawingContext(
-        val dateRange: List<LocalDate>,
-        val startPixel: Float
-) {
+internal class DrawingContext {
 
-    fun getDateRangeWithStartPixels(config: WeekViewConfigWrapper): List<Pair<LocalDate, Float>> {
-        return dateRange.zip(getStartPixels(config))
+    var startPixel = 0f
+    val dateRange = mutableListOf<LocalDate>()
+    val startPixels = mutableListOf<Float>()
+    val dateRangeWithStartPixels = mutableListOf<Pair<LocalDate, Float>>()
+
+    fun update(config: WeekViewConfigWrapper) {
+        val totalDayWidth = config.totalDayWidth
+        val leftDaysWithGaps = (ceil((config.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
+
+        startPixel = (config.currentOrigin.x
+                + totalDayWidth * leftDaysWithGaps
+                + config.timeColumnWidth)
+
+        val start = leftDaysWithGaps + 1
+        val end = start + config.numberOfVisibleDays
+
+        // If the user is scrolling, a new view becomes partially visible, so we must add an
+        // additional date to the date range
+        val isNotScrolling = config.currentOrigin.x % config.totalDayWidth == 0f
+        val modifiedEnd = if (isNotScrolling) end - 1 else end
+
+        dateRange.clear()
+        dateRange += getDateRange(start, modifiedEnd)
+
+        updateStartPixels(config, startPixel)
+
+        dateRangeWithStartPixels.clear()
+        dateRangeWithStartPixels += dateRange.zip(startPixels)
     }
 
-    fun getStartPixels(config: WeekViewConfigWrapper): List<Float> {
-        val results = mutableListOf(startPixel)
+    private fun updateStartPixels(config: WeekViewConfigWrapper, startPixel: Float) {
+        startPixels.clear()
+        startPixels += startPixel
+
         var currentStartPixel = startPixel
 
         for (day in dateRange) {
@@ -25,32 +50,7 @@ internal class DrawingContext(
 
             // In the next iteration, start from the next day.
             currentStartPixel += config.totalDayWidth
-            results.add(currentStartPixel)
-        }
-
-        return results
-    }
-
-    companion object {
-
-        @JvmStatic
-        fun create(config: WeekViewConfigWrapper): DrawingContext {
-            val totalDayWidth = config.totalDayWidth
-            val leftDaysWithGaps = (ceil((config.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
-            val startPixel = (config.currentOrigin.x
-                    + totalDayWidth * leftDaysWithGaps
-                    + config.timeColumnWidth)
-
-            val start = leftDaysWithGaps + 1
-            val end = start + config.numberOfVisibleDays
-
-            // If the user is scrolling, a new view becomes partially visible, so we must add an
-            // additional date to the date range
-            val isNotScrolling = config.currentOrigin.x % config.totalDayWidth == 0f
-            val modifiedEnd = if (isNotScrolling) end - 1 else end
-
-            val dayRange = getDateRange(start, modifiedEnd)
-            return DrawingContext(dayRange, startPixel)
+            startPixels.add(currentStartPixel)
         }
     }
 

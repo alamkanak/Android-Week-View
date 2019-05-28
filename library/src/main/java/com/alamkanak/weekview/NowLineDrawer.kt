@@ -13,7 +13,7 @@ internal class NowLineDrawer(
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         if (config.showNowLine) {
               val startPixel = drawingContext
-                .getDateRangeWithStartPixels(config)
+                .dateRangeWithStartPixels
                 .filter { it.first.isToday }
                 .map { it.second }
                 .firstOrNull() ?: return
