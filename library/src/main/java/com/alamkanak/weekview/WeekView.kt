@@ -268,7 +268,7 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var showHeaderRowBottomLine: Boolean
+    var isShowHeaderRowBottomLine: Boolean
         get() = configWrapper.showHeaderRowBottomLine
         set(value) {
             configWrapper.showHeaderRowBottomLine = value
@@ -337,7 +337,7 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
-    var showTimeColumnHourSeparator: Boolean
+    var isShowTimeColumnHourSeparator: Boolean
         get() = configWrapper.showTimeColumnHourSeparator
         set(value) {
             configWrapper.showTimeColumnHourSeparator = value
@@ -357,7 +357,7 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var showTimeColumnSeparator: Boolean
+    var isShowTimeColumnSeparator: Boolean
         get() = configWrapper.showTimeColumnSeparator
         set(value) {
             configWrapper.showTimeColumnSeparator = value
@@ -607,7 +607,7 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
-    var showCompleteDay: Boolean
+    var isShowCompleteDay: Boolean
         get() = configWrapper.showCompleteDay
         set(value) {
             configWrapper.showCompleteDay = value
@@ -620,7 +620,7 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var showNowLine: Boolean
+    var isShowNowLine: Boolean
         /**
          * Get whether "now" line should be displayed. "Now" line is defined by the attributes
          * `nowLineColor` and `nowLineStrokeWidth`.
@@ -736,7 +736,7 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var showHourSeparators: Boolean
+    var isShowHourSeparators: Boolean
         get() = configWrapper.showHourSeparators
         set(value) {
             configWrapper.showHourSeparators = value
@@ -763,7 +763,7 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var showDaySeparators: Boolean
+    var isShowDaySeparators: Boolean
         get() = configWrapper.showDaySeparators
         set(value) {
             configWrapper.showDaySeparators = value
