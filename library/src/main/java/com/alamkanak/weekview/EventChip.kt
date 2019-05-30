@@ -177,7 +177,6 @@ internal class EventChip<T>(
             layoutCache = textLayout
         }
 
-        // Draw text.
         layoutCache?.let {
             drawEventTitle(config, it, canvas)
         }
@@ -189,11 +188,12 @@ internal class EventChip<T>(
         canvas: Canvas
     ) {
         val rect = checkNotNull(rect)
-
-        canvas.save()
-        canvas.translate(rect.left + config.eventPadding, rect.top + config.eventPadding)
-        textLayout.draw(canvas)
-        canvas.restore()
+        canvas.apply {
+            save()
+            translate(rect.left + config.eventPadding, rect.top + config.eventPadding)
+            textLayout.draw(this)
+            restore()
+        }
     }
 
     private fun setBackgroundPaint(config: WeekViewConfigWrapper, paint: Paint) {

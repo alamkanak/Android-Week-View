@@ -70,15 +70,7 @@ internal class EventChipsProvider<T>(
             nextPeriodEvents = loader.load(fetchPeriods.next)
         }
 
-        cache.allEventChips.clear()
-        cache.sortAndCacheEvents(previousPeriodEvents)
-        cache.sortAndCacheEvents(currentPeriodEvents)
-        cache.sortAndCacheEvents(nextPeriodEvents)
-
-        cache.previousPeriodEvents = previousPeriodEvents
-        cache.currentPeriodEvents = currentPeriodEvents
-        cache.nextPeriodEvents = nextPeriodEvents
-        cache.fetchedPeriods = fetchPeriods
+        cache.update(previousPeriodEvents, currentPeriodEvents, nextPeriodEvents, fetchPeriods)
     }
 
     private fun calculateEventChipPositions() {

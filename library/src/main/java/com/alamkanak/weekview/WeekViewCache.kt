@@ -86,12 +86,29 @@ internal class WeekViewCache<T>(
         fetchedPeriods = null
     }
 
+    fun update(
+        previousPeriodEvents: List<WeekViewEvent<T>>,
+        currentPeriodEvents: List<WeekViewEvent<T>>,
+        nextPeriodEvents: List<WeekViewEvent<T>>,
+        fetchedPeriods: FetchPeriods
+    ) {
+        allEventChips.clear()
+        sortAndCacheEvents(previousPeriodEvents)
+        sortAndCacheEvents(currentPeriodEvents)
+        sortAndCacheEvents(nextPeriodEvents)
+
+        this.previousPeriodEvents = previousPeriodEvents
+        this.currentPeriodEvents = currentPeriodEvents
+        this.nextPeriodEvents = nextPeriodEvents
+        this.fetchedPeriods = fetchedPeriods
+    }
+
     /**
      * Sort and cache events.
      *
      * @param events The events to be sorted and cached.
      */
-    fun sortAndCacheEvents(events: List<WeekViewEvent<T>>) {
+    private fun sortAndCacheEvents(events: List<WeekViewEvent<T>>) {
         events.sorted().forEach { cacheEvent(it) }
     }
 

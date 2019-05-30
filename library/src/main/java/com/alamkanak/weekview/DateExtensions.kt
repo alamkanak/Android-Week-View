@@ -86,6 +86,16 @@ internal fun Calendar.minusDays(days: Int): Calendar {
     return plusDays(days * (-1))
 }
 
+internal fun Calendar.plusHours(hours: Int): Calendar {
+    return copy().apply {
+        add(Calendar.HOUR_OF_DAY, hours)
+    }
+}
+
+internal fun Calendar.minusHours(hours: Int): Calendar {
+    return plusHours(hours * (-1))
+}
+
 internal fun Calendar.plusMillis(millis: Int): Calendar {
     return copy().apply {
         add(Calendar.MILLISECOND, millis)

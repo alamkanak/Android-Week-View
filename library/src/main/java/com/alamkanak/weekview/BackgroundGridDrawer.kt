@@ -11,9 +11,7 @@ internal class BackgroundGridDrawer(
     private lateinit var hourLines: FloatArray
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        val startPixels = drawingContext.startPixels
-
-        for (startPixel in startPixels) {
+        drawingContext.startPixels.forEach { startPixel ->
             val startX = max(startPixel, config.timeColumnWidth)
             hourLines = createHourLines()
             drawGrid(startX, startPixel, canvas)
@@ -59,7 +57,8 @@ internal class BackgroundGridDrawer(
         val height = WeekView.height
         val hourStep = config.timeColumnHoursInterval
 
-        var i = 0
+        var lineIndex = 0
+
         for (hour in hourStep until config.hoursPerDay step hourStep) {
             val heightOfHour = (config.hourHeight * hour)
             val top = config.headerHeight + config.currentOrigin.y + heightOfHour
@@ -72,11 +71,11 @@ internal class BackgroundGridDrawer(
             val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
             if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
-                hourLines[i * 4] = startX
-                hourLines[i * 4 + 1] = top
-                hourLines[i * 4 + 2] = startPixel + widthPerDay
-                hourLines[i * 4 + 3] = top
-                i++
+                hourLines[lineIndex * 4] = startX
+                hourLines[lineIndex * 4 + 1] = top
+                hourLines[lineIndex * 4 + 2] = startPixel + widthPerDay
+                hourLines[lineIndex * 4 + 3] = top
+                lineIndex++
             }
         }
 

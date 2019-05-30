@@ -27,7 +27,6 @@ internal class EventsDrawer<T>(
     ) {
         var startPixel = drawingContext.startPixel
 
-        // Draw single events
         for (date in drawingContext.dateRange) {
             if (config.isSingleDay) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
@@ -81,12 +80,10 @@ internal class EventsDrawer<T>(
             }
 
             val eventChips = cache.allDayEventChipsByDate(date)
-            var layout: StaticLayout?
 
             for (eventChip in eventChips) {
-                layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
-                if (layout != null) {
-                    staticLayoutCache.add(Pair(eventChip, layout))
+                calculateLayoutForAllDayEvent(eventChip, startPixel)?.let {
+                    staticLayoutCache.add(Pair(eventChip, it))
                 }
             }
 
@@ -115,6 +112,7 @@ internal class EventsDrawer<T>(
     ): StaticLayout? {
         val event = eventChip.event
         val rect = checkNotNull(eventChip.rect)
+
         val left = rect.left
         val top = rect.top
         val right = rect.right
@@ -126,11 +124,9 @@ internal class EventsDrawer<T>(
             return null
         }
 
-        // Prepare the name of the event.
         val stringBuilder = SpannableStringBuilder(event.title)
         stringBuilder.setSpan(StyleSpan(Typeface.BOLD), 0, stringBuilder.length, 0)
 
-        // Prepare the location of the event.
         event.location?.let {
             stringBuilder.append(' ')
             stringBuilder.append(it)
@@ -147,10 +143,10 @@ internal class EventsDrawer<T>(
 
         // For an all day event, we display just one line
         val chipHeight = lineHeight + config.eventPadding * 2
-        eventChip.rect!!.bottom = eventChip.rect!!.top + chipHeight
+        rect.bottom = rect.top + chipHeight
 
         // Compute the available height on the right size of the chip
-        val availableHeight = (eventChip.rect!!.bottom - top - (config.eventPadding * 2).toFloat()).toInt()
+        val availableHeight = (rect.bottom - top - (config.eventPadding * 2).toFloat()).toInt()
 
         if (availableHeight >= lineHeight) {
             var availableLineCount = availableHeight / lineHeight

@@ -8,8 +8,6 @@ import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.*
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MINUTE
 import kotlin.math.max
 import kotlin.math.min
 
@@ -515,15 +513,15 @@ internal class WeekViewConfigWrapper(
     }
 
     private fun computeDifferenceWithCurrentTime() {
-        val desired = Calendar.getInstance()
+        var desired = now()
 
-        if (desired.get(HOUR_OF_DAY) > 0) {
+        if (desired.hour > 0) {
             // Add some padding above the current time (and thus: the now line)
-            desired.add(HOUR_OF_DAY, -1)
+            desired = desired.minusHours(1)
         }
 
-        val hour = desired.get(HOUR_OF_DAY)
-        val minutes = desired.get(MINUTE)
+        val hour = desired.hour
+        val minutes = desired.minute
         val fraction = minutes.toFloat() / Constants.MINUTES_PER_HOUR
 
         var verticalOffset = hourHeight * (hour + fraction)

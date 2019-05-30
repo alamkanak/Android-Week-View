@@ -25,7 +25,7 @@ internal class DayLabelDrawer(
 
     private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
         val key = day.toEpochDays()
-        val dayLabel = dayLabelCache.get(key) { provideDayLabel(key, day) }
+        val dayLabel = dayLabelCache.get(key) { provideAndCacheDayLabel(key, day) }
 
         val x = startPixel + config.widthPerDay / 2
 
@@ -39,9 +39,7 @@ internal class DayLabelDrawer(
             val y = config.headerRowPadding.toFloat() - textPaint.ascent()
             canvas.drawText(dayLabel, x, y, textPaint)
         } else {
-            val multiLineTextPaint = TextPaint(textPaint)
-            val staticLayout = buildStaticLayout(dayLabel, multiLineTextPaint)
-
+            val staticLayout = buildStaticLayout(dayLabel, TextPaint(textPaint))
             config.headerTextHeight = staticLayout.height.toFloat()
             config.refreshHeaderHeight()
 
@@ -63,7 +61,7 @@ internal class DayLabelDrawer(
         }
     }
 
-    private fun provideDayLabel(key: Int, day: Calendar): String {
+    private fun provideAndCacheDayLabel(key: Int, day: Calendar): String {
         return config.dateTimeInterpreter.interpretDate(day).also {
             dayLabelCache.put(key, it)
         }
