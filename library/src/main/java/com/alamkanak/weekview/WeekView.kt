@@ -95,6 +95,7 @@ class WeekView<T> @JvmOverloads constructor(
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.areDimensionsInvalid = true
+        dayLabelDrawer.clearLabelCache()
 
         WeekView.width = width
         WeekView.height = height
