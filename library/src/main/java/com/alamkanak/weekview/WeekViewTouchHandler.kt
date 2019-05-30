@@ -10,15 +10,12 @@ internal class WeekViewTouchHandler(
 ) {
 
     /**
-     * Returns the date and time where the user clicked on.
+     * Returns the date and time that the user clicked on.
      *
      * @param event The [MotionEvent] of the touch event.
-     * @return The time and date at the clicked position.
+     * @return The [Calendar] with the time and date of the clicked position.
      */
     fun getTimeFromPoint(event: MotionEvent): Calendar? {
-        val touchX = event.x
-        val touchY = event.y
-
         val widthPerDay = config.widthPerDay
         val totalDayWidth = widthPerDay + config.columnGap
         val originX = config.currentOrigin.x
@@ -34,7 +31,7 @@ internal class WeekViewTouchHandler(
             val start = max(startPixel, timeColumnWidth)
 
             val isVisibleHorizontally = startPixel + widthPerDay - start > 0
-            val isWithinDay = (touchX > start) and (touchX < startPixel + totalDayWidth)
+            val isWithinDay = (event.x > start) and (event.x < startPixel + totalDayWidth)
 
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now().plusDays(dayNumber - 1)
@@ -42,7 +39,7 @@ internal class WeekViewTouchHandler(
                 val originY = config.currentOrigin.y
                 val hourHeight = config.hourHeight
 
-                val pixelsFromZero = touchY - originY - config.headerHeight
+                val pixelsFromZero = event.y - originY - config.headerHeight
                 val hour = (pixelsFromZero / hourHeight).toInt()
                 val minutes = (60 * (pixelsFromZero - hour * hourHeight) / hourHeight).toInt()
 

@@ -27,7 +27,7 @@ import static java.lang.Math.round;
 import static java.util.Calendar.HOUR_OF_DAY;
 
 public final class WeekView<T> extends View
-        implements WeekViewGestureHandler.Listener, WeekViewViewState.UpdateListener {
+        implements WeekViewGestureHandlerKt.Listener, WeekViewViewState.UpdateListener {
 
     private static int width;
     private static int height;
@@ -35,7 +35,7 @@ public final class WeekView<T> extends View
     private final WeekViewConfigWrapper configWrapper;
     private final WeekViewCache<T> cache;
     private final WeekViewViewState viewState;
-    private final WeekViewGestureHandler<T> gestureHandler;
+    private final WeekViewGestureHandlerKt<T> gestureHandler;
 
     private final DrawingContext drawingContext = new DrawingContext();
 
@@ -66,7 +66,7 @@ public final class WeekView<T> extends View
         cache = new WeekViewCache<>(eventSplitter);
         viewState = new WeekViewViewState(configWrapper);
 
-        gestureHandler = new WeekViewGestureHandler<>(context, this, configWrapper, cache);
+        gestureHandler = new WeekViewGestureHandlerKt<>(this, configWrapper, cache);
 
         eventsDrawer = new EventsDrawer<>(configWrapper, cache);
         timeColumnDrawer = new TimeColumnDrawer(configWrapper);
