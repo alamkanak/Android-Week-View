@@ -130,7 +130,7 @@ internal val Calendar.atStartOfDay: Calendar
 
 internal val Calendar.daysFromToday: Int
     get() {
-        val diff = timeInMillis - today().timeInMillis
+        val diff = atStartOfDay.timeInMillis - today().timeInMillis
         return (diff / (DAY_IN_MILLIS)).toInt()
     }
 
