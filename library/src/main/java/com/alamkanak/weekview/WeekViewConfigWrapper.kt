@@ -7,10 +7,7 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
-import org.threeten.bp.DayOfWeek
-import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.ChronoUnit
-import org.threeten.bp.temporal.TemporalAdjusters
+import com.alamkanak.weekview.date.*
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE
@@ -142,8 +139,8 @@ internal class WeekViewConfigWrapper(
 
     var newHourHeight: Float = UNINITIALIZED
 
-    var minDate: LocalDate? = null
-    var maxDate: LocalDate? = null
+    var minDate: Calendar? = null
+    var maxDate: Calendar? = null
 
     private var _dateTimeInterpreter: DateTimeInterpreter =
             DefaultDateTimeInterpreter(context, numberOfVisibleDays)
@@ -485,7 +482,7 @@ internal class WeekViewConfigWrapper(
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
-    private fun getXOriginForDate(date: LocalDate): Float {
+    private fun getXOriginForDate(date: Calendar): Float {
         return -1f * date.daysFromToday * totalDayWidth
     }
 
@@ -502,7 +499,7 @@ internal class WeekViewConfigWrapper(
         // If the week view is being drawn for the first time, then consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
-        val currentDayIsNotToday = today.dayOfWeek.value != firstDayOfWeek
+        val currentDayIsNotToday = today.dayOfWeek != firstDayOfWeek
 
         if (isWeekView && currentDayIsNotToday && showFirstDayOfWeekFirst) {
             val difference = computeDifferenceWithFirstDayOfWeek(today)
@@ -539,10 +536,14 @@ internal class WeekViewConfigWrapper(
         currentOrigin.y = verticalOffset * -1
     }
 
-    fun computeDifferenceWithFirstDayOfWeek(date: LocalDate): Int {
-        val firstDayOfWeek = DayOfWeek.of(firstDayOfWeek)
-        val prevDate = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
-        return ChronoUnit.DAYS.between(prevDate, date).toInt()
+    fun computeDifferenceWithFirstDayOfWeek(date: Calendar): Int {
+        return if (date.dayOfWeek == firstDayOfWeek) {
+            0 // Already there
+        } else if (firstDayOfWeek == DayOfWeek.SUNDAY) {
+            date.dayOfWeek // Wrap around to Sunday of previous week
+        } else {
+            date.dayOfWeek - firstDayOfWeek
+        }
     }
 
     fun refreshAfterZooming() {

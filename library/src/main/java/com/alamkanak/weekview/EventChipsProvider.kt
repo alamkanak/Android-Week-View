@@ -85,7 +85,7 @@ internal class EventChipsProvider<T>(
         val results = mutableListOf<EventChip<T>>()
 
         cache.allEventChips
-                .groupBy { it.event.startDateTime.toLocalDate() }
+                .groupBy { it.event.startTime }
                 .values
                 .forEach { eventChips ->
                     computePositionOfEvents(eventChips)

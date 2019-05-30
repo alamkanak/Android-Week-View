@@ -12,9 +12,8 @@ import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.util.Pair;
 
-import org.threeten.bp.LocalDate;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.text.Layout.Alignment.ALIGN_NORMAL;
@@ -37,7 +36,7 @@ class EventsDrawer<T> {
         float startPixel = drawingContext.getStartPixel();
 
         // Draw single events
-        for (LocalDate date : drawingContext.getDateRange()) {
+        for (Calendar date : drawingContext.getDateRange()) {
             if (config.isSingleDay()) {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
@@ -51,7 +50,7 @@ class EventsDrawer<T> {
         }
     }
 
-    private void drawEventsForDate(LocalDate date,
+    private void drawEventsForDate(Calendar date,
                                    float startFromPixel, Canvas canvas, Paint paint) {
         List<EventChip<T>> eventChips = cache.normalEventChipsByDate(date);
 
@@ -84,7 +83,7 @@ class EventsDrawer<T> {
 
         float startPixel = drawingContext.getStartPixel();
 
-        for (LocalDate date : drawingContext.getDateRange()) {
+        for (Calendar date : drawingContext.getDateRange()) {
             if (config.isSingleDay()) {
                 startPixel = startPixel + config.getEventMarginHorizontal();
             }

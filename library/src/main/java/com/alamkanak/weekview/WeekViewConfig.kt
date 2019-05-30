@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
-import org.threeten.bp.DayOfWeek
+import com.alamkanak.weekview.date.DayOfWeek
 
 internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
 
@@ -107,7 +107,7 @@ internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
         try {
             // Calendar configuration
-            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DayOfWeek.MONDAY.value)
+            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DayOfWeek.MONDAY)
             numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
             restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)

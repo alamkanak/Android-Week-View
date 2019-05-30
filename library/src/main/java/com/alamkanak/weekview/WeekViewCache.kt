@@ -1,7 +1,8 @@
 package com.alamkanak.weekview
 
 import android.support.v4.util.ArrayMap
-import org.threeten.bp.LocalDate
+import com.alamkanak.weekview.date.atStartOfDay
+import java.util.*
 
 internal class WeekViewCache<T>(
         private val eventSplitter: WeekViewEventSplitter<T>
@@ -19,15 +20,15 @@ internal class WeekViewCache<T>(
     val hasEvents: Boolean
         get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
 
-    private val normalEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
-    private val allDayEventChipsByDate = ArrayMap<LocalDate, MutableList<EventChip<T>>>()
+    private val normalEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
 
-    fun normalEventChipsByDate(date: LocalDate): List<EventChip<T>> {
-        return normalEventChipsByDate[date].orEmpty()
+    fun normalEventChipsByDate(date: Calendar): List<EventChip<T>> {
+        return normalEventChipsByDate[date.atStartOfDay].orEmpty()
     }
 
-    fun allDayEventChipsByDate(date: LocalDate): List<EventChip<T>> {
-        return allDayEventChipsByDate[date].orEmpty()
+    fun allDayEventChipsByDate(date: Calendar): List<EventChip<T>> {
+        return allDayEventChipsByDate[date.atStartOfDay].orEmpty()
     }
 
     fun put(newChips: List<EventChip<T>>) {
@@ -40,12 +41,12 @@ internal class WeekViewCache<T>(
         allDayEventChips.addAll(allDay)
 
         normal.forEach {
-            val key = it.event.startDateTime.toLocalDate()
+            val key = it.event.startTime.atStartOfDay
             normalEventChipsByDate.add(key, it)
         }
 
         allDay.forEach {
-            val key = it.event.startDateTime.toLocalDate()
+            val key = it.event.startTime.atStartOfDay
             allDayEventChipsByDate.add(key, it)
         }
     }
@@ -59,7 +60,7 @@ internal class WeekViewCache<T>(
 
     private fun getEventChipsInRange(
             eventChips: List<EventChip<T>>,
-            dateRange: List<LocalDate>
+            dateRange: List<Calendar>
     ): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
         for (date in dateRange) {
@@ -70,7 +71,7 @@ internal class WeekViewCache<T>(
         return results
     }
 
-    fun getAllDayEventsInRange(dateRange: List<LocalDate>): List<WeekViewEvent<T>> {
+    fun getAllDayEventsInRange(dateRange: List<Calendar>): List<WeekViewEvent<T>> {
         return getEventChipsInRange(allDayEventChips, dateRange).filter { it.isAllDay }
     }
 
@@ -109,8 +110,8 @@ internal class WeekViewCache<T>(
         allEventChips.addAll(newChips)
     }
 
-    private fun ArrayMap<LocalDate, MutableList<EventChip<T>>>.add(
-            key: LocalDate,
+    private fun ArrayMap<Calendar, MutableList<EventChip<T>>>.add(
+            key: Calendar,
             eventChip: EventChip<T>
     ) {
         val results = getOrElse(key) { mutableListOf() }

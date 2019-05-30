@@ -1,7 +1,10 @@
 package com.alamkanak.weekview
 
 import android.view.MotionEvent
-import org.threeten.bp.ZonedDateTime
+import com.alamkanak.weekview.date.now
+import com.alamkanak.weekview.date.plusDays
+import com.alamkanak.weekview.date.withTime
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -15,7 +18,7 @@ internal class WeekViewTouchHandler(
      * @param event The [MotionEvent] of the touch event.
      * @return The time and date at the clicked position.
      */
-    fun getTimeFromPoint(event: MotionEvent): ZonedDateTime? {
+    fun getTimeFromPoint(event: MotionEvent): Calendar? {
         val touchX = event.x
         val touchY = event.y
 
@@ -37,18 +40,16 @@ internal class WeekViewTouchHandler(
             val isWithinDay = (touchX > start) and (touchX < startPixel + totalDayWidth)
 
             if (isVisibleHorizontally && isWithinDay) {
-                val day = now().plusDays(dayNumber - 1L)
+                val day = now().plusDays(dayNumber - 1)
 
                 val originY = config.currentOrigin.y
                 val hourHeight = config.hourHeight
 
                 val pixelsFromZero = touchY - originY - config.headerHeight
                 val hour = (pixelsFromZero / hourHeight).toInt()
-                val minute = (60 * (pixelsFromZero - hour * hourHeight) / hourHeight).toInt()
+                val minutes = (60 * (pixelsFromZero - hour * hourHeight) / hourHeight).toInt()
 
-                return day
-                        .withHour(hour + config.minHour)
-                        .withMinute(minute)
+                return day.withTime(config.minHour + hour, minutes)
             }
 
             startPixel += totalDayWidth

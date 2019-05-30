@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import org.threeten.bp.LocalDate
 import java.lang.Math.max
 import java.util.*
 
@@ -8,14 +7,14 @@ internal class WeekViewViewState(
         private val configWrapper: WeekViewConfigWrapper
 ) {
 
-    var scrollToDay: LocalDate? = null
+    var scrollToDay: Calendar? = null
     var scrollToHour: Int? = null
 
     var isFirstDraw = true
     var areDimensionsInvalid = true
 
-    var firstVisibleDay: LocalDate? = null
-    var lastVisibleDay: LocalDate? = null
+    var firstVisibleDay: Calendar? = null
+    var lastVisibleDay: Calendar? = null
 
     var shouldRefreshEvents: Boolean = false
     var requiresPostInvalidateOnAnimation: Boolean = false
@@ -31,7 +30,7 @@ internal class WeekViewViewState(
         areDimensionsInvalid = false
         scrollToDay?.let {
             isFirstDraw = false
-            listener.goToDate(it.toCalendar())
+            listener.goToDate(it)
         }
 
         areDimensionsInvalid = false

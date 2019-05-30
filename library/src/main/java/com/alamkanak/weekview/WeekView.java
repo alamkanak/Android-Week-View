@@ -15,18 +15,14 @@ import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
-import org.threeten.bp.LocalDate;
+import com.alamkanak.weekview.date.DateUtils2;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import static com.alamkanak.weekview.Constants.UNINITIALIZED;
-import static com.alamkanak.weekview.DateUtils.toCalendar;
-import static com.alamkanak.weekview.DateUtils.toLocalDate;
-import static com.alamkanak.weekview.DateUtils.today;
+import static com.alamkanak.weekview.date.DateUtils2.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
@@ -68,7 +64,6 @@ public final class WeekView<T> extends View
 
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        AndroidThreeTen.init(context);
 
         WeekViewConfig config = new WeekViewConfig(context, attrs);
         configWrapper = new WeekViewConfigWrapper(context, config);
@@ -105,7 +100,7 @@ public final class WeekView<T> extends View
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
         final int visibleDays = configWrapper.getNumberOfVisibleDays();
-        final LocalDate firstDate = viewState.getFirstVisibleDay();
+        final Calendar firstDate = viewState.getFirstVisibleDay();
         return new SavedState(superState, visibleDays, firstDate);
     }
 
@@ -119,8 +114,7 @@ public final class WeekView<T> extends View
         }
 
         if (savedState.firstVisibleDate != null) {
-            Calendar firstVisibleDay = toCalendar(savedState.firstVisibleDate);
-            goToDate(firstVisibleDay);
+            goToDate(savedState.firstVisibleDate);
         }
     }
 
@@ -191,33 +185,22 @@ public final class WeekView<T> extends View
     }
 
     private void notifyScrollListeners() {
-        final LocalDate oldFirstVisibleDay = viewState.getFirstVisibleDay();
+        final Calendar oldFirstVisibleDay = viewState.getFirstVisibleDay();
 
         final float totalDayWidth = configWrapper.getTotalDayWidth();
         final int visibleDays = configWrapper.getNumberOfVisibleDays();
         final int delta = (int) round(ceil(configWrapper.getCurrentOrigin().x / totalDayWidth)) * -1;
 
-        LocalDate firstVisibleDay = today().plusDays(delta);
-        LocalDate lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1);
+        Calendar firstVisibleDay = DateUtils2.plusDays(today(), delta);
+        Calendar lastVisibleDay = DateUtils2.plusDays(firstVisibleDay, visibleDays - 1);
 
         viewState.setFirstVisibleDay(firstVisibleDay);
         viewState.setLastVisibleDay(lastVisibleDay);
 
         final boolean hasFirstVisibleDayChanged = !firstVisibleDay.equals(oldFirstVisibleDay);
         if (hasFirstVisibleDayChanged && getScrollListener() != null) {
-            notifyVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay);
+            getScrollListener().onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay);
         }
-    }
-
-    private void notifyVisibleDayChanged(LocalDate newLocalDate, @Nullable LocalDate oldLocalDate) {
-        Calendar newDate = toCalendar(newLocalDate);
-        Calendar oldDate = null;
-
-        if (oldLocalDate != null) {
-            oldDate = toCalendar(oldLocalDate);
-        }
-
-        getScrollListener().onFirstVisibleDayChanged(newDate, oldDate);
     }
 
     private void prepareEventDrawing(Canvas canvas) {
@@ -308,7 +291,7 @@ public final class WeekView<T> extends View
             defaultInterpreter.setNumberOfDays(numberOfVisibleDays);
         }
 
-        LocalDate firstVisibleDay = viewState.getFirstVisibleDay();
+        Calendar firstVisibleDay = viewState.getFirstVisibleDay();
         if (firstVisibleDay != null) {
             viewState.setScrollToDay(firstVisibleDay);
         }
@@ -958,39 +941,31 @@ public final class WeekView<T> extends View
 
     @Nullable
     public Calendar getMinDate() {
-        if (configWrapper.getMinDate() != null) {
-            return toCalendar(configWrapper.getMinDate());
-        } else {
-            return null;
-        }
+        return configWrapper.getMinDate();
     }
 
     public void setMinDate(Calendar minDate) {
-        LocalDate minLocalDate = toLocalDate(minDate);
-        if (configWrapper.getMaxDate() != null && configWrapper.getMaxDate().isBefore(minLocalDate)) {
+        Calendar maxDate = configWrapper.getMaxDate();
+        if (maxDate != null && DateUtils2.isAfter(minDate, maxDate)) {
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
-        configWrapper.setMinDate(minLocalDate);
+        configWrapper.setMinDate(minDate);
         invalidate();
     }
 
     @Nullable
     public Calendar getMaxDate() {
-        if (configWrapper.getMaxDate() != null) {
-            return toCalendar(configWrapper.getMaxDate());
-        } else {
-            return null;
-        }
+        return configWrapper.getMaxDate();
     }
 
     public void setMaxDate(Calendar maxDate) {
-        LocalDate maxLocalDate = toLocalDate(maxDate);
-        if (configWrapper.getMinDate() != null && configWrapper.getMinDate().isAfter(maxLocalDate)) {
+        Calendar minDate = configWrapper.getMinDate();
+        if (minDate != null && DateUtils2.isBefore(maxDate, minDate)) {
             throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
         }
 
-        configWrapper.setMaxDate(maxLocalDate);
+        configWrapper.setMaxDate(maxDate);
         invalidate();
     }
 
@@ -1145,12 +1120,7 @@ public final class WeekView<T> extends View
      * @return The first visible day in the week view.
      */
     public Calendar getFirstVisibleDay() {
-        LocalDate firstVisibleDay = viewState.getFirstVisibleDay();
-        if (firstVisibleDay != null) {
-            return toCalendar(firstVisibleDay);
-        } else {
-            return null;
-        }
+        return Preconditions.checkNotNull(viewState.getFirstVisibleDay());
     }
 
     /**
@@ -1158,20 +1128,16 @@ public final class WeekView<T> extends View
      *
      * @return The last visible day in the week view.
      */
+    @Nullable
     public Calendar getLastVisibleDay() {
-        LocalDate lastVisibleDay = viewState.getLastVisibleDay();
-        if (lastVisibleDay != null) {
-            return toCalendar(lastVisibleDay);
-        } else {
-            return null;
-        }
+        return viewState.getLastVisibleDay();
     }
 
     /**
      * Show today on the week view.
      */
     public void goToToday() {
-        goToDate(toCalendar(today()));
+        goToDate(today());
     }
 
     public void goToCurrentTime() {
@@ -1187,34 +1153,32 @@ public final class WeekView<T> extends View
      * @param date The date to show.
      */
     public void goToDate(@NonNull Calendar date) {
-        LocalDate modifiedDate = toLocalDate(date);
-
-        final LocalDate minDate = configWrapper.getMinDate();
-        final LocalDate maxDate = configWrapper.getMaxDate();
+        final Calendar minDate = configWrapper.getMinDate();
+        final Calendar maxDate = configWrapper.getMaxDate();
 
         final int numberOfVisibleDays = configWrapper.getNumberOfVisibleDays();
         final boolean showFirstDayOfWeekFirst = configWrapper.getShowFirstDayOfWeekFirst();
 
         // If a minimum or maximum date is set, don't allow to go beyond them.
-        if (minDate != null && modifiedDate.isBefore(minDate)) {
-            modifiedDate = minDate;
-        } else if (maxDate != null && modifiedDate.isAfter(maxDate)) {
-            modifiedDate = maxDate.plusDays(1 - numberOfVisibleDays);
+        if (minDate != null && DateUtils2.isBefore(date, minDate)) {
+            date = minDate;
+        } else if (maxDate != null && DateUtils2.isAfter(date, maxDate)) {
+            date = DateUtils2.plusDays(maxDate, 1 - numberOfVisibleDays);
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
-            final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(modifiedDate);
-            modifiedDate = modifiedDate.minusDays(diff);
+            final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(date);
+            date = DateUtils2.minusDays(date, diff);
         }
 
         gestureHandler.forceScrollFinished();
 
         if (viewState.getAreDimensionsInvalid()) {
-            viewState.setScrollToDay(modifiedDate);
+            viewState.setScrollToDay(date);
             return;
         }
 
         viewState.setShouldRefreshEvents(true);
 
-        final int diff = DateUtils.getDaysFromToday(modifiedDate);
+        final int diff = DateUtils2.getDaysFromToday(date);
 
         configWrapper.getCurrentOrigin().x = diff * (-1) * configWrapper.getTotalDayWidth();
         viewState.setRequiresPostInvalidateOnAnimation(true);
@@ -1368,10 +1332,10 @@ public final class WeekView<T> extends View
         private final int numberOfVisibleDays;
 
         @Nullable
-        private final LocalDate firstVisibleDate;
+        private final Calendar firstVisibleDate;
 
         private SavedState(Parcelable superState,
-                           int numberOfVisibleDays, @Nullable LocalDate firstVisibleDate) {
+                           int numberOfVisibleDays, @Nullable Calendar firstVisibleDate) {
             super(superState);
             this.numberOfVisibleDays = numberOfVisibleDays;
             this.firstVisibleDate = firstVisibleDate;
@@ -1380,7 +1344,7 @@ public final class WeekView<T> extends View
         private SavedState(Parcel in) {
             super(in);
             numberOfVisibleDays = in.readInt();
-            firstVisibleDate = (LocalDate) in.readSerializable();
+            firstVisibleDate = (Calendar) in.readSerializable();
         }
 
         @Override

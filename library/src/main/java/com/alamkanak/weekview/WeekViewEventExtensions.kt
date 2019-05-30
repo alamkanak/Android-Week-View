@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 internal fun <T> WeekViewEvent<T>.copy(
@@ -16,11 +15,4 @@ internal fun <T> WeekViewEvent<T>.copy(
             .setStyle(style)
             .setData(data)
             .build()
-}
-
-internal fun <T> WeekViewEvent<T>.copy(
-        startTime: ZonedDateTime = this.startDateTime,
-        endTime: ZonedDateTime = this.endDateTime
-): WeekViewEvent<T> {
-    return copy(startTime.toCalendar(), endTime.toCalendar())
 }

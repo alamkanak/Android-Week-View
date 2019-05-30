@@ -1,7 +1,10 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import org.threeten.bp.ZoneId
+import com.alamkanak.weekview.date.firstDayOfYear
+import com.alamkanak.weekview.date.getDefaultDateFormat
+import com.alamkanak.weekview.date.getDefaultTimeFormat
+import com.alamkanak.weekview.date.withTime
 import java.util.*
 
 /**
@@ -29,12 +32,12 @@ internal class DefaultDateTimeInterpreter(
     }
 
     override fun interpretDate(date: Calendar): String {
-        return sdfDate.format(date.time).toUpperCase()
+        return sdfDate.format(date.time).toUpperCase(Locale.getDefault())
     }
 
     override fun interpretTime(hour: Int): String {
-        val time = calendar.atStartOfDay(ZoneId.systemDefault()).withHour(hour).withMinute(0)
-        return sdfTime.format(time.toCalendar().time)
+        val time = calendar.withTime(hour, minutes = 0)
+        return sdfTime.format(time.time)
     }
 
 }

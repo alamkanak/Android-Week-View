@@ -1,14 +1,15 @@
 package com.alamkanak.weekview
 
-import org.threeten.bp.LocalDate
+import com.alamkanak.weekview.date.getDateRange
 import java.lang.Math.ceil
+import java.util.*
 
 internal class DrawingContext {
 
     var startPixel = 0f
-    val dateRange = mutableListOf<LocalDate>()
+    val dateRange = mutableListOf<Calendar>()
     val startPixels = mutableListOf<Float>()
-    val dateRangeWithStartPixels = mutableListOf<Pair<LocalDate, Float>>()
+    val dateRangeWithStartPixels = mutableListOf<Pair<Calendar, Float>>()
 
     fun update(config: WeekViewConfigWrapper) {
         val totalDayWidth = config.totalDayWidth

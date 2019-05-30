@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import com.alamkanak.weekview.date.*
 import java.util.*
 
 /**
@@ -13,7 +14,7 @@ internal class MonthLoader<T>(
 ) : WeekViewLoader<T> {
 
     override fun toPeriod(instance: Calendar): Period {
-        return Period.fromDate(instance.toLocalDate())
+        return Period.fromDate(instance)
     }
 
     override fun onLoad(period: Period): List<WeekViewEvent<T>> {
@@ -28,7 +29,7 @@ internal class MonthLoader<T>(
 
         val listener = onMonthChangeListener ?: return emptyList()
         return listener
-                .onMonthChange(startDate.toCalendar(), endDate.toCalendar())
+                .onMonthChange(startDate, endDate)
                 .map { it.toWeekViewEvent() }
     }
 

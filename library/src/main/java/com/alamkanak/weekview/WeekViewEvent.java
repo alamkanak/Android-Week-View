@@ -5,17 +5,13 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.ZonedDateTime;
-import org.threeten.bp.temporal.ChronoUnit;
+import com.alamkanak.weekview.date.DateUtils2;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.Constants.MINUTES_PER_HOUR;
-import static com.alamkanak.weekview.DateUtils.toCalendar;
-import static com.alamkanak.weekview.DateUtils.toZonedDateTime;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -24,8 +20,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
 
     private long id;
     private String title;
-    private ZonedDateTime startTime;
-    private ZonedDateTime endTime;
+    private Calendar startTime;
+    private Calendar endTime;
     private String location;
     private boolean isAllDay;
     private Style style;
@@ -84,8 +80,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
                          String location, int color, boolean isAllDay, T data) {
         this.id = id;
         this.title = title;
-        this.startTime = toZonedDateTime(startTime);
-        this.endTime = toZonedDateTime(endTime);
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.location = location;
         this.style = new Style.Builder().setBackgroundColor(color).build();
         this.isAllDay = isAllDay;
@@ -93,45 +89,29 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     public Calendar getStartTime() {
-        return toCalendar(startTime);
-    }
-
-    public ZonedDateTime getStartDateTime() {
         return startTime;
     }
 
     public void setStartTime(Calendar startTime) {
-        this.startTime = toZonedDateTime(startTime);
-    }
-
-    public void setStartDateTime(ZonedDateTime startTime) {
         this.startTime = startTime;
     }
 
     int getEffectiveStartMinutes(WeekViewConfigWrapper config) {
-        final int startHour = startTime.getHour() - config.getMinHour();
-        return startHour * MINUTES_PER_HOUR + startTime.getMinute();
+        final int startHour = DateUtils2.getHour(startTime) - config.getMinHour();
+        return startHour * MINUTES_PER_HOUR + DateUtils2.getMinute(startTime);
     }
 
     public Calendar getEndTime() {
-        return toCalendar(endTime);
-    }
-
-    public ZonedDateTime getEndDateTime() {
         return endTime;
     }
 
     public void setEndTime(Calendar endTime) {
-        this.endTime = toZonedDateTime(endTime);
-    }
-
-    public void setEndDateTime(ZonedDateTime endTime) {
         this.endTime = endTime;
     }
 
     int getEffectiveEndMinutes(WeekViewConfigWrapper config) {
-        final int endHour = endTime.getHour() - config.getMinHour();
-        return endHour * MINUTES_PER_HOUR + endTime.getMinute();
+        final int endHour = DateUtils2.getHour(endTime) - config.getMinHour();
+        return endHour * MINUTES_PER_HOUR + DateUtils2.getMinute(endTime);
     }
 
     public String getTitle() {
@@ -198,12 +178,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         this.data = data;
     }
 
-    boolean isSameDay(LocalDate other) {
-        return startTime.toLocalDate().isEqual(other);
+    boolean isSameDay(Calendar other) {
+        return DateUtils2.isSameDate(this.getStartTime(), other);
     }
 
     boolean isWithin(int minHour, int maxHour) {
-        return startTime.getHour() >= minHour && endTime.getHour() <= maxHour;
+        return DateUtils2.getHour(startTime) >= minHour && DateUtils2.getHour(endTime) <= maxHour;
     }
 
     public int getTextColor() {
@@ -257,20 +237,23 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean collidesWith(WeekViewEvent other) {
-        if (startTime.isEqual(other.startTime) && endTime.isEqual(other.endTime)) {
+        final boolean sameStart = DateUtils2.isEqual(startTime, other.startTime);
+        final boolean sameEnd = DateUtils2.isEqual(endTime, other.endTime);
+        if (sameStart && sameEnd) {
             // Complete overlap
             return true;
         }
 
         // Resolve collisions by shortening the preceding event by 1 ms
-        if (endTime.isEqual(other.startTime)) {
-            endTime = endTime.minus(1, ChronoUnit.MILLIS);
+        if (DateUtils2.isEqual(endTime, other.startTime)) {
+            endTime = DateUtils2.minusMillis(endTime, 1);
             return false;
-        } else if (startTime.isEqual(other.endTime)) {
-            other.endTime = other.endTime.minus(1, ChronoUnit.MILLIS);
+        } else if (DateUtils2.isEqual(startTime, other.endTime)) {
+            other.endTime = DateUtils2.minusMillis(other.endTime, 1);
         }
 
-        return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime);
+        return !DateUtils2.isAfter(startTime, other.endTime)
+                && DateUtils2.isBefore(endTime, other.startTime);
     }
 
     @Override
@@ -297,11 +280,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
-        return !startTime.toLocalDate().isEqual(originalEvent.startTime.toLocalDate());
+        return !DateUtils2.isEqual(startTime, originalEvent.startTime);
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return !endTime.toLocalDate().isEqual(originalEvent.endTime.toLocalDate());
+        return !DateUtils2.isEqual(endTime, originalEvent.endTime);
     }
 
     @Override
@@ -388,12 +371,12 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
         }
 
         public Builder<T> setStartTime(@NonNull Calendar startTime) {
-            event.startTime = toZonedDateTime(startTime);
+            event.startTime = startTime;
             return this;
         }
 
         public Builder<T> setEndTime(@NonNull Calendar endTime) {
-            event.endTime = toZonedDateTime(endTime);
+            event.endTime = endTime;
             return this;
         }
 

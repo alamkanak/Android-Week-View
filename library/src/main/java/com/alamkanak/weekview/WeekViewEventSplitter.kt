@@ -1,17 +1,19 @@
 package com.alamkanak.weekview
 
+import com.alamkanak.weekview.date.*
+
 internal class WeekViewEventSplitter<T>(
         private val config: WeekViewConfigWrapper
 ) {
 
     fun split(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
-        val newEndTime = event.endDateTime
+        val newEndTime = event.endTime
         val isAtStartOfNewPeriod = config.minHour == 0
-                && newEndTime.isAtStartOfNextDay(event.startDateTime)
+                && newEndTime.isAtStartOfNextDay(event.startTime)
 
         return if (isAtStartOfNewPeriod) {
             listOf(shortenTooLongAllDayEvent(event))
-        } else if (!event.isSameDay(newEndTime.toLocalDate())) {
+        } else if (!event.isSameDay(newEndTime)) {
             splitEventByDays(event)
         } else {
             listOf(event)
@@ -21,18 +23,18 @@ internal class WeekViewEventSplitter<T>(
     private fun shortenTooLongAllDayEvent(
             event: WeekViewEvent<T>
     ): WeekViewEvent<T> {
-        val newEndTime = event.endDateTime.withTimeAtEndOfPeriod(config.maxHour)
+        val newEndTime = event.endTime.withTimeAtEndOfPeriod(config.maxHour)
         return event.copy(endTime = newEndTime)
     }
 
     private fun splitEventByDays(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
 
-        val firstEventEnd = event.startDateTime.withTimeAtEndOfPeriod(config.maxHour)
+        val firstEventEnd = event.startTime.withTimeAtEndOfPeriod(config.maxHour)
         val firstEvent = event.copy(endTime = firstEventEnd)
         results += firstEvent
 
-        val lastEventStart = event.endDateTime.withTimeAtStartOfPeriod(config.minHour)
+        val lastEventStart = event.endTime.withTimeAtStartOfPeriod(config.minHour)
         val lastEvent = event.copy(startTime = lastEventStart)
         results += lastEvent
 

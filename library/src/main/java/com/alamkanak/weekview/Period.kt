@@ -1,7 +1,9 @@
 package com.alamkanak.weekview
 
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Month
+import com.alamkanak.weekview.date.Month
+import com.alamkanak.weekview.date.month
+import com.alamkanak.weekview.date.year
+import java.util.*
 
 internal data class FetchPeriods(
         val previous: Period,
@@ -12,7 +14,7 @@ internal data class FetchPeriods(
     companion object {
 
         @JvmStatic
-        fun create(firstVisibleDay: LocalDate): FetchPeriods {
+        fun create(firstVisibleDay: Calendar): FetchPeriods {
             val current = Period.fromDate(firstVisibleDay)
             return FetchPeriods(current.previous(), current, current.next())
         }
@@ -24,21 +26,21 @@ internal data class FetchPeriods(
 data class Period(val month: Int, val year: Int) {
 
     fun previous(): Period {
-        val year = if (month == Month.JANUARY.value) year - 1 else year
-        val month = if (month == Month.JANUARY.value) Month.DECEMBER.value else month - 1
+        val year = if (month == Month.JANUARY) year - 1 else year
+        val month = if (month == Month.JANUARY) Month.DECEMBER else month - 1
         return Period(month, year)
     }
 
     fun next(): Period {
-        val year = if (month == Month.DECEMBER.value) year + 1 else year
-        val month = if (month == Month.DECEMBER.value) Month.JANUARY.value else month + 1
+        val year = if (month == Month.DECEMBER) year + 1 else year
+        val month = if (month == Month.DECEMBER) Month.JANUARY else month + 1
         return Period(month, year)
     }
 
     companion object {
 
-        fun fromDate(date: LocalDate): Period {
-            val month = date.monthValue
+        fun fromDate(date: Calendar): Period {
+            val month = date.month
             val year = date.year
             return Period(month, year)
         }

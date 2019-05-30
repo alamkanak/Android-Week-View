@@ -7,7 +7,9 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.SparseArray
-import org.threeten.bp.LocalDate
+import com.alamkanak.weekview.date.isToday
+import com.alamkanak.weekview.date.toEpochDays
+import java.util.*
 
 internal class DayLabelDrawer(
         private val config: WeekViewConfigWrapper
@@ -23,8 +25,8 @@ internal class DayLabelDrawer(
                 }
     }
 
-    private fun drawLabel(day: LocalDate, startPixel: Float, canvas: Canvas) {
-        val key = day.toEpochDay().toInt()
+    private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
+        val key = day.toEpochDays()
         val dayLabel = dayLabelCache.get(key) { provideDayLabel(key, day) }
 
         val x = startPixel + config.widthPerDay / 2
@@ -63,9 +65,9 @@ internal class DayLabelDrawer(
         }
     }
 
-    private fun provideDayLabel(key: Int, day: LocalDate): String {
-        return config.dateTimeInterpreter.interpretDate(day.toCalendar()).also {
-            dayLabelCache.put(day.toEpochDay().toInt(), it)
+    private fun provideDayLabel(key: Int, day: Calendar): String {
+        return config.dateTimeInterpreter.interpretDate(day).also {
+            dayLabelCache.put(key, it)
         }
     }
 
