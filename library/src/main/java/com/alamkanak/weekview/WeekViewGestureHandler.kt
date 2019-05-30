@@ -84,14 +84,10 @@ internal class WeekViewGestureHandler<T>(
         when (currentScrollDirection) {
             Direction.NONE -> {
                 // Allow scrolling only in one direction.
-                if (absDistanceX > absDistanceY && canScrollHorizontally) {
-                    if (distanceX > 0) {
-                        currentScrollDirection = Direction.LEFT
-                    } else {
-                        currentScrollDirection = Direction.RIGHT
-                    }
+                currentScrollDirection = if (absDistanceX > absDistanceY && canScrollHorizontally) {
+                    if (distanceX > 0) Direction.LEFT else Direction.RIGHT
                 } else {
-                    currentScrollDirection = Direction.VERTICAL
+                    Direction.VERTICAL
                 }
             }
             Direction.LEFT -> {

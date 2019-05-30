@@ -13,8 +13,8 @@ import android.util.Pair
 import java.util.*
 
 internal class EventsDrawer<T>(
-        val config: WeekViewConfigWrapper,
-        val cache: WeekViewCache<T>
+        private val config: WeekViewConfigWrapper,
+        private val cache: WeekViewCache<T>
 ) {
 
     private val rectCalculator = EventChipRectCalculator<T>(config)
@@ -44,14 +44,14 @@ internal class EventsDrawer<T>(
 
     private fun drawEventsForDate(
             date: Calendar,
-            startFromPixel: Float,
+            startPixel: Float,
             canvas: Canvas,
             paint: Paint
     ) {
         cache.normalEventChipsByDate(date)
                 .filter { it.event.isWithin(config.minHour, config.maxHour) }
                 .forEach {
-                    val chipRect = rectCalculator.calculateSingleEvent(it, startFromPixel)
+                    val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
                     if (chipRect.isValidSingleEventRect) {
                         it.rect = chipRect
                         it.draw(config, canvas, paint)

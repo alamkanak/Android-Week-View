@@ -575,26 +575,8 @@ internal class WeekViewConfigWrapper(
         currentOrigin.y = min(currentOrigin.y, 0f)
     }
 
-    fun getHeaderBottomPosition(): Float {
-        return currentOrigin.y + getTotalHeaderHeight()
-    }
-
     fun getTotalHeaderHeight(): Float {
         return headerHeight + headerRowPadding * 2f
-    }
-
-    fun getTotalTimeColumnWidth(): Float {
-        return timeTextWidth + timeColumnPadding * 2
-    }
-
-    fun resetOrigin() {
-        currentOrigin = PointF(0f, 0f)
-    }
-
-    fun setTextSize(textSize: Int) {
-        todayHeaderTextPaint.textSize = textSize.toFloat()
-        headerTextPaint.textSize = textSize.toFloat()
-        timeTextPaint.textSize = textSize.toFloat()
     }
 
     fun getPastBackgroundPaint(useWeekendColor: Boolean): Paint {

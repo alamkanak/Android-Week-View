@@ -8,9 +8,8 @@ internal data class FetchPeriods(
         val next: Period
 ) {
 
-    companion object {
+    internal companion object {
 
-        @JvmStatic
         fun create(firstVisibleDay: Calendar): FetchPeriods {
             val current = Period.fromDate(firstVisibleDay)
             return FetchPeriods(current.previous(), current, current.next())
@@ -34,7 +33,7 @@ data class Period(val month: Int, val year: Int) {
         return Period(month, year)
     }
 
-    companion object {
+    internal companion object {
 
         fun fromDate(date: Calendar): Period {
             val month = date.month

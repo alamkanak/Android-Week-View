@@ -21,10 +21,9 @@ class WeekView<T> @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr),
-        WeekViewGestureHandler.Listener, WeekViewViewState.UpdateListener {
+) : View(context, attrs, defStyleAttr), WeekViewGestureHandler.Listener, WeekViewViewState.Listener {
 
-    companion object {
+    internal companion object {
         var width: Int = 0
         var height: Int = 0
     }
@@ -36,7 +35,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val cache: WeekViewCache<T> by lazy {
         val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-        WeekViewCache(eventSplitter);
+        WeekViewCache(eventSplitter)
     }
 
     private val viewState = WeekViewViewState(configWrapper)
@@ -422,7 +421,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set corner radius for event rect.
          *
-         * @param radius the radius in px.
+         * @param value the radius in px.
          */
         set(value) {
             configWrapper.eventCornerRadius = value
@@ -482,7 +481,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set the gap between overlapping events.
          *
-         * @param gap The gap between overlapping events.
+         * @param value The gap between overlapping events.
          */
         set(value) {
             configWrapper.overlappingEventGap = value
@@ -495,7 +494,7 @@ class WeekView<T> @JvmOverloads constructor(
          * Set the top and bottom margin of the event. The event will release this margin from the top
          * and bottom edge. This margin is useful for differentiation consecutive events.
          *
-         * @param margin The top and bottom margin.
+         * @param value The top and bottom margin.
          */
         set(value) {
             configWrapper.eventMarginVertical = value
@@ -508,7 +507,7 @@ class WeekView<T> @JvmOverloads constructor(
          * Set the start and end margin of the event. The event will release this margin from the start
          * and end edge.
          *
-         * @param margin The start and end margin.
+         * @param value The start and end margin.
          */
         set(value) {
             configWrapper.eventMarginHorizontal = value
@@ -631,7 +630,7 @@ class WeekView<T> @JvmOverloads constructor(
          * Set whether "now" line should be displayed. "Now" line is defined by the attributes
          * `nowLineColor` and `nowLineStrokeWidth`.
          *
-         * @param show True if "now" line should be displayed.
+         * @param value True if "now" line should be displayed.
          */
         set(value) {
             configWrapper.showNowLine = value
@@ -648,7 +647,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set the "now" line color.
          *
-         * @param color The color of the "now" line.
+         * @param value The color of the "now" line.
          */
         set(value) {
             configWrapper.nowLinePaint.color = value
@@ -665,7 +664,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set the "now" line thickness.
          *
-         * @param width The thickness of the "now" line.
+         * @param value The thickness of the "now" line.
          */
         set(value) {
             configWrapper.nowLinePaint.strokeWidth = value.toFloat()
@@ -688,7 +687,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set whether the dot on the left-hand side of the "now" line should be displayed
          *
-         * @param show True if "now" line dot should be displayed.
+         * @param value True if "now" line dot should be displayed.
          */
         set(value) {
             configWrapper.showNowLineDot = value
@@ -705,7 +704,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set the color of the dot on the left-hand side of the "now" line.
          *
-         * @param color The color of the "now" line dot.
+         * @param value The color of the "now" line dot.
          */
         set(value) {
             configWrapper.nowDotPaint.color = value
@@ -722,7 +721,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Set the radius of the dot on the left-hand side of the "now" line.
          *
-         * @param radius The radius of the "now" line dot.
+         * @param value The radius of the "now" line dot.
          */
         set(value) {
             configWrapper.nowDotPaint.strokeWidth = value.toFloat()
@@ -857,7 +856,7 @@ class WeekView<T> @JvmOverloads constructor(
         /**
          * Sets the speed for horizontal scrolling.
          *
-         * @param speed The new horizontal scrolling speed.
+         * @param value The new horizontal scrolling speed.
          */
         set(value) {
             configWrapper.xScrollingSpeed = value

@@ -19,7 +19,7 @@ internal class WeekViewViewState(
     var shouldRefreshEvents: Boolean = false
     var requiresPostInvalidateOnAnimation: Boolean = false
 
-    fun update(listener: UpdateListener) {
+    fun update(listener: Listener) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight()
 
         val totalHeight = WeekView.height
@@ -47,7 +47,7 @@ internal class WeekViewViewState(
         areDimensionsInvalid = false
     }
 
-    internal interface UpdateListener {
+    internal interface Listener {
         fun goToDate(date: Calendar)
         fun goToHour(hour: Int)
     }
