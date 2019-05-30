@@ -69,6 +69,10 @@ internal class DayLabelDrawer(
         }
     }
 
+    internal fun clearLabelCache() {
+        dayLabelCache.clear()
+    }
+
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {
         return get(key) ?: providerIfEmpty.invoke()
     }

@@ -65,6 +65,7 @@ class WeekView<T> @JvmOverloads constructor(
         get() = configWrapper.dateTimeInterpreter
         set(value) {
             configWrapper.dateTimeInterpreter = value
+            dayLabelDrawer.clearLabelCache()
         }
 
     init {
@@ -72,10 +73,10 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     override fun onSaveInstanceState(): Parcelable {
-        val superState = super.onSaveInstanceState()
-        val visibleDays = configWrapper.numberOfVisibleDays
-        val firstDate = viewState.firstVisibleDay
-        return SavedState(superState, visibleDays, firstDate)
+        return SavedState(super.onSaveInstanceState()).apply {
+            numberOfVisibleDays = configWrapper.numberOfVisibleDays
+            firstVisibleDate = viewState.firstVisibleDay
+        }
     }
 
     override fun onRestoreInstanceState(state: Parcelable) {
