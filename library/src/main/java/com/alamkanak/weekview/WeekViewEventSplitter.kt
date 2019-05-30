@@ -1,7 +1,5 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.date.*
-
 internal class WeekViewEventSplitter<T>(
         private val config: WeekViewConfigWrapper
 ) {

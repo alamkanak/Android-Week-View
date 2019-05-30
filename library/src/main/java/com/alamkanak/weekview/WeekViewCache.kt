@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.support.v4.util.ArrayMap
-import com.alamkanak.weekview.date.atStartOfDay
 import java.util.*
 
 internal class WeekViewCache<T>(

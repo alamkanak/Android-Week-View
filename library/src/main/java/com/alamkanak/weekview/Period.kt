@@ -1,8 +1,5 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.date.Month
-import com.alamkanak.weekview.date.month
-import com.alamkanak.weekview.date.year
 import java.util.*
 
 internal data class FetchPeriods(

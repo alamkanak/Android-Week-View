@@ -7,8 +7,6 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.SparseArray
-import com.alamkanak.weekview.date.isToday
-import com.alamkanak.weekview.date.toEpochDays
 import java.util.*
 
 internal class DayLabelDrawer(

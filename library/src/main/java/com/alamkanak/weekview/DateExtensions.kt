@@ -1,11 +1,26 @@
-@file:JvmName("DateUtils2")
-package com.alamkanak.weekview.date
+@file:JvmName("DateUtils")
+package com.alamkanak.weekview
 
 import android.content.Context
 import android.text.format.DateFormat
 import com.alamkanak.weekview.Constants.DAY_IN_MILLIS
 import java.text.SimpleDateFormat
 import java.util.*
+
+object Month {
+    const val JANUARY = 1
+    const val DECEMBER = 12
+}
+
+internal object DayOfWeek {
+    const val MONDAY = 1
+    const val TUESDAY = 2
+    const val WEDNESDAY = 3
+    const val THURSDAY = 4
+    const val FRIDAY = 5
+    const val SATURDAY = 6
+    const val SUNDAY = 7
+}
 
 internal val Calendar.hour: Int
     get() = get(Calendar.HOUR_OF_DAY)

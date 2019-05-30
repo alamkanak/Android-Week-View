@@ -5,17 +5,12 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import com.alamkanak.weekview.date.DateUtils2;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static com.alamkanak.weekview.Constants.MINUTES_PER_HOUR;
 
-/**
- * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- */
 public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekViewEvent> {
 
     private long id;
@@ -97,8 +92,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     int getEffectiveStartMinutes(WeekViewConfigWrapper config) {
-        final int startHour = DateUtils2.getHour(startTime) - config.getMinHour();
-        return startHour * MINUTES_PER_HOUR + DateUtils2.getMinute(startTime);
+        final int startHour = DateUtils.getHour(startTime) - config.getMinHour();
+        return startHour * MINUTES_PER_HOUR + DateUtils.getMinute(startTime);
     }
 
     public Calendar getEndTime() {
@@ -110,8 +105,8 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     int getEffectiveEndMinutes(WeekViewConfigWrapper config) {
-        final int endHour = DateUtils2.getHour(endTime) - config.getMinHour();
-        return endHour * MINUTES_PER_HOUR + DateUtils2.getMinute(endTime);
+        final int endHour = DateUtils.getHour(endTime) - config.getMinHour();
+        return endHour * MINUTES_PER_HOUR + DateUtils.getMinute(endTime);
     }
 
     public String getTitle() {
@@ -179,11 +174,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean isSameDay(Calendar other) {
-        return DateUtils2.isSameDate(this.getStartTime(), other);
+        return DateUtils.isSameDate(this.getStartTime(), other);
     }
 
     boolean isWithin(int minHour, int maxHour) {
-        return DateUtils2.getHour(startTime) >= minHour && DateUtils2.getHour(endTime) <= maxHour;
+        return DateUtils.getHour(startTime) >= minHour && DateUtils.getHour(endTime) <= maxHour;
     }
 
     public int getTextColor() {
@@ -237,23 +232,23 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean collidesWith(WeekViewEvent other) {
-        final boolean sameStart = DateUtils2.isEqual(startTime, other.startTime);
-        final boolean sameEnd = DateUtils2.isEqual(endTime, other.endTime);
+        final boolean sameStart = DateUtils.isEqual(startTime, other.startTime);
+        final boolean sameEnd = DateUtils.isEqual(endTime, other.endTime);
         if (sameStart && sameEnd) {
             // Complete overlap
             return true;
         }
 
         // Resolve collisions by shortening the preceding event by 1 ms
-        if (DateUtils2.isEqual(endTime, other.startTime)) {
-            endTime = DateUtils2.minusMillis(endTime, 1);
+        if (DateUtils.isEqual(endTime, other.startTime)) {
+            endTime = DateUtils.minusMillis(endTime, 1);
             return false;
-        } else if (DateUtils2.isEqual(startTime, other.endTime)) {
-            other.endTime = DateUtils2.minusMillis(other.endTime, 1);
+        } else if (DateUtils.isEqual(startTime, other.endTime)) {
+            other.endTime = DateUtils.minusMillis(other.endTime, 1);
         }
 
-        return !DateUtils2.isAfter(startTime, other.endTime)
-                && DateUtils2.isBefore(endTime, other.startTime);
+        return !DateUtils.isAfter(startTime, other.endTime)
+                && DateUtils.isBefore(endTime, other.startTime);
     }
 
     @Override
@@ -280,11 +275,11 @@ public class WeekViewEvent<T> implements WeekViewDisplayable, Comparable<WeekVie
     }
 
     boolean startsOnEarlierDay(WeekViewEvent<T> originalEvent) {
-        return !DateUtils2.isEqual(startTime, originalEvent.startTime);
+        return !DateUtils.isEqual(startTime, originalEvent.startTime);
     }
 
     boolean endsOnLaterDay(WeekViewEvent<T> originalEvent) {
-        return !DateUtils2.isEqual(endTime, originalEvent.endTime);
+        return !DateUtils.isEqual(endTime, originalEvent.endTime);
     }
 
     @Override

@@ -1,15 +1,8 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import com.alamkanak.weekview.date.firstDayOfYear
-import com.alamkanak.weekview.date.getDefaultDateFormat
-import com.alamkanak.weekview.date.getDefaultTimeFormat
-import com.alamkanak.weekview.date.withTime
 import java.util.*
 
-/**
- * Created by Raquib on 1/6/2015.
- */
 interface DateTimeInterpreter {
     fun interpretDate(date: Calendar): String
     fun interpretTime(hour: Int): String

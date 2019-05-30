@@ -2,9 +2,6 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import com.alamkanak.weekview.date.isBeforeToday
-import com.alamkanak.weekview.date.isToday
-import com.alamkanak.weekview.date.isWeekend
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE

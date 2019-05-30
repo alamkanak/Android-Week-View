@@ -3,7 +3,6 @@ package com.alamkanak.weekview
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
-import com.alamkanak.weekview.date.DayOfWeek
 
 internal class WeekViewConfig(context: Context, attrs: AttributeSet) {
 

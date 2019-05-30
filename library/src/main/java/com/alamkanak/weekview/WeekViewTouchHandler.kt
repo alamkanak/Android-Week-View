@@ -1,9 +1,6 @@
 package com.alamkanak.weekview
 
 import android.view.MotionEvent
-import com.alamkanak.weekview.date.now
-import com.alamkanak.weekview.date.plusDays
-import com.alamkanak.weekview.date.withTime
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max

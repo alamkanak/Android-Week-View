@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.date.getDateRange
 import java.lang.Math.ceil
 import java.util.*
 

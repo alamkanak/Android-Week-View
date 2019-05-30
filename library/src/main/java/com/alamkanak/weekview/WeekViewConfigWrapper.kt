@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
-import com.alamkanak.weekview.date.*
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
 import java.util.Calendar.MINUTE

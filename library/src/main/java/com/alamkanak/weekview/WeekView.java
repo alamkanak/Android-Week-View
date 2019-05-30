@@ -15,23 +15,17 @@ import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.alamkanak.weekview.date.DateUtils2;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import static com.alamkanak.weekview.Constants.UNINITIALIZED;
-import static com.alamkanak.weekview.date.DateUtils2.today;
+import static com.alamkanak.weekview.DateUtils.today;
 import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static java.util.Calendar.HOUR_OF_DAY;
 
-/**
- * Created by Raquib-ul-Alam Kanak on 7/21/2014.
- * Website: http://alamkanak.github.io/
- */
 public final class WeekView<T> extends View
         implements WeekViewGestureHandler.Listener, WeekViewViewState.UpdateListener {
 
@@ -191,8 +185,8 @@ public final class WeekView<T> extends View
         final int visibleDays = configWrapper.getNumberOfVisibleDays();
         final int delta = (int) round(ceil(configWrapper.getCurrentOrigin().x / totalDayWidth)) * -1;
 
-        Calendar firstVisibleDay = DateUtils2.plusDays(today(), delta);
-        Calendar lastVisibleDay = DateUtils2.plusDays(firstVisibleDay, visibleDays - 1);
+        Calendar firstVisibleDay = DateUtils.plusDays(today(), delta);
+        Calendar lastVisibleDay = DateUtils.plusDays(firstVisibleDay, visibleDays - 1);
 
         viewState.setFirstVisibleDay(firstVisibleDay);
         viewState.setLastVisibleDay(lastVisibleDay);
@@ -946,7 +940,7 @@ public final class WeekView<T> extends View
 
     public void setMinDate(Calendar minDate) {
         Calendar maxDate = configWrapper.getMaxDate();
-        if (maxDate != null && DateUtils2.isAfter(minDate, maxDate)) {
+        if (maxDate != null && DateUtils.isAfter(minDate, maxDate)) {
             throw new IllegalArgumentException("Can't set a minDate that's after maxDate");
         }
 
@@ -961,7 +955,7 @@ public final class WeekView<T> extends View
 
     public void setMaxDate(Calendar maxDate) {
         Calendar minDate = configWrapper.getMinDate();
-        if (minDate != null && DateUtils2.isBefore(maxDate, minDate)) {
+        if (minDate != null && DateUtils.isBefore(maxDate, minDate)) {
             throw new IllegalArgumentException("Can't set a maxDate that's before minDate");
         }
 
@@ -1160,13 +1154,13 @@ public final class WeekView<T> extends View
         final boolean showFirstDayOfWeekFirst = configWrapper.getShowFirstDayOfWeekFirst();
 
         // If a minimum or maximum date is set, don't allow to go beyond them.
-        if (minDate != null && DateUtils2.isBefore(date, minDate)) {
+        if (minDate != null && DateUtils.isBefore(date, minDate)) {
             date = minDate;
-        } else if (maxDate != null && DateUtils2.isAfter(date, maxDate)) {
-            date = DateUtils2.plusDays(maxDate, 1 - numberOfVisibleDays);
+        } else if (maxDate != null && DateUtils.isAfter(date, maxDate)) {
+            date = DateUtils.plusDays(maxDate, 1 - numberOfVisibleDays);
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
             final int diff = configWrapper.computeDifferenceWithFirstDayOfWeek(date);
-            date = DateUtils2.minusDays(date, diff);
+            date = DateUtils.minusDays(date, diff);
         }
 
         gestureHandler.forceScrollFinished();
@@ -1178,7 +1172,7 @@ public final class WeekView<T> extends View
 
         viewState.setShouldRefreshEvents(true);
 
-        final int diff = DateUtils2.getDaysFromToday(date);
+        final int diff = DateUtils.getDaysFromToday(date);
 
         configWrapper.getCurrentOrigin().x = diff * (-1) * configWrapper.getTotalDayWidth();
         viewState.setRequiresPostInvalidateOnAnimation(true);
