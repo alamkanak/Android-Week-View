@@ -20,6 +20,33 @@ internal object DayOfWeek {
     const val FRIDAY = 5
     const val SATURDAY = 6
     const val SUNDAY = 7
+
+    fun fromJavaCalendar(value: Int): Int {
+        return when (value) {
+            Calendar.MONDAY -> MONDAY
+            Calendar.TUESDAY -> TUESDAY
+            Calendar.WEDNESDAY -> WEDNESDAY
+            Calendar.THURSDAY -> THURSDAY
+            Calendar.FRIDAY -> FRIDAY
+            Calendar.SATURDAY -> SATURDAY
+            Calendar.SUNDAY -> SUNDAY
+            else -> throw IllegalStateException("Unknown day of week: $value")
+        }
+    }
+
+    fun toJavaCalendar(value: Int): Int {
+        return when (value) {
+            MONDAY -> Calendar.MONDAY
+            TUESDAY -> Calendar.TUESDAY
+            WEDNESDAY -> Calendar.WEDNESDAY
+            THURSDAY -> Calendar.THURSDAY
+            FRIDAY -> Calendar.FRIDAY
+            SATURDAY -> Calendar.SATURDAY
+            SUNDAY -> Calendar.SUNDAY
+            else -> throw IllegalStateException("Unknown day of week: $value")
+        }
+    }
+
 }
 
 internal val Calendar.hour: Int
@@ -30,16 +57,8 @@ internal val Calendar.minute: Int
 
 internal val Calendar.dayOfWeek: Int
     get() {
-        return when (val dayOfWeek = get(Calendar.DAY_OF_WEEK)) {
-            Calendar.MONDAY -> DayOfWeek.MONDAY
-            Calendar.TUESDAY -> DayOfWeek.TUESDAY
-            Calendar.WEDNESDAY -> DayOfWeek.WEDNESDAY
-            Calendar.THURSDAY -> DayOfWeek.THURSDAY
-            Calendar.FRIDAY -> DayOfWeek.FRIDAY
-            Calendar.SATURDAY -> DayOfWeek.SATURDAY
-            Calendar.SUNDAY -> DayOfWeek.SUNDAY
-            else -> throw IllegalStateException("Unknown day of week: $dayOfWeek")
-        }
+        val dayOfWeekView = get(Calendar.DAY_OF_WEEK)
+        return DayOfWeek.fromJavaCalendar(dayOfWeekView)
     }
 
 internal val Calendar.month: Int

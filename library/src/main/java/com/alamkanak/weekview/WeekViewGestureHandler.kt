@@ -10,7 +10,7 @@ private enum class Direction {
     NONE, LEFT, RIGHT, VERTICAL
 }
 
-internal class WeekViewGestureHandlerKt<T>(
+internal class WeekViewGestureHandler<T>(
         view: View,
         private val config: WeekViewConfigWrapper,
         private val cache: WeekViewCache<T>
@@ -169,7 +169,7 @@ internal class WeekViewGestureHandlerKt<T>(
         val maxX = config.maxX.toInt()
 
         val dayHeight = config.hourHeight * config.hoursPerDay
-        val viewHeight = WeekView.getViewHeight()
+        val viewHeight = WeekView.height
 
         val minY = (dayHeight + config.headerHeight - viewHeight).toInt() * -1
         val maxY = 0
@@ -190,7 +190,7 @@ internal class WeekViewGestureHandlerKt<T>(
         val maxX = Integer.MAX_VALUE
 
         val dayHeight = config.hourHeight * config.hoursPerDay
-        val viewHeight = WeekView.getViewHeight()
+        val viewHeight = WeekView.height
 
         val minY = (dayHeight + config.headerHeight - viewHeight).toInt() * -1
         val maxY = 0

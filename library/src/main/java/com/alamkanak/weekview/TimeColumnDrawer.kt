@@ -16,7 +16,7 @@ internal class TimeColumnDrawer(
 
     fun drawTimeColumn(canvas: Canvas) {
         var top = config.headerHeight
-        val bottom = WeekView.getViewHeight()
+        val bottom = WeekView.height
 
         // Draw the background color for the time column.
         canvas.drawRect(0f, top, config.timeColumnWidth,

@@ -38,7 +38,7 @@ internal class HeaderRowDrawer<T>(
     }
 
     private fun drawHeaderRow(canvas: Canvas, paint: Paint) {
-        val width = WeekView.getViewWidth()
+        val width = WeekView.width
 
         canvas.restore()
         canvas.save()

@@ -527,7 +527,7 @@ internal class WeekViewConfigWrapper(
         val fraction = minutes.toFloat() / Constants.MINUTES_PER_HOUR
 
         var verticalOffset = hourHeight * (hour + fraction)
-        val viewHeight = WeekView.getViewHeight().toDouble()
+        val viewHeight = WeekView.height.toDouble()
 
         val desiredOffset = totalDayHeight - viewHeight
         verticalOffset = min(desiredOffset.toFloat(), verticalOffset)
@@ -553,7 +553,7 @@ internal class WeekViewConfigWrapper(
             // potentialMinHourHeight
             // the minimal height of an hour when zoomed completely out
             // needed to suppress the zooming below 24:00
-            val height = WeekView.getViewHeight()
+            val height = WeekView.height
             val potentialMinHourHeight = (height - headerHeight) / hoursPerDay
             newHourHeight = max(newHourHeight, potentialMinHourHeight)
 
@@ -564,7 +564,7 @@ internal class WeekViewConfigWrapper(
     }
 
     fun updateVerticalOrigin() {
-        val height = WeekView.getViewHeight()
+        val height = WeekView.height
 
         // If the new currentOrigin.y is invalid, make it valid.
         val dayHeight = hourHeight * hoursPerDay
@@ -626,7 +626,7 @@ internal class WeekViewConfigWrapper(
         }
 
         if (showCompleteDay) {
-            hourHeight = (WeekView.getViewHeight() - headerHeight) / hoursPerDay
+            hourHeight = (WeekView.height - headerHeight) / hoursPerDay
             newHourHeight = hourHeight
         }
     }

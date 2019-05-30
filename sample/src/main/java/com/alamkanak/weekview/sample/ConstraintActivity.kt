@@ -23,9 +23,9 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_constraint)
 
-        weekView.setOnEventClickListener(this)
-        weekView.setMonthChangeListener(this)
-        weekView.setEventLongPressListener(this)
+        weekView.onEventClickListener = this
+        weekView.monthChangeListener = this
+        weekView.eventLongPressListener = this
         weekView.emptyViewLongPressListener = this
 
         setupSeekBarAction()

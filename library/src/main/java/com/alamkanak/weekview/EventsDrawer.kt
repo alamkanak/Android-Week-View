@@ -218,15 +218,15 @@ internal class EventsDrawer<T>(
 
     private val RectF.isValidSingleEventRect: Boolean
         get() = (left < right
-                && left < WeekView.getViewWidth()
-                && top < WeekView.getViewHeight()
+                && left < WeekView.width
+                && top < WeekView.height
                 && right > config.timeColumnWidth
                 && bottom > config.headerHeight)
 
     private val RectF.isValidAllDayEventRect: Boolean
         get() = (left < right
-                && left < WeekView.getViewWidth()
-                && top < WeekView.getViewHeight()
+                && left < WeekView.width
+                && top < WeekView.height
                 && right > config.timeColumnWidth
                 && bottom > 0)
 

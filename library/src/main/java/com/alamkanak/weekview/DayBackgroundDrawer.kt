@@ -30,7 +30,7 @@ internal class DayBackgroundDrawer(
             return
         }
 
-        val height = WeekView.getViewHeight().toFloat()
+        val height = WeekView.height.toFloat()
 
         if (config.showDistinctPastFutureColor) {
             val useWeekendColor = day.isWeekend && config.showDistinctWeekendColor

@@ -22,7 +22,7 @@ internal class WeekViewViewState(
     fun update(listener: UpdateListener) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight()
 
-        val totalHeight = WeekView.getViewHeight()
+        val totalHeight = WeekView.height
         val dynamicHourHeight = ((totalHeight - totalHeaderHeight) / configWrapper.hoursPerDay).toInt()
 
         configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
