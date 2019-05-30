@@ -145,7 +145,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         event = new Event(5, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
         events.add(event);
 
-        //AllDay event
+        // All-day event
         startTime = Calendar.getInstance();
         startTime.set(Calendar.HOUR_OF_DAY, 0);
         startTime.set(Calendar.MINUTE, 0);
@@ -158,7 +158,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         events.add(event);
         events.add(event);
 
-        // All day event until 00:00 next day
+        // All-day event until 00:00 next day
         startTime = Calendar.getInstance();
         startTime.set(Calendar.DAY_OF_MONTH, 10);
         startTime.set(Calendar.HOUR_OF_DAY, 0);

@@ -2,10 +2,11 @@ package com.alamkanak.weekview
 
 internal object Preconditions {
 
+    @JvmOverloads
     @JvmStatic
-    fun <T> checkNotNull(value: T?): T {
+    fun <T> checkNotNull(value: T?, message: String? = null): T {
         if (value == null) {
-            throw NullPointerException()
+            throw NullPointerException(message)
         }
         return value
     }

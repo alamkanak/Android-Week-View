@@ -1,6 +1,7 @@
 package com.alamkanak.weekview;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -13,7 +14,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import static android.view.KeyEvent.ACTION_UP;
-import static com.alamkanak.weekview.Preconditions.checkState;
+import static com.alamkanak.weekview.Preconditions.checkNotNull;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.max;
@@ -236,10 +237,11 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
     public boolean onSingleTapConfirmed(MotionEvent e) {
         final EventChip<T> eventChip = findHitEvent(e);
         if (eventChip != null && eventClickListener != null) {
-            T data = eventChip.event.getData();
-            checkState(data != null, "No data to show. Did you pass the " +
-                    "original object into the constructor of WeekViewEvent?");
-            eventClickListener.onEventClick(data, eventChip.rect);
+            final WeekViewEvent<T> event = eventChip.getOriginalEvent();
+            final T data = checkNotNull(event.getData(), "No data to show. " +
+                    "Did you pass the original object into the constructor of WeekViewEvent?");
+            final RectF rect = checkNotNull(eventChip.getRect());
+            eventClickListener.onEventClick(data, rect);
             return super.onSingleTapConfirmed(e);
         }
 
@@ -263,10 +265,11 @@ final class WeekViewGestureHandler<T> extends GestureDetector.SimpleOnGestureLis
 
         final EventChip<T> eventChip = findHitEvent(e);
         if (eventChip != null && eventLongPressListener != null) {
-            final T data = eventChip.originalEvent.getData();
-            checkState(data != null, "No data to show. Did you pass the " +
-                    "original object into the constructor of WeekViewEvent?");
-            eventLongPressListener.onEventLongPress(data, eventChip.rect);
+            final WeekViewEvent<T> event = eventChip.getOriginalEvent();
+            final T data = checkNotNull(event.getData(), "No data to show. " +
+                    "Did you pass the original object into the constructor of WeekViewEvent?");
+            final RectF rect = checkNotNull(eventChip.getRect());
+            eventLongPressListener.onEventLongPress(data, rect);
         }
 
         final float timeColumnWidth = config.getTimeColumnWidth();
