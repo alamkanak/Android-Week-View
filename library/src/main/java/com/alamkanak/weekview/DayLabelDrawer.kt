@@ -10,17 +10,17 @@ import android.util.SparseArray
 import java.util.*
 
 internal class DayLabelDrawer(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     private val dayLabelCache = SparseArray<String>()
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext
-                .dateRangeWithStartPixels
-                .forEach { (date, startPixel) ->
-                    drawLabel(date, startPixel, canvas)
-                }
+            .dateRangeWithStartPixels
+            .forEach { (date, startPixel) ->
+                drawLabel(date, startPixel, canvas)
+            }
     }
 
     private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
@@ -55,11 +55,11 @@ internal class DayLabelDrawer(
     private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
         return if (SDK_INT >= M) {
             StaticLayout.Builder
-                    .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
-                    .build()
+                .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
+                .build()
         } else {
             StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
-                    Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
+                Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
         }
     }
 

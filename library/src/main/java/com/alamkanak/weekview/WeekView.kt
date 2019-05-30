@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.RectF
 import android.os.Parcelable
 import android.support.v4.view.ViewCompat
 import android.text.StaticLayout
@@ -18,9 +19,9 @@ import kotlin.math.min
 import kotlin.math.round
 
 class WeekView<T> @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), WeekViewGestureHandler.Listener, WeekViewViewState.Listener {
 
     internal companion object {
@@ -54,23 +55,6 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val paint = Paint()
     private val allDayEvents = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
-
-    var scrollListener: ScrollListener?
-        get() = gestureHandler.scrollListener
-        set(value) {
-            gestureHandler.scrollListener = value
-        }
-
-    var dateTimeInterpreter: DateTimeInterpreter
-        get() = configWrapper.dateTimeInterpreter
-        set(value) {
-            configWrapper.dateTimeInterpreter = value
-            dayLabelDrawer.clearLabelCache()
-        }
-
-    init {
-        eventChipsProvider.weekViewLoader = weekViewLoader
-    }
 
     override fun onSaveInstanceState(): Parcelable {
         return SavedState(super.onSaveInstanceState()).apply {
@@ -1062,38 +1046,36 @@ class WeekView<T> @JvmOverloads constructor(
             gestureHandler.eventClickListener = value
         }
 
+    fun setOnEventClickListener(
+        block: (data: T, rect: RectF) -> Unit
+    ) {
+        onEventClickListener = object : EventClickListener<T> {
+            override fun onEventClick(data: T, eventRect: RectF) {
+                block(data, eventRect)
+            }
+        }
+    }
+
     var monthChangeListener: MonthChangeListener<T>?
         get() {
-            return if (gestureHandler.weekViewLoader is MonthLoader<T>) {
-                (gestureHandler.weekViewLoader as MonthLoader<T>).onMonthChangeListener
-            } else null
+            return eventChipsProvider.monthLoader?.onMonthChangeListener
         }
         set(value) {
-            val weekViewLoader = MonthLoader(value)
-            gestureHandler.weekViewLoader = weekViewLoader
-            eventChipsProvider.weekViewLoader = weekViewLoader
+            eventChipsProvider.monthLoader = MonthLoader(value)
         }
 
-    var weekViewLoader: WeekViewLoader<T>?
-        /**
-         * Get event loader in the week view. Event loaders define the  interval after which the events
-         * are loaded in week view. For a MonthLoader events are loaded for every month. You can define
-         * your custom event loader by extending WeekViewLoader.
-         *
-         * @return The event loader.
-         */
-        get() = gestureHandler.weekViewLoader
-        /**
-         * Set event loader in the week view. For example, a MonthLoader. Event loaders define the
-         * interval after which the events are loaded in week view. For a MonthLoader events are loaded
-         * for every month. You can define your custom event loader by extending WeekViewLoader.
-         *
-         * @param value The event loader.
-         */
-        set(value) {
-            gestureHandler.weekViewLoader = value
-            eventChipsProvider.weekViewLoader = value
+    fun setMonthChangeListener(
+        block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
+    ) {
+        monthChangeListener = object : MonthChangeListener<T> {
+            override fun onMonthChange(
+                startDate: Calendar,
+                endDate: Calendar
+            ): List<WeekViewDisplayable<T>> {
+                return block(startDate, endDate)
+            }
         }
+    }
 
     var eventLongPressListener: EventLongPressListener<T>?
         get() = gestureHandler.eventLongPressListener
@@ -1101,16 +1083,69 @@ class WeekView<T> @JvmOverloads constructor(
             gestureHandler.eventLongPressListener = value
         }
 
+    fun setEventLongPressListener(
+        block: (data: T, rect: RectF) -> Unit
+    ) {
+        eventLongPressListener = object : EventLongPressListener<T> {
+            override fun onEventLongPress(data: T, eventRect: RectF) {
+                block(data, eventRect)
+            }
+        }
+    }
+
     var emptyViewClickListener: EmptyViewClickListener?
         get() = gestureHandler.emptyViewClickListener
         set(value) {
             gestureHandler.emptyViewClickListener = value
         }
 
+    fun setEmptyViewClickListener(
+        block: (time: Calendar) -> Unit
+    ) {
+        emptyViewClickListener = object : EmptyViewClickListener {
+            override fun onEmptyViewClicked(time: Calendar) {
+                block(time)
+            }
+        }
+    }
+
     var emptyViewLongPressListener: EmptyViewLongPressListener?
         get() = gestureHandler.emptyViewLongPressListener
         set(value) {
             gestureHandler.emptyViewLongPressListener = value
+        }
+
+    fun setEmptyViewLongPressListener(
+        block: (time: Calendar) -> Unit
+    ) {
+        emptyViewLongPressListener = object : EmptyViewLongPressListener {
+            override fun onEmptyViewLongPress(time: Calendar) {
+                block(time)
+            }
+        }
+    }
+
+    var scrollListener: ScrollListener?
+        get() = gestureHandler.scrollListener
+        set(value) {
+            gestureHandler.scrollListener = value
+        }
+
+    fun setScrollListener(
+        block: (newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) -> Unit
+    ) {
+        scrollListener = object : ScrollListener {
+            override fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) {
+                block(firstVisibleDay, oldFirstVisibleDay)
+            }
+        }
+    }
+
+    var dateTimeInterpreter: DateTimeInterpreter
+        get() = configWrapper.dateTimeInterpreter
+        set(value) {
+            configWrapper.dateTimeInterpreter = value
+            dayLabelDrawer.clearLabelCache()
         }
 
 }

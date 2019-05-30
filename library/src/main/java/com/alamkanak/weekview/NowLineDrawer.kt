@@ -7,19 +7,19 @@ import java.util.Calendar.MINUTE
 import kotlin.math.max
 
 internal class NowLineDrawer(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         if (config.showNowLine) {
-              val startPixel = drawingContext
+            val startPixel = drawingContext
                 .dateRangeWithStartPixels
                 .filter { it.first.isToday }
                 .map { it.second }
                 .firstOrNull() ?: return
 
-                val startX = max(startPixel, config.timeColumnWidth)
-                drawLine(startX, startPixel, canvas)
+            val startX = max(startPixel, config.timeColumnWidth)
+            drawLine(startX, startPixel, canvas)
         }
     }
 

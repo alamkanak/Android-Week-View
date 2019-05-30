@@ -8,23 +8,23 @@ import java.util.Calendar.MINUTE
 import kotlin.math.max
 
 internal class DayBackgroundDrawer(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext
-                .dateRangeWithStartPixels
-                .forEach { (date, startPixel) ->
-                    val startX = max(startPixel, config.timeColumnWidth)
-                    drawDayBackground(date, startX, startPixel, canvas)
-                }
+            .dateRangeWithStartPixels
+            .forEach { (date, startPixel) ->
+                val startX = max(startPixel, config.timeColumnWidth)
+                drawDayBackground(date, startX, startPixel, canvas)
+            }
     }
 
     private fun drawDayBackground(
-            day: Calendar,
-            startX: Float,
-            startPixel: Float,
-            canvas: Canvas
+        day: Calendar,
+        startX: Float,
+        startPixel: Float,
+        canvas: Canvas
     ) {
         if (config.widthPerDay + startPixel - startX <= 0) {
             return

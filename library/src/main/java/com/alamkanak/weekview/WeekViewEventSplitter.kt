@@ -1,13 +1,13 @@
 package com.alamkanak.weekview
 
 internal class WeekViewEventSplitter<T>(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     fun split(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         val newEndTime = event.endTime
         val isAtStartOfNewPeriod = config.minHour == 0
-                && newEndTime.isAtStartOfNextDay(event.startTime)
+            && newEndTime.isAtStartOfNextDay(event.startTime)
 
         return if (isAtStartOfNewPeriod) {
             listOf(shortenTooLongAllDayEvent(event))
@@ -19,7 +19,7 @@ internal class WeekViewEventSplitter<T>(
     }
 
     private fun shortenTooLongAllDayEvent(
-            event: WeekViewEvent<T>
+        event: WeekViewEvent<T>
     ): WeekViewEvent<T> {
         val newEndTime = event.endTime.withTimeAtEndOfPeriod(config.maxHour)
         return event.copy(endTime = newEndTime)

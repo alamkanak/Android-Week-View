@@ -6,7 +6,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 internal class WeekViewTouchHandler(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     /**

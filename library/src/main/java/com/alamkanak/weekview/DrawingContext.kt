@@ -15,8 +15,8 @@ internal class DrawingContext {
         val leftDaysWithGaps = (ceil((config.currentOrigin.x / totalDayWidth).toDouble()) * -1).toInt()
 
         startPixel = (config.currentOrigin.x
-                + totalDayWidth * leftDaysWithGaps
-                + config.timeColumnWidth)
+            + totalDayWidth * leftDaysWithGaps
+            + config.timeColumnWidth)
 
         val start = leftDaysWithGaps + 1
         val end = start + config.numberOfVisibleDays

@@ -1,19 +1,27 @@
 package com.alamkanak.weekview
 
 import android.support.v4.view.animation.FastOutLinearInInterpolator
-import android.view.*
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_UP
+import android.view.ScaleGestureDetector
+import android.view.View
+import android.view.ViewConfiguration
 import android.widget.OverScroller
-import kotlin.math.*
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.round
 
 private enum class Direction {
     NONE, LEFT, RIGHT, VERTICAL
 }
 
 internal class WeekViewGestureHandler<T>(
-        view: View,
-        private val config: WeekViewConfigWrapper,
-        private val cache: WeekViewCache<T>
+    view: View,
+    private val config: WeekViewConfigWrapper,
+    private val cache: WeekViewCache<T>
 ) : GestureDetector.SimpleOnGestureListener() {
 
     private val listener = view as Listener
@@ -26,24 +34,24 @@ internal class WeekViewGestureHandler<T>(
     private val gestureDetector = GestureDetector(view.context, this)
 
     private val scaleDetector = ScaleGestureDetector(view.context,
-            object : ScaleGestureDetector.OnScaleGestureListener {
-                override fun onScaleEnd(detector: ScaleGestureDetector) {
-                    isZooming = false
-                }
+        object : ScaleGestureDetector.OnScaleGestureListener {
+            override fun onScaleEnd(detector: ScaleGestureDetector) {
+                isZooming = false
+            }
 
-                override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-                    isZooming = true
-                    goToNearestOrigin()
-                    return true
-                }
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                isZooming = true
+                goToNearestOrigin()
+                return true
+            }
 
-                override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    val hourHeight = config.hourHeight
-                    config.newHourHeight = hourHeight * detector.scaleFactor
-                    listener.onScaled()
-                    return true
-                }
-            })
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                val hourHeight = config.hourHeight
+                config.newHourHeight = hourHeight * detector.scaleFactor
+                listener.onScaled()
+                return true
+            }
+        })
 
     private var isZooming: Boolean = false
 
@@ -56,21 +64,20 @@ internal class WeekViewGestureHandler<T>(
     var emptyViewClickListener: EmptyViewClickListener? = null
     var emptyViewLongPressListener: EmptyViewLongPressListener? = null
 
-    var weekViewLoader: WeekViewLoader<T>? = null
     var scrollListener: ScrollListener? = null
 
     override fun onDown(
-            e: MotionEvent
+        e: MotionEvent
     ): Boolean {
         goToNearestOrigin()
         return true
     }
 
     override fun onScroll(
-            e1: MotionEvent,
-            e2: MotionEvent,
-            distanceX: Float,
-            distanceY: Float
+        e1: MotionEvent,
+        e2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
     ): Boolean {
         if (isZooming) {
             return true
@@ -124,18 +131,18 @@ internal class WeekViewGestureHandler<T>(
     }
 
     override fun onFling(
-            e1: MotionEvent,
-            e2: MotionEvent,
-            velocityX: Float,
-            velocityY: Float
+        e1: MotionEvent,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
     ): Boolean {
         if (isZooming) {
             return true
         }
 
         if (currentFlingDirection == Direction.LEFT && !config.horizontalScrollingEnabled ||
-                currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled ||
-                currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled) {
+            currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled ||
+            currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled) {
             return true
         }
 
@@ -153,7 +160,7 @@ internal class WeekViewGestureHandler<T>(
     }
 
     private fun onFlingHorizontal(
-            originalVelocityX: Float
+        originalVelocityX: Float
     ) {
         val startX = config.currentOrigin.x.toInt()
         val startY = config.currentOrigin.y.toInt()
@@ -174,7 +181,7 @@ internal class WeekViewGestureHandler<T>(
     }
 
     private fun onFlingVertical(
-            originalVelocityY: Float
+        originalVelocityY: Float
     ) {
         val startX = config.currentOrigin.x.toInt()
         val startY = config.currentOrigin.y.toInt()
@@ -195,13 +202,13 @@ internal class WeekViewGestureHandler<T>(
     }
 
     override fun onSingleTapConfirmed(
-            e: MotionEvent
+        e: MotionEvent
     ): Boolean {
         eventClickListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
             val event = eventChip.originalEvent
             val data = Preconditions.checkNotNull(event.data,
-                    "No data to show. Did you pass the original object into the constructor of WeekViewEvent?")
+                "No data to show. Did you pass the original object into the constructor of WeekViewEvent?")
             val rect = checkNotNull(eventChip.rect)
             listener.onEventClick(data, rect)
             return super.onSingleTapConfirmed(e)
@@ -211,7 +218,7 @@ internal class WeekViewGestureHandler<T>(
         val timeColumnWidth = config.timeColumnWidth
 
         if (emptyViewClickListener != null
-                && e.x > timeColumnWidth && e.y > config.headerHeight) {
+            && e.x > timeColumnWidth && e.y > config.headerHeight) {
             val selectedTime = touchHandler.getTimeFromPoint(e)
             if (selectedTime != null) {
                 emptyViewClickListener?.onEmptyViewClicked(selectedTime)
@@ -227,7 +234,7 @@ internal class WeekViewGestureHandler<T>(
         eventLongPressListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
             val data = Preconditions.checkNotNull(eventChip.event.data,
-                    "No data to show. Did you pass the original object into the constructor of WeekViewEvent?"
+                "No data to show. Did you pass the original object into the constructor of WeekViewEvent?"
             )
             val rect = checkNotNull(eventChip.rect)
             listener.onEventLongPress(data, rect)
@@ -245,7 +252,7 @@ internal class WeekViewGestureHandler<T>(
     }
 
     private fun findHitEvent(
-            e: MotionEvent
+        e: MotionEvent
     ): EventChip<T>? {
         return cache.allEventChips.firstOrNull { it.isHit(e) }
     }

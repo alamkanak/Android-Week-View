@@ -1,4 +1,5 @@
 @file:JvmName("DateUtils")
+
 package com.alamkanak.weekview
 
 import android.content.Context
@@ -113,7 +114,8 @@ internal fun Calendar.toEpochDays(): Int {
     return (timeInMillis / DAY_IN_MILLIS).toInt()
 }
 
-internal fun Calendar.lengthOfMonth(): Int = getActualMaximum(Calendar.DAY_OF_MONTH)
+internal val Calendar.lengthOfMonth: Int
+    get() = getActualMaximum(Calendar.DAY_OF_MONTH)
 
 internal fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
     return withHour(hour).withMinutes(0).withSeconds(0).withMillis(0)
@@ -144,8 +146,8 @@ internal fun Calendar.isSameDate(other: Calendar): Boolean = toEpochDays() == ot
 
 internal fun firstDayOfYear(): Calendar {
     return today()
-            .withMonth(Calendar.JANUARY)
-            .withDayOfMonth(1)
+        .withMonth(Calendar.JANUARY)
+        .withDayOfMonth(1)
 }
 
 internal fun getDateRange(daysSinceToday: Int, size: Int): List<Calendar> {

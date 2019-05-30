@@ -9,8 +9,8 @@ interface DateTimeInterpreter {
 }
 
 internal class DefaultDateTimeInterpreter(
-        context: Context,
-        numberOfDays: Int
+    context: Context,
+    numberOfDays: Int
 ) : DateTimeInterpreter {
 
     private var sdfDate = getDefaultDateFormat(numberOfDays)

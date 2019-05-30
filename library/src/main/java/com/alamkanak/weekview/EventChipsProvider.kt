@@ -1,12 +1,12 @@
 package com.alamkanak.weekview
 
 internal class EventChipsProvider<T>(
-        private val config: WeekViewConfigWrapper,
-        private val cache: WeekViewCache<T>,
-        private val viewState: WeekViewViewState
+    private val config: WeekViewConfigWrapper,
+    private val cache: WeekViewCache<T>,
+    private val viewState: WeekViewViewState
 ) {
 
-    var weekViewLoader: WeekViewLoader<T>? = null
+    var monthLoader: MonthLoader<T>? = null
 
     fun loadEventsIfNecessary() {
         val hasNoEvents = cache.allEventChips.isEmpty()
@@ -56,18 +56,18 @@ internal class EventChipsProvider<T>(
             }
         }
 
-        val loader = checkNotNull(weekViewLoader) { "No WeekViewLoader or MonthChangeListener provided." }
+        val loader = checkNotNull(monthLoader) { "No WeekViewLoader or MonthChangeListener provided." }
 
         if (previousPeriodEvents == null) {
-            previousPeriodEvents = loader.onLoad(fetchPeriods.previous)
+            previousPeriodEvents = loader.load(fetchPeriods.previous)
         }
 
         if (currentPeriodEvents == null) {
-            currentPeriodEvents = loader.onLoad(fetchPeriods.current)
+            currentPeriodEvents = loader.load(fetchPeriods.current)
         }
 
         if (nextPeriodEvents == null) {
-            nextPeriodEvents = loader.onLoad(fetchPeriods.next)
+            nextPeriodEvents = loader.load(fetchPeriods.next)
         }
 
         cache.allEventChips.clear()
@@ -85,12 +85,12 @@ internal class EventChipsProvider<T>(
         val results = mutableListOf<EventChip<T>>()
 
         cache.allEventChips
-                .groupBy { it.event.startTime }
-                .values
-                .forEach { eventChips ->
-                    computePositionOfEvents(eventChips)
-                    results += eventChips
-                }
+            .groupBy { it.event.startTime }
+            .values
+            .forEach { eventChips ->
+                computePositionOfEvents(eventChips)
+                results += eventChips
+            }
 
         cache.put(results)
     }
@@ -104,7 +104,7 @@ internal class EventChipsProvider<T>(
             outerLoop@ for (collisionGroup in collisionGroups) {
                 for (groupEvent in collisionGroup) {
                     if (groupEvent.event.collidesWith(eventChip.event)
-                            && groupEvent.event.isAllDay == eventChip.event.isAllDay) {
+                        && groupEvent.event.isAllDay == eventChip.event.isAllDay) {
                         collisionGroup.add(eventChip)
                         isPlaced = true
                         break@outerLoop

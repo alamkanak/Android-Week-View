@@ -4,7 +4,7 @@ import android.support.v4.util.ArrayMap
 import java.util.*
 
 internal class WeekViewCache<T>(
-        private val eventSplitter: WeekViewEventSplitter<T>
+    private val eventSplitter: WeekViewEventSplitter<T>
 ) {
 
     var allEventChips = mutableListOf<EventChip<T>>()
@@ -53,19 +53,19 @@ internal class WeekViewCache<T>(
     fun covers(fetchPeriods: FetchPeriods): Boolean {
         return this.fetchedPeriods?.let {
             it.previous == fetchPeriods.previous && it.current == fetchPeriods.current
-                    && it.next == fetchPeriods.next
+                && it.next == fetchPeriods.next
         } ?: false
     }
 
     private fun getEventChipsInRange(
-            eventChips: List<EventChip<T>>,
-            dateRange: List<Calendar>
+        eventChips: List<EventChip<T>>,
+        dateRange: List<Calendar>
     ): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
         for (date in dateRange) {
             results += eventChips
-                    .filter { it.event.isSameDay(date) }
-                    .map { it.event }
+                .filter { it.event.isSameDay(date) }
+                .map { it.event }
         }
         return results
     }
@@ -110,8 +110,8 @@ internal class WeekViewCache<T>(
     }
 
     private fun ArrayMap<Calendar, MutableList<EventChip<T>>>.add(
-            key: Calendar,
-            eventChip: EventChip<T>
+        key: Calendar,
+        eventChip: EventChip<T>
     ) {
         val results = getOrElse(key) { mutableListOf() }
         results.add(eventChip)

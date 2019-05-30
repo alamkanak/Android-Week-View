@@ -4,7 +4,7 @@ import java.lang.Math.max
 import java.util.*
 
 internal class WeekViewViewState(
-        private val configWrapper: WeekViewConfigWrapper
+    private val configWrapper: WeekViewConfigWrapper
 ) {
 
     var scrollToDay: Calendar? = null

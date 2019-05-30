@@ -3,12 +3,12 @@ package com.alamkanak.weekview
 import android.graphics.RectF
 
 internal class EventChipRectCalculator<T>(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
 
     fun calculateSingleEvent(
-            eventChip: EventChip<T>,
-            startPixel: Float
+        eventChip: EventChip<T>,
+        startPixel: Float
     ): RectF {
         val widthPerDay = config.widthPerDay
 
@@ -40,8 +40,8 @@ internal class EventChipRectCalculator<T>(
     }
 
     fun calculateAllDayEvent(
-            eventChip: EventChip<T>,
-            startPixel: Float
+        eventChip: EventChip<T>,
+        startPixel: Float
     ): RectF {
         val top = config.headerRowPadding * 1.5f + config.headerTextHeight
         val bottom = top + eventChip.bottom

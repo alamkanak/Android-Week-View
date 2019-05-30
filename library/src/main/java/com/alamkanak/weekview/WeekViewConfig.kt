@@ -5,8 +5,8 @@ import android.graphics.Color
 import android.util.AttributeSet
 
 internal class WeekViewConfig(
-        context: Context,
-        attrs: AttributeSet?
+    context: Context,
+    attrs: AttributeSet?
 ) {
 
     // Calendar configuration

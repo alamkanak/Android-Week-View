@@ -4,9 +4,9 @@ import android.graphics.Canvas
 import android.graphics.Paint
 
 internal class HeaderRowDrawer<T>(
-        private val config: WeekViewConfigWrapper,
-        private val cache: WeekViewCache<T>,
-        private val viewState: WeekViewViewState
+    private val config: WeekViewConfigWrapper,
+    private val cache: WeekViewCache<T>,
+    private val viewState: WeekViewViewState
 ) {
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas, paint: Paint) {

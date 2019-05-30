@@ -7,15 +7,15 @@ import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.*
 
 data class WeekViewEvent<T> internal constructor(
-        var id: Long = 0L,
-        var title: String = "",
-        var startTime: Calendar = now(),
-        var endTime: Calendar = now(),
-        var location: String? = null,
-        var isAllDay: Boolean = false,
-        var style: Style = Style(),
-        var data: T? = null
-): WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
+    var id: Long = 0L,
+    var title: String = "",
+    var startTime: Calendar = now(),
+    var endTime: Calendar = now(),
+    var location: String? = null,
+    var isAllDay: Boolean = false,
+    var style: Style = Style(),
+    var data: T? = null
+) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
 
     val isNotAllDay: Boolean
         get() = isAllDay.not()

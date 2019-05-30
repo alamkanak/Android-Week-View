@@ -3,9 +3,9 @@ package com.alamkanak.weekview
 import java.util.*
 
 internal data class FetchPeriods(
-        val previous: Period,
-        val current: Period,
-        val next: Period
+    val previous: Period,
+    val current: Period,
+    val next: Period
 ) {
 
     internal companion object {
@@ -19,7 +19,7 @@ internal data class FetchPeriods(
 
 }
 
-data class Period(val month: Int, val year: Int) {
+internal data class Period(val month: Int, val year: Int) {
 
     fun previous(): Period {
         val year = if (month == Month.JANUARY) year - 1 else year

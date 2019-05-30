@@ -13,17 +13,17 @@ import android.util.Pair
 import java.util.*
 
 internal class EventsDrawer<T>(
-        private val config: WeekViewConfigWrapper,
-        private val cache: WeekViewCache<T>
+    private val config: WeekViewConfigWrapper,
+    private val cache: WeekViewCache<T>
 ) {
 
     private val rectCalculator = EventChipRectCalculator<T>(config)
     private val staticLayoutCache = ArrayList<Pair<EventChip<T>, StaticLayout>>()
 
     fun drawSingleEvents(
-            drawingContext: DrawingContext,
-            canvas: Canvas,
-            paint: Paint
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
     ) {
         var startPixel = drawingContext.startPixel
 
@@ -43,22 +43,22 @@ internal class EventsDrawer<T>(
     }
 
     private fun drawEventsForDate(
-            date: Calendar,
-            startPixel: Float,
-            canvas: Canvas,
-            paint: Paint
+        date: Calendar,
+        startPixel: Float,
+        canvas: Canvas,
+        paint: Paint
     ) {
         cache.normalEventChipsByDate(date)
-                .filter { it.event.isWithin(config.minHour, config.maxHour) }
-                .forEach {
-                    val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
-                    if (chipRect.isValidSingleEventRect) {
-                        it.rect = chipRect
-                        it.draw(config, canvas, paint)
-                    } else {
-                        it.rect = null
-                    }
+            .filter { it.event.isWithin(config.minHour, config.maxHour) }
+            .forEach {
+                val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
+                if (chipRect.isValidSingleEventRect) {
+                    it.rect = chipRect
+                    it.draw(config, canvas, paint)
+                } else {
+                    it.rect = null
                 }
+            }
     }
 
     /**
@@ -68,7 +68,7 @@ internal class EventsDrawer<T>(
      * @return The association of [EventChip]s with his StaticLayout
      */
     fun prepareDrawAllDayEvents(
-            drawingContext: DrawingContext
+        drawingContext: DrawingContext
     ): List<Pair<EventChip<T>, StaticLayout>> {
         config.setCurrentAllDayEventHeight(0)
         staticLayoutCache.clear()
@@ -97,8 +97,8 @@ internal class EventsDrawer<T>(
     }
 
     private fun calculateLayoutForAllDayEvent(
-            eventChip: EventChip<T>,
-            startPixel: Float
+        eventChip: EventChip<T>,
+        startPixel: Float
     ): StaticLayout? {
         val chipRect = rectCalculator.calculateAllDayEvent(eventChip, startPixel)
         if (chipRect.isValidAllDayEventRect) {
@@ -111,7 +111,7 @@ internal class EventsDrawer<T>(
     }
 
     private fun calculateChipTextLayout(
-            eventChip: EventChip<T>
+        eventChip: EventChip<T>
     ): StaticLayout? {
         val event = eventChip.event
         val rect = checkNotNull(eventChip.rect)
@@ -141,7 +141,7 @@ internal class EventsDrawer<T>(
         // Get text dimensions.
         val textPaint = event.getTextPaint(config)
         var textLayout = StaticLayout(
-                stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
+            stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
 
         val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -183,9 +183,9 @@ internal class EventsDrawer<T>(
      * @param canvas         The canvas to draw upon.
      */
     fun drawAllDayEvents(
-            eventChips: List<Pair<EventChip<T>, StaticLayout>>?,
-            canvas: Canvas,
-            paint: Paint
+        eventChips: List<Pair<EventChip<T>, StaticLayout>>?,
+        canvas: Canvas,
+        paint: Paint
     ) {
         if (eventChips == null) {
             return
@@ -218,16 +218,16 @@ internal class EventsDrawer<T>(
 
     private val RectF.isValidSingleEventRect: Boolean
         get() = (left < right
-                && left < WeekView.width
-                && top < WeekView.height
-                && right > config.timeColumnWidth
-                && bottom > config.headerHeight)
+            && left < WeekView.width
+            && top < WeekView.height
+            && right > config.timeColumnWidth
+            && bottom > config.headerHeight)
 
     private val RectF.isValidAllDayEventRect: Boolean
         get() = (left < right
-                && left < WeekView.width
-                && top < WeekView.height
-                && right > config.timeColumnWidth
-                && bottom > 0)
+            && left < WeekView.width
+            && top < WeekView.height
+            && right > config.timeColumnWidth
+            && bottom > 0)
 
 }

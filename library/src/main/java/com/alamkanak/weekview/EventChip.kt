@@ -20,9 +20,9 @@ import android.view.MotionEvent
  * instance will be stored in "event".
  */
 internal class EventChip<T>(
-        val event: WeekViewEvent<T>,
-        val originalEvent: WeekViewEvent<T>,
-        var rect: RectF?
+    val event: WeekViewEvent<T>,
+    val originalEvent: WeekViewEvent<T>,
+    var rect: RectF?
 ) {
 
     var left = 0f
@@ -35,18 +35,18 @@ internal class EventChip<T>(
     private var availableHeightCache: Int = 0
 
     internal fun draw(
-            config: WeekViewConfigWrapper,
-            canvas: Canvas,
-            paint: Paint
+        config: WeekViewConfigWrapper,
+        canvas: Canvas,
+        paint: Paint
     ) {
         draw(config, null, canvas, paint)
     }
 
     internal fun draw(
-            config: WeekViewConfigWrapper,
-            textLayout: StaticLayout?,
-            canvas: Canvas,
-            paint: Paint
+        config: WeekViewConfigWrapper,
+        textLayout: StaticLayout?,
+        canvas: Canvas,
+        paint: Paint
     ) {
         val cornerRadius = config.eventCornerRadius.toFloat()
         setBackgroundPaint(config, paint)
@@ -58,10 +58,10 @@ internal class EventChip<T>(
 
             val rect = checkNotNull(rect)
             val adjustedRect = RectF(
-                    rect.left + borderWidth / 2f,
-                    rect.top + borderWidth / 2f,
-                    rect.right - borderWidth / 2f,
-                    rect.bottom - borderWidth / 2f)
+                rect.left + borderWidth / 2f,
+                rect.top + borderWidth / 2f,
+                rect.right - borderWidth / 2f,
+                rect.bottom - borderWidth / 2f)
             canvas.drawRoundRect(adjustedRect, cornerRadius, cornerRadius, paint)
         }
 
@@ -69,15 +69,16 @@ internal class EventChip<T>(
             drawCornersForMultiDayEvents(paint, cornerRadius, canvas)
         }
 
-        textLayout?.let { // The text height has already been calculated
+        textLayout?.let {
+            // The text height has already been calculated
             drawEventTitle(config, it, canvas)
         } ?: calculateTextHeightAndDrawTitle(config, canvas)
     }
 
     private fun drawCornersForMultiDayEvents(
-            backgroundPaint: Paint,
-            cornerRadius: Float,
-            canvas: Canvas
+        backgroundPaint: Paint,
+        cornerRadius: Float,
+        canvas: Canvas
     ) {
         val rect = checkNotNull(rect)
 
@@ -119,8 +120,8 @@ internal class EventChip<T>(
     }
 
     private fun calculateTextHeightAndDrawTitle(
-            config: WeekViewConfigWrapper,
-            canvas: Canvas
+        config: WeekViewConfigWrapper,
+        canvas: Canvas
     ) {
         val rect = checkNotNull(rect)
 
@@ -150,7 +151,7 @@ internal class EventChip<T>(
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(config)
             var textLayout = StaticLayout(stringBuilder,
-                    textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
+                textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
 
             val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -161,7 +162,7 @@ internal class EventChip<T>(
                     // Ellipsize text to fit into event rect.
                     val availableArea = availableLineCount * availableWidth
                     val ellipsized = TextUtils.ellipsize(stringBuilder,
-                            textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
+                        textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
 
                     val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
                     textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
@@ -183,9 +184,9 @@ internal class EventChip<T>(
     }
 
     private fun drawEventTitle(
-            config: WeekViewConfigWrapper,
-            textLayout: StaticLayout,
-            canvas: Canvas
+        config: WeekViewConfigWrapper,
+        textLayout: StaticLayout,
+        canvas: Canvas
     ) {
         val rect = checkNotNull(rect)
 

@@ -5,9 +5,9 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class BackgroundGridDrawer(
-        private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper
 ) {
-    
+
     private lateinit var hourLines: FloatArray
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {

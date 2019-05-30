@@ -14,8 +14,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class WeekViewConfigWrapper(
-        context: Context,
-        private val config: WeekViewConfig
+    context: Context,
+    private val config: WeekViewConfig
 ) {
 
     var timeTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -82,7 +82,7 @@ internal class WeekViewConfigWrapper(
         color = config.todayBackgroundColor
     }
 
-    private val futureBackgroundPaint: Paint  = Paint().apply {
+    private val futureBackgroundPaint: Paint = Paint().apply {
         color = config.futureBackgroundColor
     }
 
@@ -142,7 +142,7 @@ internal class WeekViewConfigWrapper(
     var maxDate: Calendar? = null
 
     private var _dateTimeInterpreter: DateTimeInterpreter =
-            DefaultDateTimeInterpreter(context, numberOfVisibleDays)
+        DefaultDateTimeInterpreter(context, numberOfVisibleDays)
 
     var dateTimeInterpreter: DateTimeInterpreter
         get() = _dateTimeInterpreter
@@ -618,9 +618,9 @@ internal class WeekViewConfigWrapper(
      */
     private fun initTextTimeWidth() {
         timeTextWidth = (0 until hoursPerDay)
-                .map { dateTimeInterpreter.interpretTime(it) }
-                .map { timeTextPaint.measureText(it) }
-                .max() ?: 0f
+            .map { dateTimeInterpreter.interpretTime(it) }
+            .map { timeTextPaint.measureText(it) }
+            .max() ?: 0f
     }
 
 }
