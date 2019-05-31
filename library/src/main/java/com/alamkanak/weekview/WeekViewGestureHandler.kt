@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import android.support.v4.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_UP

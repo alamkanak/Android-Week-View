@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Paint
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.*
