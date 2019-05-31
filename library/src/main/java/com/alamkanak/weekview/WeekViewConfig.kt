@@ -46,6 +46,7 @@ internal class WeekViewConfig(
     // Event chips
     var eventCornerRadius: Int = 0
     var eventTextSize: Int = 0
+    var adaptiveEventTextSize: Boolean = false
     var eventTextColor: Int = 0
     var eventPadding: Int = 0
     var defaultEventColor: Int = 0
@@ -149,6 +150,7 @@ internal class WeekViewConfig(
             // Event chips
             eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0)
             eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context))
+            adaptiveEventTextSize = a.getBoolean(R.styleable.WeekView_adaptiveEventTextSize, false)
             eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK)
             eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, 8)
             defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR)

@@ -121,6 +121,12 @@ internal class WeekViewConfigWrapper(
             textSize = config.eventTextSize.toFloat()
         }
 
+    var adaptiveEventTextSize: Boolean
+        get() = config.adaptiveEventTextSize
+        set(value) {
+            config.adaptiveEventTextSize = value
+        }
+
     val allDayEventTextPaint: TextPaint
         get() = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
             style = Paint.Style.FILL

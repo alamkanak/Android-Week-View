@@ -52,6 +52,7 @@
         <!-- Event chips -->
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventTextSize" format="dimension" />
+        <attr name="adaptiveEventTextSize" format="boolean" />
         <attr name="eventTextColor" format="color" />
         <attr name="eventPadding" format="dimension" />
         <attr name="defaultEventColor" format="color" />

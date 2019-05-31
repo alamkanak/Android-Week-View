@@ -10,6 +10,7 @@
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:adaptiveEventTextSize="true"
         app:columnGap="1dp"
         app:eventCornerRadius="4dp"
         app:eventTextColor="@android:color/white"

@@ -162,6 +162,7 @@ internal class EventChip<T>(
             val lineHeight = textLayout.height / textLayout.lineCount
 
             if (availableHeight >= lineHeight) {
+                // The text fits into the chip, so we just need to ellipsize it
                 var availableLineCount = availableHeight / lineHeight
                 do {
                     // Ellipsize text to fit into event rect.
@@ -175,6 +176,19 @@ internal class EventChip<T>(
                     // Repeat until text is short enough.
                     availableLineCount--
                 } while (textLayout.height > availableHeight)
+            } else if (config.adaptiveEventTextSize) {
+                // The text doesn't fit into the chip, so we need to gradually reduce its size until it does
+                do {
+                    textPaint.textSize -= 1f
+
+                    val adaptiveLineCount = availableHeight / textLayout.lineHeight
+                    val availableArea = adaptiveLineCount * availableWidth
+                    val ellipsized = TextUtils.ellipsize(stringBuilder,
+                        textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
+
+                    val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+                    textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+                } while (availableHeight <= textLayout.lineHeight)
             }
 
             availableWidthCache = availableWidth
@@ -220,5 +234,8 @@ internal class EventChip<T>(
             e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
         } ?: false
     }
+
+    private val StaticLayout.lineHeight: Int
+        get() = height / lineCount
 
 }
