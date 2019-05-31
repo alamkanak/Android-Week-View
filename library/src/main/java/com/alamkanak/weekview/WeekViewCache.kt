@@ -75,7 +75,7 @@ internal class WeekViewCache<T>(
     }
 
     fun clearEventChipsCache() {
-        allEventChips.forEach { it.rect = null }
+        allEventChips.forEach(EventChip<T>::clearCache)
     }
 
     fun clear() {

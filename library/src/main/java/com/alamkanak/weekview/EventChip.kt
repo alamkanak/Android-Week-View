@@ -34,6 +34,12 @@ internal class EventChip<T>(
     private var availableWidthCache: Int = 0
     private var availableHeightCache: Int = 0
 
+    fun clearCache() {
+        rect = null
+        availableWidthCache = 0
+        availableHeightCache = 0
+    }
+
     internal fun draw(
         config: WeekViewConfigWrapper,
         canvas: Canvas,
@@ -158,7 +164,6 @@ internal class EventChip<T>(
             if (availableHeight >= lineHeight) {
                 var availableLineCount = availableHeight / lineHeight
                 do {
-                    // TODO: Don't truncate
                     // Ellipsize text to fit into event rect.
                     val availableArea = availableLineCount * availableWidth
                     val ellipsized = TextUtils.ellipsize(stringBuilder,
@@ -178,7 +183,9 @@ internal class EventChip<T>(
         }
 
         layoutCache?.let {
-            drawEventTitle(config, it, canvas)
+            if (it.height <= availableHeight) {
+                drawEventTitle(config, it, canvas)
+            }
         }
     }
 

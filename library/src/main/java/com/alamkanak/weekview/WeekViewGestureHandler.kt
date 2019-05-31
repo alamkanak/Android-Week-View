@@ -37,6 +37,7 @@ internal class WeekViewGestureHandler<T>(
         object : ScaleGestureDetector.OnScaleGestureListener {
             override fun onScaleEnd(detector: ScaleGestureDetector) {
                 isZooming = false
+                cache.clearEventChipsCache()
             }
 
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
