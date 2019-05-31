@@ -519,11 +519,13 @@ internal class WeekViewConfigWrapper(
     }
 
     private fun computeDifferenceWithCurrentTime() {
-        var desired = now()
+        val now = now()
 
-        if (desired.hour > 0) {
+        val desired = if (now.hour > 0) {
             // Add some padding above the current time (and thus: the now line)
-            desired = desired.minusHours(1)
+            now.minusHours(1)
+        } else {
+            now.atStartOfDay
         }
 
         val hour = desired.hour
