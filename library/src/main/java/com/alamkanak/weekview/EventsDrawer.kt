@@ -202,7 +202,7 @@ internal class EventsDrawer<T>(
             0f
         }
 
-        val height = config.headerHeight - headerRowBottomLine
+        val height = config.headerHeight - headerRowBottomLine * 1.5f
         val width = config.timeTextWidth + config.timeColumnPadding * 2
 
         canvas.clipRect(0f, 0f, width, height)

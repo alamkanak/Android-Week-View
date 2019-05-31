@@ -54,8 +54,14 @@ internal class HeaderRowDrawer<T>(
         canvas.save()
 
         // Clip to paint header row only.
-        canvas.clipRect(config.timeColumnWidth, 0f, width.toFloat(), config.headerHeight)
-        canvas.drawRect(0f, 0f, width.toFloat(), config.headerHeight, headerBackground)
+        val headerRowBottomLine = if (config.showHeaderRowBottomLine) {
+            config.headerRowBottomLinePaint.strokeWidth
+        } else {
+            0f
+        }
+        val topLeftCornerHeight = config.headerHeight - headerRowBottomLine * 1.5f
+        canvas.clipRect(config.timeColumnWidth, 0f, width.toFloat(), topLeftCornerHeight)
+        canvas.drawRect(0f, 0f, width.toFloat(), topLeftCornerHeight, headerBackground)
 
         canvas.restore()
         canvas.save()
