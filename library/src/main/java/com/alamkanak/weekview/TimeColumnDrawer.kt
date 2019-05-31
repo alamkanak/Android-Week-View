@@ -15,16 +15,14 @@ internal class TimeColumnDrawer(
     }
 
     fun drawTimeColumn(canvas: Canvas) {
-        var top = config.headerHeight
-        val bottom = WeekView.height
+        var topMargin = config.headerHeight
+        val bottom = WeekView.height.toFloat()
 
         // Draw the background color for the time column.
-        canvas.drawRect(0f, top, config.timeColumnWidth, bottom.toFloat(), config.timeColumnBackgroundPaint)
-
+        canvas.drawRect(0f, topMargin, config.timeColumnWidth, bottom, config.timeColumnBackgroundPaint)
         canvas.restore()
         canvas.save()
-
-        canvas.clipRect(0f, top, config.timeColumnWidth, bottom.toFloat())
+        canvas.clipRect(0f, topMargin, config.timeColumnWidth, bottom)
 
         val startHour = config.startHour
         val hourLines = FloatArray(config.hoursPerDay * 4)
@@ -32,13 +30,13 @@ internal class TimeColumnDrawer(
 
         for (hour in startHour until config.hoursPerDay step hourStep) {
             val heightOfHour = (config.hourHeight * hour)
-            top = config.headerHeight + config.currentOrigin.y + heightOfHour
+            topMargin = config.headerHeight + config.currentOrigin.y + heightOfHour
 
             // Draw the text if its y position is not outside of the visible area. The pivot point
             // of the text is the point at the bottom-right corner.
-            if (top < bottom) {
+            if (topMargin < bottom) {
                 val x = config.timeTextWidth + config.timeColumnPadding
-                var y = top + config.timeTextHeight / 2
+                var y = topMargin + config.timeTextHeight / 2
 
                 // If the hour separator is shown in the time column, move the time label below it
                 if (config.showTimeColumnHourSeparator) {
@@ -49,11 +47,10 @@ internal class TimeColumnDrawer(
 
                 if (config.showTimeColumnHourSeparator && hour > 0) {
                     val j = hour - 1
-                    val yHoursLines = top
                     hourLines[j * 4] = 0f
-                    hourLines[j * 4 + 1] = yHoursLines
+                    hourLines[j * 4 + 1] = topMargin
                     hourLines[j * 4 + 2] = config.timeColumnWidth
-                    hourLines[j * 4 + 3] = yHoursLines
+                    hourLines[j * 4 + 3] = topMargin
                 }
             }
         }
@@ -61,7 +58,7 @@ internal class TimeColumnDrawer(
         // Draw the vertical time column separator
         if (config.showTimeColumnSeparator) {
             val lineX = config.timeColumnWidth - config.timeColumnSeparatorStrokeWidth
-            canvas.drawLine(lineX, config.headerHeight, lineX, bottom.toFloat(), config.timeColumnSeparatorPaint)
+            canvas.drawLine(lineX, config.headerHeight, lineX, bottom, config.timeColumnSeparatorPaint)
         }
 
         // Draw the hour separator inside the time column

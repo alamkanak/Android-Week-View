@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_UP
@@ -8,6 +7,7 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewConfiguration
 import android.widget.OverScroller
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -207,9 +207,9 @@ internal class WeekViewGestureHandler<T>(
     ): Boolean {
         eventClickListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
-            val event = eventChip.originalEvent
-            val data = Preconditions.checkNotNull(event.data,
-                "No data to show. Did you pass the original object into the constructor of WeekViewEvent?")
+            val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
+                "Did you pass the original object into the constructor of WeekViewEvent?")
+
             val rect = checkNotNull(eventChip.rect)
             listener.onEventClick(data, rect)
             return super.onSingleTapConfirmed(e)
@@ -234,9 +234,9 @@ internal class WeekViewGestureHandler<T>(
 
         eventLongPressListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
-            val data = Preconditions.checkNotNull(eventChip.event.data,
-                "No data to show. Did you pass the original object into the constructor of WeekViewEvent?"
-            )
+            val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
+                "Did you pass the original object into the constructor of WeekViewEvent?")
+
             val rect = checkNotNull(eventChip.rect)
             listener.onEventLongPress(data, rect)
         }

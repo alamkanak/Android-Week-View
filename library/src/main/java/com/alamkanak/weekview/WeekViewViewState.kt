@@ -4,7 +4,8 @@ import java.lang.Math.max
 import java.util.*
 
 internal class WeekViewViewState(
-    private val configWrapper: WeekViewConfigWrapper
+    private val configWrapper: WeekViewConfigWrapper,
+    private val listener: Listener
 ) {
 
     var scrollToDay: Calendar? = null
@@ -19,7 +20,7 @@ internal class WeekViewViewState(
     var shouldRefreshEvents: Boolean = false
     var requiresPostInvalidateOnAnimation: Boolean = false
 
-    fun update(listener: Listener) {
+    fun update() {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight()
 
         val totalHeight = WeekView.height

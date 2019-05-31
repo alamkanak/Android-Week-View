@@ -6,12 +6,12 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.Parcelable
-import androidx.core.view.ViewCompat
 import android.text.StaticLayout
 import android.util.AttributeSet
 import android.util.Pair
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.view.ViewCompat
 import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.*
 import kotlin.math.ceil
@@ -39,7 +39,7 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewCache(eventSplitter)
     }
 
-    private val viewState = WeekViewViewState(configWrapper)
+    private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler = WeekViewGestureHandler(this, configWrapper, cache)
 
     private val drawingContext = DrawingContext()
@@ -94,7 +94,7 @@ class WeekView<T> @JvmOverloads constructor(
         val isFirstDraw = viewState.isFirstDraw
 
         calculateWidthPerDay()
-        viewState.update(this)
+        viewState.update()
 
         configWrapper.refreshAfterZooming()
         configWrapper.updateVerticalOrigin()
