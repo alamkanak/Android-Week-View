@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.AttributeSet
 
 internal class WeekViewConfig(
@@ -106,8 +107,12 @@ internal class WeekViewConfig(
     var minHour: Int = 0
     var maxHour: Int = 0
 
+    // Font
+    var typeface: Typeface = Typeface.DEFAULT
+
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
+
         try {
             // Calendar configuration
             firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DayOfWeek.MONDAY)
@@ -205,6 +210,10 @@ internal class WeekViewConfig(
             horizontalScrollingEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, true)
             verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, true)
             scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, 250)
+
+            // Font
+            val fontFamily = a.getString(R.styleable.WeekView_fontFamily)
+            typeface = Typeface.create(fontFamily, Typeface.NORMAL)
         } finally {
             a.recycle()
         }

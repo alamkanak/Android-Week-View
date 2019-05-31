@@ -107,6 +107,9 @@
         <attr name="horizontalScrollingEnabled" format="boolean" />
         <attr name="scrollDuration" format="integer" />
 
+        <!-- Font -->
+        <attr name="fontFamily" format="string" />
+
     </declare-styleable>
 
 </resources>

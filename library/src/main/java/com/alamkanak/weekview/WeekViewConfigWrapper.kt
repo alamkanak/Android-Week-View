@@ -20,6 +20,7 @@ internal class WeekViewConfigWrapper(
         textAlign = Paint.Align.RIGHT
         textSize = config.timeColumnTextSize.toFloat()
         color = config.timeColumnTextColor
+        typeface = config.typeface
     }
 
     var timeTextWidth: Float = 0.toFloat()
@@ -30,7 +31,7 @@ internal class WeekViewConfigWrapper(
         color = config.headerRowTextColor
         textAlign = Paint.Align.CENTER
         textSize = config.headerRowTextSize.toFloat()
-        typeface = Typeface.DEFAULT_BOLD
+        typeface = Typeface.create(config.typeface, Typeface.BOLD)
     }
 
     val headerRowBottomLinePaint: Paint = Paint().apply {
@@ -45,7 +46,7 @@ internal class WeekViewConfigWrapper(
     val todayHeaderTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
         textSize = config.headerRowTextSize.toFloat()
-        typeface = Typeface.DEFAULT_BOLD
+        typeface = Typeface.create(config.typeface, Typeface.BOLD)
         color = config.todayHeaderTextColor
     }
 
@@ -119,6 +120,7 @@ internal class WeekViewConfigWrapper(
             style = Paint.Style.FILL
             color = config.eventTextColor
             textSize = config.eventTextSize.toFloat()
+            typeface = config.typeface
         }
 
     var adaptiveEventTextSize: Boolean
@@ -132,6 +134,7 @@ internal class WeekViewConfigWrapper(
             style = Paint.Style.FILL
             color = config.eventTextColor
             textSize = config.allDayEventTextSize.toFloat()
+            typeface = config.typeface
         }
 
     val timeColumnBackgroundPaint: Paint = Paint().apply {
@@ -474,6 +477,12 @@ internal class WeekViewConfigWrapper(
         get() = config.showDistinctPastFutureColor
         set(value) {
             config.showDistinctPastFutureColor = value
+        }
+
+    var typeface: Typeface
+        get() = config.typeface
+        set(value) {
+            config.typeface = value
         }
 
     fun calculateTimeColumnWidth() {
