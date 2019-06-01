@@ -6,6 +6,8 @@ import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.R;
 import com.alamkanak.weekview.sample.apiclient.Event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -56,7 +58,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth);
 
-        event = new Event(123, getEventTitle(startTime), startTime, endTime, "", color4, false, false);
+        event = new Event(2, getEventTitle(startTime), startTime, endTime, "", color4, false, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -69,7 +71,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.set(Calendar.MINUTE, 30);
         endTime.set(Calendar.MONTH, newMonth);
 
-        event = new Event(10, getEventTitle(startTime), startTime, endTime, "", color2, false, true);
+        event = new Event(3, getEventTitle(startTime), startTime, endTime, "", color2, false, true);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -81,7 +83,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.set(Calendar.HOUR_OF_DAY, 5);
         endTime.set(Calendar.MINUTE, 0);
 
-        event = new Event(10, getEventTitle(startTime), startTime, endTime, "", color3, false, false);
+        event = new Event(4, getEventTitle(startTime), startTime, endTime, "", color3, false, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -93,7 +95,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 2);
         endTime.set(Calendar.MONTH, newMonth);
 
-        event = new Event(2, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
+        event = new Event(5, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -106,7 +108,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 3);
         endTime.set(Calendar.MONTH, newMonth);
 
-        event = new Event(3, getEventTitle(startTime), startTime, endTime, "", color3, false, false);
+        event = new Event(6, getEventTitle(startTime), startTime, endTime, "", color3, false, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -118,7 +120,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
 
-        event = new Event(4, getEventTitle(startTime), startTime, endTime, "Location", color4, false, true);
+        event = new Event(7, getEventTitle(startTime), startTime, endTime, "Location", color4, false, true);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -130,7 +132,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
 
-        event = new Event(5, getEventTitle(startTime), startTime, endTime, "", color1, false, false);
+        event = new Event(8, getEventTitle(startTime), startTime, endTime, "", color1, false, false);
         events.add(event);
 
         startTime = Calendar.getInstance();
@@ -142,7 +144,7 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 3);
 
-        event = new Event(5, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
+        event = new Event(9, getEventTitle(startTime), startTime, endTime, "", color2, false, false);
         events.add(event);
 
         // All-day event
@@ -154,8 +156,10 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.add(Calendar.HOUR_OF_DAY, 23);
 
-        event = new Event(7, getEventTitle(startTime), startTime, endTime, "", color4, true, false);
+        event = new Event(10, getEventTitle(startTime), startTime, endTime, "", color4, true, false);
         events.add(event);
+
+        event = new Event(11, getEventTitle(startTime), startTime, endTime, "", color4, true, false);
         events.add(event);
 
         // All-day event until 00:00 next day
@@ -170,18 +174,20 @@ public class FakeEventsDatabase implements EventsDatabase {
         endTime = (Calendar) startTime.clone();
         endTime.set(Calendar.DAY_OF_MONTH, 11);
 
-        event = new Event(8, getEventTitle(startTime), startTime, endTime, "", color1, true, false);
+        event = new Event(12, getEventTitle(startTime), startTime, endTime, "", color1, true, false);
         events.add(event);
 
         return events;
     }
 
     private String getEventTitle(Calendar time) {
+        DateFormat sdf = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
+        String formattedDate = sdf.format(time.getTime());
+
         int hour = time.get(Calendar.HOUR_OF_DAY);
         int minute = time.get(Calendar.MINUTE);
-        int month = time.get(Calendar.MONTH) + 1;
-        int dayOfMonth = time.get(Calendar.DAY_OF_MONTH);
-        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth);
+
+        return String.format(Locale.getDefault(), "Event of %02d:%02d %s", hour, minute, formattedDate);
     }
 
 }

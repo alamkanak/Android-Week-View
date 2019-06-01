@@ -20,6 +20,9 @@ data class WeekViewEvent<T> internal constructor(
     val isNotAllDay: Boolean
         get() = isAllDay.not()
 
+    internal val isMultiDay: Boolean
+        get() = isSameDay(endTime).not()
+
     internal fun getEffectiveStartMinutes(config: WeekViewConfigWrapper): Int {
         val startHour = startTime.hour - config.minHour
         return startHour * MINUTES_PER_HOUR + startTime.minute

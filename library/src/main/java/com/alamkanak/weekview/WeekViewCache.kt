@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
 import androidx.collection.ArrayMap
-import java.util.*
+import java.util.Calendar
 
 internal class WeekViewCache<T>(
     private val eventSplitter: WeekViewEventSplitter<T>
@@ -93,6 +93,7 @@ internal class WeekViewCache<T>(
         fetchedPeriods: FetchPeriods
     ) {
         allEventChips.clear()
+
         sortAndCacheEvents(previousPeriodEvents)
         sortAndCacheEvents(currentPeriodEvents)
         sortAndCacheEvents(nextPeriodEvents)

@@ -122,7 +122,7 @@ internal val Calendar.isToday: Boolean
     get() = isSameDate(today())
 
 internal fun Calendar.toEpochDays(): Int {
-    return (timeInMillis / DAY_IN_MILLIS).toInt()
+    return (atStartOfDay.timeInMillis / DAY_IN_MILLIS).toInt()
 }
 
 internal val Calendar.lengthOfMonth: Int
