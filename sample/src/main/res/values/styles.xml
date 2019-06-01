@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/toolbar</item>
         <item name="colorPrimaryDark">#BBB</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -12,13 +11,13 @@
 
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">#EEE</item>
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/toolbar</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@android:color/white</item>
     </style>
 
     <style name="Button">
         <item name="android:background">?selectableItemBackground</item>
         <item name="android:gravity">left|center_vertical</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">@dimen/default_space</item>
         <item name="android:textAllCaps">false</item>
     </style>
 

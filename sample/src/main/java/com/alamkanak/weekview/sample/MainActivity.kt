@@ -2,9 +2,10 @@ package com.alamkanak.weekview.sample
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.alamkanak.weekview.sample.util.EqualSpacingItemDecoration
+import kotlinx.android.synthetic.main.activity_main.recyclerView
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,35 +13,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<View>(R.id.buttonBasic).setOnClickListener {
-            val intent = Intent(this@MainActivity, BaseActivity::class.java)
-            startActivity(intent)
-        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = SamplesAdapter(SAMPLES, this::onItemClick)
 
-        findViewById<View>(R.id.buttonStatic).setOnClickListener {
-            val intent = Intent(this@MainActivity, StaticActivity::class.java)
-            startActivity(intent)
-        }
+        val spacing = Math.round(resources.getDimension(R.dimen.default_space))
+        recyclerView.addItemDecoration(EqualSpacingItemDecoration(spacing))
+    }
 
-        findViewById<View>(R.id.buttonConstraint).setOnClickListener {
-            val intent = Intent(this@MainActivity, ConstraintActivity::class.java)
-            startActivity(intent)
-        }
+    private fun onItemClick(sample: Sample) {
+        val intent = Intent(this, sample.activity)
+        startActivity(intent)
+    }
 
-        findViewById<View>(R.id.buttonAsynchronous).setOnClickListener {
-            val intent = Intent(this@MainActivity, AsyncActivity::class.java)
-            startActivity(intent)
-        }
+    private companion object {
 
-        findViewById<View>(R.id.buttonLimited).setOnClickListener {
-            val intent = Intent(this@MainActivity, LimitedActivity::class.java)
-            startActivity(intent)
-        }
+        private val SAMPLES = listOf(
+            Sample(R.string.title_activity_basic, BaseActivity::class.java),
+            Sample(R.string.title_activity_static, StaticActivity::class.java),
+            Sample(R.string.title_activity_constraint, ConstraintActivity::class.java),
+            Sample(R.string.title_activity_limited, LimitedActivity::class.java),
+            Sample(R.string.title_activity_custom_font, CustomFontActivity::class.java),
+            Sample(R.string.title_activity_asynchronous, AsyncActivity::class.java)
+        )
 
-        findViewById<View>(R.id.buttonCustomFont).setOnClickListener {
-            val intent = Intent(this@MainActivity, CustomFontActivity::class.java)
-            startActivity(intent)
-        }
     }
 
 }
