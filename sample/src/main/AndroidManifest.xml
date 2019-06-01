@@ -35,6 +35,9 @@
         <activity
             android:name=".LimitedActivity"
             android:label="@string/week_view" />
+        <activity
+            android:name=".CustomFontActivity"
+            android:label="@string/week_view" />
     </application>
 
 </manifest>

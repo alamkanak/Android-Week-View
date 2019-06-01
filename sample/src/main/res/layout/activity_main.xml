@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonBasic"
         style="@style/Button"
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonStatic"
         style="@style/Button"
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonLimited"
         style="@style/Button"
         android:layout_width="match_parent"
@@ -42,7 +42,7 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonConstraint"
         style="@style/Button"
         android:layout_width="match_parent"
@@ -54,7 +54,19 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonCustomFont"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/title_activity_custom_font" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonAsynchronous"
         style="@style/Button"
         android:layout_width="match_parent"

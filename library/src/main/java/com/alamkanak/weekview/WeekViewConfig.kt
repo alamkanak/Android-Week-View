@@ -212,11 +212,40 @@ internal class WeekViewConfig(
             scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, 250)
 
             // Font
-            val fontFamily = a.getString(R.styleable.WeekView_fontFamily)
-            typeface = Typeface.create(fontFamily, Typeface.NORMAL)
+            val fontFamily: String? = a.getString(R.styleable.WeekView_fontFamily)
+            val typeface = a.getInteger(R.styleable.WeekView_typeface, 0)
+            val textStyle = a.getInteger(R.styleable.WeekView_textStyle, 0)
+            setTypefaceFromAttrs(fontFamily, typeface, textStyle)
         } finally {
             a.recycle()
         }
+    }
+
+    private fun setTypefaceFromAttrs(
+        familyName: String?,
+        typefaceIndex: Int,
+        styleIndex: Int
+    ) {
+        if (familyName != null) {
+            val tf = Typeface.create(familyName, styleIndex)
+            if (tf != null) {
+                typeface = tf
+                return
+            }
+        }
+
+        typeface = when (typefaceIndex) {
+            SANS -> Typeface.SANS_SERIF
+            SERIF -> Typeface.SERIF
+            MONOSPACE -> Typeface.MONOSPACE
+            else -> typeface
+        }
+    }
+
+    private companion object {
+        private const val SANS = 1
+        private const val SERIF = 2
+        private const val MONOSPACE = 3
     }
 
 }

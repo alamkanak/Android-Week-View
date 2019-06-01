@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.StaticLayout
 import android.util.AttributeSet
@@ -13,7 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.ViewCompat
 import com.alamkanak.weekview.Constants.UNINITIALIZED
-import java.util.*
+import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.round
@@ -1033,6 +1034,19 @@ class WeekView<T> @JvmOverloads constructor(
      */
     val firstVisibleHour: Double
         get() = (configWrapper.currentOrigin.y * -1 / configWrapper.hourHeight).toDouble()
+
+    /////////////////////////////////////////////////////////////////
+    //
+    //  Fonts
+    //
+    /////////////////////////////////////////////////////////////////
+
+    var typeface: Typeface
+        get() = configWrapper.typeface
+        set(value) {
+            configWrapper.typeface = value
+            invalidate()
+        }
 
     /////////////////////////////////////////////////////////////////
     //
