@@ -7,10 +7,12 @@ import android.graphics.Typeface
 import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
-import android.text.TextUtils
+import android.text.TextUtils.TruncateAt.END
+import android.text.TextUtils.ellipsize
 import android.text.style.StyleSpan
 import android.util.Pair
-import java.util.*
+import java.util.ArrayList
+import java.util.Calendar
 
 internal class EventsDrawer<T>(
     private val config: WeekViewConfigWrapper,
@@ -124,20 +126,19 @@ internal class EventsDrawer<T>(
             return null
         }
 
-        val stringBuilder = SpannableStringBuilder(event.title)
-        stringBuilder.setSpan(StyleSpan(Typeface.BOLD), 0, stringBuilder.length, 0)
+        val text = SpannableStringBuilder(event.title)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
 
         event.location?.let {
-            stringBuilder.append(' ')
-            stringBuilder.append(it)
+            text.append(' ')
+            text.append(it)
         }
 
         val availableWidth = (right - left - (config.eventPadding * 2).toFloat()).toInt()
 
         // Get text dimensions.
         val textPaint = event.getTextPaint(config)
-        var textLayout = StaticLayout(
-            stringBuilder, textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
+        val textLayout = StaticLayout(text, textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
 
         val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -148,26 +149,50 @@ internal class EventsDrawer<T>(
         // Compute the available height on the right size of the chip
         val availableHeight = (rect.bottom - top - (config.eventPadding * 2).toFloat()).toInt()
 
-        if (availableHeight >= lineHeight) {
-            var availableLineCount = availableHeight / lineHeight
-            do {
-                // Ellipsize text to fit into event rect.
-                val availableArea = availableLineCount * availableWidth
-                val ellipsized = TextUtils.ellipsize(stringBuilder, textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
-                val width = (right - left - (config.eventPadding * 2).toFloat()).toInt()
-                textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
-
-                // Reduce line count.
-                availableLineCount--
-
-                // Repeat until text is short enough.
-            } while (textLayout.height > availableHeight)
+        val finalTextLayout = if (availableHeight >= lineHeight) {
+            ellipsizeTextToFitChip(eventChip, text, textLayout, config, availableHeight, availableWidth)
+        } else {
+            textLayout
         }
 
         // Refresh the header height
         if (chipHeight > config.getCurrentAllDayEventHeight()) {
             config.setCurrentAllDayEventHeight(chipHeight)
         }
+
+        return finalTextLayout
+    }
+
+    private fun ellipsizeTextToFitChip(
+        eventChip: EventChip<T>,
+        text: CharSequence,
+        staticLayout: StaticLayout,
+        config: WeekViewConfigWrapper,
+        availableHeight: Int,
+        availableWidth: Int
+    ): StaticLayout {
+        var textLayout = staticLayout
+        val textPaint = eventChip.event.getTextPaint(config)
+
+        val lineHeight = textLayout.lineHeight
+        var availableLineCount = availableHeight / lineHeight
+
+        val rect = checkNotNull(eventChip.rect)
+        val left = rect.left
+        val right = rect.right
+
+        do {
+            // Ellipsize text to fit into event rect.
+            val availableArea = availableLineCount * availableWidth
+            val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
+            val width = (right - left - (config.eventPadding * 2).toFloat()).toInt()
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+
+            // Reduce line count.
+            availableLineCount--
+
+            // Repeat until text is short enough.
+        } while (textLayout.height > availableHeight)
 
         return textLayout
     }

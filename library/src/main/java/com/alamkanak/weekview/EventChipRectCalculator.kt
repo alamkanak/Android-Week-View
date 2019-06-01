@@ -35,8 +35,8 @@ internal class EventChipRectCalculator<T>(
     }
 
     private fun calculateVerticalDistanceFromTopOrBottom(value: Float): Float {
-        val foo = config.hourHeight * config.hoursPerDay * value / config.minutesPerDay
-        return foo + config.currentOrigin.y + config.headerHeight - config.eventMarginVertical
+        val pixelsFromTop = config.hourHeight * config.hoursPerDay * value / config.minutesPerDay
+        return pixelsFromTop + config.currentOrigin.y + config.headerHeight - config.eventMarginVertical
     }
 
     fun calculateAllDayEvent(

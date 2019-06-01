@@ -7,7 +7,8 @@ import android.graphics.Typeface
 import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
-import android.text.TextUtils
+import android.text.TextUtils.TruncateAt.END
+import android.text.TextUtils.ellipsize
 import android.text.style.StyleSpan
 import android.view.MotionEvent
 
@@ -131,69 +132,51 @@ internal class EventChip<T>(
     ) {
         val rect = checkNotNull(rect)
 
-        val negativeWidth = rect.right - rect.left - (config.eventPadding * 2).toFloat() < 0
-        val negativeHeight = rect.bottom - rect.top - (config.eventPadding * 2).toFloat() < 0
+        val negativeWidth = rect.right - rect.left - (config.eventPadding * 2f) < 0
+        val negativeHeight = rect.bottom - rect.top - (config.eventPadding * 2f) < 0
         if (negativeWidth || negativeHeight) {
             return
         }
 
         // Prepare the name of the event.
-        val stringBuilder = SpannableStringBuilder(event.title)
-        stringBuilder.setSpan(StyleSpan(Typeface.BOLD), 0, stringBuilder.length, 0)
+        val text = SpannableStringBuilder(event.title)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
 
         // Prepare the location of the event.
         if (event.location != null) {
-            stringBuilder.append(' ')
-            stringBuilder.append(event.location)
+            text.append(' ')
+            text.append(event.location)
         }
 
-        val availableHeight = (rect.bottom - rect.top - (config.eventPadding * 2).toFloat()).toInt()
-        val availableWidth = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+        val availableHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()
+        val availableWidth = (rect.right - rect.left - (config.eventPadding * 2f)).toInt()
 
         // Get text dimensions.
-        val didAvailableAreaChange = availableWidth != availableWidthCache || availableHeight != availableHeightCache
+        val didAvailableAreaChange =
+            availableWidth != availableWidthCache || availableHeight != availableHeightCache
         val isCached = layoutCache != null
 
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(config)
-            var textLayout = StaticLayout(stringBuilder,
+            val textLayout = StaticLayout(text,
                 textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
 
-            val lineHeight = textLayout.height / textLayout.lineCount
+            val lineHeight = textLayout.lineHeight
 
-            if (availableHeight >= lineHeight) {
+            val finalTextLayout = if (availableHeight >= lineHeight) {
                 // The text fits into the chip, so we just need to ellipsize it
-                var availableLineCount = availableHeight / lineHeight
-                do {
-                    // Ellipsize text to fit into event rect.
-                    val availableArea = availableLineCount * availableWidth
-                    val ellipsized = TextUtils.ellipsize(stringBuilder,
-                        textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
-
-                    val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-                    textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
-
-                    // Repeat until text is short enough.
-                    availableLineCount--
-                } while (textLayout.height > availableHeight)
+                ellipsizeTextToFitChip(text, textLayout, config, availableHeight, availableWidth)
             } else if (config.adaptiveEventTextSize) {
-                // The text doesn't fit into the chip, so we need to gradually reduce its size until it does
-                do {
-                    textPaint.textSize -= 1f
-
-                    val adaptiveLineCount = availableHeight / textLayout.lineHeight
-                    val availableArea = adaptiveLineCount * availableWidth
-                    val ellipsized = TextUtils.ellipsize(stringBuilder,
-                        textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
-
-                    val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-                    textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
-                } while (availableHeight <= textLayout.lineHeight)
+                // The text doesn't fit into the chip, so we need to gradually reduce its size
+                // until it does
+                scaleTextIntoChip(text, textLayout, config, availableHeight, availableWidth)
+            } else {
+                textLayout
             }
 
             availableWidthCache = availableWidth
             availableHeightCache = availableHeight
-            layoutCache = textLayout
+            layoutCache = finalTextLayout
         }
 
         layoutCache?.let {
@@ -201,6 +184,63 @@ internal class EventChip<T>(
                 drawEventTitle(config, it, canvas)
             }
         }
+    }
+
+    private fun ellipsizeTextToFitChip(
+        text: CharSequence,
+        staticLayout: StaticLayout,
+        config: WeekViewConfigWrapper,
+        availableHeight: Int,
+        availableWidth: Int
+    ): StaticLayout {
+        // The text fits into the chip, so we just need to ellipsize it
+        var textLayout = staticLayout
+
+        val textPaint = event.getTextPaint(config)
+        val lineHeight = textLayout.lineHeight
+
+        var availableLineCount = availableHeight / lineHeight
+        val rect = checkNotNull(rect)
+
+        do {
+            // Ellipsize text to fit into event rect.
+            val availableArea = availableLineCount * availableWidth
+            val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
+
+            val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+
+            // Repeat until text is short enough.
+            availableLineCount--
+        } while (textLayout.height > availableHeight)
+
+        return textLayout
+    }
+
+    private fun scaleTextIntoChip(
+        text: CharSequence,
+        staticLayout: StaticLayout,
+        config: WeekViewConfigWrapper,
+        availableHeight: Int,
+        availableWidth: Int
+    ): StaticLayout {
+        // The text doesn't fit into the chip, so we need to gradually reduce its size until it does
+        var textLayout = staticLayout
+        val textPaint = event.getTextPaint(config)
+        val rect = checkNotNull(rect)
+
+        do {
+            textPaint.textSize -= 1f
+
+            val adaptiveLineCount = availableHeight / textLayout.lineHeight
+            val availableArea = adaptiveLineCount * availableWidth
+            val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
+
+            val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+        } while (availableHeight <= textLayout.lineHeight)
+
+        return textLayout
     }
 
     private fun drawEventTitle(
@@ -245,8 +285,5 @@ internal class EventChip<T>(
             e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
         } ?: false
     }
-
-    private val StaticLayout.lineHeight: Int
-        get() = height / lineCount
 
 }
