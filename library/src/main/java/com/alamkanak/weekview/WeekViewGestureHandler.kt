@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.OverScroller
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -84,8 +85,8 @@ internal class WeekViewGestureHandler<T>(
             return true
         }
 
-        val absDistanceX = Math.abs(distanceX)
-        val absDistanceY = Math.abs(distanceY)
+        val absDistanceX = abs(distanceX)
+        val absDistanceY = abs(distanceY)
 
         val canScrollHorizontally = config.horizontalScrollingEnabled
 
@@ -141,7 +142,7 @@ internal class WeekViewGestureHandler<T>(
             return true
         }
 
-        if (currentFlingDirection == Direction.LEFT && !config.horizontalScrollingEnabled ||
+        if (currentFlingDirection == Direction.LEFT && !config.horizontalFlingEnabled ||
             currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled ||
             currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled) {
             return true
@@ -190,8 +191,8 @@ internal class WeekViewGestureHandler<T>(
         val velocityX = 0
         val velocityY = originalVelocityY.toInt()
 
-        val minX = Integer.MIN_VALUE
-        val maxX = Integer.MAX_VALUE
+        val minX = Int.MIN_VALUE
+        val maxX = Int.MAX_VALUE
 
         val dayHeight = config.hourHeight * config.hoursPerDay
         val viewHeight = WeekView.height
@@ -217,9 +218,9 @@ internal class WeekViewGestureHandler<T>(
 
         // If the tap was on in an empty space, then trigger the callback.
         val timeColumnWidth = config.timeColumnWidth
+        val isWithinCalendarArea = e.x > timeColumnWidth && e.y > config.headerHeight
 
-        if (emptyViewClickListener != null
-            && e.x > timeColumnWidth && e.y > config.headerHeight) {
+        if (emptyViewClickListener != null && isWithinCalendarArea) {
             val selectedTime = touchHandler.getTimeFromPoint(e)
             if (selectedTime != null) {
                 emptyViewClickListener?.onEmptyViewClicked(selectedTime)

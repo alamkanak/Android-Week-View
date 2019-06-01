@@ -7,7 +7,7 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
-import java.util.*
+import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
 
@@ -226,7 +226,7 @@ internal class WeekViewConfigWrapper(
     val minX: Float
         get() {
             return maxDate?.let {
-                val date = it.plusDays(1L - numberOfVisibleDays)
+                val date = it.minusDays(numberOfVisibleDays - 1)
                 getXOriginForDate(date)
             } ?: Float.NEGATIVE_INFINITY
         }

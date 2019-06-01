@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
 import android.view.MotionEvent
-import java.util.*
+import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -21,17 +21,19 @@ internal class WeekViewTouchHandler(
         val originX = config.currentOrigin.x
         val timeColumnWidth = config.timeColumnWidth
 
-        val leftDaysWithGaps = (ceil((originX / totalDayWidth).toDouble()) * -1).toInt()
-        var startPixel = originX + totalDayWidth * leftDaysWithGaps + timeColumnWidth
+        val daysFromOrigin = (ceil((originX / totalDayWidth).toDouble()) * -1).toInt()
+        var startPixel = originX + daysFromOrigin * totalDayWidth + timeColumnWidth
 
-        val begin = leftDaysWithGaps + 1
-        val end = leftDaysWithGaps + config.numberOfVisibleDays + 1
+        val firstDay = daysFromOrigin + 1
+        val lastDay = firstDay + config.numberOfVisibleDays
 
-        for (dayNumber in begin..end) {
+        for (dayNumber in firstDay..lastDay) {
             val start = max(startPixel, timeColumnWidth)
+            val end = startPixel + totalDayWidth
+            val width = end - start
 
-            val isVisibleHorizontally = startPixel + widthPerDay - start > 0
-            val isWithinDay = (event.x > start) and (event.x < startPixel + totalDayWidth)
+            val isVisibleHorizontally = width > 0
+            val isWithinDay = event.x in start..end
 
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now().plusDays(dayNumber - 1)
@@ -39,9 +41,11 @@ internal class WeekViewTouchHandler(
                 val originY = config.currentOrigin.y
                 val hourHeight = config.hourHeight
 
-                val pixelsFromZero = event.y - originY - config.headerHeight
-                val hour = (pixelsFromZero / hourHeight).toInt()
-                val minutes = (60 * (pixelsFromZero - hour * hourHeight) / hourHeight).toInt()
+                val pixelsFromMidnight = event.y - originY - config.headerHeight
+                val hour = (pixelsFromMidnight / hourHeight).toInt()
+
+                val pixelsFromFullHour = pixelsFromMidnight - hour * hourHeight
+                val minutes = (pixelsFromFullHour / hourHeight).toInt() * 60
 
                 return day.withTime(config.minHour + hour, minutes)
             }
