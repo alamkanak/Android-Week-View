@@ -6,7 +6,8 @@ import android.content.Context
 import android.text.format.DateFormat
 import com.alamkanak.weekview.Constants.DAY_IN_MILLIS
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 object Month {
     const val JANUARY = 1
@@ -227,4 +228,11 @@ internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
 internal fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
     val format = if (DateFormat.is24HourFormat(context)) "HH:mm" else "hh a"
     return SimpleDateFormat(format, Locale.getDefault())
+}
+
+internal fun Calendar.format(
+    format: Int = java.text.DateFormat.MEDIUM
+): String {
+    val sdf = SimpleDateFormat.getDateInstance(format)
+    return sdf.format(time)
 }

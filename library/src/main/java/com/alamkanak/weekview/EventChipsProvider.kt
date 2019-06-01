@@ -75,96 +75,136 @@ internal class EventChipsProvider<T>(
 
     private fun calculateEventChipPositions() {
         val results = mutableListOf<EventChip<T>>()
+        val groups = cache.allEventChips.groupBy { it.event.startTime.atStartOfDay }
 
-        cache.allEventChips
-            .groupBy { it.event.startTime }
-            .values
-            .forEach { eventChips ->
-                computePositionOfEvents(eventChips)
-                results += eventChips
-            }
+        for (eventChips in groups.values) {
+            computePositionOfEvents(eventChips)
+            results += eventChips
+        }
 
         cache.put(results)
     }
 
+    /**
+     * Forms [CollisionGroup]s for all event chips and uses them to expand the [EventChip]s to their
+     * maximum width.
+     *
+     * @param eventChips A list of [EventChip]s
+     */
     private fun computePositionOfEvents(eventChips: List<EventChip<T>>) {
-        // Make "collision groups" for all events that collide with others.
-        val collisionGroups = mutableListOf<MutableList<EventChip<T>>>()
+        val collisionGroups = mutableListOf<CollisionGroup<T>>()
+
         for (eventChip in eventChips) {
-            var isPlaced = false
+            val collidingGroup = collisionGroups.firstOrNull { it.collidesWith(eventChip) }
 
-            outerLoop@ for (collisionGroup in collisionGroups) {
-                for (groupEvent in collisionGroup) {
-                    if (groupEvent.event.collidesWith(eventChip.event)
-                        && groupEvent.event.isAllDay == eventChip.event.isAllDay) {
-                        collisionGroup.add(eventChip)
-                        isPlaced = true
-                        break@outerLoop
-                    }
-                }
-            }
-
-            if (!isPlaced) {
-                collisionGroups += mutableListOf(eventChip)
+            if (collidingGroup != null) {
+                collidingGroup.add(eventChip)
+            } else {
+                collisionGroups += CollisionGroup(eventChip)
             }
         }
 
         for (collisionGroup in collisionGroups) {
-            expandEventsToMaxWidth(collisionGroup)
+            expandEventsToMaxWidth(collisionGroup.eventChips)
         }
     }
 
-    private fun expandEventsToMaxWidth(collisionGroup: List<EventChip<T>>) {
-        // Expand the events to maximum possible width.
-        val columns = mutableListOf<MutableList<EventChip<T>>>()
-        columns.add(mutableListOf())
+    /**
+     * Expand all [EventChip]s in a [CollisionGroup] to their maximum width.
+     *
+     * @param eventChips The [EventChip]s of a [CollisionGroup]
+     */
+    private fun expandEventsToMaxWidth(eventChips: List<EventChip<T>>) {
+        val columns = mutableListOf<Column<T>>(Column())
 
-        for (eventChip in collisionGroup) {
-            var isPlaced = false
-
-            for (column in columns) {
-                if (column.isEmpty()) {
-                    column.add(eventChip)
-                    isPlaced = true
-                } else if (!eventChip.event.collidesWith(column[column.size - 1].event)) {
-                    column.add(eventChip)
-                    isPlaced = true
-                    break
-                }
-            }
-
-            if (!isPlaced) {
-                columns += mutableListOf(eventChip)
+        for (eventChip in eventChips) {
+            val fittingColumn = columns.firstOrNull { it.fits(eventChip) }
+            if (fittingColumn != null) {
+                fittingColumn.add(eventChip)
+            } else {
+                columns += Column(eventChip)
             }
         }
 
-        // Calculate left and right position for all the events.
-        // Get the maxRowCount by looking in all columns.
-        var maxRowCount = 0
-        for (column in columns) {
-            maxRowCount = Math.max(maxRowCount, column.size)
-        }
+        val rows = columns.map { it.size }.max() ?: 0
 
-        for (i in 0 until maxRowCount) {
-            // Set the left and right values of the event.
-            var j = 0f
-            for (column in columns) {
-                if (column.size >= i + 1) {
-                    val eventChip = column[i]
+        for (row in 0 until rows) {
+            columns.forEachIndexed { index, column ->
+                val hasEventInRow = column.size > row
+
+                if (hasEventInRow) {
+                    val eventChip = column[row]
+
+                    // Every column gets the same width. For instance, if there are four columns,
+                    // then each column's width is 0.25.
                     eventChip.width = 1f / columns.size
-                    eventChip.left = j / columns.size
 
-                    if (!eventChip.event.isAllDay) {
-                        eventChip.top = eventChip.event.getEffectiveStartMinutes(config).toFloat()
-                        eventChip.bottom = eventChip.event.getEffectiveEndMinutes(config).toFloat()
-                    } else {
-                        eventChip.top = 0f
-                        eventChip.bottom = 100f
-                    }
+                    // The start position is calculated based on the index of the column. For
+                    // instance, if there are four columns, the start positions will be 0, 0.25, 0.5
+                    // and 0.75.
+                    eventChip.left = index.toFloat() / columns.size
+
+                    eventChip.calculateTopAndBottom(config)
                 }
-                j++
             }
         }
+    }
+
+    /**
+     * This class encapsulates [EventChip]s that collide with each other, meaning that they overlap
+     * from a time perspective.
+     *
+     */
+    private class CollisionGroup<T>(
+        val eventChips: MutableList<EventChip<T>>
+    ) {
+
+        constructor(eventChip: EventChip<T>) : this(mutableListOf(eventChip))
+
+        /**
+         * Returns whether an [EventChip] collides with any [EventChip] already in the
+         * [CollisionGroup].
+         *
+         * @param eventChip An [EventChip]
+         * @return Whether a collision exists
+         */
+        fun collidesWith(eventChip: EventChip<T>): Boolean {
+            return eventChips.any { it.event.collidesWith(eventChip.event) }
+        }
+
+        fun add(eventChip: EventChip<T>) {
+            eventChips.add(eventChip)
+        }
+
+    }
+
+    /**
+     * This class encapsulates [EventChip]s that are displayed in the same column.
+     */
+    private class Column<T>(
+        val eventChips: MutableList<EventChip<T>> = mutableListOf()
+    ) {
+
+        constructor(eventChip: EventChip<T>) : this(mutableListOf(eventChip))
+
+        val isEmpty: Boolean
+            get() = eventChips.isEmpty()
+
+        val size: Int
+            get() = eventChips.size
+
+        fun add(eventChip: EventChip<T>) {
+            eventChips.add(eventChip)
+        }
+
+        operator fun get(index: Int): EventChip<T> {
+            return eventChips[index]
+        }
+
+        fun fits(eventChip: EventChip<T>): Boolean {
+            return isEmpty || !eventChips.last().event.collidesWith(eventChip.event)
+        }
+
     }
 
 }

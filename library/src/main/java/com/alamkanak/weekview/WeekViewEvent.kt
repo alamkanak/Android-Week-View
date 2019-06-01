@@ -4,7 +4,7 @@ import android.graphics.Paint
 import android.text.TextPaint
 import androidx.annotation.ColorInt
 import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
-import java.util.*
+import java.util.Calendar
 
 data class WeekViewEvent<T> internal constructor(
     var id: Long = 0L,
@@ -38,7 +38,7 @@ data class WeekViewEvent<T> internal constructor(
         return startTime.hour >= minHour && endTime.hour <= maxHour
     }
 
-    val hasBorder: Boolean
+    internal val hasBorder: Boolean
         get() = style.borderWidth > 0
 
     internal fun getColorOrDefault(config: WeekViewConfigWrapper): Int {
@@ -62,6 +62,10 @@ data class WeekViewEvent<T> internal constructor(
     }
 
     internal fun collidesWith(other: WeekViewEvent<T>): Boolean {
+        if (isAllDay != other.isAllDay) {
+            return false
+        }
+
         if (startTime.isEqual(other.startTime) && endTime.isEqual(other.endTime)) {
             // Complete overlap
             return true
@@ -75,14 +79,14 @@ data class WeekViewEvent<T> internal constructor(
             other.endTime = other.endTime.minusMillis(1)
         }
 
-        return !startTime.isAfter(other.endTime) && endTime.isBefore(other.startTime)
+        return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime)
     }
 
-    fun startsOnEarlierDay(originalEvent: WeekViewEvent<T>): Boolean {
+    internal fun startsOnEarlierDay(originalEvent: WeekViewEvent<T>): Boolean {
         return !startTime.isEqual(originalEvent.startTime)
     }
 
-    fun endsOnLaterDay(originalEvent: WeekViewEvent<T>): Boolean {
+    internal fun endsOnLaterDay(originalEvent: WeekViewEvent<T>): Boolean {
         return !endTime.isEqual(originalEvent.endTime)
     }
 

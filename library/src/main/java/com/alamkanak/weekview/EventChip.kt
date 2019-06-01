@@ -229,6 +229,17 @@ internal class EventChip<T>(
         paint.style = Paint.Style.STROKE
     }
 
+    fun calculateTopAndBottom(config: WeekViewConfigWrapper) {
+        if (event.isNotAllDay) {
+            top = event.getEffectiveStartMinutes(config).toFloat()
+            bottom = event.getEffectiveEndMinutes(config).toFloat()
+        } else {
+            // TODO
+            top = 0f
+            bottom = 100f
+        }
+    }
+
     fun isHit(e: MotionEvent): Boolean {
         return rect?.let {
             e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
