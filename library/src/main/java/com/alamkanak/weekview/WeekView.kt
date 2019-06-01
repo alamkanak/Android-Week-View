@@ -1160,6 +1160,7 @@ class WeekView<T> @JvmOverloads constructor(
         set(value) {
             configWrapper.dateTimeInterpreter = value
             dayLabelDrawer.clearLabelCache()
+            timeColumnDrawer.clearLabelCache()
         }
 
 }

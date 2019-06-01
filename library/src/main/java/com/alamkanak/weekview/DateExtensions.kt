@@ -219,9 +219,9 @@ internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
 
 internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     return when (numberOfDays) {
-        7 -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character
         1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // display full weekday
-        else -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display first three characters
+        in 2..6 -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display first three characters
+        else -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character
     }
 }
 

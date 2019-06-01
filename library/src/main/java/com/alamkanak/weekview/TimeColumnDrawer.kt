@@ -6,11 +6,15 @@ import android.util.SparseArray
 internal class TimeColumnDrawer(
     private val config: WeekViewConfigWrapper
 ) {
-    private val times = SparseArray<String>()
+    private val timeLabelCache = SparseArray<String>()
 
     init {
+        cacheTimeLabels()
+    }
+
+    private fun cacheTimeLabels() {
         for (hour in config.startHour until config.hoursPerDay step config.timeColumnHoursInterval) {
-            times.put(hour, config.dateTimeInterpreter.interpretTime(hour + config.minHour))
+            timeLabelCache.put(hour, config.dateTimeInterpreter.interpretTime(hour + config.minHour))
         }
     }
 
@@ -43,7 +47,7 @@ internal class TimeColumnDrawer(
                     y += config.timeTextHeight / 2 + config.hourSeparatorPaint.strokeWidth + config.timeColumnPadding
                 }
 
-                canvas.drawText(times[hour], x, y, config.timeTextPaint)
+                canvas.drawText(timeLabelCache[hour], x, y, config.timeTextPaint)
 
                 if (config.showTimeColumnHourSeparator && hour > 0) {
                     val j = hour - 1
@@ -67,6 +71,11 @@ internal class TimeColumnDrawer(
         }
 
         canvas.restore()
+    }
+
+    fun clearLabelCache() {
+        timeLabelCache.clear()
+        cacheTimeLabels()
     }
 
 }
