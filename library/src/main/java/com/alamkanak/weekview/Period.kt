@@ -38,7 +38,7 @@ internal data class Period(val month: Int, val year: Int) {
     internal companion object {
 
         fun fromDate(date: Calendar): Period {
-            val month = date.month
+            val month = Month.fromJavaCalendar(date.month)
             val year = date.year
             return Period(month, year)
         }

@@ -149,7 +149,7 @@ internal class WeekViewConfigWrapper(
     var maxDate: Calendar? = null
 
     private var _dateTimeInterpreter: DateTimeInterpreter =
-        DefaultDateTimeInterpreter(context, numberOfVisibleDays)
+        DefaultDateTimeInterpreter(RealDateFormatProvider(context), numberOfVisibleDays)
 
     var dateTimeInterpreter: DateTimeInterpreter
         get() = _dateTimeInterpreter

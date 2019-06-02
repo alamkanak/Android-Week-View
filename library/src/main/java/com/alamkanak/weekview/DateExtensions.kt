@@ -1,17 +1,27 @@
-@file:JvmName("DateUtils")
-
 package com.alamkanak.weekview
 
-import android.content.Context
-import android.text.format.DateFormat
 import com.alamkanak.weekview.Constants.DAY_IN_MILLIS
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-object Month {
+internal object Month {
     const val JANUARY = 1
+    const val FEBRUARY = 2
+    const val MARCH = 3
+    const val APRIL = 4
+    const val MAY = 5
+    const val JUNE = 6
+    const val JULY = 7
+    const val AUGUST = 8
+    const val SEPTEMBER = 9
+    const val OCTOBER = 10
+    const val NOVEMBER = 11
     const val DECEMBER = 12
+
+    fun fromJavaCalendar(value: Int): Int = value + 1
+
+    fun toJavaCalendar(value: Int): Int = value - 1
 }
 
 internal object DayOfWeek {
@@ -61,6 +71,11 @@ internal val Calendar.dayOfWeek: Int
     get() {
         val dayOfWeekView = get(Calendar.DAY_OF_WEEK)
         return DayOfWeek.fromJavaCalendar(dayOfWeekView)
+    }
+
+internal val Calendar.dayOfMonth: Int
+    get() {
+        return get(Calendar.DAY_OF_MONTH)
     }
 
 internal val Calendar.month: Int
@@ -170,8 +185,8 @@ internal fun firstDayOfYear(): Calendar {
         .withDayOfMonth(1)
 }
 
-internal fun getDateRange(daysSinceToday: Int, size: Int): List<Calendar> {
-    return (daysSinceToday..size).map { today().plusDays(it - 1) }
+internal fun getDateRange(start: Int, end: Int): List<Calendar> {
+    return (start..end).map { today().plusDays(it - 1) }
 }
 
 internal val Calendar.isWeekend: Boolean
@@ -234,8 +249,8 @@ internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     }
 }
 
-internal fun getDefaultTimeFormat(context: Context): SimpleDateFormat {
-    val format = if (DateFormat.is24HourFormat(context)) "HH:mm" else "hh a"
+internal fun getDefaultTimeFormat(is24HourFormat: Boolean): SimpleDateFormat {
+    val format = if (is24HourFormat) "HH:mm" else "hh a"
     return SimpleDateFormat(format, Locale.getDefault())
 }
 
