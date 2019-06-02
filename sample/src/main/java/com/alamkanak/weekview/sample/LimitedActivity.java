@@ -2,16 +2,17 @@ package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.alamkanak.weekview.EmptyViewLongPressListener;
-import com.alamkanak.weekview.EventClickListener;
-import com.alamkanak.weekview.EventLongPressListener;
-import com.alamkanak.weekview.MonthChangeListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.alamkanak.weekview.OnEmptyViewLongPressListener;
+import com.alamkanak.weekview.OnEventClickListener;
+import com.alamkanak.weekview.OnEventLongPressListener;
+import com.alamkanak.weekview.OnMonthChangeListener;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
@@ -33,8 +34,8 @@ import static java.util.Calendar.DAY_OF_MONTH;
  * Created by cs8898 on 2/11/2019.
  */
 public class LimitedActivity extends AppCompatActivity
-        implements EventClickListener<Event>, MonthChangeListener<Event>,
-        EventLongPressListener<Event>, EmptyViewLongPressListener {
+        implements OnEventClickListener<Event>, OnMonthChangeListener<Event>,
+        OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
@@ -54,9 +55,9 @@ public class LimitedActivity extends AppCompatActivity
 
         mWeekView = findViewById(R.id.weekView);
         mWeekView.setOnEventClickListener(this);
-        mWeekView.setMonthChangeListener(this);
-        mWeekView.setEventLongPressListener(this);
-        mWeekView.setEmptyViewLongPressListener(this);
+        mWeekView.setOnMonthChangeListener(this);
+        mWeekView.setOnEventLongPressListener(this);
+        mWeekView.setOnEmptyViewLongPressListener(this);
 
         Calendar now = Calendar.getInstance();
 

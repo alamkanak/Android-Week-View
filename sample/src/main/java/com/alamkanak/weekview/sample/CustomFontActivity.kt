@@ -6,10 +6,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alamkanak.weekview.EmptyViewLongPressListener
-import com.alamkanak.weekview.EventClickListener
-import com.alamkanak.weekview.EventLongPressListener
-import com.alamkanak.weekview.MonthChangeListener
+import com.alamkanak.weekview.OnEmptyViewLongPressListener
+import com.alamkanak.weekview.OnEventClickListener
+import com.alamkanak.weekview.OnEventLongPressListener
+import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.apiclient.Event
@@ -18,8 +18,8 @@ import com.alamkanak.weekview.sample.database.FakeEventsDatabase
 import java.util.Calendar
 import java.util.Locale
 
-open class CustomFontActivity : AppCompatActivity(), EventClickListener<Event>, MonthChangeListener<Event>,
-    EventLongPressListener<Event>, EmptyViewLongPressListener {
+open class CustomFontActivity : AppCompatActivity(), OnEventClickListener<Event>,
+    OnMonthChangeListener<Event>, OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
 
     private var weekViewType = TYPE_THREE_DAY_VIEW
     private lateinit var weekView: WeekView<Event>
@@ -34,9 +34,9 @@ open class CustomFontActivity : AppCompatActivity(), EventClickListener<Event>, 
 
         weekView = findViewById(R.id.weekView)
         weekView.onEventClickListener = this
-        weekView.monthChangeListener = this
-        weekView.eventLongPressListener = this
-        weekView.emptyViewLongPressListener = this
+        weekView.onMonthChangeListener = this
+        weekView.onEventLongPressListener = this
+        weekView.onEmptyViewLongPressListener = this
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

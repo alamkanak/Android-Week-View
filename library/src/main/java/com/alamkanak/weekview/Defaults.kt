@@ -2,7 +2,8 @@ package com.alamkanak.weekview
 
 import android.content.Context
 import android.graphics.Color
-import android.util.TypedValue
+import android.util.TypedValue.COMPLEX_UNIT_SP
+import android.util.TypedValue.applyDimension
 
 internal class Defaults {
 
@@ -23,7 +24,7 @@ internal class Defaults {
 
         private fun convertTextDimension(context: Context, textSize: Int): Int {
             val displayMetrics = context.resources.displayMetrics
-            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize.toFloat(), displayMetrics).toInt()
+            return applyDimension(COMPLEX_UNIT_SP, textSize.toFloat(), displayMetrics).toInt()
         }
 
     }

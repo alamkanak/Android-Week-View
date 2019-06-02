@@ -2,7 +2,8 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import java.util.*
+import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
+import java.util.Calendar
 import kotlin.math.max
 
 internal class DayBackgroundDrawer(
@@ -10,12 +11,10 @@ internal class DayBackgroundDrawer(
 ) {
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        drawingContext
-            .dateRangeWithStartPixels
-            .forEach { (date, startPixel) ->
-                val startX = max(startPixel, config.timeColumnWidth)
-                drawDayBackground(date, startX, startPixel, canvas)
-            }
+        drawingContext.dateRangeWithStartPixels.forEach { (date, startPixel) ->
+            val startX = max(startPixel, config.timeColumnWidth)
+            drawDayBackground(date, startX, startPixel, canvas)
+        }
     }
 
     private fun drawDayBackground(
@@ -44,7 +43,7 @@ internal class DayBackgroundDrawer(
                 else -> canvas.drawRect(startX, startY, endX, height, futurePaint)
             }
         } else {
-            val todayPaint = config.getTodayBackgroundPaint(day.isToday)
+            val todayPaint = config.getDayBackgroundPaint(day.isToday)
             val right = startPixel + config.widthPerDay
             canvas.drawRect(startX, config.headerHeight, right, height, todayPaint)
         }
@@ -53,7 +52,7 @@ internal class DayBackgroundDrawer(
     private fun drawPastAndFutureRect(startX: Float, startY: Float, endX: Float, pastPaint: Paint,
                                       futurePaint: Paint, height: Float, canvas: Canvas) {
         val now = now()
-        val beforeNow = (now.hour + now.minute / 60.0f) * config.hourHeight
+        val beforeNow = (now.hour + now.minute / MINUTES_PER_HOUR) * config.hourHeight
         canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint)
         canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint)
     }

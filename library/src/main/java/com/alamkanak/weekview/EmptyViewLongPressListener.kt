@@ -1,9 +1,9 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import java.util.Calendar
 
 @FunctionalInterface
-interface EmptyViewLongPressListener {
+interface OnEmptyViewLongPressListener {
 
     /**
      * Called when an empty area of [WeekView] is long-clicked.

@@ -1,9 +1,9 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import java.util.Calendar
 
 @FunctionalInterface
-interface MonthChangeListener<T> {
+interface OnMonthChangeListener<T> {
 
     /**
      * Called when the month displayed in the [WeekView] changes.

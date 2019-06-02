@@ -60,11 +60,11 @@ internal class WeekViewGestureHandler<T>(
     private val minimumFlingVelocity = ViewConfiguration.get(view.context).scaledMinimumFlingVelocity
     private val scaledTouchSlop = ViewConfiguration.get(view.context).scaledTouchSlop
 
-    var eventClickListener: EventClickListener<T>? = null
-    var eventLongPressListener: EventLongPressListener<T>? = null
+    var onEventClickListener: OnEventClickListener<T>? = null
+    var onEventLongPressListener: OnEventLongPressListener<T>? = null
 
-    var emptyViewClickListener: EmptyViewClickListener? = null
-    var emptyViewLongPressListener: EmptyViewLongPressListener? = null
+    var onEmptyViewClickListener: OnEmptyViewClickListener? = null
+    var onEmptyViewLongPressListener: OnEmptyViewLongPressListener? = null
 
     var scrollListener: ScrollListener? = null
 
@@ -206,7 +206,7 @@ internal class WeekViewGestureHandler<T>(
     override fun onSingleTapConfirmed(
         e: MotionEvent
     ): Boolean {
-        eventClickListener?.let { listener ->
+        onEventClickListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
             val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
                 "Did you pass the original object into the constructor of WeekViewEvent?")
@@ -220,10 +220,10 @@ internal class WeekViewGestureHandler<T>(
         val timeColumnWidth = config.timeColumnWidth
         val isWithinCalendarArea = e.x > timeColumnWidth && e.y > config.headerHeight
 
-        if (emptyViewClickListener != null && isWithinCalendarArea) {
-            val selectedTime = touchHandler.getTimeFromPoint(e)
+        if (onEmptyViewClickListener != null && isWithinCalendarArea) {
+            val selectedTime = touchHandler.calculateTimeFromPoint(e)
             if (selectedTime != null) {
-                emptyViewClickListener?.onEmptyViewClicked(selectedTime)
+                onEmptyViewClickListener?.onEmptyViewClicked(selectedTime)
             }
         }
 
@@ -233,7 +233,7 @@ internal class WeekViewGestureHandler<T>(
     override fun onLongPress(e: MotionEvent) {
         super.onLongPress(e)
 
-        eventLongPressListener?.let { listener ->
+        onEventLongPressListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
             val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
                 "Did you pass the original object into the constructor of WeekViewEvent?")
@@ -245,9 +245,9 @@ internal class WeekViewGestureHandler<T>(
         val timeColumnWidth = config.timeColumnWidth
 
         // If the tap was on in an empty space, then trigger the callback.
-        emptyViewLongPressListener?.let { listener ->
+        onEmptyViewLongPressListener?.let { listener ->
             if (e.x > timeColumnWidth && e.y > config.headerHeight) {
-                val selectedTime = touchHandler.getTimeFromPoint(e) ?: return@let
+                val selectedTime = touchHandler.calculateTimeFromPoint(e) ?: return@let
                 listener.onEmptyViewLongPress(selectedTime)
             }
         }

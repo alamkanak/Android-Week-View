@@ -602,7 +602,7 @@ internal class WeekViewConfigWrapper(
         return if (useWeekendColor) futureWeekendBackgroundPaint else futureBackgroundPaint
     }
 
-    fun getTodayBackgroundPaint(isToday: Boolean): Paint {
+    fun getDayBackgroundPaint(isToday: Boolean): Paint {
         return if (isToday) todayBackgroundPaint else dayBackgroundPaint
     }
 

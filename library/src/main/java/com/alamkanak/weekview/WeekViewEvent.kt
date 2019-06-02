@@ -41,13 +41,6 @@ data class WeekViewEvent<T> internal constructor(
         return startTime.hour >= minHour && endTime.hour <= maxHour
     }
 
-    internal val hasBorder: Boolean
-        get() = style.borderWidth > 0
-
-    internal fun getColorOrDefault(config: WeekViewConfigWrapper): Int {
-        return if (style.backgroundColor != 0) style.backgroundColor else config.defaultEventColor
-    }
-
     internal fun getTextPaint(config: WeekViewConfigWrapper): TextPaint {
         val textPaint = if (isAllDay) {
             config.allDayEventTextPaint
@@ -86,11 +79,11 @@ data class WeekViewEvent<T> internal constructor(
     }
 
     internal fun startsOnEarlierDay(originalEvent: WeekViewEvent<T>): Boolean {
-        return !startTime.isEqual(originalEvent.startTime)
+        return startTime.isNotEqual(originalEvent.startTime)
     }
 
     internal fun endsOnLaterDay(originalEvent: WeekViewEvent<T>): Boolean {
-        return !endTime.isEqual(originalEvent.endTime)
+        return endTime.isNotEqual(originalEvent.endTime)
     }
 
     override fun compareTo(other: WeekViewEvent<T>): Int {
@@ -119,6 +112,13 @@ data class WeekViewEvent<T> internal constructor(
 
         var borderColor: Int = 0
             private set
+
+        internal val hasBorder: Boolean
+            get() = borderWidth > 0
+
+        internal fun getBackgroundColorOrDefault(config: WeekViewConfigWrapper): Int {
+            return if (backgroundColor != 0) backgroundColor else config.defaultEventColor
+        }
 
         class Builder {
 

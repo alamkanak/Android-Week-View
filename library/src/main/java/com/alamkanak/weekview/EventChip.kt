@@ -59,7 +59,7 @@ internal class EventChip<T>(
         setBackgroundPaint(config, paint)
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
 
-        if (event.hasBorder) {
+        if (event.style.hasBorder) {
             setBorderPaint(paint)
             val borderWidth = event.style.borderWidth
 
@@ -99,7 +99,7 @@ internal class EventChip<T>(
             canvas.drawRect(bottomRect, backgroundPaint)
         }
 
-        if (!event.hasBorder) {
+        if (!event.style.hasBorder) {
             return
         }
 
@@ -258,7 +258,7 @@ internal class EventChip<T>(
     }
 
     private fun setBackgroundPaint(config: WeekViewConfigWrapper, paint: Paint) {
-        paint.color = event.getColorOrDefault(config)
+        paint.color = event.style.getBackgroundColorOrDefault(config)
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
     }

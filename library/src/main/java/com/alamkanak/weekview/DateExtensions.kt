@@ -77,6 +77,10 @@ internal fun Calendar.isEqual(other: Calendar): Boolean {
     return timeInMillis == other.timeInMillis
 }
 
+internal fun Calendar.isNotEqual(other: Calendar): Boolean {
+    return timeInMillis != other.timeInMillis
+}
+
 internal fun Calendar.plusDays(days: Int): Calendar {
     return copy().apply {
         add(Calendar.DATE, days)
@@ -139,6 +143,11 @@ internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
 internal val Calendar.atStartOfDay: Calendar
     get() {
         return withTimeAtStartOfPeriod(0)
+    }
+
+internal val Calendar.atEndOfDay: Calendar
+    get() {
+        return withTimeAtEndOfPeriod(24)
     }
 
 internal val Calendar.daysFromToday: Int

@@ -2,19 +2,27 @@ package com.alamkanak.weekview.sample
 
 import android.graphics.RectF
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.SeekBar
 import android.widget.Toast
-import com.alamkanak.weekview.*
+import androidx.appcompat.app.AppCompatActivity
+import com.alamkanak.weekview.DateTimeInterpreter
+import com.alamkanak.weekview.OnEmptyViewLongPressListener
+import com.alamkanak.weekview.OnEventClickListener
+import com.alamkanak.weekview.OnEventLongPressListener
+import com.alamkanak.weekview.OnMonthChangeListener
+import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.database.EventsDatabase
 import com.alamkanak.weekview.sample.database.FakeEventsDatabase
-import kotlinx.android.synthetic.main.activity_constraint.*
+import kotlinx.android.synthetic.main.activity_constraint.guideline
+import kotlinx.android.synthetic.main.activity_constraint.seekBar
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
-class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, MonthChangeListener<Event>,
-        EventLongPressListener<Event>, EmptyViewLongPressListener {
+class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
+    OnMonthChangeListener<Event>, OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
 
     private val weekView: WeekView<Event> by lazy { findViewById<WeekView<Event>>(R.id.weekView) }
     private val database: EventsDatabase by lazy { FakeEventsDatabase(this) }
@@ -24,9 +32,9 @@ class ConstraintActivity : AppCompatActivity(), EventClickListener<Event>, Month
         setContentView(R.layout.activity_constraint)
 
         weekView.onEventClickListener = this
-        weekView.monthChangeListener = this
-        weekView.eventLongPressListener = this
-        weekView.emptyViewLongPressListener = this
+        weekView.onMonthChangeListener = this
+        weekView.onEventLongPressListener = this
+        weekView.onEmptyViewLongPressListener = this
 
         setupSeekBarAction()
         setupDateTimeInterpreter()

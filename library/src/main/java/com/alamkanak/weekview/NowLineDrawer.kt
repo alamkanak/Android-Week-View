@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import kotlin.math.max
 
 internal class NowLineDrawer(
@@ -26,7 +27,7 @@ internal class NowLineDrawer(
         val top = config.headerHeight + config.currentOrigin.y
         val now = now()
 
-        val portionOfDay = (now.hour - config.minHour) + now.minute / 60.0f
+        val portionOfDay = (now.hour - config.minHour) + now.minute / MINUTES_PER_HOUR
         val portionOfDayInPixels = portionOfDay * config.hourHeight
         val lineY = top + portionOfDayInPixels
         val endX = startPixel + config.widthPerDay

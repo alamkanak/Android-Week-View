@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import java.util.Calendar
 
 internal data class FetchPeriods(
     val previous: Period,
@@ -12,7 +12,7 @@ internal data class FetchPeriods(
 
         fun create(firstVisibleDay: Calendar): FetchPeriods {
             val current = Period.fromDate(firstVisibleDay)
-            return FetchPeriods(current.previous(), current, current.next())
+            return FetchPeriods(current.previous, current, current.next)
         }
 
     }
@@ -21,17 +21,19 @@ internal data class FetchPeriods(
 
 internal data class Period(val month: Int, val year: Int) {
 
-    fun previous(): Period {
-        val year = if (month == Month.JANUARY) year - 1 else year
-        val month = if (month == Month.JANUARY) Month.DECEMBER else month - 1
-        return Period(month, year)
-    }
+    val previous: Period
+        get() {
+            val year = if (month == Month.JANUARY) year - 1 else year
+            val month = if (month == Month.JANUARY) Month.DECEMBER else month - 1
+            return Period(month, year)
+        }
 
-    fun next(): Period {
-        val year = if (month == Month.DECEMBER) year + 1 else year
-        val month = if (month == Month.DECEMBER) Month.JANUARY else month + 1
-        return Period(month, year)
-    }
+    val next: Period
+        get() {
+            val year = if (month == Month.DECEMBER) year + 1 else year
+            val month = if (month == Month.DECEMBER) Month.JANUARY else month + 1
+            return Period(month, year)
+        }
 
     internal companion object {
 

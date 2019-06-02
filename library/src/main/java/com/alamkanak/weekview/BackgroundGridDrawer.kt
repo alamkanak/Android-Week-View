@@ -13,13 +13,12 @@ internal class BackgroundGridDrawer(
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
         drawingContext.startPixels.forEach { startPixel ->
             val startX = max(startPixel, config.timeColumnWidth)
-            hourLines = createHourLines()
             drawGrid(startX, startPixel, canvas)
         }
     }
 
     private fun createHourLines(): FloatArray {
-        val height = WeekView.width
+        val height = WeekView.height
 
         val headerHeight = config.getTotalHeaderHeight()
         val gridHeight = height - headerHeight.toInt()
@@ -32,6 +31,7 @@ internal class BackgroundGridDrawer(
 
     private fun drawGrid(startX: Float, startPixel: Float, canvas: Canvas) {
         if (config.showHourSeparators) {
+            hourLines = createHourLines()
             drawHourLines(startX, startPixel, canvas)
         }
 

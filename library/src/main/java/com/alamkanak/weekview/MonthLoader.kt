@@ -7,21 +7,24 @@ package com.alamkanak.weekview
  * [WeekViewEvent].
  */
 internal class MonthLoader<T>(
-    var onMonthChangeListener: MonthChangeListener<T>?
+    var onMonthChangeListener: OnMonthChangeListener<T>?
 ) {
 
     fun load(period: Period): List<WeekViewEvent<T>> {
-        val (month, year) = period
+        val listener = checkNotNull(onMonthChangeListener) {
+            "No OnMonthChangeListener found. Provide one via weekView.setOnMonthChangeListener()."
+        }
 
         val startDate = today()
-            .withYear(year)
-            .withMonth(month)
+            .withYear(period.year)
+            .withMonth(period.month)
             .withDayOfMonth(1)
 
         val maxDays = startDate.lengthOfMonth
-        val endDate = startDate.withDayOfMonth(maxDays)
+        val endDate = startDate
+            .withDayOfMonth(maxDays)
+            .atEndOfDay
 
-        val listener = onMonthChangeListener ?: return emptyList()
         return listener
             .onMonthChange(startDate, endDate)
             .map { it.toWeekViewEvent() }

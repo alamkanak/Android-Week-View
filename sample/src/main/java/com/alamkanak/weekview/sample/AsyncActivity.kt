@@ -3,18 +3,21 @@ package com.alamkanak.weekview.sample
 import android.app.ProgressDialog
 import android.graphics.RectF
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.alamkanak.weekview.*
+import androidx.appcompat.app.AppCompatActivity
+import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.WeekViewDisplayable
+import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.apiclient.ApiEvent
 import com.alamkanak.weekview.sample.apiclient.MyJsonService
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
 import retrofit.client.Response
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
 
@@ -37,9 +40,9 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
 
         weekView = findViewById(R.id.weekView)
         weekView.setOnEventClickListener(this::onEventClick)
-        weekView.setEventLongPressListener(this::onEventLongPress)
-        weekView.setMonthChangeListener(this::onMonthChange)
-        weekView.setEmptyViewLongPressListener(this::onEmptyViewLongPress)
+        weekView.setOnEventLongPressListener(this::onEventLongPress)
+        weekView.setOnMonthChangeListener(this::onMonthChange)
+        weekView.setOnEmptyViewLongPressListener(this::onEmptyViewLongPress)
 
         progressDialog.show()
     }

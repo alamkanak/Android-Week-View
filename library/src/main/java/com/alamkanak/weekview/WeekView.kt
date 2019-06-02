@@ -1054,23 +1054,23 @@ class WeekView<T> @JvmOverloads constructor(
     //
     /////////////////////////////////////////////////////////////////
 
-    var onEventClickListener: EventClickListener<T>?
-        get() = gestureHandler.eventClickListener
+    var onEventClickListener: OnEventClickListener<T>?
+        get() = gestureHandler.onEventClickListener
         set(value) {
-            gestureHandler.eventClickListener = value
+            gestureHandler.onEventClickListener = value
         }
 
     fun setOnEventClickListener(
         block: (data: T, rect: RectF) -> Unit
     ) {
-        onEventClickListener = object : EventClickListener<T> {
+        onEventClickListener = object : OnEventClickListener<T> {
             override fun onEventClick(data: T, eventRect: RectF) {
                 block(data, eventRect)
             }
         }
     }
 
-    var monthChangeListener: MonthChangeListener<T>?
+    var onMonthChangeListener: OnMonthChangeListener<T>?
         get() {
             return eventChipsProvider.monthLoader?.onMonthChangeListener
         }
@@ -1078,10 +1078,10 @@ class WeekView<T> @JvmOverloads constructor(
             eventChipsProvider.monthLoader = MonthLoader(value)
         }
 
-    fun setMonthChangeListener(
+    fun setOnMonthChangeListener(
         block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
     ) {
-        monthChangeListener = object : MonthChangeListener<T> {
+        onMonthChangeListener = object : OnMonthChangeListener<T> {
             override fun onMonthChange(
                 startDate: Calendar,
                 endDate: Calendar
@@ -1091,48 +1091,48 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
-    var eventLongPressListener: EventLongPressListener<T>?
-        get() = gestureHandler.eventLongPressListener
+    var onEventLongPressListener: OnEventLongPressListener<T>?
+        get() = gestureHandler.onEventLongPressListener
         set(value) {
-            gestureHandler.eventLongPressListener = value
+            gestureHandler.onEventLongPressListener = value
         }
 
-    fun setEventLongPressListener(
+    fun setOnEventLongPressListener(
         block: (data: T, rect: RectF) -> Unit
     ) {
-        eventLongPressListener = object : EventLongPressListener<T> {
+        onEventLongPressListener = object : OnEventLongPressListener<T> {
             override fun onEventLongPress(data: T, eventRect: RectF) {
                 block(data, eventRect)
             }
         }
     }
 
-    var emptyViewClickListener: EmptyViewClickListener?
-        get() = gestureHandler.emptyViewClickListener
+    var onEmptyViewClickListener: OnEmptyViewClickListener?
+        get() = gestureHandler.onEmptyViewClickListener
         set(value) {
-            gestureHandler.emptyViewClickListener = value
+            gestureHandler.onEmptyViewClickListener = value
         }
 
     fun setEmptyViewClickListener(
         block: (time: Calendar) -> Unit
     ) {
-        emptyViewClickListener = object : EmptyViewClickListener {
+        onEmptyViewClickListener = object : OnEmptyViewClickListener {
             override fun onEmptyViewClicked(time: Calendar) {
                 block(time)
             }
         }
     }
 
-    var emptyViewLongPressListener: EmptyViewLongPressListener?
-        get() = gestureHandler.emptyViewLongPressListener
+    var onEmptyViewLongPressListener: OnEmptyViewLongPressListener?
+        get() = gestureHandler.onEmptyViewLongPressListener
         set(value) {
-            gestureHandler.emptyViewLongPressListener = value
+            gestureHandler.onEmptyViewLongPressListener = value
         }
 
-    fun setEmptyViewLongPressListener(
+    fun setOnEmptyViewLongPressListener(
         block: (time: Calendar) -> Unit
     ) {
-        emptyViewLongPressListener = object : EmptyViewLongPressListener {
+        onEmptyViewLongPressListener = object : OnEmptyViewLongPressListener {
             override fun onEmptyViewLongPress(time: Calendar) {
                 block(time)
             }

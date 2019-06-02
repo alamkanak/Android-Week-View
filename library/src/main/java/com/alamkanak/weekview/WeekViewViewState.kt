@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
 import java.lang.Math.max
-import java.util.*
+import java.util.Calendar
 
 internal class WeekViewViewState(
     private val configWrapper: WeekViewConfigWrapper,
@@ -21,27 +21,27 @@ internal class WeekViewViewState(
     var requiresPostInvalidateOnAnimation: Boolean = false
 
     fun update() {
-        val totalHeaderHeight = configWrapper.getTotalHeaderHeight()
+        val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()
 
         val totalHeight = WeekView.height
-        val dynamicHourHeight = ((totalHeight - totalHeaderHeight) / configWrapper.hoursPerDay).toInt()
+        val dynamicHourHeight = (totalHeight - totalHeaderHeight) / configWrapper.hoursPerDay
 
-        configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
+        if (areDimensionsInvalid) {
+            configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
 
-        areDimensionsInvalid = false
-        scrollToDay?.let {
-            isFirstDraw = false
-            listener.goToDate(it)
+            scrollToDay?.let {
+                isFirstDraw = false
+                listener.goToDate(it)
+            }
+
+            scrollToHour?.let {
+                listener.goToHour(it)
+            }
+
+            scrollToDay = null
+            scrollToHour = null
+            areDimensionsInvalid = false
         }
-
-        areDimensionsInvalid = false
-        scrollToHour?.let {
-            listener.goToHour(it)
-        }
-
-        scrollToDay = null
-        scrollToHour = null
-        areDimensionsInvalid = false
     }
 
     fun invalidate() {

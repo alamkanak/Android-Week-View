@@ -15,7 +15,7 @@ internal class WeekViewTouchHandler(
      * @param event The [MotionEvent] of the touch event.
      * @return The [Calendar] with the time and date of the clicked position.
      */
-    fun getTimeFromPoint(event: MotionEvent): Calendar? {
+    fun calculateTimeFromPoint(event: MotionEvent): Calendar? {
         val widthPerDay = config.widthPerDay
         val totalDayWidth = widthPerDay + config.columnGap
         val originX = config.currentOrigin.x

@@ -11,7 +11,7 @@ internal class WeekViewEventSplitter<T>(
         return if (isAtStartOfNewPeriod) {
             listOf(shortenTooLongAllDayEvent(event))
         } else if (event.isMultiDay) {
-            splitEventByDays(event)
+            splitEventByDates(event)
         } else {
             listOf(event)
         }
@@ -24,7 +24,7 @@ internal class WeekViewEventSplitter<T>(
         return event.copy(endTime = newEndTime)
     }
 
-    private fun splitEventByDays(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
+    private fun splitEventByDates(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         val results = mutableListOf<WeekViewEvent<T>>()
 
         val firstEventEnd = event.startTime.withTimeAtEndOfPeriod(config.maxHour)
