@@ -426,7 +426,7 @@ internal class WeekViewConfigWrapper(
         get() = config.maxHour - config.minHour
 
     val minutesPerDay: Int
-        get() = hoursPerDay * Constants.MINUTES_PER_HOUR
+        get() = (hoursPerDay * Constants.MINUTES_PER_HOUR).toInt()
 
     val startHour: Int
         get() = if (showMidnightHour && showTimeColumnHourSeparator) minHour else timeColumnHoursInterval

@@ -13,8 +13,8 @@ import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.apiclient.Event
-import com.alamkanak.weekview.sample.database.EventsDatabase
-import com.alamkanak.weekview.sample.database.FakeEventsDatabase
+import com.alamkanak.weekview.sample.data.EventsDatabase
+import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import java.util.Calendar
 import java.util.Locale
 

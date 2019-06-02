@@ -25,12 +25,12 @@ data class WeekViewEvent<T> internal constructor(
 
     internal fun getEffectiveStartMinutes(config: WeekViewConfigWrapper): Int {
         val startHour = startTime.hour - config.minHour
-        return startHour * MINUTES_PER_HOUR + startTime.minute
+        return startHour * MINUTES_PER_HOUR.toInt() + startTime.minute
     }
 
     internal fun getEffectiveEndMinutes(config: WeekViewConfigWrapper): Int {
         val endHour = endTime.hour - config.minHour
-        return endHour * MINUTES_PER_HOUR + endTime.minute
+        return endHour * MINUTES_PER_HOUR.toInt() + endTime.minute
     }
 
     internal fun isSameDay(other: Calendar): Boolean {

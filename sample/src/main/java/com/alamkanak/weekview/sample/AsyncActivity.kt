@@ -11,21 +11,19 @@ import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.apiclient.ApiEvent
-import com.alamkanak.weekview.sample.apiclient.MyJsonService
-import retrofit.Callback
-import retrofit.RestAdapter
-import retrofit.RetrofitError
-import retrofit.client.Response
+import com.alamkanak.weekview.sample.data.FakeEventsApi
 import java.util.Calendar
 import java.util.Locale
 
-class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
+class AsyncActivity : AppCompatActivity() {
 
     private val events = arrayListOf<WeekViewDisplayable<ApiEvent>>()
     private var calledNetwork = false
     private var weekViewType = TYPE_THREE_DAY_VIEW
 
     private lateinit var weekView: WeekView<ApiEvent>
+
+    private val apiService = FakeEventsApi(this)
 
     private val progressDialog: ProgressDialog by lazy {
         ProgressDialog(this).apply {
@@ -108,15 +106,9 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
         val newYear = startDate.get(Calendar.YEAR)
         val newMonth = startDate.get(Calendar.MONTH)
 
-        // Download events from network if it hasn't been done already. To understand how events are
-        // downloaded using retrofit, visit http://square.github.io/retrofit
+        // Fetch events from network if it hasn't been done already
         if (!calledNetwork) {
-            val retrofit = RestAdapter.Builder()
-                    .setEndpoint("https://api.myjson.com/bins")
-                    .build()
-
-            val service = retrofit.create(MyJsonService::class.java)
-            service.listEvents(this)
+            apiService.fetchEvents(this::onEventsFetched)
             calledNetwork = true
         }
 
@@ -137,18 +129,12 @@ class AsyncActivity : AppCompatActivity(), Callback<List<ApiEvent>> {
                 && event.endTime.get(Calendar.MONTH) == month - 1
     }
 
-    override fun success(events: List<ApiEvent>, response: Response) {
+    private fun onEventsFetched(events: List<ApiEvent>) {
         this.events.clear()
         this.events.addAll(events)
 
         progressDialog.dismiss()
         weekView.notifyDataSetChanged()
-    }
-
-    override fun failure(error: RetrofitError) {
-        error.printStackTrace()
-        progressDialog.dismiss()
-        Toast.makeText(this, R.string.async_error, Toast.LENGTH_SHORT).show()
     }
 
     private fun onEventClick(event: ApiEvent, eventRect: RectF) {
