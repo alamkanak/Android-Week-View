@@ -48,7 +48,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val headerRowDrawer = HeaderRowDrawer(configWrapper, cache, viewState)
     private val dayLabelDrawer = DayLabelDrawer(configWrapper)
-    private val eventsDrawer = EventsDrawer(configWrapper, cache)
+    private val eventsDrawer = EventsDrawer(context, configWrapper, cache)
     private val timeColumnDrawer = TimeColumnDrawer(configWrapper)
     private val dayBackgroundDrawer = DayBackgroundDrawer(configWrapper)
     private val backgroundGridDrawer = BackgroundGridDrawer(configWrapper)

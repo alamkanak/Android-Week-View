@@ -1,8 +1,11 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.graphics.Paint
 import android.text.TextPaint
 import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.Calendar
 
@@ -41,14 +44,23 @@ data class WeekViewEvent<T> internal constructor(
         return startTime.hour >= minHour && endTime.hour <= maxHour
     }
 
-    internal fun getTextPaint(config: WeekViewConfigWrapper): TextPaint {
+    internal fun getTextPaint(
+        context: Context,
+        config: WeekViewConfigWrapper
+    ): TextPaint {
         val textPaint = if (isAllDay) {
             config.allDayEventTextPaint
         } else {
             config.eventTextPaint
         }
 
-        textPaint.color = if (style.textColor != 0) style.textColor else config.eventTextPaint.color
+        textPaint.color = when (val resource = style.textColorResource) {
+            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Value -> resource.color
+            null -> config.eventTextPaint.color
+        }
+
+        // textPaint.color = if (style.textColor != 0) style.textColor else config.eventTextPaint.color
 
         if (style.isTextStrikeThrough) {
             textPaint.flags = textPaint.flags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -96,28 +108,29 @@ data class WeekViewEvent<T> internal constructor(
 
     override fun toWeekViewEvent(): WeekViewEvent<T> = this
 
+    internal sealed class ColorResource {
+        data class Value(val color: Int) : ColorResource()
+        data class ResourceId(val colorResId: Int) : ColorResource()
+    }
+
     class Style {
 
-        var backgroundColor: Int = 0
+        internal var backgroundColorResource: ColorResource? = null
+        internal var textColorResource: ColorResource? = null
+
+        internal var isTextStrikeThrough: Boolean = false
             private set
 
-        var textColor: Int = 0
+        internal var borderWidth: Int = 0
             private set
 
-        var isTextStrikeThrough: Boolean = false
-            private set
-
-        var borderWidth: Int = 0
-            private set
-
-        var borderColor: Int = 0
-            private set
+        internal var borderColorResource: ColorResource? = null
 
         internal val hasBorder: Boolean
             get() = borderWidth > 0
 
-        internal fun getBackgroundColorOrDefault(config: WeekViewConfigWrapper): Int {
-            return if (backgroundColor != 0) backgroundColor else config.defaultEventColor
+        internal fun getBackgroundColorOrDefault(config: WeekViewConfigWrapper): ColorResource {
+            return backgroundColorResource ?: ColorResource.Value(config.defaultEventColor)
         }
 
         class Builder {
@@ -125,12 +138,22 @@ data class WeekViewEvent<T> internal constructor(
             private val style = Style()
 
             fun setBackgroundColor(@ColorInt color: Int): Builder {
-                style.backgroundColor = color
+                style.backgroundColorResource = ColorResource.Value(color)
+                return this
+            }
+
+            fun setBackgroundColorResource(@ColorRes colorResId: Int): Builder {
+                style.backgroundColorResource = ColorResource.ResourceId(colorResId)
                 return this
             }
 
             fun setTextColor(@ColorInt color: Int): Builder {
-                style.textColor = color
+                style.textColorResource = ColorResource.Value(color)
+                return this
+            }
+
+            fun setTextColorResource(@ColorRes colorResId: Int): Builder {
+                style.textColorResource = ColorResource.ResourceId(colorResId)
                 return this
             }
 
@@ -145,7 +168,12 @@ data class WeekViewEvent<T> internal constructor(
             }
 
             fun setBorderColor(@ColorInt color: Int): Builder {
-                style.borderColor = color
+                style.borderColorResource = ColorResource.Value(color)
+                return this
+            }
+
+            fun setBorderColorResource(@ColorRes colorResId: Int): Builder {
+                style.borderColorResource = ColorResource.ResourceId(colorResId)
                 return this
             }
 

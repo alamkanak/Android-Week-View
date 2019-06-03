@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
@@ -15,6 +16,7 @@ import java.util.ArrayList
 import java.util.Calendar
 
 internal class EventsDrawer<T>(
+    private val context: Context,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) {
@@ -55,7 +57,7 @@ internal class EventsDrawer<T>(
                 val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
                 if (chipRect.isValidSingleEventRect) {
                     it.rect = chipRect
-                    it.draw(config, canvas, paint)
+                    it.draw(context, config, canvas, paint)
                 } else {
                     it.rect = null
                 }
@@ -137,7 +139,7 @@ internal class EventsDrawer<T>(
         val availableWidth = (right - left - (config.eventPadding * 2).toFloat()).toInt()
 
         // Get text dimensions.
-        val textPaint = event.getTextPaint(config)
+        val textPaint = event.getTextPaint(context, config)
         val textLayout = StaticLayout(text, textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
 
         val lineHeight = textLayout.height / textLayout.lineCount
@@ -172,7 +174,7 @@ internal class EventsDrawer<T>(
         availableWidth: Int
     ): StaticLayout {
         var textLayout = staticLayout
-        val textPaint = eventChip.event.getTextPaint(config)
+        val textPaint = eventChip.event.getTextPaint(context, config)
 
         val lineHeight = textLayout.lineHeight
         var availableLineCount = availableHeight / lineHeight
@@ -215,7 +217,7 @@ internal class EventsDrawer<T>(
         for (pair in eventChips) {
             val eventChip = pair.first
             val layout = pair.second
-            eventChip.draw(config, layout, canvas, paint)
+            eventChip.draw(context, config, layout, canvas, paint)
         }
 
         // Hide events when they are in the top left corner

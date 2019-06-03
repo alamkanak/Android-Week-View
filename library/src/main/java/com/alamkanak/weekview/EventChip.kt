@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
@@ -11,6 +12,8 @@ import android.text.TextUtils.TruncateAt.END
 import android.text.TextUtils.ellipsize
 import android.text.style.StyleSpan
 import android.view.MotionEvent
+import androidx.core.content.ContextCompat
+import com.alamkanak.weekview.WeekViewEvent.ColorResource
 
 /**
  * A class to hold reference to the events and their visual representation. An EventRect is
@@ -42,25 +45,27 @@ internal class EventChip<T>(
     }
 
     internal fun draw(
+        context: Context,
         config: WeekViewConfigWrapper,
         canvas: Canvas,
         paint: Paint
     ) {
-        draw(config, null, canvas, paint)
+        draw(context, config, null, canvas, paint)
     }
 
     internal fun draw(
+        context: Context,
         config: WeekViewConfigWrapper,
         textLayout: StaticLayout?,
         canvas: Canvas,
         paint: Paint
     ) {
         val cornerRadius = config.eventCornerRadius.toFloat()
-        setBackgroundPaint(config, paint)
+        setBackgroundPaint(context, config, paint)
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
 
         if (event.style.hasBorder) {
-            setBorderPaint(paint)
+            setBorderPaint(context, paint)
             val borderWidth = event.style.borderWidth
 
             val rect = checkNotNull(rect)
@@ -79,7 +84,7 @@ internal class EventChip<T>(
         textLayout?.let {
             // The text height has already been calculated
             drawEventTitle(config, it, canvas)
-        } ?: calculateTextHeightAndDrawTitle(config, canvas)
+        } ?: calculateTextHeightAndDrawTitle(context, config, canvas)
     }
 
     private fun drawCornersForMultiDayEvents(
@@ -127,6 +132,7 @@ internal class EventChip<T>(
     }
 
     private fun calculateTextHeightAndDrawTitle(
+        context: Context,
         config: WeekViewConfigWrapper,
         canvas: Canvas
     ) {
@@ -157,7 +163,7 @@ internal class EventChip<T>(
         val isCached = layoutCache != null
 
         if (didAvailableAreaChange || !isCached) {
-            val textPaint = event.getTextPaint(config)
+            val textPaint = event.getTextPaint(context, config)
             val textLayout = StaticLayout(text,
                 textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
 
@@ -165,11 +171,11 @@ internal class EventChip<T>(
 
             val finalTextLayout = if (availableHeight >= lineHeight) {
                 // The text fits into the chip, so we just need to ellipsize it
-                ellipsizeTextToFitChip(text, textLayout, config, availableHeight, availableWidth)
+                ellipsizeTextToFitChip(context, text, textLayout, config, availableHeight, availableWidth)
             } else if (config.adaptiveEventTextSize) {
                 // The text doesn't fit into the chip, so we need to gradually reduce its size
                 // until it does
-                scaleTextIntoChip(text, textLayout, config, availableHeight, availableWidth)
+                scaleTextIntoChip(context, text, textLayout, config, availableHeight, availableWidth)
             } else {
                 textLayout
             }
@@ -187,6 +193,7 @@ internal class EventChip<T>(
     }
 
     private fun ellipsizeTextToFitChip(
+        context: Context,
         text: CharSequence,
         staticLayout: StaticLayout,
         config: WeekViewConfigWrapper,
@@ -196,7 +203,7 @@ internal class EventChip<T>(
         // The text fits into the chip, so we just need to ellipsize it
         var textLayout = staticLayout
 
-        val textPaint = event.getTextPaint(config)
+        val textPaint = event.getTextPaint(context, config)
         val lineHeight = textLayout.lineHeight
 
         var availableLineCount = availableHeight / lineHeight
@@ -218,6 +225,7 @@ internal class EventChip<T>(
     }
 
     private fun scaleTextIntoChip(
+        context: Context,
         text: CharSequence,
         staticLayout: StaticLayout,
         config: WeekViewConfigWrapper,
@@ -226,7 +234,7 @@ internal class EventChip<T>(
     ): StaticLayout {
         // The text doesn't fit into the chip, so we need to gradually reduce its size until it does
         var textLayout = staticLayout
-        val textPaint = event.getTextPaint(config)
+        val textPaint = event.getTextPaint(context, config)
         val rect = checkNotNull(rect)
 
         do {
@@ -257,14 +265,30 @@ internal class EventChip<T>(
         }
     }
 
-    private fun setBackgroundPaint(config: WeekViewConfigWrapper, paint: Paint) {
-        paint.color = event.style.getBackgroundColorOrDefault(config)
+    private fun setBackgroundPaint(
+        context: Context,
+        config: WeekViewConfigWrapper,
+        paint: Paint
+    ) {
+        val resource = event.style.getBackgroundColorOrDefault(config)
+
+        paint.color = when (resource) {
+            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Value -> resource.color
+        }
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
     }
 
-    private fun setBorderPaint(paint: Paint) {
-        paint.color = event.style.borderColor
+    private fun setBorderPaint(
+        context: Context,
+        paint: Paint
+    ) {
+        paint.color = when (val resource = event.style.borderColorResource) {
+            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Value -> resource.color
+            null -> 0
+        }
         paint.strokeWidth = event.style.borderWidth.toFloat()
         paint.style = Paint.Style.STROKE
     }
