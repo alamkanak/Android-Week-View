@@ -273,7 +273,7 @@ internal class EventChip<T>(
         val resource = event.style.getBackgroundColorOrDefault(config)
 
         paint.color = when (resource) {
-            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
             is ColorResource.Value -> resource.color
         }
         paint.strokeWidth = 0f
@@ -285,7 +285,7 @@ internal class EventChip<T>(
         paint: Paint
     ) {
         paint.color = when (val resource = event.style.borderColorResource) {
-            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
             is ColorResource.Value -> resource.color
             null -> 0
         }

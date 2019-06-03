@@ -55,7 +55,7 @@ data class WeekViewEvent<T> internal constructor(
         }
 
         textPaint.color = when (val resource = style.textColorResource) {
-            is ColorResource.ResourceId -> ContextCompat.getColor(context, resource.colorResId)
+            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
             is ColorResource.Value -> resource.color
             null -> config.eventTextPaint.color
         }
@@ -110,20 +110,15 @@ data class WeekViewEvent<T> internal constructor(
 
     internal sealed class ColorResource {
         data class Value(val color: Int) : ColorResource()
-        data class ResourceId(val colorResId: Int) : ColorResource()
+        data class Id(val resId: Int) : ColorResource()
     }
 
     class Style {
 
         internal var backgroundColorResource: ColorResource? = null
         internal var textColorResource: ColorResource? = null
-
         internal var isTextStrikeThrough: Boolean = false
-            private set
-
         internal var borderWidth: Int = 0
-            private set
-
         internal var borderColorResource: ColorResource? = null
 
         internal val hasBorder: Boolean
@@ -142,8 +137,8 @@ data class WeekViewEvent<T> internal constructor(
                 return this
             }
 
-            fun setBackgroundColorResource(@ColorRes colorResId: Int): Builder {
-                style.backgroundColorResource = ColorResource.ResourceId(colorResId)
+            fun setBackgroundColorResource(@ColorRes resId: Int): Builder {
+                style.backgroundColorResource = ColorResource.Id(resId)
                 return this
             }
 
@@ -152,8 +147,8 @@ data class WeekViewEvent<T> internal constructor(
                 return this
             }
 
-            fun setTextColorResource(@ColorRes colorResId: Int): Builder {
-                style.textColorResource = ColorResource.ResourceId(colorResId)
+            fun setTextColorResource(@ColorRes resId: Int): Builder {
+                style.textColorResource = ColorResource.Id(resId)
                 return this
             }
 
@@ -172,8 +167,8 @@ data class WeekViewEvent<T> internal constructor(
                 return this
             }
 
-            fun setBorderColorResource(@ColorRes colorResId: Int): Builder {
-                style.borderColorResource = ColorResource.ResourceId(colorResId)
+            fun setBorderColorResource(@ColorRes resId: Int): Builder {
+                style.borderColorResource = ColorResource.Id(resId)
                 return this
             }
 
