@@ -5,25 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-internal object Month {
-    const val JANUARY = 1
-    const val FEBRUARY = 2
-    const val MARCH = 3
-    const val APRIL = 4
-    const val MAY = 5
-    const val JUNE = 6
-    const val JULY = 7
-    const val AUGUST = 8
-    const val SEPTEMBER = 9
-    const val OCTOBER = 10
-    const val NOVEMBER = 11
-    const val DECEMBER = 12
-
-    fun fromJavaCalendar(value: Int): Int = value + 1
-
-    fun toJavaCalendar(value: Int): Int = value - 1
-}
-
 internal object DayOfWeek {
     const val MONDAY = 1
     const val TUESDAY = 2

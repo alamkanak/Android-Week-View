@@ -11,7 +11,7 @@ class PeriodTest {
         val period = Period.fromDate(firstDayOfYear())
         val previous = period.previous
 
-        assertEquals(previous.month, Month.DECEMBER)
+        assertEquals(previous.month, Calendar.DECEMBER)
         assertEquals(previous.year, period.year - 1)
     }
 
@@ -21,7 +21,7 @@ class PeriodTest {
         val period = Period.fromDate(date)
         val previous = period.previous
 
-        assertEquals(previous.month, Month.JULY)
+        assertEquals(previous.month, Calendar.JULY)
         assertEquals(previous.year, period.year)
     }
 
@@ -31,7 +31,7 @@ class PeriodTest {
         val period = Period.fromDate(date)
         val next = period.next
 
-        assertEquals(next.month, Month.SEPTEMBER)
+        assertEquals(next.month, Calendar.SEPTEMBER)
         assertEquals(next.year, period.year)
     }
 
@@ -41,7 +41,7 @@ class PeriodTest {
         val period = Period.fromDate(date)
         val next = period.next
 
-        assertEquals(next.month, Month.JANUARY)
+        assertEquals(next.month, Calendar.JANUARY)
         assertEquals(next.year, period.year + 1)
     }
 
