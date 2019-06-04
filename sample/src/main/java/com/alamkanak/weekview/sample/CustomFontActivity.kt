@@ -6,10 +6,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alamkanak.weekview.OnEmptyViewLongPressListener
-import com.alamkanak.weekview.OnEventClickListener
-import com.alamkanak.weekview.OnEventLongPressListener
-import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.apiclient.Event
@@ -18,8 +14,7 @@ import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import java.util.Calendar
 import java.util.Locale
 
-open class CustomFontActivity : AppCompatActivity(), OnEventClickListener<Event>,
-    OnMonthChangeListener<Event>, OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
+open class CustomFontActivity : AppCompatActivity() {
 
     private var weekViewType = TYPE_THREE_DAY_VIEW
     private lateinit var weekView: WeekView<Event>
@@ -33,10 +28,10 @@ open class CustomFontActivity : AppCompatActivity(), OnEventClickListener<Event>
         setContentView(R.layout.activity_custom_font)
 
         weekView = findViewById(R.id.weekView)
-        weekView.onEventClickListener = this
-        weekView.onMonthChangeListener = this
-        weekView.onEventLongPressListener = this
-        weekView.onEmptyViewLongPressListener = this
+        weekView.setOnEventClickListener(this::onEventClick)
+        weekView.setOnMonthChangeListener(this::onMonthChange)
+        weekView.setOnEventLongPressListener(this::onEventLongPress)
+        weekView.setOnEmptyViewLongPressListener(this::onEmptyViewLongPress)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -105,20 +100,30 @@ open class CustomFontActivity : AppCompatActivity(), OnEventClickListener<Event>
         return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth)
     }
 
-    override fun onMonthChange(startDate: Calendar,
-                               endDate: Calendar): List<WeekViewDisplayable<Event>> {
+    private fun onMonthChange(
+        startDate: Calendar,
+        endDate: Calendar
+    ): List<WeekViewDisplayable<Event>> {
         return database.getEventsInRange(startDate, endDate)
     }
 
-    override fun onEventClick(data: Event, eventRect: RectF) {
+    private fun onEventClick(
+        data: Event,
+        eventRect: RectF
+    ) {
         Toast.makeText(this, "Clicked " + data.title, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEventLongPress(data: Event, eventRect: RectF) {
+    private fun onEventLongPress(
+        data: Event,
+        eventRect: RectF
+    ) {
         Toast.makeText(this, "Long pressed event: " + data.title, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEmptyViewLongPress(time: Calendar) {
+    private fun onEmptyViewLongPress(
+        time: Calendar
+    ) {
         Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
     }
 
