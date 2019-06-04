@@ -10,14 +10,14 @@ import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.Calendar
 
 data class WeekViewEvent<T> internal constructor(
-    var id: Long = 0L,
-    var title: String = "",
-    var startTime: Calendar = now(),
-    var endTime: Calendar = now(),
-    var location: String? = null,
-    var isAllDay: Boolean = false,
-    var style: Style = Style(),
-    var data: T? = null
+    internal var id: Long = 0L,
+    internal var titleResource: TextResource? = null,
+    internal var startTime: Calendar = now(),
+    internal var endTime: Calendar = now(),
+    internal var locationResource: TextResource? = null,
+    internal var isAllDay: Boolean = false,
+    internal var style: Style = Style(),
+    internal var data: T? = null
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
 
     val isNotAllDay: Boolean
@@ -59,8 +59,6 @@ data class WeekViewEvent<T> internal constructor(
             is ColorResource.Value -> resource.color
             null -> config.eventTextPaint.color
         }
-
-        // textPaint.color = if (style.textColor != 0) style.textColor else config.eventTextPaint.color
 
         if (style.isTextStrikeThrough) {
             textPaint.flags = textPaint.flags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -111,6 +109,11 @@ data class WeekViewEvent<T> internal constructor(
     internal sealed class ColorResource {
         data class Value(val color: Int) : ColorResource()
         data class Id(val resId: Int) : ColorResource()
+    }
+
+    internal sealed class TextResource {
+        data class Value(val text: String) : TextResource()
+        data class Id(val resId: Int) : TextResource()
     }
 
     class Style {
@@ -190,7 +193,12 @@ data class WeekViewEvent<T> internal constructor(
         }
 
         fun setTitle(title: String): Builder<T> {
-            event.title = title
+            event.titleResource = TextResource.Value(title)
+            return this
+        }
+
+        fun setTitle(resId: Int): Builder<T> {
+            event.titleResource = TextResource.Id(resId)
             return this
         }
 
@@ -205,7 +213,12 @@ data class WeekViewEvent<T> internal constructor(
         }
 
         fun setLocation(location: String): Builder<T> {
-            event.location = location
+            event.locationResource = TextResource.Value(location)
+            return this
+        }
+
+        fun setLocation(resId: Int): Builder<T> {
+            event.locationResource = TextResource.Id(resId)
             return this
         }
 

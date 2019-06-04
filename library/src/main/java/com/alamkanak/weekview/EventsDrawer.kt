@@ -12,6 +12,7 @@ import android.text.TextUtils.TruncateAt.END
 import android.text.TextUtils.ellipsize
 import android.text.style.StyleSpan
 import android.util.Pair
+import com.alamkanak.weekview.WeekViewEvent.TextResource
 import java.util.ArrayList
 import java.util.Calendar
 
@@ -128,10 +129,22 @@ internal class EventsDrawer<T>(
             return null
         }
 
-        val text = SpannableStringBuilder(event.title)
+        val title = when (val resource = event.titleResource) {
+            is TextResource.Id -> context.getString(resource.resId)
+            is TextResource.Value -> resource.text
+            null -> TODO()
+        }
+
+        val text = SpannableStringBuilder(title)
         text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
 
-        event.location?.let {
+        val location = when (val resource = event.locationResource) {
+            is TextResource.Id -> context.getString(resource.resId)
+            is TextResource.Value -> resource.text
+            null -> null
+        }
+
+        location?.let {
             text.append(' ')
             text.append(it)
         }

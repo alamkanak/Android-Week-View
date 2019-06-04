@@ -144,14 +144,24 @@ internal class EventChip<T>(
             return
         }
 
-        // Prepare the name of the event.
-        val text = SpannableStringBuilder(event.title)
+        val title = when (val resource = event.titleResource) {
+            is WeekViewEvent.TextResource.Id -> context.getString(resource.resId)
+            is WeekViewEvent.TextResource.Value -> resource.text
+            null -> TODO()
+        }
+
+        val text = SpannableStringBuilder(title)
         text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
 
-        // Prepare the location of the event.
-        if (event.location != null) {
+        val location = when (val resource = event.locationResource) {
+            is WeekViewEvent.TextResource.Id -> context.getString(resource.resId)
+            is WeekViewEvent.TextResource.Value -> resource.text
+            null -> null
+        }
+
+        location?.let {
             text.append(' ')
-            text.append(event.location)
+            text.append(it)
         }
 
         val availableHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()

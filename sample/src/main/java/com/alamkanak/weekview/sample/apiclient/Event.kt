@@ -3,7 +3,7 @@ package com.alamkanak.weekview.sample.apiclient
 import android.graphics.Color
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
-import java.util.*
+import java.util.Calendar
 
 class Event(
         val id: Long,
