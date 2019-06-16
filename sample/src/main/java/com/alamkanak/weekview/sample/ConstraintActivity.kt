@@ -2,6 +2,7 @@ package com.alamkanak.weekview.sample
 
 import android.graphics.RectF
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -95,6 +96,16 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
                 val sdfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
                 return sdfTime.format(calendar.time)
             }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

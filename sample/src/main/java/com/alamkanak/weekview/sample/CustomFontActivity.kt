@@ -40,26 +40,29 @@ open class CustomFontActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
             R.id.action_today -> {
                 weekView.goToToday()
-                return true
+                true
             }
             R.id.action_day_view -> {
                 openDayView(item)
-                return true
+                true
             }
             R.id.action_three_day_view -> {
                 openThreeDayView(item)
-                return true
+                true
             }
             R.id.action_week_view -> {
                 openWeekView(item)
-                return true
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun openDayView(item: MenuItem) {

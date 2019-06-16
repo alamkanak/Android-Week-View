@@ -51,14 +51,29 @@ class AsyncActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_today -> weekView.goToToday()
-            R.id.action_day_view -> openDayView(item)
-            R.id.action_three_day_view -> openThreeDayView(item)
-            R.id.action_week_view -> openWeekView(item)
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            R.id.action_today -> {
+                weekView.goToToday()
+                true
+            }
+            R.id.action_day_view -> {
+                openDayView(item)
+                true
+            }
+            R.id.action_three_day_view -> {
+                openThreeDayView(item)
+                true
+            }
+            R.id.action_week_view -> {
+                openWeekView(item)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private fun openDayView(item: MenuItem) {

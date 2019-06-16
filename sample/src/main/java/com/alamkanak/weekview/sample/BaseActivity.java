@@ -68,6 +68,9 @@ public class BaseActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.action_today:
                 mWeekView.goToToday();
                 return true;

@@ -22,22 +22,52 @@
         </activity>
         <activity
             android:name=".BaseActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".StaticActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".AsyncActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".ConstraintActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".LimitedActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".CustomFontActivity"
-            android:label="@string/week_view" />
+            android:label="@string/week_view"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

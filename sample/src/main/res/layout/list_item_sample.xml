@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/toolbar"
     app:cardCornerRadius="8dp"
-    app:contentPadding="@dimen/default_space"
-    app:cardBackgroundColor="@color/toolbar">
+    app:contentPadding="@dimen/default_space">
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
         android:textSize="16sp"
         tools:text="Lorem ipsum" />
 

@@ -2,6 +2,7 @@ package com.alamkanak.weekview.sample;
 
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -120,4 +121,17 @@ public class StaticActivity extends AppCompatActivity
         String formattedLastDay = format.format(mWeekView.getLastVisibleDay().getTime());
         mDateTV.setText(getString(R.string.date_infos, formattedFirstDay, formattedLastDay));
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
