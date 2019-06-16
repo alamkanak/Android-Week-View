@@ -123,10 +123,20 @@ internal class EventsDrawer<T>(
         val right = rect.right
         val bottom = rect.bottom
 
-        val negativeWidth = right - left - (config.eventPadding * 2).toFloat() < 0
-        val negativeHeight = bottom - top - (config.eventPadding * 2).toFloat() < 0
-        if (negativeWidth || negativeHeight) {
+        val width = right - left - (config.eventPadding * 2)
+        val height = bottom - top - (config.eventPadding * 2)
+
+        if (height < 0f) {
             return null
+        }
+
+        if (width < 0f) {
+            // This is needed if there are many all-day events
+            val dummyTextLayout = createDummyTextLayout(event)
+            val chipHeight = dummyTextLayout.height + config.eventPadding * 2
+            rect.bottom = rect.top + chipHeight
+            setAllDayEventHeight(chipHeight)
+            return dummyTextLayout
         }
 
         val title = when (val resource = event.titleResource) {
@@ -149,7 +159,7 @@ internal class EventsDrawer<T>(
             text.append(it)
         }
 
-        val availableWidth = (right - left - (config.eventPadding * 2).toFloat()).toInt()
+        val availableWidth = width.toInt()
 
         // Get text dimensions.
         val textPaint = event.getTextPaint(context, config)
@@ -171,11 +181,25 @@ internal class EventsDrawer<T>(
         }
 
         // Refresh the header height
-        if (chipHeight > config.getCurrentAllDayEventHeight()) {
-            config.setCurrentAllDayEventHeight(chipHeight)
-        }
+        setAllDayEventHeight(chipHeight)
 
         return finalTextLayout
+    }
+
+    private fun setAllDayEventHeight(height: Int) {
+        if (height > config.getCurrentAllDayEventHeight()) {
+            config.setCurrentAllDayEventHeight(height)
+        }
+    }
+
+    /**
+     * Creates a dummy text layout that is only used to determine the height of all-day events.
+     */
+    private fun createDummyTextLayout(
+        event: WeekViewEvent<T>
+    ): StaticLayout {
+        val textPaint = event.getTextPaint(context, config)
+        return StaticLayout("", textPaint, 0, ALIGN_NORMAL, 1f, 0f, false)
     }
 
     private fun ellipsizeTextToFitChip(
@@ -201,6 +225,13 @@ internal class EventsDrawer<T>(
             val availableArea = availableLineCount * availableWidth
             val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
             val width = (right - left - (config.eventPadding * 2).toFloat()).toInt()
+
+            if (eventChip.event.isAllDay && width < 0) {
+                // This day contains too many all-day events. We only draw the event chips,
+                // but don't attempt to draw the event titles.
+                break
+            }
+
             textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
 
             // Reduce line count.
