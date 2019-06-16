@@ -4,7 +4,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_UP
 import android.view.ScaleGestureDetector
-import android.view.View
 import android.view.ViewConfiguration
 import android.widget.OverScroller
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
@@ -20,7 +19,7 @@ private enum class Direction {
 }
 
 internal class WeekViewGestureHandler<T>(
-    view: View,
+    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) : GestureDetector.SimpleOnGestureListener() {
@@ -174,7 +173,7 @@ internal class WeekViewGestureHandler<T>(
         val maxX = config.maxX.toInt()
 
         val dayHeight = config.hourHeight * config.hoursPerDay
-        val viewHeight = WeekView.height
+        val viewHeight = view.height
 
         val minY = (dayHeight + config.headerHeight - viewHeight).toInt() * -1
         val maxY = 0
@@ -195,7 +194,7 @@ internal class WeekViewGestureHandler<T>(
         val maxX = Int.MAX_VALUE
 
         val dayHeight = config.hourHeight * config.hoursPerDay
-        val viewHeight = WeekView.height
+        val viewHeight = view.height
 
         val minY = (dayHeight + config.headerHeight - viewHeight).toInt() * -1
         val maxY = 0

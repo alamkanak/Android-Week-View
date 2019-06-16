@@ -25,14 +25,9 @@ class WeekView<T> @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), WeekViewGestureHandler.Listener, WeekViewViewState.Listener {
 
-    internal companion object {
-        var width: Int = 0
-        var height: Int = 0
-    }
-
     private val configWrapper: WeekViewConfigWrapper by lazy {
         val config = WeekViewConfig(context, attrs)
-        WeekViewConfigWrapper(context, config)
+        WeekViewConfigWrapper(this, config)
     }
 
     private val cache: WeekViewCache<T> by lazy {
@@ -46,12 +41,12 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawingContext = DrawingContext()
     private val eventChipsProvider = EventChipsProvider(configWrapper, cache, viewState)
 
-    private val headerRowDrawer = HeaderRowDrawer(configWrapper, cache, viewState)
-    private val dayLabelDrawer = DayLabelDrawer(configWrapper)
-    private val eventsDrawer = EventsDrawer(context, configWrapper, cache)
-    private val timeColumnDrawer = TimeColumnDrawer(configWrapper)
-    private val dayBackgroundDrawer = DayBackgroundDrawer(configWrapper)
-    private val backgroundGridDrawer = BackgroundGridDrawer(configWrapper)
+    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper, cache, viewState)
+    private val dayLabelDrawer = DayLabelDrawer(this, configWrapper)
+    private val eventsDrawer = EventsDrawer(this, configWrapper, cache)
+    private val timeColumnDrawer = TimeColumnDrawer(this, configWrapper)
+    private val dayBackgroundDrawer = DayBackgroundDrawer(this, configWrapper)
+    private val backgroundGridDrawer = BackgroundGridDrawer(this, configWrapper)
     private val nowLineDrawer = NowLineDrawer(configWrapper)
 
     private val paint = Paint()
@@ -82,9 +77,6 @@ class WeekView<T> @JvmOverloads constructor(
         viewState.areDimensionsInvalid = true
         dayLabelDrawer.clearLabelCache()
 
-        WeekView.width = width
-        WeekView.height = height
-
         if (configWrapper.showCompleteDay) {
             configWrapper.updateHourHeight(height)
         }
@@ -95,10 +87,10 @@ class WeekView<T> @JvmOverloads constructor(
         val isFirstDraw = viewState.isFirstDraw
 
         calculateWidthPerDay()
-        viewState.update()
+        viewState.update(this)
 
-        configWrapper.refreshAfterZooming()
-        configWrapper.updateVerticalOrigin()
+        configWrapper.refreshAfterZooming(this)
+        configWrapper.updateVerticalOrigin(this)
 
         notifyScrollListeners()
         prepareEventDrawing(canvas)

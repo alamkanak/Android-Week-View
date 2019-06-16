@@ -20,10 +20,10 @@ internal class WeekViewViewState(
     var shouldRefreshEvents: Boolean = false
     var requiresPostInvalidateOnAnimation: Boolean = false
 
-    fun update() {
+    fun update(view: WeekView<*>) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()
 
-        val totalHeight = WeekView.height
+        val totalHeight = view.height
         val dynamicHourHeight = (totalHeight - totalHeaderHeight) / configWrapper.hoursPerDay
 
         if (areDimensionsInvalid) {

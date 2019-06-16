@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 
 internal class HeaderRowDrawer<T>(
+    private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
     private val viewState: WeekViewViewState
@@ -23,7 +24,7 @@ internal class HeaderRowDrawer<T>(
         val eventChips = cache.allDayEventChips
         if (eventChips.isEmpty()) {
             config.hasEventInHeader = false
-            config.refreshHeaderHeight()
+            config.refreshHeaderHeight(view)
         }
 
         if (viewState.firstVisibleDay == null) {
@@ -34,11 +35,11 @@ internal class HeaderRowDrawer<T>(
         val visibleEvents = cache.getAllDayEventsInRange(dateRange)
 
         config.hasEventInHeader = visibleEvents.any { it.isAllDay }
-        config.refreshHeaderHeight()
+        config.refreshHeaderHeight(view)
     }
 
     private fun drawHeaderRow(canvas: Canvas, paint: Paint) {
-        val width = WeekView.width
+        val width = view.width
 
         canvas.restore()
         canvas.save()

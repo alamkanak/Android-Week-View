@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
@@ -17,11 +16,12 @@ import java.util.ArrayList
 import java.util.Calendar
 
 internal class EventsDrawer<T>(
-    private val context: Context,
+    private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) {
 
+    private val context = view.context
     private val rectCalculator = EventChipRectCalculator<T>(config)
     private val staticLayoutCache = ArrayList<Pair<EventChip<T>, StaticLayout>>()
 
@@ -132,7 +132,7 @@ internal class EventsDrawer<T>(
         val title = when (val resource = event.titleResource) {
             is TextResource.Id -> context.getString(resource.resId)
             is TextResource.Value -> resource.text
-            null -> TODO()
+            null -> ""
         }
 
         val text = SpannableStringBuilder(title)
@@ -254,15 +254,15 @@ internal class EventsDrawer<T>(
 
     private val RectF.isValidSingleEventRect: Boolean
         get() = (left < right
-            && left < WeekView.width
-            && top < WeekView.height
+            && left < view.width
+            && top < view.height
             && right > config.timeColumnWidth
             && bottom > config.headerHeight)
 
     private val RectF.isValidAllDayEventRect: Boolean
         get() = (left < right
-            && left < WeekView.width
-            && top < WeekView.height
+            && left < view.width
+            && top < view.height
             && right > config.timeColumnWidth
             && bottom > 0)
 

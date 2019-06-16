@@ -5,6 +5,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class BackgroundGridDrawer(
+    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
 ) {
 
@@ -18,10 +19,8 @@ internal class BackgroundGridDrawer(
     }
 
     private fun createHourLines(): FloatArray {
-        val height = WeekView.height
-
         val headerHeight = config.getTotalHeaderHeight()
-        val gridHeight = height - headerHeight.toInt()
+        val gridHeight = view.height - headerHeight.toInt()
 
         val linesPerDay = (gridHeight / config.hourHeight) + 1
         val overallLines = linesPerDay.roundToInt() * (config.numberOfVisibleDays + 1)
@@ -45,18 +44,15 @@ internal class BackgroundGridDrawer(
         val widthPerDay = config.totalDayWidth
 
         val top = config.headerHeight
-        val height = WeekView.height
 
         for (i in 0 until days) {
             val start = startPixel + widthPerDay * (i + 1)
-            canvas.drawLine(start, top, start, top + height, config.daySeparatorPaint)
+            canvas.drawLine(start, top, start, top + view.height, config.daySeparatorPaint)
         }
     }
 
     private fun drawHourLines(startX: Float, startPixel: Float, canvas: Canvas) {
-        val height = WeekView.height
         val hourStep = config.timeColumnHoursInterval
-
         var lineIndex = 0
 
         for (hour in hourStep until config.hoursPerDay step hourStep) {
@@ -67,7 +63,7 @@ internal class BackgroundGridDrawer(
             val separatorWidth = config.hourSeparatorPaint.strokeWidth
 
             val isNotHiddenByHeader = top > config.headerHeight - separatorWidth
-            val isWithinVisibleRange = top < height
+            val isWithinVisibleRange = top < view.height
             val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
             if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {

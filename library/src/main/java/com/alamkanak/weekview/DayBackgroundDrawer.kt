@@ -7,6 +7,7 @@ import java.util.Calendar
 import kotlin.math.max
 
 internal class DayBackgroundDrawer(
+    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
 ) {
 
@@ -27,7 +28,7 @@ internal class DayBackgroundDrawer(
             return
         }
 
-        val height = WeekView.height.toFloat()
+        val height = view.height.toFloat()
 
         if (config.showDistinctPastFutureColor) {
             val useWeekendColor = day.isWeekend && config.showDistinctWeekendColor

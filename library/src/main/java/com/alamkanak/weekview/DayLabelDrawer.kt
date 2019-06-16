@@ -7,9 +7,10 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.SparseArray
-import java.util.*
+import java.util.Calendar
 
 internal class DayLabelDrawer(
+    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
 ) {
 
@@ -41,7 +42,7 @@ internal class DayLabelDrawer(
         } else {
             val staticLayout = buildStaticLayout(dayLabel, TextPaint(textPaint))
             config.headerTextHeight = staticLayout.height.toFloat()
-            config.refreshHeaderHeight()
+            config.refreshHeaderHeight(view)
 
             canvas.save()
             canvas.translate(x, config.headerRowPadding.toFloat())

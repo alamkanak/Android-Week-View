@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.util.SparseArray
 
 internal class TimeColumnDrawer(
+    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
 ) {
     private val timeLabelCache = SparseArray<String>()
@@ -20,7 +21,7 @@ internal class TimeColumnDrawer(
 
     fun drawTimeColumn(canvas: Canvas) {
         var topMargin = config.headerHeight
-        val bottom = WeekView.height.toFloat()
+        val bottom = view.height.toFloat()
 
         // Draw the background color for the time column.
         canvas.drawRect(0f, topMargin, config.timeColumnWidth, bottom, config.timeColumnBackgroundPaint)

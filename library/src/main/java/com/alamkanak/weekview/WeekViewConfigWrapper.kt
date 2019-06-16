@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.content.Context
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
@@ -12,9 +11,11 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal class WeekViewConfigWrapper(
-    context: Context,
+    private val view: WeekView<*>,
     private val config: WeekViewConfig
 ) {
+
+    private val context = view.context
 
     var timeTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.RIGHT
@@ -163,7 +164,7 @@ internal class WeekViewConfigWrapper(
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
         timeTextHeight = rect.height().toFloat()
         initTextTimeWidth()
-        refreshHeaderHeight()
+        refreshHeaderHeight(view)
     }
 
     var numberOfVisibleDays: Int
@@ -500,7 +501,7 @@ internal class WeekViewConfigWrapper(
 
     fun setCurrentAllDayEventHeight(height: Int) {
         currentAllDayEventHeight = height
-        refreshHeaderHeight()
+        refreshHeaderHeight(view)
     }
 
     fun getCurrentAllDayEventHeight(): Int {
@@ -519,7 +520,7 @@ internal class WeekViewConfigWrapper(
         }
 
         if (showCurrentTimeFirst) {
-            computeDifferenceWithCurrentTime()
+            computeDifferenceWithCurrentTime(view)
         }
 
         // Overwrites the origin when today is out of date range
@@ -527,7 +528,7 @@ internal class WeekViewConfigWrapper(
         currentOrigin.x = max(currentOrigin.x, minX)
     }
 
-    private fun computeDifferenceWithCurrentTime() {
+    private fun computeDifferenceWithCurrentTime(view: WeekView<*>) {
         val now = now()
 
         val desired = if (now.hour > 0) {
@@ -542,7 +543,7 @@ internal class WeekViewConfigWrapper(
         val fraction = minutes.toFloat() / Constants.MINUTES_PER_HOUR
 
         var verticalOffset = hourHeight * (hour + fraction)
-        val viewHeight = WeekView.height.toDouble()
+        val viewHeight = view.height.toDouble()
 
         val desiredOffset = totalDayHeight - viewHeight
         verticalOffset = min(desiredOffset.toFloat(), verticalOffset)
@@ -560,7 +561,7 @@ internal class WeekViewConfigWrapper(
         }
     }
 
-    fun refreshAfterZooming() {
+    fun refreshAfterZooming(view: WeekView<*>) {
         if (newHourHeight > 0 && !showCompleteDay) {
             newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
             newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
@@ -568,7 +569,7 @@ internal class WeekViewConfigWrapper(
             // potentialMinHourHeight
             // the minimal height of an hour when zoomed completely out
             // needed to suppress the zooming below 24:00
-            val height = WeekView.height
+            val height = view.height
             val potentialMinHourHeight = (height - headerHeight) / hoursPerDay
             newHourHeight = max(newHourHeight, potentialMinHourHeight)
 
@@ -578,13 +579,10 @@ internal class WeekViewConfigWrapper(
         }
     }
 
-    fun updateVerticalOrigin() {
-        val height = WeekView.height
-
+    fun updateVerticalOrigin(view: WeekView<*>) {
         // If the new currentOrigin.y is invalid, make it valid.
         val dayHeight = hourHeight * hoursPerDay
-
-        val potentialNewVerticalOrigin = height - (dayHeight + headerHeight)
+        val potentialNewVerticalOrigin = view.height - (dayHeight + headerHeight)
 
         currentOrigin.y = max(currentOrigin.y, potentialNewVerticalOrigin)
         currentOrigin.y = min(currentOrigin.y, 0f)
@@ -611,7 +609,7 @@ internal class WeekViewConfigWrapper(
         newHourHeight = hourHeight
     }
 
-    fun refreshHeaderHeight() {
+    fun refreshHeaderHeight(view: WeekView<*>) {
         headerHeight = headerRowPadding * 2 + headerTextHeight
 
         if (showHeaderRowBottomLine) {
@@ -623,7 +621,7 @@ internal class WeekViewConfigWrapper(
         }
 
         if (showCompleteDay) {
-            hourHeight = (WeekView.height - headerHeight) / hoursPerDay
+            hourHeight = (view.height - headerHeight) / hoursPerDay
             newHourHeight = hourHeight
         }
     }
