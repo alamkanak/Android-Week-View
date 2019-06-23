@@ -80,6 +80,8 @@ internal class WeekViewCache<T>(
 
     fun clear() {
         allEventChips.clear()
+        allDayEventChipsByDate.clear()
+        normalEventChipsByDate.clear()
         previousPeriodEvents = null
         currentPeriodEvents = null
         nextPeriodEvents = null

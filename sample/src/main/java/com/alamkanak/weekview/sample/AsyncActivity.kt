@@ -153,7 +153,9 @@ class AsyncActivity : AppCompatActivity() {
     }
 
     private fun onEventClick(event: ApiEvent, eventRect: RectF) {
-        Toast.makeText(this, "Clicked " + event.name, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Removing ${event.name} ...", Toast.LENGTH_SHORT).show()
+        events.remove(event)
+        weekView.notifyDataSetChanged()
     }
 
     private fun onEventLongPress(event: ApiEvent, eventRect: RectF) {
