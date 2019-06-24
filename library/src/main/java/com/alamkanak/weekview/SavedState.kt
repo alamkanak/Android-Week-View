@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import android.os.Parcel
 import android.os.Parcelable
 import android.view.View
-import java.util.*
+import java.util.Calendar
 
 internal class SavedState : View.BaseSavedState {
 
@@ -11,6 +11,15 @@ internal class SavedState : View.BaseSavedState {
     var firstVisibleDate: Calendar? = null
 
     constructor(superState: Parcelable) : super(superState)
+
+    constructor(
+        superState: Parcelable,
+        numberOfVisibleDays: Int,
+        firstVisibleDate: Calendar?
+    ) : super(superState) {
+        this.numberOfVisibleDays = numberOfVisibleDays
+        this.firstVisibleDate = firstVisibleDate
+    }
 
     constructor(source: Parcel) : super(source) {
         numberOfVisibleDays = source.readInt()

@@ -52,10 +52,10 @@ class WeekView<T> @JvmOverloads constructor(
     private val paint = Paint()
     private val allDayEvents = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
 
-    override fun onSaveInstanceState(): Parcelable {
-        return SavedState(super.onSaveInstanceState()).apply {
-            numberOfVisibleDays = configWrapper.numberOfVisibleDays
-            firstVisibleDate = viewState.firstVisibleDay
+    override fun onSaveInstanceState(): Parcelable? {
+        val superState = super.onSaveInstanceState()
+        return superState?.let {
+            SavedState(it, configWrapper.numberOfVisibleDays, viewState.firstVisibleDay)
         }
     }
 

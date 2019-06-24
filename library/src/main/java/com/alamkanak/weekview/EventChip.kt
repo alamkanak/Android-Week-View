@@ -62,7 +62,10 @@ internal class EventChip<T>(
     ) {
         val cornerRadius = config.eventCornerRadius.toFloat()
         setBackgroundPaint(context, config, paint)
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
+
+        rect?.let {
+            canvas.drawRoundRect(it, cornerRadius, cornerRadius, paint)
+        }
 
         if (event.style.hasBorder) {
             setBorderPaint(context, paint)
