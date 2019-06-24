@@ -1,1 +1,1 @@
-include ':library', ':sample', ':weekview-threetenabp', ':weekview-jodatime', ':weekview-jsr310'
+include ':core', ':jodatime', ':jsr310', ':sample', ':threetenabp'
