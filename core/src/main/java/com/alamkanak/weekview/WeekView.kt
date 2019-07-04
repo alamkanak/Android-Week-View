@@ -245,6 +245,12 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Deprecated(
+        "Use isShowHeaderRowBottomLine",
+        ReplaceWith("isShowHeaderRowBottomLine")
+    )
+    fun getShowHeaderRowBottomLine() = isShowHeaderRowBottomLine
+
     var isShowHeaderRowBottomLine: Boolean
         get() = configWrapper.showHeaderRowBottomLine
         set(value) {
@@ -314,6 +320,12 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    @Deprecated(
+        "Use isShowTimeColumnHourSeparator",
+        ReplaceWith("isShowTimeColumnHourSeparator")
+    )
+    fun showTimeColumnHourSeparator() = isShowTimeColumnHourSeparator
+
     var isShowTimeColumnHourSeparator: Boolean
         get() = configWrapper.showTimeColumnHourSeparator
         set(value) {
@@ -333,6 +345,12 @@ class WeekView<T> @JvmOverloads constructor(
     //  Time column separator
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Deprecated(
+        "Use isShowTimeColumnSeparator",
+        ReplaceWith("isShowTimeColumnSeparator")
+    )
+    fun getShowTimeColumnSeparator() = isShowTimeColumnSeparator
 
     var isShowTimeColumnSeparator: Boolean
         get() = configWrapper.showTimeColumnSeparator
@@ -713,6 +731,12 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Deprecated(
+        "Use isShowHourSeparators",
+        ReplaceWith("isShowHourSeparators")
+    )
+    fun showHourSeparators() = isShowHourSeparators
+
     var isShowHourSeparators: Boolean
         get() = configWrapper.showHourSeparators
         set(value) {
@@ -739,6 +763,12 @@ class WeekView<T> @JvmOverloads constructor(
     //  Day separators
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Deprecated(
+        "Use isShowDaySeparators",
+        ReplaceWith("isShowDaySeparators")
+    )
+    fun showDaySeparators() = isShowDaySeparators
 
     var isShowDaySeparators: Boolean
         get() = configWrapper.showDaySeparators
@@ -1062,6 +1092,12 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
+    @Deprecated(
+        "Use onMonthChangeListener",
+        ReplaceWith("onMonthChangeListener")
+    )
+    fun getMonthChangeListener() = onMonthChangeListener
+
     var onMonthChangeListener: OnMonthChangeListener<T>?
         get() {
             return eventChipsProvider.monthLoader?.onMonthChangeListener
@@ -1069,6 +1105,14 @@ class WeekView<T> @JvmOverloads constructor(
         set(value) {
             eventChipsProvider.monthLoader = MonthLoader(value)
         }
+
+    @Deprecated(
+        "Use onMonthChangeListener",
+        ReplaceWith("onMonthChangeListener")
+    )
+    fun setMonthChangeListener(listener: OnMonthChangeListener<T>) {
+        onMonthChangeListener = listener
+    }
 
     fun setOnMonthChangeListener(
         block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
@@ -1081,6 +1125,20 @@ class WeekView<T> @JvmOverloads constructor(
                 return block(startDate, endDate)
             }
         }
+    }
+
+    @Deprecated(
+        "Use onEventLongPressListener",
+        ReplaceWith("onEventLongPressListener")
+    )
+    val eventLongPressListener = onEventLongPressListener
+
+    @Deprecated(
+        "Use onEventLongPressListener",
+        ReplaceWith("onEventLongPressListener")
+    )
+    fun setEventLongPressListener(listener: EventLongPressListener<T>) {
+        onEventLongPressListener = listener
     }
 
     var onEventLongPressListener: OnEventLongPressListener<T>?
@@ -1099,13 +1157,27 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
+    @Deprecated(
+        "Use onEmptyViewClickListener",
+        ReplaceWith("onEmptyViewClickListener")
+    )
+    val emptyViewClickListener = onEmptyViewClickListener
+
     var onEmptyViewClickListener: OnEmptyViewClickListener?
         get() = gestureHandler.onEmptyViewClickListener
         set(value) {
             gestureHandler.onEmptyViewClickListener = value
         }
 
-    fun setEmptyViewClickListener(
+    @Deprecated(
+        "Use onEmptyViewClickListener",
+        ReplaceWith("onEmptyViewClickListener")
+    )
+    fun setEmptyViewClickListener(listener: EmptyViewClickListener) {
+        onEmptyViewClickListener = listener
+    }
+
+    fun setOnEmptyViewClickListener(
         block: (time: Calendar) -> Unit
     ) {
         onEmptyViewClickListener = object : OnEmptyViewClickListener {
@@ -1115,11 +1187,25 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
+    @Deprecated(
+        "Use onEmptyViewLongPressListener",
+        ReplaceWith("onEmptyViewLongPressListener")
+    )
+    val emptyViewLongPressListener = onEmptyViewLongPressListener
+
     var onEmptyViewLongPressListener: OnEmptyViewLongPressListener?
         get() = gestureHandler.onEmptyViewLongPressListener
         set(value) {
             gestureHandler.onEmptyViewLongPressListener = value
         }
+
+    @Deprecated(
+        "Use onEmptyViewLongPressListener",
+        ReplaceWith("onEmptyViewLongPressListener")
+    )
+    fun setEmptyViewLongPressListener(listener: EmptyViewLongPressListener) {
+        onEmptyViewLongPressListener = listener
+    }
 
     fun setOnEmptyViewLongPressListener(
         block: (time: Calendar) -> Unit

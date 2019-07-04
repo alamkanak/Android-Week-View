@@ -2,6 +2,12 @@ package com.alamkanak.weekview
 
 import android.graphics.RectF
 
+@Deprecated(
+    "Use OnEventLongPressListener",
+    ReplaceWith("OnEventLongPressListener")
+)
+typealias EventLongPressListener<T> = OnEventLongPressListener<T>
+
 @FunctionalInterface
 interface OnEventLongPressListener<T> {
 

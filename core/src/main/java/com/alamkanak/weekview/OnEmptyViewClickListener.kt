@@ -2,6 +2,12 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
+@Deprecated(
+    "Use OnEmptyViewClickListener",
+    ReplaceWith("OnEmptyViewClickListener")
+)
+typealias EmptyViewClickListener = OnEmptyViewClickListener
+
 @FunctionalInterface
 interface OnEmptyViewClickListener {
 

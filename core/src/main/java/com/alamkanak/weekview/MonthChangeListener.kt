@@ -2,6 +2,12 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
+@Deprecated(
+    "Use OnMonthChangeListener",
+    ReplaceWith("OnMonthChangeListener")
+)
+typealias MonthChangeListener<T> = OnMonthChangeListener<T>
+
 @FunctionalInterface
 interface OnMonthChangeListener<T> {
 
