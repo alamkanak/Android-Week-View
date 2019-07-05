@@ -1,6 +1,9 @@
 package com.alamkanak.weekview.threetenabp
 
+import com.alamkanak.weekview.OnEmptyViewClickListener
+import com.alamkanak.weekview.OnEmptyViewLongPressListener
 import com.alamkanak.weekview.OnMonthChangeListener
+import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
@@ -32,8 +35,59 @@ fun <T> WeekView<T>.setOnMonthChangeListener(
     }
 }
 
+fun <T> WeekView<T>.goToDate(date: LocalDate) {
+    goToDate(date.toCalendar())
+}
+
+fun <T> WeekView<T>.setScrollListener(
+    block: (
+        newFirstVisibleDay: LocalDate,
+        oldFirstVisibleDay: LocalDate?
+    ) -> Unit
+) {
+    scrollListener = object : ScrollListener {
+        override fun onFirstVisibleDayChanged(
+            newFirstVisibleDay: Calendar,
+            oldFirstVisibleDay: Calendar?
+        ) {
+            block(newFirstVisibleDay.toLocalDate(), oldFirstVisibleDay?.toLocalDate())
+        }
+    }
+}
+
+fun <T> WeekView<T>.setOnEmptyViewClickListener(
+    block: (time: LocalDateTime) -> Unit
+) {
+    onEmptyViewClickListener = object : OnEmptyViewClickListener {
+        override fun onEmptyViewClicked(time: Calendar) {
+            block(time.toLocalDateTime())
+        }
+    }
+}
+
+fun <T> WeekView<T>.setOnEmptyViewLongPressListener(
+    block: (time: LocalDateTime) -> Unit
+) {
+    onEmptyViewLongPressListener = object : OnEmptyViewLongPressListener {
+        override fun onEmptyViewLongPress(time: Calendar) {
+            block(time.toLocalDateTime())
+        }
+    }
+}
+
 internal fun Calendar.toLocalDate(): LocalDate {
     return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()
+}
+
+internal fun Calendar.toLocalDateTime(): LocalDateTime {
+    return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDateTime()
+}
+
+internal fun LocalDate.toCalendar(): Calendar {
+    val instant = atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
+    val calendar = Calendar.getInstance()
+    calendar.time = DateTimeUtils.toDate(instant)
+    return calendar
 }
 
 internal fun LocalDateTime.toCalendar(): Calendar {

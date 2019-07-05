@@ -972,9 +972,10 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     fun goToCurrentTime() {
-        val now = Calendar.getInstance()
-        goToDate(now)
-        goToHour(now.hour)
+        now().apply {
+            goToDate(this)
+            goToHour(hour)
+        }
     }
 
     /**
@@ -1227,7 +1228,10 @@ class WeekView<T> @JvmOverloads constructor(
         block: (newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) -> Unit
     ) {
         scrollListener = object : ScrollListener {
-            override fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) {
+            override fun onFirstVisibleDayChanged(
+                newFirstVisibleDay: Calendar,
+                oldFirstVisibleDay: Calendar?
+            ) {
                 block(firstVisibleDay, oldFirstVisibleDay)
             }
         }

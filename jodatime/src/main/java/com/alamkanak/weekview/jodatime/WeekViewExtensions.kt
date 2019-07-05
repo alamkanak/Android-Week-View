@@ -1,6 +1,9 @@
 package com.alamkanak.weekview.jodatime
 
+import com.alamkanak.weekview.OnEmptyViewClickListener
+import com.alamkanak.weekview.OnEmptyViewLongPressListener
 import com.alamkanak.weekview.OnMonthChangeListener
+import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
@@ -34,10 +37,58 @@ fun <T> WeekView<T>.setOnMonthChangeListener(
     }
 }
 
+fun <T> WeekView<T>.goToDate(date: LocalDate) {
+    goToDate(date.toCalendar())
+}
+
+fun <T> WeekView<T>.setScrollListener(
+    block: (
+        newFirstVisibleDay: LocalDate,
+        oldFirstVisibleDay: LocalDate?
+    ) -> Unit
+) {
+    scrollListener = object : ScrollListener {
+        override fun onFirstVisibleDayChanged(
+            newFirstVisibleDay: Calendar,
+            oldFirstVisibleDay: Calendar?
+        ) {
+            block(newFirstVisibleDay.toLocalDate(), oldFirstVisibleDay?.toLocalDate())
+        }
+    }
+}
+
+fun <T> WeekView<T>.setOnEmptyViewClickListener(
+    block: (time: LocalDateTime) -> Unit
+) {
+    onEmptyViewClickListener = object : OnEmptyViewClickListener {
+        override fun onEmptyViewClicked(time: Calendar) {
+            block(time.toLocalDateTime())
+        }
+    }
+}
+
+fun <T> WeekView<T>.setOnEmptyViewLongPressListener(
+    block: (time: LocalDateTime) -> Unit
+) {
+    onEmptyViewLongPressListener = object : OnEmptyViewLongPressListener {
+        override fun onEmptyViewLongPress(time: Calendar) {
+            block(time.toLocalDateTime())
+        }
+    }
+}
+
 internal fun Calendar.toLocalDate(): LocalDate {
     val dateTimeZone = DateTimeZone.forID(timeZone.id)
     val dateTime = DateTime(timeInMillis, dateTimeZone)
     return dateTime.toLocalDate()
+}
+
+internal fun Calendar.toLocalDateTime() = LocalDateTime(timeInMillis)
+
+internal fun LocalDate.toCalendar(): Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.time = toDate()
+    return calendar
 }
 
 internal fun LocalDateTime.toCalendar(): Calendar {
