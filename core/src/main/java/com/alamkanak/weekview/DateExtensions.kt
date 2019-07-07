@@ -65,10 +65,6 @@ internal val Calendar.month: Int
 internal val Calendar.year: Int
     get() = get(Calendar.YEAR)
 
-internal fun Calendar.plusDays(days: Long): Calendar {
-    return plusDays(days.toInt())
-}
-
 internal fun Calendar.isEqual(other: Calendar): Boolean {
     return timeInMillis == other.timeInMillis
 }
@@ -155,7 +151,7 @@ internal val Calendar.daysFromToday: Int
 internal fun today(): Calendar = now().atStartOfDay
 
 internal fun now(): Calendar {
-    return Calendar.getInstance() // TODO Timezone?
+    return Calendar.getInstance()
 }
 
 internal fun Calendar.isSameDate(other: Calendar): Boolean = toEpochDays() == other.toEpochDays()
@@ -224,9 +220,9 @@ internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
 
 internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
     return when (numberOfDays) {
-        1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // display full weekday
-        in 2..6 -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // display first three characters
-        else -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // display the first character
+        1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // full weekday
+        in 2..6 -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // first three characters
+        else -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // first character
     }
 }
 

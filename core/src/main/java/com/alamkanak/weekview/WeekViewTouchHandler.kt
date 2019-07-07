@@ -38,10 +38,8 @@ internal class WeekViewTouchHandler(
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now().plusDays(dayNumber - 1)
 
-                val originY = config.currentOrigin.y
                 val hourHeight = config.hourHeight
-
-                val pixelsFromMidnight = event.y - originY - config.headerHeight
+                val pixelsFromMidnight = event.y - config.currentOrigin.y - config.headerHeight
                 val hour = (pixelsFromMidnight / hourHeight).toInt()
 
                 val pixelsFromFullHour = pixelsFromMidnight - hour * hourHeight

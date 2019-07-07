@@ -7,6 +7,9 @@ import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
 import android.widget.OverScroller
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import com.alamkanak.weekview.Direction.LEFT
+import com.alamkanak.weekview.Direction.NONE
+import com.alamkanak.weekview.Direction.RIGHT
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -15,7 +18,22 @@ import kotlin.math.min
 import kotlin.math.round
 
 private enum class Direction {
-    NONE, LEFT, RIGHT, VERTICAL
+    NONE, LEFT, RIGHT, VERTICAL;
+
+    val isHorizontal: Boolean
+        get() = this == LEFT || this == RIGHT
+
+    val isLeft: Boolean
+        get() = this == LEFT
+
+    val isRight: Boolean
+        get() = this == RIGHT
+
+    val isVertical: Boolean
+        get() = this == VERTICAL
+
+    val isNotNone: Boolean
+        get() = this != NONE
 }
 
 internal class WeekViewGestureHandler<T>(
@@ -28,8 +46,8 @@ internal class WeekViewGestureHandler<T>(
     private val touchHandler = WeekViewTouchHandler(config)
 
     private val scroller = OverScroller(view.context, FastOutLinearInInterpolator())
-    private var currentScrollDirection = Direction.NONE
-    private var currentFlingDirection = Direction.NONE
+    private var currentScrollDirection = NONE
+    private var currentFlingDirection = NONE
 
     private val gestureDetector = GestureDetector(view.context, this)
 
@@ -90,38 +108,38 @@ internal class WeekViewGestureHandler<T>(
         val canScrollHorizontally = config.horizontalScrollingEnabled
 
         when (currentScrollDirection) {
-            Direction.NONE -> {
+            NONE -> {
                 // Allow scrolling only in one direction.
                 currentScrollDirection = if (absDistanceX > absDistanceY && canScrollHorizontally) {
-                    if (distanceX > 0) Direction.LEFT else Direction.RIGHT
+                    if (distanceX > 0) LEFT else RIGHT
                 } else {
                     Direction.VERTICAL
                 }
             }
-            Direction.LEFT -> {
+            LEFT -> {
                 // Change direction if there was enough change.
                 if (absDistanceX > absDistanceY && distanceX < -scaledTouchSlop) {
-                    currentScrollDirection = Direction.RIGHT
+                    currentScrollDirection = RIGHT
                 }
             }
-            Direction.RIGHT -> {
+            RIGHT -> {
                 // Change direction if there was enough change.
                 if (absDistanceX > absDistanceY && distanceX > scaledTouchSlop) {
-                    currentScrollDirection = Direction.LEFT
+                    currentScrollDirection = LEFT
                 }
             }
             else -> Unit
         }
 
         // Calculate the new origin after scroll.
-        when (currentScrollDirection) {
-            Direction.LEFT, Direction.RIGHT -> {
+        when {
+            currentScrollDirection.isHorizontal -> {
                 config.currentOrigin.x -= distanceX * config.xScrollingSpeed
                 config.currentOrigin.x = min(config.currentOrigin.x, config.maxX)
                 config.currentOrigin.x = max(config.currentOrigin.x, config.minX)
                 listener.onScrolled()
             }
-            Direction.VERTICAL -> {
+            currentScrollDirection.isVertical -> {
                 config.currentOrigin.y -= distanceY
                 listener.onScrolled()
             }
@@ -141,18 +159,21 @@ internal class WeekViewGestureHandler<T>(
             return true
         }
 
-        if (currentFlingDirection == Direction.LEFT && !config.horizontalFlingEnabled ||
-            currentFlingDirection == Direction.RIGHT && !config.horizontalFlingEnabled ||
-            currentFlingDirection == Direction.VERTICAL && !config.verticalFlingEnabled) {
+        val isHorizontalAndDisabled =
+            currentFlingDirection.isHorizontal && !config.horizontalFlingEnabled
+
+        val isVerticalAndDisabled = currentFlingDirection.isVertical && !config.verticalFlingEnabled
+
+        if (isHorizontalAndDisabled || isVerticalAndDisabled) {
             return true
         }
 
         scroller.forceFinished(true)
 
         currentFlingDirection = currentScrollDirection
-        when (currentFlingDirection) {
-            Direction.LEFT, Direction.RIGHT -> onFlingHorizontal(velocityX)
-            Direction.VERTICAL -> onFlingVertical(velocityY)
+        when {
+            currentFlingDirection.isHorizontal -> onFlingHorizontal(velocityX)
+            currentFlingDirection.isVertical -> onFlingVertical(velocityY)
             else -> Unit
         }
 
@@ -260,23 +281,20 @@ internal class WeekViewGestureHandler<T>(
 
     private fun goToNearestOrigin() {
         val totalDayWidth = config.totalDayWidth
-        var leftDays = (config.currentOrigin.x / totalDayWidth).toDouble()
+        val leftDays = (config.currentOrigin.x / totalDayWidth).toDouble()
 
-        leftDays = if (currentFlingDirection != Direction.NONE) {
+        val finalLeftDays = when {
             // snap to nearest day
-            round(leftDays)
-        } else if (currentScrollDirection == Direction.LEFT) {
+            currentFlingDirection.isNotNone -> round(leftDays)
             // snap to last day
-            floor(leftDays)
-        } else if (currentScrollDirection == Direction.RIGHT) {
+            currentScrollDirection.isLeft -> floor(leftDays)
             // snap to next day
-            ceil(leftDays)
-        } else {
+            currentScrollDirection.isRight -> ceil(leftDays)
             // snap to nearest day
-            round(leftDays)
+            else -> round(leftDays)
         }
 
-        val nearestOrigin = (config.currentOrigin.x - leftDays * totalDayWidth).toInt()
+        val nearestOrigin = (config.currentOrigin.x - finalLeftDays * totalDayWidth).toInt()
 
         if (nearestOrigin != 0) {
             // Stop current animation
@@ -297,7 +315,7 @@ internal class WeekViewGestureHandler<T>(
         }
 
         // Reset scrolling and fling direction.
-        currentFlingDirection = Direction.NONE
+        currentFlingDirection = NONE
         currentScrollDirection = currentFlingDirection
     }
 
@@ -305,12 +323,13 @@ internal class WeekViewGestureHandler<T>(
         scaleDetector.onTouchEvent(event)
         val value = gestureDetector.onTouchEvent(event)
 
-        // Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection are set
-        if (event.action == ACTION_UP && !isZooming && currentFlingDirection == Direction.NONE) {
-            if (currentScrollDirection == Direction.RIGHT || currentScrollDirection == Direction.LEFT) {
+        // Check after call of gestureDetector, so currentFlingDirection and currentScrollDirection
+        // are set
+        if (event.action == ACTION_UP && !isZooming && currentFlingDirection == NONE) {
+            if (currentScrollDirection == RIGHT || currentScrollDirection == LEFT) {
                 goToNearestOrigin()
             }
-            currentScrollDirection = Direction.NONE
+            currentScrollDirection = NONE
         }
 
         return value
@@ -318,14 +337,14 @@ internal class WeekViewGestureHandler<T>(
 
     fun forceScrollFinished() {
         scroller.forceFinished(true)
-        currentFlingDirection = Direction.NONE
+        currentFlingDirection = NONE
         currentScrollDirection = currentFlingDirection
     }
 
     fun computeScroll() {
         val isFinished = scroller.isFinished
-        val isFlinging = currentFlingDirection != Direction.NONE
-        val isScrolling = currentScrollDirection != Direction.NONE
+        val isFlinging = currentFlingDirection.isNotNone
+        val isScrolling = currentScrollDirection.isNotNone
 
         if (isFinished && isFlinging) {
             // Snap to day after fling is finished

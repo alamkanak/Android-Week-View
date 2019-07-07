@@ -7,12 +7,15 @@ import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.Calendar
-import java.util.Date
+
+//////////////////////////////////////////////
+//
+//   WeekViewEvent.Builder extensions
+//
+//////////////////////////////////////////////
 
 fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())
@@ -21,6 +24,15 @@ fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekVie
 fun <T> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setEndTime(endTime.toCalendar())
 }
+
+//////////////////////////////////////////////
+//
+//   WeekView extensions
+//
+//////////////////////////////////////////////
+
+val <T> WeekView<T>.adapter: WeekViewAdapter<T>
+    get() = WeekViewAdapter(this)
 
 fun <T> WeekView<T>.setOnMonthChangeListener(
     block: (
@@ -76,26 +88,4 @@ fun <T> WeekView<T>.setOnEmptyViewLongPressListener(
             block(time.toLocalDateTime())
         }
     }
-}
-
-internal fun Calendar.toLocalDate(): LocalDate {
-    return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()
-}
-
-internal fun Calendar.toLocalDateTime(): LocalDateTime {
-    return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDateTime()
-}
-
-internal fun LocalDate.toCalendar(): Calendar {
-    val instant = atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()
-    val calendar = Calendar.getInstance()
-    calendar.time = Date.from(instant)
-    return calendar
-}
-
-internal fun LocalDateTime.toCalendar(): Calendar {
-    val instant = atZone(ZoneId.systemDefault()).toInstant()
-    val calendar = Calendar.getInstance()
-    calendar.time = Date.from(instant)
-    return calendar
 }

@@ -7,11 +7,15 @@ import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import java.util.Calendar
+
+//////////////////////////////////////////////
+//
+//   WeekViewEvent.Builder extensions
+//
+//////////////////////////////////////////////
 
 fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())
@@ -20,6 +24,15 @@ fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekVie
 fun <T> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setEndTime(endTime.toCalendar())
 }
+
+//////////////////////////////////////////////
+//
+//   WeekView extensions
+//
+//////////////////////////////////////////////
+
+val <T> WeekView<T>.adapter: WeekViewAdapter<T>
+    get() = WeekViewAdapter(this)
 
 fun <T> WeekView<T>.setOnMonthChangeListener(
     block: (
@@ -75,24 +88,4 @@ fun <T> WeekView<T>.setOnEmptyViewLongPressListener(
             block(time.toLocalDateTime())
         }
     }
-}
-
-internal fun Calendar.toLocalDate(): LocalDate {
-    val dateTimeZone = DateTimeZone.forID(timeZone.id)
-    val dateTime = DateTime(timeInMillis, dateTimeZone)
-    return dateTime.toLocalDate()
-}
-
-internal fun Calendar.toLocalDateTime() = LocalDateTime(timeInMillis)
-
-internal fun LocalDate.toCalendar(): Calendar {
-    val calendar = Calendar.getInstance()
-    calendar.time = toDate()
-    return calendar
-}
-
-internal fun LocalDateTime.toCalendar(): Calendar {
-    val calendar = Calendar.getInstance()
-    calendar.time = toDate()
-    return calendar
 }
