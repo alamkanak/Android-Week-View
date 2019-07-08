@@ -9,7 +9,7 @@ import android.text.TextUtils
 import android.text.TextUtils.TruncateAt.END
 import android.text.style.StyleSpan
 
-internal class EventsUpdater<T>(
+internal class AllDayEventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
@@ -18,6 +18,15 @@ internal class EventsUpdater<T>(
     private val context = view.context
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
+    private var previousHorizontalOrigin: Float? = null
+
+    override fun isRequired(): Boolean {
+        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+        val isCacheIncomplete = cache.isAllDayEventLayoutsCleared
+        val doRectsNeedRefresh = cache.allDayEventLayouts.map { it.first }.any { it.rect == null }
+        return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh
+    }
+
     /**
      * Compute the StaticLayout for all-day events to update the header height
      *
@@ -25,8 +34,10 @@ internal class EventsUpdater<T>(
      * @return The association of [EventChip]s with their [StaticLayout]s
      */
     override fun update(drawingContext: DrawingContext) {
+        previousHorizontalOrigin = config.currentOrigin.x
+
         config.setCurrentAllDayEventHeight(0)
-        cache.allDayEventLayouts.clear()
+        cache.clearAllDayEventLayouts()
 
         drawingContext
             .dateRangeWithStartPixels
@@ -39,6 +50,8 @@ internal class EventsUpdater<T>(
                     }
                 }
             }
+
+        cache.isAllDayEventLayoutsCleared = false
     }
 
     private fun calculateLayoutForAllDayEvent(

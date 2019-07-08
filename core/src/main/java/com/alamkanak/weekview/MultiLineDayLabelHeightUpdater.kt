@@ -4,17 +4,34 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.Log
 import android.util.SparseArray
 import java.util.Calendar
 
-internal class MultiLineDayLabelUpdater<T>(
+internal class MultiLineDayLabelHeightUpdater<T>(
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) : Updater {
 
-    override fun isRequired(): Boolean = config.singleLineHeader.not()
+    private var previousHorizontalOrigin: Float? = null
+
+    override fun isRequired(): Boolean {
+        if (config.singleLineHeader) {
+            return false
+        }
+
+        val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
+        val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
+        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+        val isCacheIncomplete = config.numberOfVisibleDays != cache.allDayEventLayouts.size
+
+        return didTimeColumnChange || didScrollHorizontally || isCacheIncomplete
+    }
 
     override fun update(drawingContext: DrawingContext) {
+        Log.d("MultiLineDayLabel", "updated multi-line label height updater")
+        previousHorizontalOrigin = config.currentOrigin.x
+
         val multiDayLabels = drawingContext
             .dateRangeWithStartPixels
             .map { it.first }

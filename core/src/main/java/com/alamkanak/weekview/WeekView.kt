@@ -47,9 +47,10 @@ class WeekView<T> @JvmOverloads constructor(
     // Be careful when changing the order of the updaters, as the calculation of any updater might
     // depend on results of previous updaters
     private val updaters = listOf(
-        MultiLineDayLabelUpdater(configWrapper, cache),
-        HeaderRowUpdater(configWrapper, eventCache),
-        EventsUpdater(this, configWrapper, cache)
+        MultiLineDayLabelHeightUpdater(configWrapper, cache),
+        HeaderRowHeightUpdater(configWrapper, eventCache),
+        AllDayEventsUpdater(this, configWrapper, cache),
+        SingleEventsUpdater(this, configWrapper, cache)
     )
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -57,13 +58,40 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
-        SingleEventsDrawer(this, configWrapper, cache),
+        SingleEventsDrawer(context, configWrapper, cache),
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper, cache),
         AllDayEventsDrawer(context, configWrapper, cache),
         TimeColumnDrawer(this, configWrapper)
     )
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        viewState.update(this)
+
+        configWrapper.refreshAfterZooming()
+        configWrapper.updateVerticalOrigin()
+
+        notifyScrollListeners()
+        prepareEventDrawing(canvas)
+
+        if (viewState.isFirstDraw) {
+            configWrapper.moveCurrentOriginIfFirstDraw()
+            viewState.isFirstDraw = false
+        }
+
+        drawingContext.update(configWrapper)
+        if (!isInEditMode) {
+            eventChipsProvider.loadEventsIfNecessary()
+        }
+
+        updaters
+            .filter { it.isRequired() }
+            .forEach { it.update(drawingContext) }
+
+        drawers.forEach { it.draw(drawingContext, canvas, paint) }
+    }
 
     override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
@@ -95,33 +123,6 @@ class WeekView<T> @JvmOverloads constructor(
         if (configWrapper.showCompleteDay) {
             configWrapper.updateHourHeight(height)
         }
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        viewState.update(this)
-
-        configWrapper.refreshAfterZooming()
-        configWrapper.updateVerticalOrigin()
-
-        notifyScrollListeners()
-        prepareEventDrawing(canvas)
-
-        if (viewState.isFirstDraw) {
-            configWrapper.moveCurrentOriginIfFirstDraw()
-            viewState.isFirstDraw = false
-        }
-
-        drawingContext.update(configWrapper)
-        if (!isInEditMode) {
-            eventChipsProvider.loadEventsIfNecessary()
-        }
-
-        updaters
-            .filter { it.isRequired() }
-            .forEach { it.update(drawingContext) }
-
-        drawers.forEach { it.draw(drawingContext, canvas, paint) }
     }
 
     private fun notifyScrollListeners() {

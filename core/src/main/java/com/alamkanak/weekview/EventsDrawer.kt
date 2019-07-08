@@ -3,17 +3,13 @@ package com.alamkanak.weekview
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.RectF
 import java.util.Calendar
 
 internal class SingleEventsDrawer<T>(
-    private val view: WeekView<T>,
+    private val context: Context,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) : Drawer {
-
-    private val context = view.context
-    private val rectCalculator = EventChipRectCalculator<T>(config)
 
     override fun draw(
         drawingContext: DrawingContext,
@@ -22,36 +18,21 @@ internal class SingleEventsDrawer<T>(
     ) {
         drawingContext
             .dateRangeWithStartPixels
-            .forEach { (date, startPixel) ->
-                drawEventsForDate(date, startPixel, canvas, paint)
+            .forEach { (date, _) ->
+                drawEventsForDate(date, canvas, paint)
             }
     }
 
     private fun drawEventsForDate(
         date: Calendar,
-        startPixel: Float,
         canvas: Canvas,
         paint: Paint
     ) {
-        cache.eventCache.normalEventChipsByDate(date)
-            .filter { it.event.isWithin(config.minHour, config.maxHour) }
-            .forEach {
-                val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
-                if (chipRect.isValidSingleEventRect) {
-                    it.rect = chipRect
-                    it.draw(context, config, canvas, paint)
-                } else {
-                    it.rect = null
-                }
-            }
+        val eventChips = cache.eventCache.normalEventChipsByDate(date).filter { it.rect != null }
+        eventChips.forEach {
+            it.draw(context, config, canvas, paint)
+        }
     }
-
-    private val RectF.isValidSingleEventRect: Boolean
-        get() = (left < right
-            && left < view.width
-            && top < view.height
-            && right > config.timeColumnWidth
-            && bottom > config.headerHeight)
 
 }
 
@@ -93,7 +74,7 @@ internal class AllDayEventsDrawer<T>(
     }
 
     override fun clear() {
-        cache.allDayEventLayouts.clear()
+        cache.clearAllDayEventLayouts()
     }
 
 }
