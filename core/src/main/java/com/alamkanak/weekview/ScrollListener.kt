@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import java.util.*
+import java.util.Calendar
 
 @FunctionalInterface
 interface ScrollListener {
@@ -9,8 +9,8 @@ interface ScrollListener {
      * Called when the first visible day has changed.
      *
      * @param newFirstVisibleDay The new first visible day
-     * @param oldFirstVisibleDay The old first visible day (is null on the first call).
+     * @param oldFirstVisibleDay The old first visible day
      */
-    fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?)
+    fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?)
 
 }

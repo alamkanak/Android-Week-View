@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +29,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import static androidx.core.util.Preconditions.checkNotNull;
 
 public class StaticActivity extends AppCompatActivity
         implements OnEventClickListener<Event>, OnMonthChangeListener<Event>,
@@ -58,10 +59,9 @@ public class StaticActivity extends AppCompatActivity
         left.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar cal = mWeekView.getFirstVisibleDay();
-                cal.add(Calendar.DAY_OF_MONTH, -7);
+                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDay());
+                cal.add(Calendar.DATE, -7);
                 mWeekView.goToDate(cal);
-                updateDateText();
             }
         });
 
@@ -69,16 +69,15 @@ public class StaticActivity extends AppCompatActivity
         right.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar cal = mWeekView.getFirstVisibleDay();
-                cal.add(Calendar.DAY_OF_MONTH, 7);
+                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDay());
+                cal.add(Calendar.DATE, 7);
                 mWeekView.goToDate(cal);
-                updateDateText();
             }
         });
 
         mWeekView.setScrollListener(new ScrollListener() {
             @Override
-            public void onFirstVisibleDayChanged(@NonNull Calendar newFirstVisibleDay,
+            public void onFirstVisibleDayChanged(@Nullable Calendar newFirstVisibleDay,
                                                  @Nullable Calendar oldFirstVisibleDay) {
                 updateDateText();
             }
@@ -117,8 +116,17 @@ public class StaticActivity extends AppCompatActivity
 
     private void updateDateText() {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        String formattedFirstDay = format.format(mWeekView.getFirstVisibleDay().getTime());
-        String formattedLastDay = format.format(mWeekView.getLastVisibleDay().getTime());
+
+        String formattedFirstDay = "none";
+        if (mWeekView.getFirstVisibleDay() != null) {
+            formattedFirstDay = format.format(mWeekView.getFirstVisibleDay().getTime());
+        }
+
+        String formattedLastDay = "none";
+        if (mWeekView.getLastVisibleDay() != null) {
+            formattedLastDay = format.format(mWeekView.getLastVisibleDay().getTime());
+        }
+
         mDateTV.setText(getString(R.string.date_infos, formattedFirstDay, formattedLastDay));
     }
 

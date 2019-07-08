@@ -201,7 +201,7 @@ internal fun Calendar.withMillis(millis: Int): Calendar {
     return copy().apply { set(Calendar.MILLISECOND, millis) }
 }
 
-private fun Calendar.copy(): Calendar = clone() as Calendar
+internal fun Calendar.copy(): Calendar = clone() as Calendar
 
 /**
  * Checks if this date is at the start of the next day after startTime.

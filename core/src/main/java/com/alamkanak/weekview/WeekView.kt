@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat
 import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.Calendar
 import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -98,7 +99,6 @@ class WeekView<T> @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         viewState.update(this)
 
         configWrapper.refreshAfterZooming()
@@ -126,10 +126,15 @@ class WeekView<T> @JvmOverloads constructor(
 
     private fun notifyScrollListeners() {
         val oldFirstVisibleDay = viewState.firstVisibleDay
-
         val totalDayWidth = configWrapper.totalDayWidth
         val visibleDays = configWrapper.numberOfVisibleDays
-        val delta = ceil(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * -1
+
+        val isBeforeCurrentTime = configWrapper.currentOrigin.x > 0
+        val delta = if (isBeforeCurrentTime) {
+            ceil(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * (-1)
+        } else {
+            floor(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * (-1)
+        }
 
         val firstVisibleDay = today().plusDays(delta)
         val lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1)
@@ -137,7 +142,10 @@ class WeekView<T> @JvmOverloads constructor(
         viewState.firstVisibleDay = firstVisibleDay
         viewState.lastVisibleDay = lastVisibleDay
 
-        val hasFirstVisibleDayChanged = firstVisibleDay != oldFirstVisibleDay
+        val hasFirstVisibleDayChanged = oldFirstVisibleDay?.let {
+            firstVisibleDay.isSameDate(it).not()
+        } ?: true
+
         if (hasFirstVisibleDayChanged) {
             scrollListener?.onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay)
         }
@@ -794,7 +802,7 @@ class WeekView<T> @JvmOverloads constructor(
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     var minDate: Calendar?
-        get() = configWrapper.minDate
+        get() = configWrapper.minDate?.copy()
         set(value) {
             val maxDate = configWrapper.maxDate
             if (maxDate != null && value != null && value.isAfter(maxDate)) {
@@ -806,7 +814,7 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     var maxDate: Calendar?
-        get() = configWrapper.maxDate
+        get() = configWrapper.maxDate?.copy()
         set(value) {
             val minDate = configWrapper.minDate
             if (minDate != null && value != null && value.isBefore(minDate)) {
@@ -949,8 +957,8 @@ class WeekView<T> @JvmOverloads constructor(
      *
      * @return The first visible day in the week view.
      */
-    val firstVisibleDay: Calendar
-        get() = checkNotNull(viewState.firstVisibleDay)
+    val firstVisibleDay: Calendar?
+        get() = viewState.firstVisibleDay?.copy()
 
     /**
      * Returns the last visible day in the week view.
@@ -958,7 +966,7 @@ class WeekView<T> @JvmOverloads constructor(
      * @return The last visible day in the week view.
      */
     val lastVisibleDay: Calendar?
-        get() = viewState.lastVisibleDay
+        get() = viewState.lastVisibleDay?.copy()
 
     /**
      * Show today on the week view.
@@ -1008,7 +1016,6 @@ class WeekView<T> @JvmOverloads constructor(
         viewState.shouldRefreshEvents = true
 
         val diff = modifiedDate.daysFromToday
-
         configWrapper.currentOrigin.x = diff.toFloat() * (-1f) * configWrapper.totalDayWidth
         invalidate()
     }
@@ -1220,11 +1227,11 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     fun setScrollListener(
-        block: (newFirstVisibleDay: Calendar, oldFirstVisibleDay: Calendar?) -> Unit
+        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
     ) {
         scrollListener = object : ScrollListener {
             override fun onFirstVisibleDayChanged(
-                newFirstVisibleDay: Calendar,
+                newFirstVisibleDay: Calendar?,
                 oldFirstVisibleDay: Calendar?
             ) {
                 block(firstVisibleDay, oldFirstVisibleDay)
