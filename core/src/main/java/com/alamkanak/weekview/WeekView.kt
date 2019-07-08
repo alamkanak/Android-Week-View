@@ -29,6 +29,12 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
+    // *********************************************************************************************
+    //
+    //  Data holders
+    //
+    // *********************************************************************************************
+
     private val cache: WeekViewCache<T> by lazy {
         val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
         WeekViewCache(eventSplitter)
@@ -40,7 +46,22 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawingContext = DrawingContext()
     private val eventChipsProvider = EventChipsProvider(configWrapper, cache, viewState)
 
-    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper, cache)
+    // *********************************************************************************************
+    //
+    //  Calculators
+    //
+    // *********************************************************************************************
+
+    private val headerRowCalculator = HeaderRowCalculator(configWrapper, cache)
+    private val eventsCalculator = EventsCalculator(this, configWrapper, cache)
+
+    // *********************************************************************************************
+    //
+    //  Drawers
+    //
+    // *********************************************************************************************
+
+    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper)
     private val dayLabelDrawer = DayLabelDrawer(this, configWrapper)
     private val eventsDrawer = EventsDrawer(this, configWrapper, cache)
     private val timeColumnDrawer = TimeColumnDrawer(this, configWrapper)
@@ -105,19 +126,25 @@ class WeekView<T> @JvmOverloads constructor(
             eventChipsProvider.loadEventsIfNecessary()
         }
 
+        // ––––––––––––––––––––––––––––––––– Calculators –––––––––––––––––––––––––––––––––––––––––––
+
+        headerRowCalculator.update(drawingContext)
+
         allDayEvents.clear()
-        allDayEvents += eventsDrawer.prepareDrawAllDayEvents(drawingContext)
+        allDayEvents += eventsCalculator.update(drawingContext)
+
+        // ––––––––––––––––––––––––––––––––––– Drawers –––––––––––––––––––––––––––––––––––––––––––––
 
         dayBackgroundDrawer.draw(drawingContext, canvas)
         backgroundGridDrawer.draw(drawingContext, canvas)
 
-        eventsDrawer.drawSingleEvents(drawingContext, canvas, paint)
-
-        nowLineDrawer.draw(drawingContext, canvas)
-        headerRowDrawer.draw(drawingContext, canvas, paint)
+        headerRowDrawer.draw(canvas, paint)
         dayLabelDrawer.draw(drawingContext, canvas)
 
+        eventsDrawer.drawSingleEvents(drawingContext, canvas, paint)
         eventsDrawer.drawAllDayEvents(allDayEvents, canvas, paint)
+
+        nowLineDrawer.draw(drawingContext, canvas)
         timeColumnDrawer.drawTimeColumn(canvas)
     }
 

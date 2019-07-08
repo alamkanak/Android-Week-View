@@ -5,19 +5,10 @@ import android.graphics.Paint
 
 internal class HeaderRowDrawer<T>(
     private val view: WeekView<T>,
-    private val config: WeekViewConfigWrapper,
-    cache: WeekViewCache<T>
+    private val config: WeekViewConfigWrapper
 ) {
 
-    // TODO Move out of HeaderRowDrawer
-    private val calculator = HeaderRowCalculator(config, cache)
-
-    fun draw(drawingContext: DrawingContext, canvas: Canvas, paint: Paint) {
-        calculator.update(drawingContext)
-        drawHeaderRow(canvas, paint)
-    }
-
-    private fun drawHeaderRow(canvas: Canvas, paint: Paint) {
+    fun draw(canvas: Canvas, paint: Paint) {
         val width = view.width
 
         canvas.restore()

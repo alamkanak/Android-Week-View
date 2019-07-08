@@ -13,10 +13,6 @@ internal class EventsDrawer<T>(
 ) {
 
     private val context = view.context
-
-    // TODO Move out of EventsDrawer
-    private val eventsCalculator = EventsCalculator(view, config, cache)
-
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
     fun drawSingleEvents(
@@ -48,18 +44,6 @@ internal class EventsDrawer<T>(
                     it.rect = null
                 }
             }
-    }
-
-    /**
-     * Compute the StaticLayout for all-day events to update the header height
-     *
-     * @param drawingContext The [DrawingContext] to use for drawing
-     * @return The association of [EventChip]s with his StaticLayout
-     */
-    fun prepareDrawAllDayEvents(
-        drawingContext: DrawingContext
-    ): List<Pair<EventChip<T>, StaticLayout>> {
-        return eventsCalculator.update(drawingContext)
     }
 
     /**

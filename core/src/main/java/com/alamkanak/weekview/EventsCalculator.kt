@@ -18,6 +18,12 @@ internal class EventsCalculator<T>(
     private val rectCalculator = EventChipRectCalculator<T>(config)
     private val staticLayoutCache = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
 
+    /**
+     * Compute the StaticLayout for all-day events to update the header height
+     *
+     * @param drawingContext The [DrawingContext] to use for drawing
+     * @return The association of [EventChip]s with their [StaticLayout]s
+     */
     fun update(drawingContext: DrawingContext): List<Pair<EventChip<T>, StaticLayout>> {
         config.setCurrentAllDayEventHeight(0)
         staticLayoutCache.clear()
