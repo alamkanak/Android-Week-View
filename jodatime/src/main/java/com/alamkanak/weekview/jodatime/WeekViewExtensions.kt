@@ -56,16 +56,16 @@ fun <T> WeekView<T>.goToDate(date: LocalDate) {
 
 fun <T> WeekView<T>.setScrollListener(
     block: (
-        newFirstVisibleDay: LocalDate,
+        newFirstVisibleDay: LocalDate?,
         oldFirstVisibleDay: LocalDate?
     ) -> Unit
 ) {
     scrollListener = object : ScrollListener {
         override fun onFirstVisibleDayChanged(
-            newFirstVisibleDay: Calendar,
+            newFirstVisibleDay: Calendar?,
             oldFirstVisibleDay: Calendar?
         ) {
-            block(newFirstVisibleDay.toLocalDate(), oldFirstVisibleDay?.toLocalDate())
+            block(newFirstVisibleDay?.toLocalDate(), oldFirstVisibleDay?.toLocalDate())
         }
     }
 }
