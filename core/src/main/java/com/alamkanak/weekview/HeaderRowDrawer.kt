@@ -6,9 +6,13 @@ import android.graphics.Paint
 internal class HeaderRowDrawer<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper
-) {
+) : Drawer {
 
-    fun draw(canvas: Canvas, paint: Paint) {
+    override fun draw(
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         val width = view.width
 
         canvas.restore()

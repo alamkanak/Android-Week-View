@@ -1,21 +1,21 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
-import android.text.StaticLayout
 import java.util.Calendar
 
-internal class EventsDrawer<T>(
+internal class SingleEventsDrawer<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
-) {
+    private val cache: EventCache<T>
+) : Drawer {
 
     private val context = view.context
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
-    fun drawSingleEvents(
+    override fun draw(
         drawingContext: DrawingContext,
         canvas: Canvas,
         paint: Paint
@@ -46,17 +46,27 @@ internal class EventsDrawer<T>(
             }
     }
 
-    /**
-     * Draw all the all-day events of a particular day.
-     *
-     * @param eventChips The list of pairs of [EventChip] and [StaticLayout] to draw
-     * @param canvas The canvas to draw upon.
-     */
-    fun drawAllDayEvents(
-        eventChips: List<Pair<EventChip<T>, StaticLayout>>,
+    private val RectF.isValidSingleEventRect: Boolean
+        get() = (left < right
+            && left < view.width
+            && top < view.height
+            && right > config.timeColumnWidth
+            && bottom > config.headerHeight)
+
+}
+
+internal class AllDayEventsDrawer<T>(
+    private val context: Context,
+    private val config: WeekViewConfigWrapper,
+    private val megaCache: MegaCache<T>
+) : Drawer {
+
+    override fun draw(
+        drawingContext: DrawingContext,
         canvas: Canvas,
         paint: Paint
     ) {
+        val eventChips = megaCache.allDayEventLayouts
         for (pair in eventChips) {
             val eventChip = pair.first
             val layout = pair.second
@@ -81,12 +91,5 @@ internal class EventsDrawer<T>(
         canvas.restore()
         canvas.save()
     }
-
-    private val RectF.isValidSingleEventRect: Boolean
-        get() = (left < right
-            && left < view.width
-            && top < view.height
-            && right > config.timeColumnWidth
-            && bottom > config.headerHeight)
 
 }

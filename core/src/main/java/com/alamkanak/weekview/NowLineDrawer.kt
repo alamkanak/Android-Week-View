@@ -1,14 +1,19 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.Paint
 import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import kotlin.math.max
 
 internal class NowLineDrawer(
     private val config: WeekViewConfigWrapper
-) {
+) : Drawer {
 
-    fun draw(drawingContext: DrawingContext, canvas: Canvas) {
+    override fun draw(
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         if (config.showNowLineDot.not()) {
             return
         }

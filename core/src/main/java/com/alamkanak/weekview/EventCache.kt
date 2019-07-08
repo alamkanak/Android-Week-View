@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import androidx.collection.ArrayMap
 import java.util.Calendar
 
-internal class WeekViewCache<T>(
+internal class EventCache<T>(
     private val eventSplitter: WeekViewEventSplitter<T>
 ) {
 

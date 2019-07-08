@@ -1,12 +1,14 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.util.SparseArray
 
 internal class TimeColumnDrawer(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
-) {
+) : Drawer, CachingDrawer {
+
     private val timeLabelCache = SparseArray<String>()
 
     init {
@@ -19,7 +21,11 @@ internal class TimeColumnDrawer(
         }
     }
 
-    fun drawTimeColumn(canvas: Canvas) {
+    override fun draw(
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         var topMargin = config.headerHeight
         val bottom = view.height.toFloat()
 
@@ -74,7 +80,7 @@ internal class TimeColumnDrawer(
         canvas.restore()
     }
 
-    fun clearLabelCache() {
+    override fun clear() {
         timeLabelCache.clear()
         cacheTimeLabels()
     }

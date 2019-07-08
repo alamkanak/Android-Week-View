@@ -39,7 +39,7 @@ private enum class Direction {
 internal class WeekViewGestureHandler<T>(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
+    private val cache: EventCache<T>
 ) : GestureDetector.SimpleOnGestureListener() {
 
     private val listener = view as Listener

@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.os.Parcelable
-import android.text.StaticLayout
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -29,48 +28,38 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
-    // *********************************************************************************************
-    //
-    //  Data holders
-    //
-    // *********************************************************************************************
-
-    private val cache: WeekViewCache<T> by lazy {
+    private val eventCache: EventCache<T> by lazy {
         val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-        WeekViewCache(eventSplitter)
+        EventCache(eventSplitter)
     }
 
+    private val megaCache = MegaCache(eventCache)
+
     private val viewState = WeekViewViewState(configWrapper, this)
-    private val gestureHandler = WeekViewGestureHandler(this, configWrapper, cache)
+    private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventCache)
 
     private val drawingContext = DrawingContext()
-    private val eventChipsProvider = EventChipsProvider(configWrapper, cache, viewState)
-
-    // *********************************************************************************************
-    //
-    //  Calculators
-    //
-    // *********************************************************************************************
-
-    private val headerRowCalculator = HeaderRowCalculator(configWrapper, cache)
-    private val eventsCalculator = EventsCalculator(this, configWrapper, cache)
-
-    // *********************************************************************************************
-    //
-    //  Drawers
-    //
-    // *********************************************************************************************
-
-    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper)
-    private val dayLabelDrawer = DayLabelDrawer(this, configWrapper)
-    private val eventsDrawer = EventsDrawer(this, configWrapper, cache)
-    private val timeColumnDrawer = TimeColumnDrawer(this, configWrapper)
-    private val dayBackgroundDrawer = DayBackgroundDrawer(this, configWrapper)
-    private val backgroundGridDrawer = BackgroundGridDrawer(this, configWrapper)
-    private val nowLineDrawer = NowLineDrawer(configWrapper)
+    private val eventChipsProvider = EventChipsProvider(configWrapper, eventCache, viewState)
 
     private val paint = Paint()
-    private val allDayEvents = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
+
+    private val updaters = listOf(
+        HeaderRowUpdater(configWrapper, eventCache),
+        EventsUpdater(this, configWrapper, megaCache)
+    )
+
+    // Be careful when changing the order of the drawers, as that might cause
+    // views to incorrectly draw over each other
+    private val drawers = listOf(
+        DayBackgroundDrawer(this, configWrapper),
+        BackgroundGridDrawer(this, configWrapper),
+        SingleEventsDrawer(this, configWrapper, eventCache),
+        NowLineDrawer(configWrapper),
+        HeaderRowDrawer(this, configWrapper),
+        DayLabelDrawer(configWrapper),
+        AllDayEventsDrawer(context, configWrapper, megaCache),
+        TimeColumnDrawer(this, configWrapper)
+    )
 
     override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
@@ -96,8 +85,7 @@ class WeekView<T> @JvmOverloads constructor(
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.areDimensionsInvalid = true
 
-        dayLabelDrawer.clearLabelCache()
-        timeColumnDrawer.clearLabelCache()
+        clearCachingDrawers()
         calculateWidthPerDay()
 
         if (configWrapper.showCompleteDay) {
@@ -126,26 +114,9 @@ class WeekView<T> @JvmOverloads constructor(
             eventChipsProvider.loadEventsIfNecessary()
         }
 
-        // ––––––––––––––––––––––––––––––––– Calculators –––––––––––––––––––––––––––––––––––––––––––
+        updaters.forEach { it.update(drawingContext) }
 
-        headerRowCalculator.update(drawingContext)
-
-        allDayEvents.clear()
-        allDayEvents += eventsCalculator.update(drawingContext)
-
-        // ––––––––––––––––––––––––––––––––––– Drawers –––––––––––––––––––––––––––––––––––––––––––––
-
-        dayBackgroundDrawer.draw(drawingContext, canvas)
-        backgroundGridDrawer.draw(drawingContext, canvas)
-
-        headerRowDrawer.draw(canvas, paint)
-        dayLabelDrawer.draw(drawingContext, canvas)
-
-        eventsDrawer.drawSingleEvents(drawingContext, canvas, paint)
-        eventsDrawer.drawAllDayEvents(allDayEvents, canvas, paint)
-
-        nowLineDrawer.draw(drawingContext, canvas)
-        timeColumnDrawer.drawTimeColumn(canvas)
+        drawers.forEach { it.draw(drawingContext, canvas, paint) }
     }
 
     private fun notifyScrollListeners() {
@@ -168,7 +139,7 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     private fun prepareEventDrawing(canvas: Canvas) {
-        cache.clearEventChipsCache()
+        eventCache.clearEventChipsCache()
         canvas.save()
         clipEventsRect(canvas)
     }
@@ -242,7 +213,7 @@ class WeekView<T> @JvmOverloads constructor(
         set(value) {
             configWrapper.numberOfVisibleDays = value
             dateTimeInterpreter.setNumberOfDays(value)
-            dayLabelDrawer.clearLabelCache()
+            clearCachingDrawers()
 
             viewState.firstVisibleDay?.let {
                 // Scroll to first visible day after changing the number of visible days
@@ -1260,8 +1231,13 @@ class WeekView<T> @JvmOverloads constructor(
         get() = configWrapper.dateTimeInterpreter
         set(value) {
             configWrapper.dateTimeInterpreter = value
-            dayLabelDrawer.clearLabelCache()
-            timeColumnDrawer.clearLabelCache()
+            clearCachingDrawers()
         }
+
+    private fun clearCachingDrawers() {
+        drawers
+            .filterIsInstance(CachingDrawer::class.java)
+            .forEach { it.clear() }
+    }
 
 }

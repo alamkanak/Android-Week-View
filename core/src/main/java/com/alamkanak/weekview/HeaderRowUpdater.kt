@@ -1,11 +1,11 @@
 package com.alamkanak.weekview
 
-internal class HeaderRowCalculator<T>(
+internal class HeaderRowUpdater<T>(
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
-) {
+    private val cache: EventCache<T>
+) : Updater {
 
-    fun update(drawingContext: DrawingContext) {
+    override fun update(drawingContext: DrawingContext) {
         config.timeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
         refreshHeaderHeight(drawingContext)
     }

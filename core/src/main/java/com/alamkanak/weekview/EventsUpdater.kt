@@ -2,21 +2,21 @@ package com.alamkanak.weekview
 
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.text.Layout
+import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextUtils
+import android.text.TextUtils.TruncateAt.END
 import android.text.style.StyleSpan
 
-internal class EventsCalculator<T>(
+internal class EventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
-) {
+    private val megaCache: MegaCache<T>
+) : Updater {
 
     private val context = view.context
     private val rectCalculator = EventChipRectCalculator<T>(config)
-    private val staticLayoutCache = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
 
     /**
      * Compute the StaticLayout for all-day events to update the header height
@@ -24,24 +24,22 @@ internal class EventsCalculator<T>(
      * @param drawingContext The [DrawingContext] to use for drawing
      * @return The association of [EventChip]s with their [StaticLayout]s
      */
-    fun update(drawingContext: DrawingContext): List<Pair<EventChip<T>, StaticLayout>> {
+    override fun update(drawingContext: DrawingContext) {
         config.setCurrentAllDayEventHeight(0)
-        staticLayoutCache.clear()
+        megaCache.allDayEventLayouts.clear()
 
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
-                val eventChips = cache.allDayEventChipsByDate(date)
+                val eventChips = megaCache.eventCache.allDayEventChipsByDate(date)
 
                 for (eventChip in eventChips) {
                     val layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
                     if (layout != null) {
-                        staticLayoutCache.add(Pair(eventChip, layout))
+                        megaCache.allDayEventLayouts.add(Pair(eventChip, layout))
                     }
                 }
             }
-
-        return staticLayoutCache
     }
 
     private fun calculateLayoutForAllDayEvent(
@@ -109,7 +107,7 @@ internal class EventsCalculator<T>(
 
         // Get text dimensions.
         val textPaint = event.getTextPaint(context, config)
-        val textLayout = StaticLayout(text, textPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
+        val textLayout = StaticLayout(text, textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
 
         val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -121,7 +119,8 @@ internal class EventsCalculator<T>(
         val availableHeight = (rect.bottom - top - (config.eventPadding * 2).toFloat()).toInt()
 
         val finalTextLayout = if (availableHeight >= lineHeight) {
-            ellipsizeTextToFitChip(eventChip, text, textLayout, config, availableHeight, availableWidth)
+            ellipsizeTextToFitChip(
+                eventChip, text, textLayout, config, availableHeight, availableWidth)
         } else {
             textLayout
         }
@@ -145,7 +144,7 @@ internal class EventsCalculator<T>(
         event: WeekViewEvent<T>
     ): StaticLayout {
         val textPaint = event.getTextPaint(context, config)
-        return StaticLayout("", textPaint, 0, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
+        return StaticLayout("", textPaint, 0, ALIGN_NORMAL, 1f, 0f, false)
     }
 
     private fun ellipsizeTextToFitChip(
@@ -169,7 +168,7 @@ internal class EventsCalculator<T>(
         do {
             // Ellipsize text to fit into event rect.
             val availableArea = availableLineCount * availableWidth
-            val ellipsized = TextUtils.ellipsize(text, textPaint, availableArea.toFloat(), TextUtils.TruncateAt.END)
+            val ellipsized = TextUtils.ellipsize(text, textPaint, availableArea.toFloat(), END)
             val width = (right - left - (config.eventPadding * 2).toFloat()).toInt()
 
             if (eventChip.event.isAllDay && width < 0) {
@@ -178,7 +177,7 @@ internal class EventsCalculator<T>(
                 break
             }
 
-            textLayout = StaticLayout(ellipsized, textPaint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
 
             // Reduce line count.
             availableLineCount--

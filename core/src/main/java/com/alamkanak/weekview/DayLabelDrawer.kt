@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.M
 import android.text.Layout
@@ -10,13 +11,16 @@ import android.util.SparseArray
 import java.util.Calendar
 
 internal class DayLabelDrawer(
-    private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
-) {
+) : Drawer, CachingDrawer {
 
     private val dayLabelCache = SparseArray<String>()
 
-    fun draw(drawingContext: DrawingContext, canvas: Canvas) {
+    override fun draw(
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
@@ -68,7 +72,7 @@ internal class DayLabelDrawer(
         }
     }
 
-    internal fun clearLabelCache() {
+    override fun clear() {
         dayLabelCache.clear()
     }
 

@@ -9,9 +9,13 @@ import kotlin.math.max
 internal class DayBackgroundDrawer(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
-) {
+) : Drawer {
 
-    fun draw(drawingContext: DrawingContext, canvas: Canvas) {
+    override fun draw(
+        drawingContext: DrawingContext,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         drawingContext.dateRangeWithStartPixels.forEach { (date, startPixel) ->
             val startX = max(startPixel, config.timeColumnWidth)
             drawDayBackground(date, startX, startPixel, canvas)

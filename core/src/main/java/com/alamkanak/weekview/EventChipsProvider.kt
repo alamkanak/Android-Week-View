@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 internal class EventChipsProvider<T>(
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>,
+    private val cache: EventCache<T>,
     private val viewState: WeekViewViewState
 ) {
 
