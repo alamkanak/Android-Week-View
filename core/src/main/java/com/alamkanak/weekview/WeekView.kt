@@ -33,8 +33,6 @@ class WeekView<T> @JvmOverloads constructor(
         EventCache(eventSplitter)
     }
 
-    private val megaCache = MegaCache(eventCache)
-
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventCache)
 
@@ -45,7 +43,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val updaters = listOf(
         HeaderRowUpdater(configWrapper, eventCache),
-        EventsUpdater(this, configWrapper, megaCache)
+        EventsUpdater(this, configWrapper, eventCache)
     )
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -57,7 +55,7 @@ class WeekView<T> @JvmOverloads constructor(
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper),
-        AllDayEventsDrawer(context, configWrapper, megaCache),
+        AllDayEventsDrawer(context, configWrapper, eventCache),
         TimeColumnDrawer(this, configWrapper)
     )
 

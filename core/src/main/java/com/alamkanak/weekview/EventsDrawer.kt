@@ -58,7 +58,7 @@ internal class SingleEventsDrawer<T>(
 internal class AllDayEventsDrawer<T>(
     private val context: Context,
     private val config: WeekViewConfigWrapper,
-    private val megaCache: MegaCache<T>
+    private val cache: EventCache<T>
 ) : Drawer {
 
     override fun draw(
@@ -66,7 +66,7 @@ internal class AllDayEventsDrawer<T>(
         canvas: Canvas,
         paint: Paint
     ) {
-        val eventChips = megaCache.allDayEventLayouts
+        val eventChips = cache.allDayEventLayouts
         for (pair in eventChips) {
             val eventChip = pair.first
             val layout = pair.second

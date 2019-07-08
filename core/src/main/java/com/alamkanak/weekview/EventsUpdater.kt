@@ -12,7 +12,7 @@ import android.text.style.StyleSpan
 internal class EventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val megaCache: MegaCache<T>
+    private val cache: EventCache<T>
 ) : Updater {
 
     private val context = view.context
@@ -26,17 +26,17 @@ internal class EventsUpdater<T>(
      */
     override fun update(drawingContext: DrawingContext) {
         config.setCurrentAllDayEventHeight(0)
-        megaCache.allDayEventLayouts.clear()
+        cache.allDayEventLayouts.clear()
 
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
-                val eventChips = megaCache.eventCache.allDayEventChipsByDate(date)
+                val eventChips = cache.allDayEventChipsByDate(date)
 
                 for (eventChip in eventChips) {
                     val layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
                     if (layout != null) {
-                        megaCache.allDayEventLayouts.add(Pair(eventChip, layout))
+                        cache.allDayEventLayouts.add(Pair(eventChip, layout))
                     }
                 }
             }
