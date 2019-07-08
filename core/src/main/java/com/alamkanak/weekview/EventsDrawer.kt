@@ -30,20 +30,11 @@ internal class EventsDrawer<T>(
         canvas: Canvas,
         paint: Paint
     ) {
-        var startPixel = drawingContext.startPixel
-
-        for (date in drawingContext.dateRange) {
-            if (config.isSingleDay) {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                startPixel += config.eventMarginHorizontal
+        drawingContext
+            .dateRangeWithStartPixels
+            .forEach { (date, startPixel) ->
+                drawEventsForDate(date, startPixel, canvas, paint)
             }
-
-            drawEventsForDate(date, startPixel, canvas, paint)
-
-            // In the next iteration, start from the next day.
-            startPixel += config.totalDayWidth
-        }
     }
 
     private fun drawEventsForDate(
@@ -77,23 +68,18 @@ internal class EventsDrawer<T>(
         config.setCurrentAllDayEventHeight(0)
         staticLayoutCache.clear()
 
-        var startPixel = drawingContext.startPixel
+        drawingContext
+            .dateRangeWithStartPixels
+            .forEach { (date, startPixel) ->
+                val eventChips = cache.allDayEventChipsByDate(date)
 
-        for (date in drawingContext.dateRange) {
-            if (config.isSingleDay) {
-                startPixel += config.eventMarginHorizontal
-            }
-
-            val eventChips = cache.allDayEventChipsByDate(date)
-
-            for (eventChip in eventChips) {
-                calculateLayoutForAllDayEvent(eventChip, startPixel)?.let {
-                    staticLayoutCache.add(Pair(eventChip, it))
+                for (eventChip in eventChips) {
+                    val layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
+                    if (layout != null) {
+                        staticLayoutCache.add(Pair(eventChip, layout))
+                    }
                 }
             }
-
-            startPixel += config.totalDayWidth
-        }
 
         return staticLayoutCache
     }

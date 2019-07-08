@@ -18,7 +18,6 @@ internal class WeekViewViewState(
     var lastVisibleDay: Calendar? = null
 
     var shouldRefreshEvents: Boolean = false
-    var requiresPostInvalidateOnAnimation: Boolean = false
 
     fun update(view: WeekView<*>) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()

@@ -12,7 +12,7 @@ internal class BackgroundGridDrawer(
     private lateinit var hourLines: FloatArray
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        drawingContext.startPixels.forEach { startPixel ->
+        drawingContext.dateRangeWithStartPixels.forEach { (_, startPixel) ->
             val startX = max(startPixel, config.timeColumnWidth)
             drawGrid(startX, startPixel, canvas)
         }

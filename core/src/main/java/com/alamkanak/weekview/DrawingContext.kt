@@ -5,9 +5,10 @@ import kotlin.math.ceil
 
 internal class DrawingContext {
 
-    var startPixel = 0f
-    val dateRange = mutableListOf<Calendar>()
-    val startPixels = mutableListOf<Float>()
+    private var startPixel = 0f
+    private val dateRange = mutableListOf<Calendar>()
+    private val startPixels = mutableListOf<Float>()
+
     val dateRangeWithStartPixels = mutableListOf<Pair<Calendar, Float>>()
 
     fun update(config: WeekViewConfigWrapper) {
@@ -36,21 +37,16 @@ internal class DrawingContext {
 
     private fun updateStartPixels(config: WeekViewConfigWrapper, startPixel: Float) {
         startPixels.clear()
-        startPixels += startPixel
 
-        var currentStartPixel = startPixel
+        val singleDayMargin = config.eventMarginHorizontal.toFloat()
 
-        for (day in dateRange) {
-            if (config.isSingleDay) {
+        startPixels += dateRange.indices
+            .map { index -> startPixel + index * config.totalDayWidth }
+            .map {
                 // Add a margin at the start if we're in day view. Otherwise, screen space is too
                 // precious and we refrain from doing so.
-                currentStartPixel += config.eventMarginHorizontal.toFloat()
+                if (config.isSingleDay) it + singleDayMargin else it
             }
-
-            // In the next iteration, start from the next day.
-            currentStartPixel += config.totalDayWidth
-            startPixels.add(currentStartPixel)
-        }
     }
 
 }

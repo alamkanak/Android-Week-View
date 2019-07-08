@@ -149,13 +149,13 @@ internal class WeekViewConfigWrapper(
     var minDate: Calendar? = null
     var maxDate: Calendar? = null
 
-    private var _dateTimeInterpreter: DateTimeInterpreter =
+    private var internalDateTimeInterpreter: DateTimeInterpreter =
         DefaultDateTimeInterpreter(RealDateFormatProvider(context), numberOfVisibleDays)
 
     var dateTimeInterpreter: DateTimeInterpreter
-        get() = _dateTimeInterpreter
+        get() = internalDateTimeInterpreter
         set(value) {
-            _dateTimeInterpreter = value
+            internalDateTimeInterpreter = value
             initTextTimeWidth()
         }
 
@@ -490,8 +490,8 @@ internal class WeekViewConfigWrapper(
         timeColumnWidth = timeTextWidth + timeColumnPadding * 2
     }
 
-    fun calculateWidthPerDay(width: Int) {
-        val availableWidth = width.toFloat() - timeColumnWidth - columnGap * numberOfVisibleDays
+    fun calculateWidthPerDay() {
+        val availableWidth = view.width.toFloat() - timeColumnWidth - columnGap * numberOfVisibleDays
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
@@ -561,7 +561,7 @@ internal class WeekViewConfigWrapper(
         }
     }
 
-    fun refreshAfterZooming(view: WeekView<*>) {
+    fun refreshAfterZooming() {
         if (newHourHeight > 0 && !showCompleteDay) {
             newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
             newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
@@ -579,7 +579,7 @@ internal class WeekViewConfigWrapper(
         }
     }
 
-    fun updateVerticalOrigin(view: WeekView<*>) {
+    fun updateVerticalOrigin() {
         // If the new currentOrigin.y is invalid, make it valid.
         val dayHeight = hourHeight * hoursPerDay
         val potentialNewVerticalOrigin = view.height - (dayHeight + headerHeight)

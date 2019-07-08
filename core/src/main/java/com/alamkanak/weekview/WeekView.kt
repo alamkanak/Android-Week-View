@@ -17,7 +17,7 @@ import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.min
-import kotlin.math.round
+import kotlin.math.roundToInt
 
 class WeekView<T> @JvmOverloads constructor(
     context: Context,
@@ -75,7 +75,10 @@ class WeekView<T> @JvmOverloads constructor(
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.areDimensionsInvalid = true
+
         dayLabelDrawer.clearLabelCache()
+        timeColumnDrawer.clearLabelCache()
+        calculateWidthPerDay()
 
         if (configWrapper.showCompleteDay) {
             configWrapper.updateHourHeight(height)
@@ -84,13 +87,11 @@ class WeekView<T> @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val isFirstDraw = viewState.isFirstDraw
 
-        calculateWidthPerDay()
         viewState.update(this)
 
-        configWrapper.refreshAfterZooming(this)
-        configWrapper.updateVerticalOrigin(this)
+        configWrapper.refreshAfterZooming()
+        configWrapper.updateVerticalOrigin()
 
         notifyScrollListeners()
         prepareEventDrawing(canvas)
@@ -106,7 +107,7 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
         allDayEvents.clear()
-        allDayEvents.addAll(eventsDrawer.prepareDrawAllDayEvents(drawingContext))
+        allDayEvents += eventsDrawer.prepareDrawAllDayEvents(drawingContext)
 
         dayBackgroundDrawer.draw(drawingContext, canvas)
         backgroundGridDrawer.draw(drawingContext, canvas)
@@ -119,16 +120,6 @@ class WeekView<T> @JvmOverloads constructor(
 
         eventsDrawer.drawAllDayEvents(allDayEvents, canvas, paint)
         timeColumnDrawer.drawTimeColumn(canvas)
-
-        if (isFirstDraw) {
-            // Temporary workaround to make sure that the events are actually being displayed
-            invalidate()
-        }
-
-        if (viewState.requiresPostInvalidateOnAnimation) {
-            viewState.requiresPostInvalidateOnAnimation = false
-            ViewCompat.postInvalidateOnAnimation(this)
-        }
     }
 
     private fun notifyScrollListeners() {
@@ -136,7 +127,7 @@ class WeekView<T> @JvmOverloads constructor(
 
         val totalDayWidth = configWrapper.totalDayWidth
         val visibleDays = configWrapper.numberOfVisibleDays
-        val delta = round(ceil((configWrapper.currentOrigin.x / totalDayWidth).toDouble())).toInt() * -1
+        val delta = ceil(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * -1
 
         val firstVisibleDay = today().plusDays(delta)
         val lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1)
@@ -145,7 +136,7 @@ class WeekView<T> @JvmOverloads constructor(
         viewState.lastVisibleDay = lastVisibleDay
 
         val hasFirstVisibleDayChanged = firstVisibleDay != oldFirstVisibleDay
-        if (hasFirstVisibleDayChanged && scrollListener != null) {
+        if (hasFirstVisibleDayChanged) {
             scrollListener?.onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay)
         }
     }
@@ -161,7 +152,7 @@ class WeekView<T> @JvmOverloads constructor(
             configWrapper.calculateTimeColumnWidth()
         }
 
-        configWrapper.calculateWidthPerDay(width)
+        configWrapper.calculateWidthPerDay()
     }
 
     private fun clipEventsRect(canvas: Canvas) {
@@ -224,12 +215,14 @@ class WeekView<T> @JvmOverloads constructor(
          */
         set(value) {
             configWrapper.numberOfVisibleDays = value
-            (dateTimeInterpreter as? DefaultDateTimeInterpreter)?.setNumberOfDays(value)
+            dateTimeInterpreter.setNumberOfDays(value)
 
             viewState.firstVisibleDay?.let {
+                // Scroll to first visible day after changing the number of visible days
                 viewState.scrollToDay = it
             }
 
+            calculateWidthPerDay()
             invalidate()
         }
 
@@ -1014,7 +1007,6 @@ class WeekView<T> @JvmOverloads constructor(
         val diff = modifiedDate.daysFromToday
 
         configWrapper.currentOrigin.x = diff.toFloat() * (-1f) * configWrapper.totalDayWidth
-        viewState.requiresPostInvalidateOnAnimation = true
         invalidate()
     }
 

@@ -57,7 +57,7 @@ internal class EventChipsProvider<T>(
         }
 
         val loader = checkNotNull(monthLoader) {
-            "No MonthChangeListener found. Provide one via weekView.setMonthChangeListener()."
+            "No OnMonthChangeListener found. Provide one via weekView.setOnMonthChangeListener()."
         }
 
         if (previousPeriodEvents == null) {

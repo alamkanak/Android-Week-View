@@ -31,7 +31,7 @@ internal class HeaderRowDrawer<T>(
             return
         }
 
-        val dateRange = drawingContext.dateRange
+        val dateRange = drawingContext.dateRangeWithStartPixels.map { it.first }
         val visibleEvents = cache.getAllDayEventsInRange(dateRange)
 
         config.hasEventInHeader = visibleEvents.any { it.isAllDay }
