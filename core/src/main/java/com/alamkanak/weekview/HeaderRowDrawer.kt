@@ -6,30 +6,15 @@ import android.graphics.Paint
 internal class HeaderRowDrawer<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
+    cache: WeekViewCache<T>
 ) {
 
+    // TODO Move out of HeaderRowDrawer
+    private val calculator = HeaderRowCalculator(config, cache)
+
     fun draw(drawingContext: DrawingContext, canvas: Canvas, paint: Paint) {
-        calculateAvailableSpaceForHeader(drawingContext)
+        calculator.update(drawingContext)
         drawHeaderRow(canvas, paint)
-    }
-
-    private fun calculateAvailableSpaceForHeader(drawingContext: DrawingContext) {
-        config.timeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
-        refreshHeaderHeight(drawingContext)
-    }
-
-    private fun refreshHeaderHeight(drawingContext: DrawingContext) {
-        if (cache.allDayEventChips.isEmpty()) {
-            config.hasEventInHeader = false
-            config.refreshHeaderHeight()
-        }
-
-        val dateRange = drawingContext.dateRangeWithStartPixels.map { it.first }
-        val visibleEvents = cache.getAllDayEventsInRange(dateRange)
-
-        config.hasEventInHeader = visibleEvents.any { it.isAllDay }
-        config.refreshHeaderHeight()
     }
 
     private fun drawHeaderRow(canvas: Canvas, paint: Paint) {
