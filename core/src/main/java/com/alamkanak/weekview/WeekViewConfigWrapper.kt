@@ -51,7 +51,8 @@ internal class WeekViewConfigWrapper(
         color = config.todayHeaderTextColor
     }
 
-    private var currentAllDayEventHeight: Int = 0
+    var currentAllDayEventHeight: Int = 0
+        private set
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
@@ -502,10 +503,6 @@ internal class WeekViewConfigWrapper(
     fun setCurrentAllDayEventHeight(height: Int) {
         currentAllDayEventHeight = height
         refreshHeaderHeight()
-    }
-
-    fun getCurrentAllDayEventHeight(): Int {
-        return currentAllDayEventHeight
     }
 
     fun moveCurrentOriginIfFirstDraw() {

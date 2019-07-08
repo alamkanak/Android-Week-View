@@ -33,6 +33,8 @@ class WeekView<T> @JvmOverloads constructor(
         EventCache(eventSplitter)
     }
 
+    private val cache = WeekViewCache(eventCache)
+
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventCache)
 
@@ -41,9 +43,12 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val paint = Paint()
 
+    // Be careful when changing the order of the updaters, as the calculation of any updater might
+    // depend on results of previous updaters
     private val updaters = listOf(
+        MultiLineDayLabelUpdater(configWrapper, cache),
         HeaderRowUpdater(configWrapper, eventCache),
-        EventsUpdater(this, configWrapper, eventCache)
+        EventsUpdater(this, configWrapper, cache)
     )
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -51,11 +56,11 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
-        SingleEventsDrawer(this, configWrapper, eventCache),
+        SingleEventsDrawer(this, configWrapper, cache),
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
-        DayLabelDrawer(configWrapper),
-        AllDayEventsDrawer(context, configWrapper, eventCache),
+        DayLabelDrawer(configWrapper, cache),
+        AllDayEventsDrawer(context, configWrapper, cache),
         TimeColumnDrawer(this, configWrapper)
     )
 
@@ -83,7 +88,7 @@ class WeekView<T> @JvmOverloads constructor(
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.areDimensionsInvalid = true
 
-        clearCachingDrawers()
+        clearCaches()
         calculateWidthPerDay()
 
         if (configWrapper.showCompleteDay) {
@@ -112,7 +117,9 @@ class WeekView<T> @JvmOverloads constructor(
             eventChipsProvider.loadEventsIfNecessary()
         }
 
-        updaters.forEach { it.update(drawingContext) }
+        updaters
+            .filter { it.isRequired() }
+            .forEach { it.update(drawingContext) }
 
         drawers.forEach { it.draw(drawingContext, canvas, paint) }
     }
@@ -211,7 +218,7 @@ class WeekView<T> @JvmOverloads constructor(
         set(value) {
             configWrapper.numberOfVisibleDays = value
             dateTimeInterpreter.setNumberOfDays(value)
-            clearCachingDrawers()
+            clearCaches()
 
             viewState.firstVisibleDay?.let {
                 // Scroll to first visible day after changing the number of visible days
@@ -1229,13 +1236,14 @@ class WeekView<T> @JvmOverloads constructor(
         get() = configWrapper.dateTimeInterpreter
         set(value) {
             configWrapper.dateTimeInterpreter = value
-            clearCachingDrawers()
+            clearCaches()
         }
 
-    private fun clearCachingDrawers() {
+    private fun clearCaches() {
         drawers
             .filterIsInstance(CachingDrawer::class.java)
             .forEach { it.clear() }
+        cache.clear()
     }
 
 }

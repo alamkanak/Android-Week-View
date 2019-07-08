@@ -2,19 +2,13 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.M
-import android.text.Layout
-import android.text.StaticLayout
-import android.text.TextPaint
 import android.util.SparseArray
 import java.util.Calendar
 
-internal class DayLabelDrawer(
-    private val config: WeekViewConfigWrapper
+internal class DayLabelDrawer<T>(
+    private val config: WeekViewConfigWrapper,
+    private val cache: WeekViewCache<T>
 ) : Drawer, CachingDrawer {
-
-    private val dayLabelCache = SparseArray<String>()
 
     override fun draw(
         drawingContext: DrawingContext,
@@ -30,7 +24,7 @@ internal class DayLabelDrawer(
 
     private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
         val key = day.toEpochDays()
-        val dayLabel = dayLabelCache.get(key) { provideAndCacheDayLabel(key, day) }
+        val dayLabel = cache.dayLabelCache.get(key) { provideAndCacheDayLabel(key, day) }
 
         val x = startPixel + config.widthPerDay / 2
 
@@ -44,10 +38,7 @@ internal class DayLabelDrawer(
             val y = config.headerRowPadding.toFloat() - textPaint.ascent()
             canvas.drawText(dayLabel, x, y, textPaint)
         } else {
-            val staticLayout = buildStaticLayout(dayLabel, TextPaint(textPaint))
-            config.headerTextHeight = staticLayout.height.toFloat()
-            config.refreshHeaderHeight()
-
+            val staticLayout = cache.multiLineDayLabelCache.get(key)
             canvas.save()
             canvas.translate(x, config.headerRowPadding.toFloat())
             staticLayout.draw(canvas)
@@ -55,25 +46,14 @@ internal class DayLabelDrawer(
         }
     }
 
-    private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
-        return if (SDK_INT >= M) {
-            StaticLayout.Builder
-                .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
-                .build()
-        } else {
-            StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
-                Layout.Alignment.ALIGN_CENTER, 1f, 0f, false)
-        }
-    }
-
     private fun provideAndCacheDayLabel(key: Int, day: Calendar): String {
         return config.dateTimeInterpreter.interpretDate(day).also {
-            dayLabelCache.put(key, it)
+            cache.dayLabelCache.put(key, it)
         }
     }
 
     override fun clear() {
-        dayLabelCache.clear()
+        cache.dayLabelCache.clear()
     }
 
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {

@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 
 internal interface Updater {
+    fun isRequired(): Boolean = true
     fun update(drawingContext: DrawingContext)
 }
 

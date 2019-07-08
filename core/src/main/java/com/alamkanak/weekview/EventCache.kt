@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.text.StaticLayout
 import androidx.collection.ArrayMap
 import java.util.Calendar
 
@@ -14,8 +13,6 @@ internal class EventCache<T>(
     var previousPeriodEvents: List<WeekViewEvent<T>>? = null
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
     var nextPeriodEvents: List<WeekViewEvent<T>>? = null
-
-    val allDayEventLayouts = mutableListOf<Pair<EventChip<T>, StaticLayout>>()
 
     var fetchedPeriods: FetchPeriods? = null
 

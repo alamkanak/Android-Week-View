@@ -14,12 +14,13 @@ internal class HeaderRowUpdater<T>(
         if (cache.allDayEventChips.isEmpty()) {
             config.hasEventInHeader = false
             config.refreshHeaderHeight()
+            return
         }
 
         val dateRange = drawingContext.dateRangeWithStartPixels.map { it.first }
         val visibleEvents = cache.getAllDayEventsInRange(dateRange)
 
-        config.hasEventInHeader = visibleEvents.any { it.isAllDay }
+        config.hasEventInHeader = visibleEvents.isNotEmpty()
         config.refreshHeaderHeight()
     }
 

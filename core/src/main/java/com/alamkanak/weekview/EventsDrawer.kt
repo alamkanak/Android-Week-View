@@ -9,7 +9,7 @@ import java.util.Calendar
 internal class SingleEventsDrawer<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>
+    private val cache: WeekViewCache<T>
 ) : Drawer {
 
     private val context = view.context
@@ -33,7 +33,7 @@ internal class SingleEventsDrawer<T>(
         canvas: Canvas,
         paint: Paint
     ) {
-        cache.normalEventChipsByDate(date)
+        cache.eventCache.normalEventChipsByDate(date)
             .filter { it.event.isWithin(config.minHour, config.maxHour) }
             .forEach {
                 val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
@@ -58,7 +58,7 @@ internal class SingleEventsDrawer<T>(
 internal class AllDayEventsDrawer<T>(
     private val context: Context,
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>
+    private val cache: WeekViewCache<T>
 ) : Drawer {
 
     override fun draw(
