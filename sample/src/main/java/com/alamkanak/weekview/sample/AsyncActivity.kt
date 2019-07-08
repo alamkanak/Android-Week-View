@@ -27,7 +27,7 @@ class AsyncActivity : AppCompatActivity() {
 
     private val progressDialog: ProgressDialog by lazy {
         ProgressDialog(this).apply {
-            setCancelable(true)
+            setCancelable(false)
             setMessage("Loading events ...")
         }
     }

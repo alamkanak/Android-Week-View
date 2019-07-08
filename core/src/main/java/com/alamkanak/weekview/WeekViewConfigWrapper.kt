@@ -487,6 +487,11 @@ internal class WeekViewConfigWrapper(
             config.typeface = value
         }
 
+    fun update() {
+        refreshAfterZooming()
+        updateVerticalOrigin()
+    }
+
     fun calculateTimeColumnWidth() {
         timeColumnWidth = timeTextWidth + timeColumnPadding * 2
     }

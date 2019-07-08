@@ -14,6 +14,8 @@ internal class SingleEventsUpdater<T>(
     override fun isRequired() = true
 
     override fun update(drawingContext: DrawingContext) {
+        cache.eventCache.clearEventChipsCache()
+
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->

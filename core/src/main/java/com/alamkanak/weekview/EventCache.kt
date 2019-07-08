@@ -75,7 +75,7 @@ internal class EventCache<T>(
     }
 
     fun clearEventChipsCache() {
-        allEventChips.forEach(EventChip<T>::clearCache)
+        allEventChips.filter { it.originalEvent.isNotAllDay }.forEach(EventChip<T>::clearCache)
     }
 
     fun clear() {

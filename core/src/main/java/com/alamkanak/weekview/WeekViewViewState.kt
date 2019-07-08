@@ -19,11 +19,9 @@ internal class WeekViewViewState(
 
     var shouldRefreshEvents: Boolean = false
 
-    fun update(view: WeekView<*>) {
+    fun update(viewHeight: Int) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()
-
-        val totalHeight = view.height
-        val dynamicHourHeight = (totalHeight - totalHeaderHeight) / configWrapper.hoursPerDay
+        val dynamicHourHeight = (viewHeight - totalHeaderHeight) / configWrapper.hoursPerDay
 
         if (areDimensionsInvalid) {
             configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
@@ -42,6 +40,11 @@ internal class WeekViewViewState(
             scrollToDay = null
             scrollToHour = null
             areDimensionsInvalid = false
+        }
+
+        if (isFirstDraw) {
+            configWrapper.moveCurrentOriginIfFirstDraw()
+            isFirstDraw = false
         }
     }
 

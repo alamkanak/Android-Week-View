@@ -15,7 +15,6 @@ internal class HeaderRowDrawer<T>(
     ) {
         val width = view.width
 
-        canvas.restore()
         canvas.save()
 
         val headerBackground = config.headerBackgroundPaint

@@ -39,7 +39,7 @@ class WeekView<T> @JvmOverloads constructor(
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventCache)
 
-    private val drawingContext = DrawingContext()
+    private val drawingContext = DrawingContext(configWrapper)
     private val eventChipsProvider = EventChipsProvider(configWrapper, eventCache, viewState)
 
     private val paint = Paint()
@@ -68,28 +68,32 @@ class WeekView<T> @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        viewState.update(this)
-
-        configWrapper.refreshAfterZooming()
-        configWrapper.updateVerticalOrigin()
-
+        updateDataHolders()
         notifyScrollListeners()
-        prepareEventDrawing(canvas)
+        refreshEvents()
+        updateDimensions()
+        performDrawing(canvas)
+    }
 
-        if (viewState.isFirstDraw) {
-            configWrapper.moveCurrentOriginIfFirstDraw()
-            viewState.isFirstDraw = false
-        }
+    private fun updateDataHolders() {
+        viewState.update(height)
+        configWrapper.update()
+        drawingContext.update()
+    }
 
-        drawingContext.update(configWrapper)
+    private fun refreshEvents() {
         if (!isInEditMode) {
             eventChipsProvider.loadEventsIfNecessary()
         }
+    }
 
+    private fun updateDimensions() {
         updaters
             .filter { it.isRequired() }
             .forEach { it.update(drawingContext) }
+    }
 
+    private fun performDrawing(canvas: Canvas) {
         drawers.forEach { it.draw(drawingContext, canvas, paint) }
     }
 
@@ -152,12 +156,6 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
-    private fun prepareEventDrawing(canvas: Canvas) {
-        eventCache.clearEventChipsCache()
-        canvas.save()
-        clipEventsRect(canvas)
-    }
-
     private fun calculateWidthPerDay() {
         if (configWrapper.timeColumnWidth == UNINITIALIZED) {
             configWrapper.calculateTimeColumnWidth()
@@ -166,11 +164,11 @@ class WeekView<T> @JvmOverloads constructor(
         configWrapper.calculateWidthPerDay()
     }
 
-    private fun clipEventsRect(canvas: Canvas) {
+    /*private fun clipEventsRect(canvas: Canvas) {
         val width = width.toFloat()
         val height = height.toFloat()
         canvas.clipRect(configWrapper.timeColumnWidth, configWrapper.headerHeight, width, height)
-    }
+    }*/
 
     override fun onScaled() {
         invalidate()

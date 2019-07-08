@@ -3,7 +3,9 @@ package com.alamkanak.weekview
 import java.util.Calendar
 import kotlin.math.ceil
 
-internal class DrawingContext {
+internal class DrawingContext(
+    private val config: WeekViewConfigWrapper
+) {
 
     private var startPixel = 0f
     private val dateRange = mutableListOf<Calendar>()
@@ -11,7 +13,7 @@ internal class DrawingContext {
 
     val dateRangeWithStartPixels = mutableListOf<Pair<Calendar, Float>>()
 
-    fun update(config: WeekViewConfigWrapper) {
+    fun update() {
         val totalDayWidth = config.totalDayWidth
         val originX = config.currentOrigin.x
 
