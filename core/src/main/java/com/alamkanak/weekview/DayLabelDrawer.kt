@@ -42,7 +42,7 @@ internal class DayLabelDrawer(
         } else {
             val staticLayout = buildStaticLayout(dayLabel, TextPaint(textPaint))
             config.headerTextHeight = staticLayout.height.toFloat()
-            config.refreshHeaderHeight(view)
+            config.refreshHeaderHeight()
 
             canvas.save()
             canvas.translate(x, config.headerRowPadding.toFloat())
@@ -58,7 +58,7 @@ internal class DayLabelDrawer(
                 .build()
         } else {
             StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
-                Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
+                Layout.Alignment.ALIGN_CENTER, 1f, 0f, false)
         }
     }
 

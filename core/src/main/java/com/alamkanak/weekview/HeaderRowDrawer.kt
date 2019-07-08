@@ -6,8 +6,7 @@ import android.graphics.Paint
 internal class HeaderRowDrawer<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>,
-    private val viewState: WeekViewViewState
+    private val cache: WeekViewCache<T>
 ) {
 
     fun draw(drawingContext: DrawingContext, canvas: Canvas, paint: Paint) {
@@ -21,21 +20,16 @@ internal class HeaderRowDrawer<T>(
     }
 
     private fun refreshHeaderHeight(drawingContext: DrawingContext) {
-        val eventChips = cache.allDayEventChips
-        if (eventChips.isEmpty()) {
+        if (cache.allDayEventChips.isEmpty()) {
             config.hasEventInHeader = false
-            config.refreshHeaderHeight(view)
-        }
-
-        if (viewState.firstVisibleDay == null) {
-            return
+            config.refreshHeaderHeight()
         }
 
         val dateRange = drawingContext.dateRangeWithStartPixels.map { it.first }
         val visibleEvents = cache.getAllDayEventsInRange(dateRange)
 
         config.hasEventInHeader = visibleEvents.any { it.isAllDay }
-        config.refreshHeaderHeight(view)
+        config.refreshHeaderHeight()
     }
 
     private fun drawHeaderRow(canvas: Canvas, paint: Paint) {

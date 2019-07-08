@@ -218,7 +218,7 @@ internal class EventsDrawer<T>(
                 break
             }
 
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
 
             // Reduce line count.
             availableLineCount--

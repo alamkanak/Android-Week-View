@@ -178,7 +178,7 @@ internal class EventChip<T>(
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(context, config)
             val textLayout = StaticLayout(text,
-                textPaint, availableWidth, ALIGN_NORMAL, 1.0f, 0.0f, false)
+                textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
 
             val lineHeight = textLayout.lineHeight
 
@@ -228,7 +228,7 @@ internal class EventChip<T>(
             val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
 
             val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
 
             // Repeat until text is short enough.
             availableLineCount--
@@ -258,7 +258,7 @@ internal class EventChip<T>(
             val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), END)
 
             val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1.0f, 0.0f, false)
+            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
         } while (availableHeight <= textLayout.lineHeight)
 
         return textLayout

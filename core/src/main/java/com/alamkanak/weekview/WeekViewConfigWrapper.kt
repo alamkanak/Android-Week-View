@@ -164,7 +164,7 @@ internal class WeekViewConfigWrapper(
         timeTextPaint.getTextBounds("00 PM", 0, "00 PM".length, rect)
         timeTextHeight = rect.height().toFloat()
         initTextTimeWidth()
-        refreshHeaderHeight(view)
+        refreshHeaderHeight()
     }
 
     var numberOfVisibleDays: Int
@@ -501,7 +501,7 @@ internal class WeekViewConfigWrapper(
 
     fun setCurrentAllDayEventHeight(height: Int) {
         currentAllDayEventHeight = height
-        refreshHeaderHeight(view)
+        refreshHeaderHeight()
     }
 
     fun getCurrentAllDayEventHeight(): Int {
@@ -609,7 +609,7 @@ internal class WeekViewConfigWrapper(
         newHourHeight = hourHeight
     }
 
-    fun refreshHeaderHeight(view: WeekView<*>) {
+    fun refreshHeaderHeight() {
         headerHeight = headerRowPadding * 2 + headerTextHeight
 
         if (showHeaderRowBottomLine) {

@@ -41,7 +41,7 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawingContext = DrawingContext()
     private val eventChipsProvider = EventChipsProvider(configWrapper, cache, viewState)
 
-    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper, cache, viewState)
+    private val headerRowDrawer = HeaderRowDrawer(this, configWrapper, cache)
     private val dayLabelDrawer = DayLabelDrawer(this, configWrapper)
     private val eventsDrawer = EventsDrawer(this, configWrapper, cache)
     private val timeColumnDrawer = TimeColumnDrawer(this, configWrapper)
@@ -216,6 +216,7 @@ class WeekView<T> @JvmOverloads constructor(
         set(value) {
             configWrapper.numberOfVisibleDays = value
             dateTimeInterpreter.setNumberOfDays(value)
+            dayLabelDrawer.clearLabelCache()
 
             viewState.firstVisibleDay?.let {
                 // Scroll to first visible day after changing the number of visible days
