@@ -9,7 +9,6 @@ import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.StaticLayout
 import android.util.AttributeSet
-import android.util.Pair
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.ViewCompat
