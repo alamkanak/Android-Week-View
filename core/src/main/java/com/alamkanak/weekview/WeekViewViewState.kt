@@ -28,11 +28,13 @@ internal class WeekViewViewState(
         if (areDimensionsInvalid) {
             configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
 
+            areDimensionsInvalid = false
             scrollToDay?.let {
                 isFirstDraw = false
                 listener.goToDate(it)
             }
 
+            areDimensionsInvalid = false
             scrollToHour?.let {
                 listener.goToHour(it)
             }

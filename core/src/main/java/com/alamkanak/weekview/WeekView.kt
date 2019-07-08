@@ -987,15 +987,15 @@ class WeekView<T> @JvmOverloads constructor(
         val showFirstDayOfWeekFirst = configWrapper.showFirstDayOfWeekFirst
 
         // If a minimum or maximum date is set, don't allow to go beyond them.
-        var modifiedDate = date
-
-        if (minDate != null && date.isBefore(minDate)) {
-            modifiedDate = minDate
+        val modifiedDate = if (minDate != null && date.isBefore(minDate)) {
+            minDate
         } else if (maxDate != null && date.isAfter(maxDate)) {
-            modifiedDate = maxDate.plusDays(1 - numberOfVisibleDays)
+            maxDate.plusDays(1 - numberOfVisibleDays)
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
             val diff = configWrapper.computeDifferenceWithFirstDayOfWeek(date)
-            modifiedDate = date.minusDays(diff)
+            date.minusDays(diff)
+        } else {
+            date
         }
 
         gestureHandler.forceScrollFinished()
@@ -1243,7 +1243,6 @@ class WeekView<T> @JvmOverloads constructor(
         drawers
             .filterIsInstance(CachingDrawer::class.java)
             .forEach { it.clear() }
-        cache.clear()
     }
 
 }

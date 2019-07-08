@@ -54,6 +54,7 @@ internal class DayLabelDrawer<T>(
 
     override fun clear() {
         cache.dayLabelCache.clear()
+        cache.multiLineDayLabelCache.clear()
     }
 
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {

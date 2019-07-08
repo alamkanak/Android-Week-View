@@ -59,7 +59,7 @@ internal class AllDayEventsDrawer<T>(
     private val context: Context,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
-) : Drawer {
+) : Drawer, CachingDrawer {
 
     override fun draw(
         drawingContext: DrawingContext,
@@ -90,6 +90,10 @@ internal class AllDayEventsDrawer<T>(
 
         canvas.restore()
         canvas.save()
+    }
+
+    override fun clear() {
+        cache.allDayEventLayouts.clear()
     }
 
 }

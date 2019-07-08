@@ -12,10 +12,4 @@ internal class WeekViewCache<T>(
     val dayLabelCache = SparseArray<String>()
     val multiLineDayLabelCache = SparseArray<StaticLayout>()
 
-    fun clear() {
-        allDayEventLayouts.clear()
-        dayLabelCache.clear()
-        multiLineDayLabelCache.clear()
-    }
-
 }
