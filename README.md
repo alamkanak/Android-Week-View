@@ -1,21 +1,22 @@
 Android Week View
 =================
 
-**Android Week View** is an Android library for displaying calendar views within an app. It was initially developed by [Raquib-ul Alam](https://github.com/alamkanak), but is not currently maintained and does not work when using API level 28. Therefore, I’m providing this fork. 
+**Android Week View** is an Android library for displaying highly customizable calendar views within your app.
 
 ![](images/screen-shot-new.png)
 
 Features
 ---------
-* Display single-day or multi-day calendar views in your app
+* Display single- or multi-day calendar views in your app
 * Extensive styling customization possible
+* Live preview in Android Studio’s layout editor
 * Infinite horizontal scrolling
-* Interactive via event click listeners
+* Interactive via click and scroll listeners
 * Interoperable with Kotlin
 
 Usage
 ---------
-1. Add the JitPack repository to your project-level build file and the dependency to the app-level build file.
+1. Add the JitPack repository to your project-level build file and the dependency to the module-level build file.
 ```groovy
 // build.gradle (project-level)
 allprojects {
@@ -52,7 +53,7 @@ implementation 'com.github.thellmund:Android-Week-View:3.4.2'
 
 3. Prepare the class of objects that you want to display in `WeekView` by implementing `WeekViewDisplayable<T>`.
 ```kotlin
-class Event(
+data class Event(
         val id: Long,
         val title: String,
         val startTime: Calendar,
