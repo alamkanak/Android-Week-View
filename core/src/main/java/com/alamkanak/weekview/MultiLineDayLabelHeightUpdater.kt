@@ -4,7 +4,6 @@ import android.os.Build
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.util.Log
 import android.util.SparseArray
 import java.util.Calendar
 
@@ -29,7 +28,6 @@ internal class MultiLineDayLabelHeightUpdater<T>(
     }
 
     override fun update(drawingContext: DrawingContext) {
-        Log.d("MultiLineDayLabel", "updated multi-line label height updater")
         previousHorizontalOrigin = config.currentOrigin.x
 
         val multiDayLabels = drawingContext

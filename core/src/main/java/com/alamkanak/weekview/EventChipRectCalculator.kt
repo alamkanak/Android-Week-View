@@ -51,7 +51,6 @@ internal class EventChipRectCalculator<T>(
         var left = startPixel + eventChip.left * widthPerDay
         var right = left + eventChip.width * widthPerDay
 
-
         if (left > startPixel) {
             left += config.overlappingEventGap / 2f
         }

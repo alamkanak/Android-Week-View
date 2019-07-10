@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.sample.data
 
+import android.app.Activity
 import android.content.Context
 import android.os.AsyncTask
 import com.alamkanak.weekview.sample.apiclient.ApiEvent
@@ -25,7 +26,11 @@ class FakeEventsApi(
             sleep(2_000)
             val inputStream = context.assets.open("events.json")
             val json = inputStream.reader().readText()
-            onSuccess(gson.fromJson<List<ApiEvent>>(json, responseType))
+
+            val activity = context as Activity
+            activity.runOnUiThread {
+                onSuccess(gson.fromJson(json, responseType))
+            }
         }
     }
 

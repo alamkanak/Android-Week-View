@@ -1,4 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/toolbar</item>
@@ -8,13 +9,9 @@
         <item name="actionMenuTextColor">@color/toolbar_text</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="colorControlActivated">@color/accent</item>
-    </style>
 
-    <style name="Button">
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:gravity">left|center_vertical</item>
-        <item name="android:padding">@dimen/default_space</item>
-        <item name="android:textAllCaps">false</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarDividerColor">#EEE</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
     </style>
-
 </resources>
