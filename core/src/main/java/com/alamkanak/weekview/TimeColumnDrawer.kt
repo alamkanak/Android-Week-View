@@ -7,7 +7,7 @@ import android.util.SparseArray
 internal class TimeColumnDrawer(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper
-) : Drawer, CachingDrawer {
+) : CachingDrawer {
 
     private val timeLabelCache = SparseArray<String>()
 

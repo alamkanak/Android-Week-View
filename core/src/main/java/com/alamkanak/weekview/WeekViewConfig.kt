@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
+import java.util.Calendar
 
 internal class WeekViewConfig(
     context: Context,
@@ -115,7 +116,7 @@ internal class WeekViewConfig(
 
         try {
             // Calendar configuration
-            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, DayOfWeek.MONDAY)
+            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, Calendar.MONDAY)
             numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
             restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)

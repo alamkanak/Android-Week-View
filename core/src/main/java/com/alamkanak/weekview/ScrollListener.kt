@@ -6,11 +6,10 @@ import java.util.Calendar
 interface ScrollListener {
 
     /**
-     * Called when the first visible day has changed.
+     * Called when the first visible date has changed.
      *
-     * @param newFirstVisibleDay The new first visible day
-     * @param oldFirstVisibleDay The old first visible day
+     * @param date The new first visible date
      */
-    fun onFirstVisibleDayChanged(newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?)
+    fun onFirstVisibleDateChanged(date: Calendar)
 
 }

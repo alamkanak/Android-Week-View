@@ -77,8 +77,7 @@ public class StaticActivity extends AppCompatActivity
 
         mWeekView.setScrollListener(new ScrollListener() {
             @Override
-            public void onFirstVisibleDayChanged(@Nullable Calendar newFirstVisibleDay,
-                                                 @Nullable Calendar oldFirstVisibleDay) {
+            public void onFirstVisibleDateChanged(@Nullable Calendar date) {
                 updateDateText();
             }
         });

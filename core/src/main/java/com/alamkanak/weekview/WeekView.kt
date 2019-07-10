@@ -152,7 +152,8 @@ class WeekView<T> @JvmOverloads constructor(
         } ?: true
 
         if (hasFirstVisibleDayChanged) {
-            scrollListener?.onFirstVisibleDayChanged(firstVisibleDay, oldFirstVisibleDay)
+            scrollListener?.onFirstVisibleDateChanged(firstVisibleDay)
+            onRangeChangeListener?.onRangeChanged(firstVisibleDay, lastVisibleDay)
         }
     }
 
@@ -163,12 +164,6 @@ class WeekView<T> @JvmOverloads constructor(
 
         configWrapper.calculateWidthPerDay()
     }
-
-    /*private fun clipEventsRect(canvas: Canvas) {
-        val width = width.toFloat()
-        val height = height.toFloat()
-        canvas.clipRect(configWrapper.timeColumnWidth, configWrapper.headerHeight, width, height)
-    }*/
 
     override fun onScaled() {
         invalidate()
@@ -190,15 +185,13 @@ class WeekView<T> @JvmOverloads constructor(
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     var firstDayOfWeek: Int
-        get() = DayOfWeek.toJavaCalendar(configWrapper.firstDayOfWeek)
+        get() = configWrapper.firstDayOfWeek
         /**
          * Set the first day of the week. First day of the week is used only when the week view is first
          * drawn. It does not of any effect after user starts scrolling horizontally.
          *
-         *
          * **Note:** This method will only work if WeekView is set to display more than 6 days at
          * once.
-         *
          *
          * @param value The supported values are [java.util.Calendar.SUNDAY],
          * [java.util.Calendar.MONDAY], [java.util.Calendar.TUESDAY],
@@ -206,7 +199,7 @@ class WeekView<T> @JvmOverloads constructor(
          * [java.util.Calendar.FRIDAY].
          */
         set(value) {
-            configWrapper.firstDayOfWeek = DayOfWeek.fromJavaCalendar(value)
+            configWrapper.firstDayOfWeek = value
             invalidate()
         }
 
@@ -1226,17 +1219,37 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     fun setScrollListener(
-        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
+        block: (date: Calendar) -> Unit
     ) {
         scrollListener = object : ScrollListener {
-            override fun onFirstVisibleDayChanged(
-                newFirstVisibleDay: Calendar?,
-                oldFirstVisibleDay: Calendar?
-            ) {
-                block(firstVisibleDay, oldFirstVisibleDay)
+            override fun onFirstVisibleDateChanged(date: Calendar) {
+                block(checkNotNull(firstVisibleDay))
             }
         }
     }
+
+    var onRangeChangeListener: OnRangeChangeListener? = null
+
+    fun setOnRangeChangeListener(
+        block: (firstVisibleDate: Calendar, lastVisibleDate: Calendar) -> Unit
+    ) {
+        onRangeChangeListener = object : OnRangeChangeListener {
+            override fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
+                block(checkNotNull(firstVisibleDay), checkNotNull(lastVisibleDay))
+            }
+        }
+    }
+
+    // TODO
+    /*fun setScrollListener(
+        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
+    ) {
+        scrollListener = object : ScrollListener {
+            override fun onFirstVisibleDateChanged(day: Calendar) {
+                block(firstVisibleDay, oldFirstVisibleDay)
+            }
+        }
+    }*/
 
     var dateTimeInterpreter: DateTimeInterpreter
         get() = configWrapper.dateTimeInterpreter

@@ -275,9 +275,7 @@ internal class WeekViewGestureHandler<T>(
 
     private fun findHitEvent(
         e: MotionEvent
-    ): EventChip<T>? {
-        return cache.allEventChips.firstOrNull { it.isHit(e) }
-    }
+    ): EventChip<T>? = cache.findHit(e)
 
     private fun goToNearestOrigin() {
         val totalDayWidth = config.totalDayWidth

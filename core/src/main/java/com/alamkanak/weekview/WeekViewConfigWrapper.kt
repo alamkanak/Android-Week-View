@@ -553,17 +553,11 @@ internal class WeekViewConfigWrapper(
         currentOrigin.y = verticalOffset * -1
     }
 
-    fun computeDifferenceWithFirstDayOfWeek(date: Calendar): Int {
-        return if (date.dayOfWeek == firstDayOfWeek) {
-            0 // Already there
-        } else if (firstDayOfWeek == DayOfWeek.SUNDAY) {
-            date.dayOfWeek // Wrap around to Sunday of previous week
-        } else {
-            date.dayOfWeek - firstDayOfWeek
-        }
-    }
+    fun computeDifferenceWithFirstDayOfWeek(
+        date: Calendar
+    ): Int = date.dayOfWeek - firstDayOfWeek
 
-    fun refreshAfterZooming() {
+    private fun refreshAfterZooming() {
         if (newHourHeight > 0 && !showCompleteDay) {
             newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
             newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
@@ -581,7 +575,7 @@ internal class WeekViewConfigWrapper(
         }
     }
 
-    fun updateVerticalOrigin() {
+    private fun updateVerticalOrigin() {
         // If the new currentOrigin.y is invalid, make it valid.
         val dayHeight = hourHeight * hoursPerDay
         val potentialNewVerticalOrigin = view.height - (dayHeight + headerHeight)

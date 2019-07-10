@@ -11,16 +11,17 @@ internal class SingleEventsDrawer<T>(
     private val cache: WeekViewCache<T>
 ) : Drawer {
 
+    private val eventChipDrawer = EventChipDrawer<T>(context, config)
+
     override fun draw(
         drawingContext: DrawingContext,
         canvas: Canvas,
         paint: Paint
-    ) {
-        drawingContext
-            .dateRangeWithStartPixels
-            .forEach { (date, _) ->
-                drawEventsForDate(date, canvas, paint)
-            }
+    ) = with(drawingContext) {
+        val dateRange = dateRangeWithStartPixels.map { it.first }
+        for (date in dateRange) {
+            drawEventsForDate(date, canvas, paint)
+        }
     }
 
     private fun drawEventsForDate(
@@ -28,10 +29,9 @@ internal class SingleEventsDrawer<T>(
         canvas: Canvas,
         paint: Paint
     ) {
-        val eventChips = cache.eventCache.normalEventChipsByDate(date).filter { it.rect != null }
-        eventChips.forEach {
-            it.draw(context, config, canvas, paint)
-        }
+        cache.eventCache
+            .normalEventChipsByDate(date).filter { it.rect != null }
+            .forEach { eventChipDrawer.draw(it, canvas, paint) }
     }
 
 }
@@ -40,7 +40,9 @@ internal class AllDayEventsDrawer<T>(
     private val context: Context,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
-) : Drawer, CachingDrawer {
+) : CachingDrawer {
+
+    private val eventChipDrawer = EventChipDrawer<T>(context, config)
 
     override fun draw(
         drawingContext: DrawingContext,
@@ -50,8 +52,8 @@ internal class AllDayEventsDrawer<T>(
         val eventChips = cache.allDayEventLayouts
         for (pair in eventChips) {
             val eventChip = pair.first
-            val layout = pair.second
-            eventChip.draw(context, config, layout, canvas, paint)
+            val textLayout = pair.second
+            eventChipDrawer.draw(eventChip, canvas, paint, textLayout)
         }
 
         // Hide events when they are in the top left corner

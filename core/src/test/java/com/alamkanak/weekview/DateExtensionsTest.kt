@@ -9,7 +9,7 @@ class DateExtensionsTest {
     @Test
     fun `returns correct day of week`() {
         val date = firstDayOfYear().withYear(2019)
-        val expected = DayOfWeek.TUESDAY
+        val expected = Calendar.TUESDAY
         val result = date.dayOfWeek
         assertEquals(expected, result)
     }

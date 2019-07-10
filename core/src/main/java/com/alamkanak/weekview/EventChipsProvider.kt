@@ -9,7 +9,7 @@ internal class EventChipsProvider<T>(
     var monthLoader: MonthLoader<T>? = null
 
     fun loadEventsIfNecessary() {
-        val hasNoEvents = cache.allEventChips.isEmpty()
+        val hasNoEvents = cache.hasEvents.not()
         val shouldRefresh = viewState.shouldRefreshEvents
 
         val firstVisibleDay = checkNotNull(viewState.firstVisibleDay)
@@ -77,7 +77,7 @@ internal class EventChipsProvider<T>(
 
     private fun calculateEventChipPositions() {
         val results = mutableListOf<EventChip<T>>()
-        val groups = cache.allEventChips.groupBy { it.event.startTime.atStartOfDay }
+        val groups = cache.groupedByDate()
 
         for (eventChips in groups.values) {
             computePositionOfEvents(eventChips)

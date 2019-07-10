@@ -8,7 +8,7 @@ import java.util.Calendar
 internal class DayLabelDrawer<T>(
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
-) : Drawer, CachingDrawer {
+) : CachingDrawer {
 
     override fun draw(
         drawingContext: DrawingContext,

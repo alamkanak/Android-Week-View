@@ -156,7 +156,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         event = Event(10, getEventTitle(startTime), startTime, endTime, "", color4, true, false)
         events.add(event)
 
-        event = Event(11, getEventTitle(startTime), startTime, endTime, "", color4, true, false)
+        event = Event(11, getEventTitle(startTime), startTime, endTime, "", color2, true, false)
         events.add(event)
 
         // All-day event until 00:00 next day

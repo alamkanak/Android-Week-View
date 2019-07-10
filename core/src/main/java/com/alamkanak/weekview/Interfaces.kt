@@ -16,6 +16,6 @@ internal interface Drawer {
     ) = Unit
 }
 
-internal interface CachingDrawer {
+internal interface CachingDrawer : Drawer {
     fun clear()
 }

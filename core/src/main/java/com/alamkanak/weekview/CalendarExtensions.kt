@@ -5,43 +5,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-internal object DayOfWeek {
-    const val MONDAY = 1
-    const val TUESDAY = 2
-    const val WEDNESDAY = 3
-    const val THURSDAY = 4
-    const val FRIDAY = 5
-    const val SATURDAY = 6
-    const val SUNDAY = 7
-
-    fun fromJavaCalendar(value: Int): Int {
-        return when (value) {
-            Calendar.MONDAY -> MONDAY
-            Calendar.TUESDAY -> TUESDAY
-            Calendar.WEDNESDAY -> WEDNESDAY
-            Calendar.THURSDAY -> THURSDAY
-            Calendar.FRIDAY -> FRIDAY
-            Calendar.SATURDAY -> SATURDAY
-            Calendar.SUNDAY -> SUNDAY
-            else -> throw IllegalStateException("Unknown day of week: $value")
-        }
-    }
-
-    fun toJavaCalendar(value: Int): Int {
-        return when (value) {
-            MONDAY -> Calendar.MONDAY
-            TUESDAY -> Calendar.TUESDAY
-            WEDNESDAY -> Calendar.WEDNESDAY
-            THURSDAY -> Calendar.THURSDAY
-            FRIDAY -> Calendar.FRIDAY
-            SATURDAY -> Calendar.SATURDAY
-            SUNDAY -> Calendar.SUNDAY
-            else -> throw IllegalStateException("Unknown day of week: $value")
-        }
-    }
-
-}
-
 internal val Calendar.hour: Int
     get() = get(Calendar.HOUR_OF_DAY)
 
@@ -49,10 +12,7 @@ internal val Calendar.minute: Int
     get() = get(Calendar.MINUTE)
 
 internal val Calendar.dayOfWeek: Int
-    get() {
-        val dayOfWeekView = get(Calendar.DAY_OF_WEEK)
-        return DayOfWeek.fromJavaCalendar(dayOfWeekView)
-    }
+    get() = get(Calendar.DAY_OF_WEEK)
 
 internal val Calendar.dayOfMonth: Int
     get() {

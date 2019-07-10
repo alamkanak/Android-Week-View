@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.view.MotionEvent
 import androidx.collection.ArrayMap
 import java.util.Calendar
 
@@ -7,8 +8,11 @@ internal class EventCache<T>(
     private val eventSplitter: WeekViewEventSplitter<T>
 ) {
 
-    var allEventChips = mutableListOf<EventChip<T>>()
-    var allDayEventChips = mutableListOf<EventChip<T>>()
+    private val allEventChips: List<EventChip<T>>
+        get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
+
+    private val normalEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
 
     var previousPeriodEvents: List<WeekViewEvent<T>>? = null
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
@@ -19,8 +23,11 @@ internal class EventCache<T>(
     val hasEvents: Boolean
         get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
 
-    private val normalEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
-    private val allDayEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
+    fun findHit(e: MotionEvent) = allEventChips.firstOrNull { it.isHit(e) }
+
+    fun groupedByDate(): Map<Calendar, List<EventChip<T>>> {
+        return allEventChips.groupBy { it.event.startTime.atStartOfDay }
+    }
 
     fun normalEventChipsByDate(date: Calendar): List<EventChip<T>> {
         return normalEventChipsByDate[date.atStartOfDay].orEmpty()
@@ -31,13 +38,7 @@ internal class EventCache<T>(
     }
 
     fun put(newChips: List<EventChip<T>>) {
-        allEventChips.clear()
-        allEventChips.addAll(newChips)
-
         val (allDay, normal) = newChips.partition { it.event.isAllDay }
-
-        allDayEventChips.clear()
-        allDayEventChips.addAll(allDay)
 
         normal.forEach {
             val key = it.event.startTime.atStartOfDay
@@ -51,8 +52,9 @@ internal class EventCache<T>(
     }
 
     fun covers(fetchPeriods: FetchPeriods): Boolean {
-        return this.fetchedPeriods?.let {
-            it.previous == fetchPeriods.previous && it.current == fetchPeriods.current
+        return fetchedPeriods?.let {
+            it.previous == fetchPeriods.previous
+                && it.current == fetchPeriods.current
                 && it.next == fetchPeriods.next
         } ?: false
     }
@@ -71,7 +73,7 @@ internal class EventCache<T>(
     }
 
     fun getAllDayEventsInRange(dateRange: List<Calendar>): List<WeekViewEvent<T>> {
-        return getEventChipsInRange(allDayEventChips, dateRange).filter { it.isAllDay }
+        return getEventChipsInRange(allEventChips, dateRange).filter { it.isAllDay }
     }
 
     fun clearEventChipsCache() {
@@ -79,12 +81,13 @@ internal class EventCache<T>(
     }
 
     fun clear() {
-        allEventChips.clear()
         allDayEventChipsByDate.clear()
         normalEventChipsByDate.clear()
+
         previousPeriodEvents = null
         currentPeriodEvents = null
         nextPeriodEvents = null
+
         fetchedPeriods = null
     }
 
@@ -94,8 +97,6 @@ internal class EventCache<T>(
         nextPeriodEvents: List<WeekViewEvent<T>>,
         fetchedPeriods: FetchPeriods
     ) {
-        allEventChips.clear()
-
         sortAndCacheEvents(previousPeriodEvents)
         sortAndCacheEvents(currentPeriodEvents)
         sortAndCacheEvents(nextPeriodEvents)
@@ -126,7 +127,7 @@ internal class EventCache<T>(
         }
 
         val newChips = eventSplitter.split(event).map { EventChip(it, event, null) }
-        allEventChips.addAll(newChips)
+        put(newChips)
     }
 
     private fun ArrayMap<Calendar, MutableList<EventChip<T>>>.add(

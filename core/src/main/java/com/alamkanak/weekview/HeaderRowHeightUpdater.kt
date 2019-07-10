@@ -21,12 +21,6 @@ internal class HeaderRowHeightUpdater<T>(
     }
 
     private fun refreshHeaderHeight(drawingContext: DrawingContext) {
-        if (cache.allDayEventChips.isEmpty()) {
-            config.hasEventInHeader = false
-            config.refreshHeaderHeight()
-            return
-        }
-
         val dateRange = drawingContext.dateRangeWithStartPixels.map { it.first }
         val visibleEvents = cache.getAllDayEventsInRange(dateRange)
 
