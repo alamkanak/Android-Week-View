@@ -85,7 +85,7 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
 
             override fun interpretDate(date: Calendar): String {
                 val result = sdfDate.format(date.time).replace(" ".toRegex(), "\n")
-                return result.substring(0, 1).toUpperCase() + result.substring(1)
+                return result.substring(0, 1).toUpperCase(Locale.getDefault()) + result.substring(1)
             }
 
             override fun interpretTime(hour: Int): String {

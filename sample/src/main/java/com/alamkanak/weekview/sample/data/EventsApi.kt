@@ -17,7 +17,6 @@ class FakeEventsApi(
 ) : EventsApi {
 
     private val responseType = object : TypeToken<List<ApiEvent>>() {}.type
-    private val gson = Gson()
 
     override fun fetchEvents(
         onSuccess: (List<ApiEvent>) -> Unit
@@ -29,7 +28,7 @@ class FakeEventsApi(
 
             val activity = context as Activity
             activity.runOnUiThread {
-                onSuccess(gson.fromJson(json, responseType))
+                onSuccess(Gson().fromJson(json, responseType))
             }
         }
     }

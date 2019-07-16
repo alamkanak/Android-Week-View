@@ -6,14 +6,14 @@ import com.alamkanak.weekview.WeekViewEvent
 import java.util.Calendar
 
 class Event(
-        val id: Long,
-        val title: String,
-        val startTime: Calendar,
-        val endTime: Calendar,
-        val location: String,
-        val color: Int,
-        val isAllDay: Boolean,
-        val isCanceled: Boolean
+    val id: Long,
+    val title: String,
+    private val startTime: Calendar,
+    private val endTime: Calendar,
+    private val location: String,
+    private val color: Int,
+    private val isAllDay: Boolean,
+    private val isCanceled: Boolean
 ) : WeekViewDisplayable<Event> {
 
     override fun toWeekViewEvent(): WeekViewEvent<Event> {

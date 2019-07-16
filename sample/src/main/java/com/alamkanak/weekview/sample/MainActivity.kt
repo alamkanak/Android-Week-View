@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alamkanak.weekview.sample.util.EqualSpacingItemDecoration
 import kotlinx.android.synthetic.main.activity_main.recyclerView
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = SamplesAdapter(SAMPLES, this::onItemClick)
 
-        val spacing = Math.round(resources.getDimension(R.dimen.default_space))
+        val spacing = resources.getDimension(R.dimen.default_space).roundToInt()
         recyclerView.addItemDecoration(EqualSpacingItemDecoration(spacing))
     }
 

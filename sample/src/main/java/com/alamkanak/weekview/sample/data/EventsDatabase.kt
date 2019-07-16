@@ -8,7 +8,6 @@ import com.alamkanak.weekview.sample.apiclient.Event
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 interface EventsDatabase {
     fun getEventsInRange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<Event>>
@@ -40,7 +39,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = Event(1, getEventTitle(startTime), startTime, endTime, "", color1, false, false)
+        event = createEvent(1, startTime, endTime, color1, isAllDay = false, isCanceled = false)
         events.add(event)
 
         // Add multi-day event
@@ -55,7 +54,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = Event(2, getEventTitle(startTime), startTime, endTime, "", color4, false, false)
+        event = createEvent(2, startTime, endTime, color4, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -68,7 +67,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = Event(3, getEventTitle(startTime), startTime, endTime, "", color2, false, true)
+        event = createEvent(3, startTime, endTime, color2, isAllDay = false, isCanceled = true)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -80,7 +79,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.HOUR_OF_DAY, 5)
         endTime.set(Calendar.MINUTE, 0)
 
-        event = Event(4, getEventTitle(startTime), startTime, endTime, "", color3, false, false)
+        event = createEvent(4, startTime, endTime, color3, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -92,7 +91,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 2)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = Event(5, getEventTitle(startTime), startTime, endTime, "", color2, false, false)
+        event = createEvent(5, startTime, endTime, color2, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -105,7 +104,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 3)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = Event(6, getEventTitle(startTime), startTime, endTime, "", color3, false, false)
+        event = createEvent(6, startTime, endTime, color3, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -117,7 +116,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = Event(7, getEventTitle(startTime), startTime, endTime, "Location", color4, false, true)
+        event = createEvent(7, startTime, endTime, color4, isAllDay = false, isCanceled = true)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -129,7 +128,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = Event(8, getEventTitle(startTime), startTime, endTime, "", color1, false, false)
+        event = createEvent(8, startTime, endTime, color1, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -141,7 +140,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = Event(9, getEventTitle(startTime), startTime, endTime, "", color2, false, false)
+        event = createEvent(9, startTime, endTime, color2, isAllDay = false, isCanceled = false)
         events.add(event)
 
         // All-day event
@@ -153,13 +152,13 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 23)
 
-        event = Event(10, getEventTitle(startTime), startTime, endTime, "", color4, true, false)
+        event = createEvent(10, startTime, endTime, color4, isAllDay = true, isCanceled = false)
         events.add(event)
 
-        event = Event(11, getEventTitle(startTime), startTime, endTime, "", color2, true, false)
+        event = createEvent(11, startTime, endTime, color2, isAllDay = true, isCanceled = false)
         events.add(event)
 
-        // All-day event until 00:00 next day
+        // All-day event until 00:00 next days
         startTime = Calendar.getInstance()
         startTime.set(Calendar.DAY_OF_MONTH, 10)
         startTime.set(Calendar.HOUR_OF_DAY, 0)
@@ -171,20 +170,27 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.set(Calendar.DAY_OF_MONTH, 11)
 
-        event = Event(12, getEventTitle(startTime), startTime, endTime, "", color1, true, false)
+        event = createEvent(12, startTime, endTime, color1, isAllDay = true, isCanceled = false)
         events.add(event)
 
         return events
     }
 
+    private fun createEvent(
+        id: Long,
+        startTime: Calendar,
+        endTime: Calendar,
+        color: Int,
+        isAllDay: Boolean,
+        isCanceled: Boolean
+    ) = Event(id, getEventTitle(startTime), startTime, endTime, "", color, isAllDay, isCanceled)
+
     private fun getEventTitle(time: Calendar): String {
         val sdf = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
         val formattedDate = sdf.format(time.time)
-
         val hour = time.get(Calendar.HOUR_OF_DAY)
         val minute = time.get(Calendar.MINUTE)
-
-        return String.format(Locale.getDefault(), "Event of %02d:%02d %s", hour, minute, formattedDate)
+        return String.format("Event of %02d:%02d %s", hour, minute, formattedDate)
     }
 
 }

@@ -131,7 +131,7 @@ public class LimitedActivity extends AppCompatActivity
         mWeekView.setNumberOfVisibleDays(7);
     }
 
-    protected String getEventTitle(Calendar time) {
+    private String getEventTitle(Calendar time) {
         int hour = time.get(Calendar.HOUR_OF_DAY);
         int minute = time.get(Calendar.MINUTE);
         int month = time.get(Calendar.MONTH) + 1;
