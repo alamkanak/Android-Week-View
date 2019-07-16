@@ -23,7 +23,7 @@ internal class EventCache<T>(
     val hasEvents: Boolean
         get() = previousPeriodEvents != null && currentPeriodEvents != null && nextPeriodEvents != null
 
-    fun findHit(e: MotionEvent) = allEventChips.firstOrNull { it.isHit(e) }
+    fun findHits(e: MotionEvent) = allEventChips.filter { it.isHit(e) }
 
     fun groupedByDate(): Map<Calendar, List<EventChip<T>>> {
         return allEventChips.groupBy { it.event.startTime.atStartOfDay }
@@ -135,7 +135,9 @@ internal class EventCache<T>(
         eventChip: EventChip<T>
     ) {
         val results = getOrElse(key) { mutableListOf() }
-        results.add(eventChip)
+        if (results.contains(eventChip).not()) {
+            results.add(eventChip)
+        }
         this[key] = results
     }
 

@@ -223,11 +223,22 @@ internal class WeekViewGestureHandler<T>(
         scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY)
     }
 
+    private fun isTapInHeaderArea(event: MotionEvent): Boolean {
+        val headerRange = view.x..config.headerHeight
+        return event.y in headerRange
+    }
+
     override fun onSingleTapConfirmed(
         e: MotionEvent
     ): Boolean {
         onEventClickListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
+            if (eventChip.event.isNotAllDay && e.isInHeader) {
+                // The user tapped in the header area and a single event that is rendered below it
+                // has recognized the tap. We ignore this.
+                return@let
+            }
+
             val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
@@ -255,6 +266,12 @@ internal class WeekViewGestureHandler<T>(
 
         onEventLongPressListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
+            if (eventChip.event.isNotAllDay && e.isInHeader) {
+                // The user tapped in the header area and a single event that is rendered below it
+                // has recognized the tap. We ignore this.
+                return@let
+            }
+
             val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
@@ -275,7 +292,17 @@ internal class WeekViewGestureHandler<T>(
 
     private fun findHitEvent(
         e: MotionEvent
-    ): EventChip<T>? = cache.findHit(e)
+    ): EventChip<T>? {
+        val candidates = cache.findHits(e)
+
+        return when {
+            candidates.isEmpty() -> null
+            // Two events hit. This is most likely because an all-day event was clicked, but a
+            // single event is rendered underneath it. We return the all-day event.
+            candidates.size == 2 -> candidates.first { it.event.isAllDay }
+            else -> candidates.first()
+        }
+    }
 
     private fun goToNearestOrigin() {
         val totalDayWidth = config.totalDayWidth
@@ -364,6 +391,9 @@ internal class WeekViewGestureHandler<T>(
     private fun shouldForceFinishScroll(): Boolean {
         return scroller.currVelocity <= minimumFlingVelocity
     }
+
+    private val MotionEvent.isInHeader: Boolean
+        get() = y in view.x..config.headerHeight
 
     internal interface Listener {
         fun onScaled()
