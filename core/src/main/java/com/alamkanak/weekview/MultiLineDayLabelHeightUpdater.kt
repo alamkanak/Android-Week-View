@@ -1,7 +1,5 @@
 package com.alamkanak.weekview
 
-import android.os.Build
-import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.SparseArray
@@ -63,16 +61,7 @@ internal class MultiLineDayLabelHeightUpdater<T>(
 
     private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
         val width = config.totalDayWidth.toInt()
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            StaticLayout.Builder
-                .obtain(dayLabel, 0, dayLabel.length, textPaint, width)
-                .setAlignment(Layout.Alignment.ALIGN_CENTER)
-                .build()
-        } else {
-            // For some reason, using ALIGN_CENTER results in right-aligned text, so we use
-            // ALIGN_NORMAL instead.
-            StaticLayout(dayLabel, textPaint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
-        }
+        return TextLayoutBuilder.build(dayLabel, textPaint, width/*, alignment = ALIGN_NORMAL*/)
     }
 
     private fun provideAndCacheDayLabel(key: Int, day: Calendar): String {

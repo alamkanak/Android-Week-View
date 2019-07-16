@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextUtils.TruncateAt
@@ -165,9 +164,7 @@ internal class EventChipDrawer<T>(
 
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(context, config)
-            val textLayout = StaticLayout(text,
-                textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
-
+            val textLayout = TextLayoutBuilder.build(text, textPaint, availableWidth)
             val lineHeight = textLayout.lineHeight
 
             val finalTextLayout = if (availableHeight >= lineHeight) {
@@ -215,7 +212,7 @@ internal class EventChipDrawer<T>(
             val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), TruncateAt.END)
 
             val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
+            textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
 
             // Repeat until text is short enough.
             availableLineCount--
@@ -246,7 +243,7 @@ internal class EventChipDrawer<T>(
             val ellipsized = ellipsize(text, textPaint, availableArea.toFloat(), TruncateAt.END)
 
             val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
+            textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
         } while (availableHeight <= textLayout.lineHeight)
 
         return textLayout

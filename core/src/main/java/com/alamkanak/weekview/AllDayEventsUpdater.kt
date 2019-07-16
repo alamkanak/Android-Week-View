@@ -2,7 +2,6 @@ package com.alamkanak.weekview
 
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.text.Layout.Alignment.ALIGN_NORMAL
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextUtils
@@ -119,7 +118,7 @@ internal class AllDayEventsUpdater<T>(
 
         // Get text dimensions.
         val textPaint = event.getTextPaint(context, config)
-        val textLayout = StaticLayout(text, textPaint, availableWidth, ALIGN_NORMAL, 1f, 0f, false)
+        val textLayout = TextLayoutBuilder.build(text, textPaint, availableWidth)
 
         val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -156,7 +155,7 @@ internal class AllDayEventsUpdater<T>(
         event: WeekViewEvent<T>
     ): StaticLayout {
         val textPaint = event.getTextPaint(context, config)
-        return StaticLayout("", textPaint, 0, ALIGN_NORMAL, 1f, 0f, false)
+        return TextLayoutBuilder.build("", textPaint, width = 0)
     }
 
     private fun ellipsizeTextToFitChip(
@@ -189,9 +188,7 @@ internal class AllDayEventsUpdater<T>(
                 break
             }
 
-            textLayout = StaticLayout(ellipsized, textPaint, width, ALIGN_NORMAL, 1f, 0f, false)
-
-            // Reduce line count.
+            textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
             availableLineCount--
 
             // Repeat until text is short enough.
