@@ -61,7 +61,7 @@ internal class MultiLineDayLabelHeightUpdater<T>(
 
     private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
         val width = config.totalDayWidth.toInt()
-        return TextLayoutBuilder.build(dayLabel, textPaint, width/*, alignment = ALIGN_NORMAL*/)
+        return TextLayoutBuilder.build(dayLabel, textPaint, width)
     }
 
     private fun provideAndCacheDayLabel(key: Int, day: Calendar): String {
