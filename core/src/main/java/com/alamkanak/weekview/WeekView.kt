@@ -73,12 +73,6 @@ class WeekView<T> @JvmOverloads constructor(
         refreshEvents()
         updateDimensions()
         performDrawing(canvas)
-
-        println("Cache dump")
-        for (date in drawingContext.dateRangeWithStartPixels.map { it.first }) {
-            println("Single: " + date.format() + " => " + eventCache.normalEventChipsByDate(date).map { it.event.id }.sorted())
-            println("All-day: " + date.format() + " => " + eventCache.allDayEventChipsByDate(date).map { it.event.id }.sorted())
-        }
     }
 
     private fun updateDataHolders() {
