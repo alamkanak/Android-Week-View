@@ -83,19 +83,19 @@ internal class WeekViewConfigWrapper(
         color = config.todayBackgroundColor
     }
 
-    private val futureBackgroundPaint: Paint = Paint().apply {
+    val futureBackgroundPaint: Paint = Paint().apply {
         color = config.futureBackgroundColor
     }
 
-    private val pastBackgroundPaint: Paint = Paint().apply {
+    val pastBackgroundPaint: Paint = Paint().apply {
         color = config.pastBackgroundColor
     }
 
-    private val futureWeekendBackgroundPaint: Paint = Paint().apply {
+    val futureWeekendBackgroundPaint: Paint = Paint().apply {
         color = config.futureWeekendBackgroundColor
     }
 
-    private val pastWeekendBackgroundPaint: Paint = Paint().apply {
+    val pastWeekendBackgroundPaint: Paint = Paint().apply {
         color = config.pastWeekendBackgroundColor
     }
 

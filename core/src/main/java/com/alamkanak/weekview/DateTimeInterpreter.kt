@@ -6,7 +6,7 @@ import java.util.Calendar
 import java.util.Locale
 
 interface DateTimeInterpreter {
-    fun setNumberOfDays(days: Int) { // TODO Make optional in Java
+    fun onSetNumberOfDays(days: Int) {
         // Free ad space
     }
     fun interpretDate(date: Calendar): String
@@ -25,7 +25,7 @@ internal class DefaultDateTimeInterpreter(
     // we always use the first day of the year
     private val calendar = firstDayOfYear()
 
-    override fun setNumberOfDays(days: Int) {
+    override fun onSetNumberOfDays(days: Int) {
         sdfDate = getDefaultDateFormat(days)
     }
 

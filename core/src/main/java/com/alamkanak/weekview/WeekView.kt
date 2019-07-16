@@ -184,40 +184,27 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the first day of the week. Possible values are [java.util.Calendar.SUNDAY],
+     * [java.util.Calendar.MONDAY], [java.util.Calendar.TUESDAY],
+     * [java.util.Calendar.WEDNESDAY], [java.util.Calendar.THURSDAY],
+     * [java.util.Calendar.FRIDAY], [java.util.Calendar.SATURDAY].
+     */
     var firstDayOfWeek: Int
         get() = configWrapper.firstDayOfWeek
-        /**
-         * Set the first day of the week. First day of the week is used only when the week view is first
-         * drawn. It does not of any effect after user starts scrolling horizontally.
-         *
-         * **Note:** This method will only work if WeekView is set to display more than 6 days at
-         * once.
-         *
-         * @param value The supported values are [java.util.Calendar.SUNDAY],
-         * [java.util.Calendar.MONDAY], [java.util.Calendar.TUESDAY],
-         * [java.util.Calendar.WEDNESDAY], [java.util.Calendar.THURSDAY],
-         * [java.util.Calendar.FRIDAY].
-         */
         set(value) {
             configWrapper.firstDayOfWeek = value
             invalidate()
         }
 
+    /**
+     * Returns the number of visible days.
+     */
     var numberOfVisibleDays: Int
-        /**
-         * Get the number of visible days in a week.
-         *
-         * @return The number of visible days in a week.
-         */
         get() = configWrapper.numberOfVisibleDays
-        /**
-         * Set the number of visible days in a week.
-         *
-         * @param value The number of visible days in a week.
-         */
         set(value) {
             configWrapper.numberOfVisibleDays = value
-            dateTimeInterpreter.setNumberOfDays(value)
+            dateTimeInterpreter.onSetNumberOfDays(value)
             clearCaches()
 
             viewState.firstVisibleDay?.let {
@@ -229,6 +216,10 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether the first day of the week should be displayed at the left-most position
+     * when WeekView is displayed for the first time.
+     */
     var isShowFirstDayOfWeekFirst: Boolean
         get() = configWrapper.showFirstDayOfWeekFirst
         set(value) {
@@ -248,30 +239,43 @@ class WeekView<T> @JvmOverloads constructor(
     fun getShowHeaderRowBottomLine() = isShowHeaderRowBottomLine
 
     var isShowHeaderRowBottomLine: Boolean
+        /**
+         * Returns whether a horizontal line should be displayed at the bottom of the header row.
+         */
         get() = configWrapper.showHeaderRowBottomLine
+        /**
+         * Sets whether a horizontal line should be displayed at the bottom of the header row.
+         */
         set(value) {
             configWrapper.showHeaderRowBottomLine = value
             invalidate()
         }
 
     var headerRowBottomLineColor: Int
+        /**
+         * Returns the color of the horizontal line at the bottom of the header row.
+         */
         get() = configWrapper.headerRowBottomLinePaint.color
+        /**
+         * Sets the color of the horizontal line at the bottom of the header row. Whether the line
+         * is displayed, is determined by [isShowHeaderRowBottomLine]
+         */
         set(value) {
             configWrapper.headerRowBottomLinePaint.color = value
             invalidate()
         }
 
     var headerRowBottomLineWidth: Int
+        /**
+         * Returns the stroke width of the horizontal line at the bottom of the header row.
+         */
         get() = configWrapper.headerRowBottomLinePaint.strokeWidth.toInt()
+        /**
+         * Sets the stroke width of the horizontal line at the bottom of the header row. Whether the
+         * line is displayed, is determined by [isShowHeaderRowBottomLine]
+         */
         set(value) {
             configWrapper.headerRowBottomLinePaint.strokeWidth = value.toFloat()
-            invalidate()
-        }
-
-    var todayHeaderTextColor: Int
-        get() = configWrapper.todayHeaderTextColor
-        set(value) {
-            configWrapper.todayHeaderTextColor = value
             invalidate()
         }
 
@@ -281,6 +285,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the padding in the time column to the left and right side of the time label.
+     */
     var timeColumnPadding: Int
         get() = configWrapper.timeColumnPadding
         set(value) {
@@ -288,6 +295,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the text color of the labels in the time column.
+     */
     var timeColumnTextColor: Int
         get() = configWrapper.timeColumnTextColor
         set(value) {
@@ -295,6 +305,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the background color of the time column.
+     */
     var timeColumnBackgroundColor: Int
         get() = configWrapper.timeColumnBackgroundColor
         set(value) {
@@ -302,6 +315,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the text size of the labels in the time column.
+     */
     var timeColumnTextSize: Int
         get() = configWrapper.timeColumnTextSize
         set(value) {
@@ -309,6 +325,10 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether the label for the midnight hour is displayed in the time column. This setting
+     * is only considered if [isShowTimeColumnHourSeparator] is set to true.
+     */
     var isShowMidnightHour: Boolean
         get() = configWrapper.showMidnightHour
         set(value) {
@@ -322,6 +342,9 @@ class WeekView<T> @JvmOverloads constructor(
     )
     fun showTimeColumnHourSeparator() = isShowTimeColumnHourSeparator
 
+    /**
+     * Returns whether a horizontal line is displayed for each hour in the time column.
+     */
     var isShowTimeColumnHourSeparator: Boolean
         get() = configWrapper.showTimeColumnHourSeparator
         set(value) {
@@ -329,6 +352,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the interval in which time labels are displayed in the time column.
+     */
     var timeColumnHoursInterval: Int
         get() = configWrapper.timeColumnHoursInterval
         set(value) {
@@ -348,6 +374,9 @@ class WeekView<T> @JvmOverloads constructor(
     )
     fun getShowTimeColumnSeparator() = isShowTimeColumnSeparator
 
+    /**
+     * Returns whether a vertical line is displayed at the end of the time column.
+     */
     var isShowTimeColumnSeparator: Boolean
         get() = configWrapper.showTimeColumnSeparator
         set(value) {
@@ -355,6 +384,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the color of the time column separator.
+     */
     var timeColumnSeparatorColor: Int
         get() = configWrapper.timeColumnSeparatorColor
         set(value) {
@@ -362,6 +394,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the stroke width of the time column separator.
+     */
     var timeColumnSeparatorWidth: Int
         get() = configWrapper.timeColumnSeparatorStrokeWidth
         set(value) {
@@ -375,6 +410,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the header row padding, which is applied above and below the all-day event chips.
+     */
     var headerRowPadding: Int
         get() = configWrapper.headerRowPadding
         set(value) {
@@ -382,6 +420,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the header row background color.
+     */
     var headerRowBackgroundColor: Int
         get() = configWrapper.headerRowBackgroundColor
         set(value) {
@@ -389,6 +430,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the text color used for all date labels except today.
+     */
     var headerRowTextColor: Int
         get() = configWrapper.headerRowTextColor
         set(value) {
@@ -396,6 +440,19 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the text color used for today's date label.
+     */
+    var todayHeaderTextColor: Int
+        get() = configWrapper.todayHeaderTextColor
+        set(value) {
+            configWrapper.todayHeaderTextColor = value
+            invalidate()
+        }
+
+    /**
+     * Returns the text size of all date labels.
+     */
     var headerRowTextSize: Int
         get() = configWrapper.headerRowTextSize
         set(value) {
@@ -409,18 +466,19 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the corner radius of an [EventChip].
+     */
     var eventCornerRadius: Int
         get() = configWrapper.eventCornerRadius
-        /**
-         * Set corner radius for event rect.
-         *
-         * @param value the radius in px.
-         */
         set(value) {
             configWrapper.eventCornerRadius = value
             invalidate()
         }
 
+    /**
+     * Returns the text size of a single-event [EventChip].
+     */
     var eventTextSize: Int
         get() = configWrapper.eventTextPaint.textSize.toInt()
         set(value) {
@@ -428,6 +486,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the text size of an all-day [EventChip].
+     */
     var allDayEventTextSize: Int
         get() = configWrapper.allDayEventTextPaint.textSize.toInt()
         set(value) {
@@ -435,13 +496,29 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    @Deprecated(
+        "Use defaultEventTextColor",
+        ReplaceWith("defaultEventTextColor")
+    )
     var eventTextColor: Int
+        get() = defaultEventTextColor
+        set(value) {
+            defaultEventTextColor = value
+        }
+
+    /**
+     * Returns the default text color of an [EventChip].
+     */
+    var defaultEventTextColor: Int
         get() = configWrapper.eventTextPaint.color
         set(value) {
             configWrapper.eventTextPaint.color = value
             invalidate()
         }
 
+    /**
+     * Returns the padding within an [EventChip].
+     */
     var eventPadding: Int
         get() = configWrapper.eventPadding
         set(value) {
@@ -449,6 +526,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the default text color of an [EventChip].
+     */
     var defaultEventColor: Int
         get() = configWrapper.defaultEventColor
         set(value) {
@@ -462,6 +542,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the column gap at the end of each day.
+     */
     var columnGap: Int
         get() = configWrapper.columnGap
         set(value) {
@@ -469,39 +552,32 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the horizontal gap between overlapping [EventChip]s.
+     */
     var overlappingEventGap: Int
         get() = configWrapper.overlappingEventGap
-        /**
-         * Set the gap between overlapping events.
-         *
-         * @param value The gap between overlapping events.
-         */
         set(value) {
             configWrapper.overlappingEventGap = value
             invalidate()
         }
 
+    /**
+     * Returns the vertical margin of an [EventChip].
+     */
     var eventMarginVertical: Int
         get() = configWrapper.eventMarginVertical
-        /**
-         * Set the top and bottom margin of the event. The event will release this margin from the top
-         * and bottom edge. This margin is useful for differentiation consecutive events.
-         *
-         * @param value The top and bottom margin.
-         */
         set(value) {
             configWrapper.eventMarginVertical = value
             invalidate()
         }
 
+    /**
+     * Returns the horizontal margin of an [EventChip]. This margin is only applied in single-day
+     * view and if there are no overlapping events.
+     */
     var eventMarginHorizontal: Int
         get() = configWrapper.eventMarginHorizontal
-        /**
-         * Set the start and end margin of the event. The event will release this margin from the start
-         * and end edge.
-         *
-         * @param value The start and end margin.
-         */
         set(value) {
             configWrapper.eventMarginHorizontal = value
             invalidate()
@@ -513,6 +589,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the background color of a day.
+     */
     var dayBackgroundColor: Int
         get() = configWrapper.dayBackgroundPaint.color
         set(value) {
@@ -520,6 +599,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the background color of the current date.
+     */
     var todayBackgroundColor: Int
         get() = configWrapper.todayBackgroundPaint.color
         set(value) {
@@ -527,49 +609,76 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether weekends should have a background color different from [dayBackgroundColor].
+     *
+     * The weekend background colors can be defined by [pastWeekendBackgroundColor] and
+     * [futureWeekendBackgroundColor].
+     */
     var isShowDistinctWeekendColor: Boolean
-        /**
-         * Whether weekends should have a background color different from the normal day background
-         * color. The weekend background colors are defined by the attributes
-         * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
-         *
-         * @return True if weekends should have different background colors.
-         */
         get() = configWrapper.showDistinctWeekendColor
-        /**
-         * Set whether weekends should have a background color different from the normal day background
-         * color. The weekend background colors are defined by the attributes
-         * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
-         *
-         * @param value True if weekends should have different background colors.
-         */
         set(value) {
             configWrapper.showDistinctWeekendColor = value
             invalidate()
         }
 
+    /**
+     * Returns whether past and future days should have background colors different from
+     * [dayBackgroundColor].
+     *
+     * The past and future day colors can be defined by [pastBackgroundColor] and
+     * [futureBackgroundColor].
+     */
     var isShowDistinctPastFutureColor: Boolean
-        /**
-         * Whether past and future days should have two different background colors. The past and
-         * future day colors are defined by the attributes `futureBackgroundColor` and
-         * `pastBackgroundColor`.
-         *
-         * @return True if past and future days should have two different background colors.
-         */
         get() = configWrapper.showDistinctPastFutureColor
-        /**
-         * Set whether weekends should have a background color different from the normal day background
-         * color. The past and future day colors are defined by the attributes `futureBackgroundColor`
-         * and `pastBackgroundColor`.
-         *
-         * @param value True if past and future should have two different background colors.
-         */
         set(value) {
             configWrapper.showDistinctPastFutureColor = value
             invalidate()
         }
 
-    // TODO: Past & future background color, pastWeekend and futureWeekend
+    /**
+     * Returns the background color for past dates. If not explicitly set, WeekView will used
+     * [dayBackgroundColor].
+     */
+    var pastBackgroundColor: Int
+        get() = configWrapper.pastBackgroundPaint.color
+        set(value) {
+            configWrapper.pastBackgroundPaint.color = value
+            invalidate()
+        }
+
+    /**
+     * Returns the background color for past weekend dates. If not explicitly set, WeekView will
+     * used [pastBackgroundColor].
+     */
+    var pastWeekendBackgroundColor: Int
+        get() = configWrapper.pastWeekendBackgroundPaint.color
+        set(value) {
+            configWrapper.pastWeekendBackgroundPaint.color = value
+            invalidate()
+        }
+
+    /**
+     * Returns the background color for future dates. If not explicitly set, WeekView will used
+     * [dayBackgroundColor].
+     */
+    var futureBackgroundColor: Int
+        get() = configWrapper.futureBackgroundPaint.color
+        set(value) {
+            configWrapper.futureBackgroundPaint.color = value
+            invalidate()
+        }
+
+    /**
+     * Returns the background color for future weekend dates. If not explicitly set, WeekView will
+     * used [futureBackgroundColor].
+     */
+    var futureWeekendBackgroundColor: Int
+        get() = configWrapper.futureWeekendBackgroundPaint.color
+        set(value) {
+            configWrapper.futureWeekendBackgroundPaint.color = value
+            invalidate()
+        }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -577,6 +686,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the current height of an hour.
+     */
     var hourHeight: Float
         get() = configWrapper.hourHeight
         set(value) {
@@ -584,6 +696,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the minimum height of an hour.
+     */
     var minHourHeight: Int
         get() = configWrapper.minHourHeight
         set(value) {
@@ -591,6 +706,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the maximum height of an hour.
+     */
     var maxHourHeight: Int
         get() = configWrapper.maxHourHeight
         set(value) {
@@ -598,6 +716,10 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether the complete day should be shown, in which case [hourHeight] automatically
+     * adjusts to accommodate all hours between [minHour] and [maxHour].
+     */
     var isShowCompleteDay: Boolean
         get() = configWrapper.showCompleteDay
         set(value) {
@@ -611,54 +733,31 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns whether a horizontal line should be displayed at the current time.
+     */
     var isShowNowLine: Boolean
-        /**
-         * Get whether "now" line should be displayed. "Now" line is defined by the attributes
-         * `nowLineColor` and `nowLineStrokeWidth`.
-         *
-         * @return True if "now" line should be displayed.
-         */
         get() = configWrapper.showNowLine
-        /**
-         * Set whether "now" line should be displayed. "Now" line is defined by the attributes
-         * `nowLineColor` and `nowLineStrokeWidth`.
-         *
-         * @param value True if "now" line should be displayed.
-         */
         set(value) {
             configWrapper.showNowLine = value
             invalidate()
         }
 
+    /**
+     * Returns the color of the horizontal "now" line.
+     */
     var nowLineColor: Int
-        /**
-         * Get the "now" line color.
-         *
-         * @return The color of the "now" line.
-         */
         get() = configWrapper.nowLinePaint.color
-        /**
-         * Set the "now" line color.
-         *
-         * @param value The color of the "now" line.
-         */
         set(value) {
             configWrapper.nowLinePaint.color = value
             invalidate()
         }
 
+    /**
+     * Returns the stroke width of the horizontal "now" line.
+     */
     var nowLineStrokeWidth: Int
-        /**
-         * Get the "now" line thickness.
-         *
-         * @return The thickness of the "now" line.
-         */
         get() = configWrapper.nowLinePaint.strokeWidth.toInt()
-        /**
-         * Set the "now" line thickness.
-         *
-         * @param value The thickness of the "now" line.
-         */
         set(value) {
             configWrapper.nowLinePaint.strokeWidth = value.toFloat()
             invalidate()
@@ -670,52 +769,32 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns whether a dot at the start of the "now" line is displayed. The dot is only displayed
+     * if [isShowNowLine] is set to true.
+     */
     var isShowNowLineDot: Boolean
-        /**
-         * Get whether the dot on the left-hand side of the "now" line is displayed.
-         *
-         * @return True if "now" line dot is be displayed.
-         */
         get() = configWrapper.showNowLineDot
-        /**
-         * Set whether the dot on the left-hand side of the "now" line should be displayed
-         *
-         * @param value True if "now" line dot should be displayed.
-         */
         set(value) {
             configWrapper.showNowLineDot = value
             invalidate()
         }
 
+    /**
+     * Returns the color of the dot at the start of the "now" line.
+     */
     var nowLineDotColor: Int
-        /**
-         * Get the color of the dot on the left-hand side of the "now" line.
-         *
-         * @return The color of the "now" line dot.
-         */
         get() = configWrapper.nowDotPaint.color
-        /**
-         * Set the color of the dot on the left-hand side of the "now" line.
-         *
-         * @param value The color of the "now" line dot.
-         */
         set(value) {
             configWrapper.nowDotPaint.color = value
             invalidate()
         }
 
+    /**
+     * Returns the radius of the dot at the start of the "now" line.
+     */
     var nowLineDotRadius: Int
-        /**
-         * Get the radius of the dot on the left-hand side of the "now" line.
-         *
-         * @return The radius of the "now" line dot.
-         */
         get() = configWrapper.nowDotPaint.strokeWidth.toInt()
-        /**
-         * Set the radius of the dot on the left-hand side of the "now" line.
-         *
-         * @param value The radius of the "now" line dot.
-         */
         set(value) {
             configWrapper.nowDotPaint.strokeWidth = value.toFloat()
             invalidate()
@@ -766,6 +845,9 @@ class WeekView<T> @JvmOverloads constructor(
     )
     fun showDaySeparators() = isShowDaySeparators
 
+    /**
+     * Returns whether vertical lines are displayed as separators between dates.
+     */
     var isShowDaySeparators: Boolean
         get() = configWrapper.showDaySeparators
         set(value) {
@@ -773,6 +855,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the color of the separators between dates.
+     */
     var daySeparatorColor: Int
         get() = configWrapper.daySeparatorPaint.color
         set(value) {
@@ -780,6 +865,9 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the stroke color of the separators between dates.
+     */
     var daySeparatorStrokeWidth: Int
         get() = configWrapper.daySeparatorPaint.strokeWidth.toInt()
         set(value) {
@@ -793,6 +881,10 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the minimum date that [WeekView] will display, or null if none is set. Events before
+     * this date will not be shown.
+     */
     var minDate: Calendar?
         get() = configWrapper.minDate?.copy()
         set(value) {
@@ -805,6 +897,10 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the maximum date that [WeekView] will display, or null if none is set. Events after
+     * this date will not be shown.
+     */
     var maxDate: Calendar?
         get() = configWrapper.maxDate?.copy()
         set(value) {
@@ -823,6 +919,10 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the minimum hour that [WeekView] will display. Events before this time will not be
+     * shown.
+     */
     var minHour: Int
         get() = configWrapper.minHour
         set(value) {
@@ -834,6 +934,10 @@ class WeekView<T> @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the maximum hour that [WeekView] will display. Events before this time will not be
+     * shown.
+     */
     var maxHour: Int
         get() = configWrapper.maxHour
         set(value) {
@@ -851,75 +955,44 @@ class WeekView<T> @JvmOverloads constructor(
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the scrolling speed factor in horizontal direction.
+     */
     var xScrollingSpeed: Float
-        /**
-         * Get the scrolling speed factor in horizontal direction.
-         *
-         * @return The speed factor in horizontal direction.
-         */
         get() = configWrapper.xScrollingSpeed
-        /**
-         * Sets the speed for horizontal scrolling.
-         *
-         * @param value The new horizontal scrolling speed.
-         */
         set(value) {
             configWrapper.xScrollingSpeed = value
         }
 
+    /**
+     * Returns whether WeekView can fling horizontally.
+     */
     var isHorizontalFlingEnabled: Boolean
-        /**
-         * Get whether the week view should fling horizontally.
-         *
-         * @return True if the week view has horizontal fling enabled.
-         */
         get() = configWrapper.horizontalFlingEnabled
-        /**
-         * Set whether the week view should fling horizontally.
-         */
         set(value) {
             configWrapper.horizontalFlingEnabled = value
         }
 
+    /**
+     * Returns whether WeekView can scroll horizontally.
+     */
     var isHorizontalScrollingEnabled: Boolean
-        /**
-         * Returns whether the user can scroll horizontally. If not, the user can
-         * only scroll vertically.
-         *
-         * @return True if horizontal scrolling is enabled. Default is true.
-         */
         get() = configWrapper.horizontalScrollingEnabled
-        /**
-         * Sets whether the user can scroll horizontally.
-         */
         set(value) {
             configWrapper.horizontalScrollingEnabled = value
         }
 
+    /**
+     * Returns whether WeekView can fling vertically.
+     */
     var isVerticalFlingEnabled: Boolean
-        /**
-         * Get whether the week view should fling vertically.
-         *
-         * @return True if the week view has vertical fling enabled.
-         */
         get() = configWrapper.verticalFlingEnabled
-        /**
-         * Set whether the week view should fling vertically.
-         */
         set(value) {
             configWrapper.verticalFlingEnabled = value
         }
 
     var scrollDuration: Int
-        /**
-         * Get scroll duration
-         *
-         * @return scroll duration
-         */
         get() = configWrapper.scrollDuration
-        /**
-         * Set the scroll duration
-         */
         set(value) {
             configWrapper.scrollDuration = value
         }
@@ -945,28 +1018,27 @@ class WeekView<T> @JvmOverloads constructor(
     /////////////////////////////////////////////////////////////////
 
     /**
-     * Returns the first visible day in the week view.
-     *
-     * @return The first visible day in the week view.
+     * Returns the first visible day.
      */
     val firstVisibleDay: Calendar?
         get() = viewState.firstVisibleDay?.copy()
 
     /**
-     * Returns the last visible day in the week view.
-     *
-     * @return The last visible day in the week view.
+     * Returns the last visible day.
      */
     val lastVisibleDay: Calendar?
         get() = viewState.lastVisibleDay?.copy()
 
     /**
-     * Show today on the week view.
+     * Shows the current date.
      */
     fun goToToday() {
         goToDate(today())
     }
 
+    /**
+     * Shows the current date and time.
+     */
     fun goToCurrentTime() {
         now().apply {
             goToDate(this)
@@ -975,7 +1047,8 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     /**
-     * Show a specific day on the week view.
+     * Shows a specific day. If it is before [minDate] or after [maxDate], these will be shown
+     * instead.
      *
      * @param date The date to show.
      */
@@ -1021,7 +1094,7 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     /**
-     * Vertically scroll to a specific hour in the week view.
+     * Scrolls to a specific hour.
      *
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
@@ -1045,9 +1118,7 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     /**
-     * Get the first hour that is visible on the screen.
-     *
-     * @return The first hour that is visible.
+     * Returns the first hour that is visible on the screen.
      */
     val firstVisibleHour: Double
         get() = (configWrapper.currentOrigin.y * -1 / configWrapper.hourHeight).toDouble()
@@ -1058,6 +1129,9 @@ class WeekView<T> @JvmOverloads constructor(
     //
     /////////////////////////////////////////////////////////////////
 
+    /**
+     * Returns the typeface used for events, time labels and date labels.
+     */
     var typeface: Typeface
         get() = configWrapper.typeface
         set(value) {
@@ -1228,6 +1302,19 @@ class WeekView<T> @JvmOverloads constructor(
         }
     }
 
+    @Deprecated(
+        "Use setScrollListener(block: (Calendar) -> Unit)"
+    )
+    fun setScrollListener(
+        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
+    ) {
+        scrollListener = object : ScrollListener {
+            override fun onFirstVisibleDateChanged(date: Calendar) {
+                block(firstVisibleDay, null)
+            }
+        }
+    }
+
     var onRangeChangeListener: OnRangeChangeListener? = null
 
     fun setOnRangeChangeListener(
@@ -1239,17 +1326,6 @@ class WeekView<T> @JvmOverloads constructor(
             }
         }
     }
-
-    // TODO
-    /*fun setScrollListener(
-        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
-    ) {
-        scrollListener = object : ScrollListener {
-            override fun onFirstVisibleDateChanged(day: Calendar) {
-                block(firstVisibleDay, oldFirstVisibleDay)
-            }
-        }
-    }*/
 
     var dateTimeInterpreter: DateTimeInterpreter
         get() = configWrapper.dateTimeInterpreter

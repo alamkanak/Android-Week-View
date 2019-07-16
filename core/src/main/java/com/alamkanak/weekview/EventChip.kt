@@ -58,9 +58,6 @@ internal data class EventChip<T>(
         if (event.isNotAllDay) {
             top = event.getEffectiveStartMinutes(config).toFloat()
             bottom = event.getEffectiveEndMinutes(config).toFloat()
-        } else {
-            top = 0f
-            bottom = 100f // TODO
         }
     }
 
