@@ -155,9 +155,13 @@ internal class EventChipDrawer<T>(
         val availableHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()
         val availableWidth = (rect.right - rect.left - (config.eventPadding * 2f)).toInt()
 
+        if (availableHeight == 0 || availableWidth == 0) {
+            return
+        }
+
         // Get text dimensions.
         val didAvailableAreaChange = eventChip.didAvailableAreaChange(rect, config.eventPadding)
-        val isCached = textLayoutCache.containsKey(event.id) // eventChip.isCached
+        val isCached = textLayoutCache.containsKey(event.id)
 
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(context, config)
