@@ -223,11 +223,6 @@ internal class WeekViewGestureHandler<T>(
         scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY)
     }
 
-    private fun isTapInHeaderArea(event: MotionEvent): Boolean {
-        val headerRange = view.x..config.headerHeight
-        return event.y in headerRange
-    }
-
     override fun onSingleTapConfirmed(
         e: MotionEvent
     ): Boolean {
@@ -332,7 +327,7 @@ internal class WeekViewGestureHandler<T>(
             val distanceX = -nearestOrigin
             val distanceY = 0
 
-            val daysScrolled = Math.abs(nearestOrigin) / config.widthPerDay
+            val daysScrolled = abs(nearestOrigin) / config.widthPerDay
             val duration = (daysScrolled * config.scrollDuration).toInt()
 
             scroller.startScroll(startX, startY, distanceX, distanceY, duration)

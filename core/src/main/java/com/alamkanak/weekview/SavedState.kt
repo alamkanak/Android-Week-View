@@ -2,10 +2,10 @@ package com.alamkanak.weekview
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.view.View
+import android.view.View.BaseSavedState
 import java.util.Calendar
 
-internal class SavedState : View.BaseSavedState {
+internal class SavedState : BaseSavedState {
 
     var numberOfVisibleDays: Int = 0
     var firstVisibleDate: Calendar? = null
@@ -32,15 +32,11 @@ internal class SavedState : View.BaseSavedState {
         out.writeSerializable(firstVisibleDate)
     }
 
-    @JvmField
-    val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-
-        override fun createFromParcel(source: Parcel): SavedState {
-            return SavedState(source)
-        }
-
-        override fun newArray(size: Int): Array<SavedState?> {
-            return arrayOfNulls(size)
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(source: Parcel) = SavedState(source)
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
         }
     }
 

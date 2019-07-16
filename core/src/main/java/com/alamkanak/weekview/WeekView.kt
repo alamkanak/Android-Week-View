@@ -487,6 +487,16 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     /**
+     * Returns whether the text size of the [EventChip] is adapting to the [EventChip] height.
+     */
+    var isAdaptiveEventTextSize: Boolean
+        get() = configWrapper.adaptiveEventTextSize
+        set(value) {
+            configWrapper.adaptiveEventTextSize = value
+            invalidate()
+        }
+
+    /**
      * Returns the text size of an all-day [EventChip].
      */
     var allDayEventTextSize: Int

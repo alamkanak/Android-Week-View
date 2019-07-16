@@ -6,8 +6,8 @@ import android.graphics.Paint
 import java.util.Calendar
 
 internal class SingleEventsDrawer<T>(
-    private val context: Context,
-    private val config: WeekViewConfigWrapper,
+    context: Context,
+    config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) : Drawer {
 
@@ -37,7 +37,7 @@ internal class SingleEventsDrawer<T>(
 }
 
 internal class AllDayEventsDrawer<T>(
-    private val context: Context,
+    context: Context,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>
 ) : CachingDrawer {

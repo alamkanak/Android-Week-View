@@ -8,12 +8,10 @@ internal class WeekViewEventSplitter<T>(
         val isAtStartOfNewPeriod = config.minHour == 0
             && event.endTime.isAtStartOfNextDay(event.startTime)
 
-        return if (isAtStartOfNewPeriod) {
-            listOf(shortenTooLongAllDayEvent(event))
-        } else if (event.isMultiDay) {
-            splitEventByDates(event)
-        } else {
-            listOf(event)
+        return when {
+            isAtStartOfNewPeriod -> listOf(shortenTooLongAllDayEvent(event))
+            event.isMultiDay -> splitEventByDates(event)
+            else -> listOf(event)
         }
     }
 

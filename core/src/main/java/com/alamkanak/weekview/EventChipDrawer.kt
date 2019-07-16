@@ -151,10 +151,10 @@ internal class EventChipDrawer<T>(
             text.append(it)
         }
 
-        val availableHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()
-        val availableWidth = (rect.right - rect.left - (config.eventPadding * 2f)).toInt()
+        val chipHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()
+        val chipWidth = (rect.right - rect.left - (config.eventPadding * 2f)).toInt()
 
-        if (availableHeight == 0 || availableWidth == 0) {
+        if (chipHeight == 0 || chipWidth == 0) {
             return
         }
 
@@ -164,26 +164,27 @@ internal class EventChipDrawer<T>(
 
         if (didAvailableAreaChange || !isCached) {
             val textPaint = event.getTextPaint(context, config)
-            val textLayout = TextLayoutBuilder.build(text, textPaint, availableWidth)
+            val textLayout = TextLayoutBuilder.build(text, textPaint, chipWidth)
             val lineHeight = textLayout.lineHeight
 
-            val finalTextLayout = if (availableHeight >= lineHeight) {
+            val fitsIntoChip = chipHeight >= lineHeight
+            val isAdaptive = config.adaptiveEventTextSize
+
+            val finalTextLayout = when {
                 // The text fits into the chip, so we just need to ellipsize it
-                ellipsizeTextToFitChip(eventChip, text, textLayout, availableHeight, availableWidth)
-            } else if (config.adaptiveEventTextSize) {
-                // The text doesn't fit into the chip, so we need to gradually reduce its size
-                // until it does
-                scaleTextIntoChip(eventChip, text, textLayout, availableHeight, availableWidth)
-            } else {
-                textLayout
+                fitsIntoChip -> ellipsizeTextToFitChip(eventChip, text, textLayout, chipHeight, chipWidth)
+                // The text doesn't fit into the chip, so we need to gradually reduce its size until
+                // it does
+                isAdaptive -> scaleTextIntoChip(eventChip, text, textLayout, chipHeight, chipWidth)
+                else -> textLayout
             }
 
             textLayoutCache[event.id] = finalTextLayout
-            eventChip.updateAvailableArea(availableWidth, availableHeight)
+            eventChip.updateAvailableArea(chipWidth, chipHeight)
         }
 
         val textLayout = textLayoutCache[event.id] ?: return
-        if (textLayout.height <= availableHeight) {
+        if (textLayout.height <= chipHeight) {
             drawEventTitle(eventChip, textLayout, canvas)
         }
     }

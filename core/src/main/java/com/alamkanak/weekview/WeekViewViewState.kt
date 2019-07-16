@@ -11,7 +11,7 @@ internal class WeekViewViewState(
     var scrollToDay: Calendar? = null
     var scrollToHour: Int? = null
 
-    var isFirstDraw = true
+    private var isFirstDraw = true
     var areDimensionsInvalid = true
 
     var firstVisibleDay: Calendar? = null
