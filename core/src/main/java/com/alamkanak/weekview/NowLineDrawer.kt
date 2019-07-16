@@ -34,12 +34,13 @@ internal class NowLineDrawer(
 
         val portionOfDay = (now.hour - config.minHour) + now.minute / MINUTES_PER_HOUR
         val portionOfDayInPixels = portionOfDay * config.hourHeight
-        val lineY = top + portionOfDayInPixels
-        val endX = startPixel + config.widthPerDay
-        canvas.drawLine(startX, lineY, endX, lineY, config.nowLinePaint)
+        val verticalOffset = top + portionOfDayInPixels
+
+        val endX = startPixel + config.totalDayWidth
+        canvas.drawLine(startX, verticalOffset, endX, verticalOffset, config.nowLinePaint)
 
         if (config.showNowLineDot) {
-            drawDot(startPixel, lineY, canvas)
+            drawDot(startPixel, verticalOffset, canvas)
         }
     }
 
