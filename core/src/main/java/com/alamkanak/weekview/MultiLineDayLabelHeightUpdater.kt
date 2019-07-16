@@ -62,13 +62,16 @@ internal class MultiLineDayLabelHeightUpdater<T>(
     }
 
     private fun buildStaticLayout(dayLabel: String, textPaint: TextPaint): StaticLayout {
+        val width = config.totalDayWidth.toInt()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             StaticLayout.Builder
-                .obtain(dayLabel, 0, dayLabel.length, textPaint, config.totalDayWidth.toInt())
+                .obtain(dayLabel, 0, dayLabel.length, textPaint, width)
+                .setAlignment(Layout.Alignment.ALIGN_CENTER)
                 .build()
         } else {
-            StaticLayout(dayLabel, textPaint, config.totalDayWidth.toInt(),
-                Layout.Alignment.ALIGN_CENTER, 1f, 0f, false)
+            // For some reason, using ALIGN_CENTER results in right-aligned text, so we use
+            // ALIGN_NORMAL instead.
+            StaticLayout(dayLabel, textPaint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false)
         }
     }
 
