@@ -13,8 +13,6 @@ import android.view.View
 import androidx.core.view.ViewCompat
 import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.Calendar
-import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -134,12 +132,8 @@ class WeekView<T> @JvmOverloads constructor(
         val totalDayWidth = configWrapper.totalDayWidth
         val visibleDays = configWrapper.numberOfVisibleDays
 
-        val isBeforeCurrentTime = configWrapper.currentOrigin.x > 0
-        val delta = if (isBeforeCurrentTime) {
-            ceil(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * (-1)
-        } else {
-            floor(configWrapper.currentOrigin.x / totalDayWidth).roundToInt() * (-1)
-        }
+        val daysScrolled = configWrapper.currentOrigin.x / totalDayWidth
+        val delta = daysScrolled.roundToInt() * (-1)
 
         val firstVisibleDay = today().plusDays(delta)
         val lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1)
