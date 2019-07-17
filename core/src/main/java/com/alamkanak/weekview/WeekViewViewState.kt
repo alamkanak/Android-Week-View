@@ -8,14 +8,14 @@ internal class WeekViewViewState(
     private val listener: Listener
 ) {
 
-    var scrollToDay: Calendar? = null
+    var scrollToDate: Calendar? = null
     var scrollToHour: Int? = null
 
     private var isFirstDraw = true
     var areDimensionsInvalid = true
 
-    var firstVisibleDay: Calendar? = null
-    var lastVisibleDay: Calendar? = null
+    var firstVisibleDate: Calendar? = null
+    var lastVisibleDate: Calendar? = null
 
     var shouldRefreshEvents: Boolean = false
 
@@ -27,7 +27,7 @@ internal class WeekViewViewState(
             configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
 
             areDimensionsInvalid = false
-            scrollToDay?.let {
+            scrollToDate?.let {
                 isFirstDraw = false
                 listener.goToDate(it)
             }
@@ -37,7 +37,7 @@ internal class WeekViewViewState(
                 listener.goToHour(it)
             }
 
-            scrollToDay = null
+            scrollToDate = null
             scrollToHour = null
             areDimensionsInvalid = false
         }

@@ -12,7 +12,7 @@ internal class EventChipsProvider<T>(
         val hasNoEvents = cache.hasEvents.not()
         val shouldRefresh = viewState.shouldRefreshEvents
 
-        val firstVisibleDay = checkNotNull(viewState.firstVisibleDay)
+        val firstVisibleDay = checkNotNull(viewState.firstVisibleDate)
         val fetchPeriods = FetchPeriods.create(firstVisibleDay)
 
         if (hasNoEvents || shouldRefresh || !cache.covers(fetchPeriods)) {

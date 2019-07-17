@@ -59,7 +59,7 @@ public class StaticActivity extends AppCompatActivity
         left.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDay());
+                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDate());
                 cal.add(Calendar.DATE, -7);
                 mWeekView.goToDate(cal);
             }
@@ -69,7 +69,7 @@ public class StaticActivity extends AppCompatActivity
         right.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDay());
+                Calendar cal = checkNotNull(mWeekView.getFirstVisibleDate());
                 cal.add(Calendar.DATE, 7);
                 mWeekView.goToDate(cal);
             }
@@ -117,13 +117,13 @@ public class StaticActivity extends AppCompatActivity
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         String formattedFirstDay = "none";
-        if (mWeekView.getFirstVisibleDay() != null) {
-            formattedFirstDay = format.format(mWeekView.getFirstVisibleDay().getTime());
+        if (mWeekView.getFirstVisibleDate() != null) {
+            formattedFirstDay = format.format(mWeekView.getFirstVisibleDate().getTime());
         }
 
         String formattedLastDay = "none";
-        if (mWeekView.getLastVisibleDay() != null) {
-            formattedLastDay = format.format(mWeekView.getLastVisibleDay().getTime());
+        if (mWeekView.getLastVisibleDate() != null) {
+            formattedLastDay = format.format(mWeekView.getLastVisibleDate().getTime());
         }
 
         mDateTV.setText(getString(R.string.date_infos, formattedFirstDay, formattedLastDay));

@@ -33,10 +33,10 @@ class WeekViewAdapter<T>(
             weekView.maxDate = value?.toCalendar()
         }
 
-    val firstVisibleDay: LocalDate?
-        get() = weekView.firstVisibleDay?.toLocalDate()
+    val firstVisibleDate: LocalDate?
+        get() = weekView.firstVisibleDate?.toLocalDate()
 
-    val lastVisibleDay: LocalDate?
-        get() = weekView.lastVisibleDay?.toLocalDate()
+    val lastVisibleDate: LocalDate?
+        get() = weekView.lastVisibleDate?.toLocalDate()
 
 }

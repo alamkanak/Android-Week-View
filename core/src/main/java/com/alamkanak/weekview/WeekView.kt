@@ -98,7 +98,7 @@ class WeekView<T> @JvmOverloads constructor(
     override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
         return superState?.let {
-            SavedState(it, configWrapper.numberOfVisibleDays, viewState.firstVisibleDay)
+            SavedState(it, configWrapper.numberOfVisibleDays, viewState.firstVisibleDate)
         }
     }
 
@@ -128,26 +128,26 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     private fun notifyScrollListeners() {
-        val oldFirstVisibleDay = viewState.firstVisibleDay
+        val oldFirstVisibleDay = viewState.firstVisibleDate
         val totalDayWidth = configWrapper.totalDayWidth
         val visibleDays = configWrapper.numberOfVisibleDays
 
         val daysScrolled = configWrapper.currentOrigin.x / totalDayWidth
         val delta = daysScrolled.roundToInt() * (-1)
 
-        val firstVisibleDay = today().plusDays(delta)
-        val lastVisibleDay = firstVisibleDay.plusDays(visibleDays - 1)
+        val firstVisibleDate = today().plusDays(delta)
+        val lastVisibleDate = firstVisibleDate.plusDays(visibleDays - 1)
 
-        viewState.firstVisibleDay = firstVisibleDay
-        viewState.lastVisibleDay = lastVisibleDay
+        viewState.firstVisibleDate = firstVisibleDate
+        viewState.lastVisibleDate = lastVisibleDate
 
         val hasFirstVisibleDayChanged = oldFirstVisibleDay?.let {
-            firstVisibleDay.isSameDate(it).not()
+            firstVisibleDate.isSameDate(it).not()
         } ?: true
 
         if (hasFirstVisibleDayChanged) {
-            scrollListener?.onFirstVisibleDateChanged(firstVisibleDay)
-            onRangeChangeListener?.onRangeChanged(firstVisibleDay, lastVisibleDay)
+            scrollListener?.onFirstVisibleDateChanged(firstVisibleDate)
+            onRangeChangeListener?.onRangeChanged(firstVisibleDate, lastVisibleDate)
         }
     }
 
@@ -201,9 +201,9 @@ class WeekView<T> @JvmOverloads constructor(
             dateTimeInterpreter.onSetNumberOfDays(value)
             clearCaches()
 
-            viewState.firstVisibleDay?.let {
+            viewState.firstVisibleDate?.let {
                 // Scroll to first visible day after changing the number of visible days
-                viewState.scrollToDay = it
+                viewState.scrollToDate = it
             }
 
             calculateWidthPerDay()
@@ -1021,17 +1021,31 @@ class WeekView<T> @JvmOverloads constructor(
     //
     /////////////////////////////////////////////////////////////////
 
-    /**
-     * Returns the first visible day.
-     */
+    @Deprecated(
+        "Use firstVisibleDate",
+        ReplaceWith("firstVisibleDate")
+    )
     val firstVisibleDay: Calendar?
-        get() = viewState.firstVisibleDay?.copy()
+        get() = viewState.firstVisibleDate?.copy()
 
     /**
-     * Returns the last visible day.
+     * Returns the first visible date.
      */
+    val firstVisibleDate: Calendar?
+        get() = viewState.firstVisibleDate?.copy()
+
+    @Deprecated(
+        "Use lastVisibleDate",
+        ReplaceWith("lastVisibleDate")
+    )
     val lastVisibleDay: Calendar?
-        get() = viewState.lastVisibleDay?.copy()
+        get() = viewState.lastVisibleDate?.copy()
+
+    /**
+     * Returns the last visible date.
+     */
+    val lastVisibleDate: Calendar?
+        get() = viewState.lastVisibleDate?.copy()
 
     /**
      * Shows the current date.
@@ -1051,7 +1065,7 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     /**
-     * Shows a specific day. If it is before [minDate] or after [maxDate], these will be shown
+     * Shows a specific date. If it is before [minDate] or after [maxDate], these will be shown
      * instead.
      *
      * @param date The date to show.
@@ -1078,7 +1092,7 @@ class WeekView<T> @JvmOverloads constructor(
         gestureHandler.forceScrollFinished()
 
         if (viewState.areDimensionsInvalid) {
-            viewState.scrollToDay = modifiedDate
+            viewState.scrollToDate = modifiedDate
             return
         }
 
@@ -1301,7 +1315,7 @@ class WeekView<T> @JvmOverloads constructor(
     ) {
         scrollListener = object : ScrollListener {
             override fun onFirstVisibleDateChanged(date: Calendar) {
-                block(checkNotNull(firstVisibleDay))
+                block(checkNotNull(firstVisibleDate))
             }
         }
     }
@@ -1310,11 +1324,11 @@ class WeekView<T> @JvmOverloads constructor(
         "Use setScrollListener(block: (Calendar) -> Unit)"
     )
     fun setScrollListener(
-        block: (newFirstVisibleDay: Calendar?, oldFirstVisibleDay: Calendar?) -> Unit
+        block: (newFirstVisibleDate: Calendar?, oldFirstVisibleDate: Calendar?) -> Unit
     ) {
         scrollListener = object : ScrollListener {
             override fun onFirstVisibleDateChanged(date: Calendar) {
-                block(firstVisibleDay, null)
+                block(firstVisibleDate, null)
             }
         }
     }
@@ -1326,7 +1340,7 @@ class WeekView<T> @JvmOverloads constructor(
     ) {
         onRangeChangeListener = object : OnRangeChangeListener {
             override fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
-                block(checkNotNull(firstVisibleDay), checkNotNull(lastVisibleDay))
+                block(firstVisibleDate, lastVisibleDate)
             }
         }
     }
