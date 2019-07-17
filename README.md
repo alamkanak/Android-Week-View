@@ -88,7 +88,7 @@ data class Event(
 
 4. Configure `WeekView` in code.
 ```kotlin
-val weekView = findViewById<WeekView>(R.id.weekView)
+val weekView: WeekView<Event> = findViewById(R.id.weekView)
 weekView.setOnEventClickListener { calendarItem, eventRect ->
     // ...
 }
