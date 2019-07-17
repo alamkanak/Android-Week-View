@@ -8,22 +8,19 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.0'
-
+    compileSdkVersion buildConfig.compileSdk
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 29
+        minSdkVersion buildConfig.minSdk
+        targetSdkVersion buildConfig.targetSdk
     }
-
     androidExtensions {
         experimental = true
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation libraries.kotlin
+    implementation libraries.appCompat
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.28.2'
