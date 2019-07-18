@@ -203,9 +203,7 @@ internal class EventChipDrawer<T>(
         var textLayout = staticLayout
 
         val textPaint = event.getTextPaint(context, config)
-        val lineHeight = textLayout.lineHeight
-
-        var availableLineCount = availableHeight / lineHeight
+        var availableLineCount = availableHeight / textLayout.lineHeight
 
         do {
             // Ellipsize text to fit into event rect.
@@ -245,7 +243,7 @@ internal class EventChipDrawer<T>(
 
             val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
             textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
-        } while (availableHeight <= textLayout.lineHeight)
+        } while (availableHeight <= textLayout.height)
 
         return textLayout
     }

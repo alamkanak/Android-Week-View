@@ -72,7 +72,7 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
 
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val adjustedProgress = SEEKBAR_MIN_VALUE + progress
+                val adjustedProgress = ((SEEKBAR_MIN_VALUE + progress) / 5) * 5
                 guideline.setGuidelinePercent(adjustedProgress / 100f)
             }
         })
