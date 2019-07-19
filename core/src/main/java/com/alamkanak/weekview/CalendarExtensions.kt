@@ -4,6 +4,7 @@ import com.alamkanak.weekview.Constants.DAY_IN_MILLIS
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.roundToInt
 
 internal val Calendar.hour: Int
     get() = get(Calendar.HOUR_OF_DAY)
@@ -104,8 +105,8 @@ internal val Calendar.atEndOfDay: Calendar
 
 internal val Calendar.daysFromToday: Int
     get() {
-        val diff = atStartOfDay.timeInMillis - today().timeInMillis
-        return (diff / (DAY_IN_MILLIS)).toInt()
+        val diff = (atStartOfDay.timeInMillis - today().timeInMillis).toFloat()
+        return (diff / DAY_IN_MILLIS).roundToInt()
     }
 
 internal fun today(): Calendar = now().atStartOfDay
