@@ -135,10 +135,20 @@ internal class EventCache<T>(
         eventChip: EventChip<T>
     ) {
         val results = getOrElse(key) { mutableListOf() }
-        if (results.contains(eventChip).not()) {
+        val indexOfExisting = results.indexOfFirst { it.event.id == eventChip.event.id }
+        if (indexOfExisting != -1) {
+            // If an event with the same ID already exists, replace it. The new event will likely be
+            // more up-to-date.
+            results.replace(indexOfExisting, eventChip)
+        } else {
             results.add(eventChip)
         }
         this[key] = results
+    }
+
+    private fun <T> MutableList<T>.replace(index: Int, element: T) {
+        removeAt(index)
+        add(index, element)
     }
 
 }
