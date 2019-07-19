@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity() {
             Sample(R.string.title_activity_constraint, ConstraintActivity::class.java),
             Sample(R.string.title_activity_limited, LimitedActivity::class.java),
             Sample(R.string.title_activity_custom_font, CustomFontActivity::class.java),
-            Sample(R.string.title_activity_asynchronous, AsyncActivity::class.java)
+            Sample(R.string.title_activity_asynchronous, AsyncActivity::class.java),
+            Sample(R.string.title_activity_with_fragment, WithFragmentActivity::class.java)
         )
 
     }
