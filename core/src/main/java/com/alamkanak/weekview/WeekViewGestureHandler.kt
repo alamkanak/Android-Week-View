@@ -39,10 +39,10 @@ private enum class Direction {
 internal class WeekViewGestureHandler<T>(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>
+    private val cache: EventCache<T>,
+    private val listener: Listener
 ) : GestureDetector.SimpleOnGestureListener() {
 
-    private val listener = view as Listener
     private val touchHandler = WeekViewTouchHandler(config)
 
     private val scroller = OverScroller(view.context, FastOutLinearInInterpolator())

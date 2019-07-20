@@ -20,7 +20,7 @@ class WeekView<T> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), WeekViewGestureHandler.Listener, WeekViewViewState.Listener {
+) : View(context, attrs, defStyleAttr), WeekViewViewState.Listener {
 
     private val configWrapper: WeekViewConfigWrapper by lazy {
         val config = WeekViewConfig(context, attrs)
@@ -32,13 +32,20 @@ class WeekView<T> @JvmOverloads constructor(
         EventCache(eventSplitter)
     }
 
+    private val gestureListener = object : WeekViewGestureHandler.Listener {
+        override fun onScaled() = invalidate()
+        override fun onScrolled() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
+    }
+
     private val cache = WeekViewCache(eventCache)
 
     private val viewState = WeekViewViewState(configWrapper, this)
-    private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventCache)
+    private val gestureHandler =
+        WeekViewGestureHandler(this, configWrapper, eventCache, gestureListener)
 
     private val drawingContext = DrawingContext(configWrapper)
-    private val eventChipsProvider = EventChipsProvider(configWrapper, eventCache, viewState)
+    private val eventChipsProvider = EventChipsProvider(eventCache, viewState)
+    private val eventChipsExpander = EventChipsExpander(configWrapper, eventCache)
 
     private val paint = Paint()
 
@@ -82,6 +89,7 @@ class WeekView<T> @JvmOverloads constructor(
     private fun refreshEvents() {
         if (!isInEditMode) {
             eventChipsProvider.loadEventsIfNecessary()
+            eventChipsExpander.calculateEventChipPositions()
         }
     }
 
@@ -157,14 +165,6 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
         configWrapper.calculateWidthPerDay()
-    }
-
-    override fun onScaled() {
-        invalidate()
-    }
-
-    override fun onScrolled() {
-        ViewCompat.postInvalidateOnAnimation(this)
     }
 
     override fun invalidate() {
@@ -931,7 +931,7 @@ class WeekView<T> @JvmOverloads constructor(
         get() = configWrapper.minHour
         set(value) {
             if (value < 0 || value > configWrapper.maxHour) {
-                throw IllegalArgumentException("minHour must be larger than 0 and smaller than maxHour.")
+                throw IllegalArgumentException("minHour must be between 0 and maxHour.")
             }
 
             configWrapper.minHour = value
@@ -946,7 +946,7 @@ class WeekView<T> @JvmOverloads constructor(
         get() = configWrapper.maxHour
         set(value) {
             if (value > 24 || value < configWrapper.minHour) {
-                throw IllegalArgumentException("maxHour must be smaller than 24 and larger than minHour.")
+                throw IllegalArgumentException("maxHour must be between minHour and 24.")
             }
 
             configWrapper.maxHour = value

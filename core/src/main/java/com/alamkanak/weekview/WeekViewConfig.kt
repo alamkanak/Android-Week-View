@@ -181,7 +181,7 @@ internal class WeekViewConfig(
             // Hour height
             hourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, 50).toFloat()
             minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0)
-            maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 250)
+            maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 400)
             effectiveMinHourHeight = minHourHeight
             showCompleteDay = a.getBoolean(R.styleable.WeekView_showCompleteDay, false)
 
