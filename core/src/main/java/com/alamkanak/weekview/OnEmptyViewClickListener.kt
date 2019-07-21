@@ -17,5 +17,4 @@ interface OnEmptyViewClickListener {
      * @param time A [Calendar] with the date and time of the clicked position
      */
     fun onEmptyViewClicked(time: Calendar)
-
 }

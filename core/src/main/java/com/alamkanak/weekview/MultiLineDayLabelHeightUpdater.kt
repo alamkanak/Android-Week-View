@@ -74,5 +74,4 @@ internal class MultiLineDayLabelHeightUpdater<T>(
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {
         return get(key) ?: providerIfEmpty.invoke()
     }
-
 }

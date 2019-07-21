@@ -50,5 +50,4 @@ internal class DrawingContext(
                 if (config.isSingleDay) it + singleDayMargin else it
             }
     }
-
 }

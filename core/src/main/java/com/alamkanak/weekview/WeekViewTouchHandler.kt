@@ -53,5 +53,4 @@ internal class WeekViewTouchHandler(
 
         return null
     }
-
 }

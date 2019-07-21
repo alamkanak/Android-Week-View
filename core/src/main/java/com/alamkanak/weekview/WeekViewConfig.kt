@@ -248,5 +248,4 @@ internal class WeekViewConfig(
         private const val SERIF = 2
         private const val MONOSPACE = 3
     }
-
 }

@@ -30,12 +30,9 @@ class SamplesAdapter(
     override fun getItemCount() = samples.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
         fun bind(sample: Sample, onClick: (Sample) -> Unit) = with(itemView) {
             text.text = context.getString(sample.labelResId)
             setOnClickListener { onClick(sample) }
         }
-
     }
-
 }

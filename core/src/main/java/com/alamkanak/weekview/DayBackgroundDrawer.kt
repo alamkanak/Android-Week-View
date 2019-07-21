@@ -54,12 +54,18 @@ internal class DayBackgroundDrawer(
         }
     }
 
-    private fun drawPastAndFutureRect(startX: Float, startY: Float, endX: Float, pastPaint: Paint,
-                                      futurePaint: Paint, height: Float, canvas: Canvas) {
+    private fun drawPastAndFutureRect(
+        startX: Float,
+        startY: Float,
+        endX: Float,
+        pastPaint: Paint,
+        futurePaint: Paint,
+        height: Float,
+        canvas: Canvas
+    ) {
         val now = now()
         val beforeNow = (now.hour + now.minute / MINUTES_PER_HOUR) * config.hourHeight
         canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint)
         canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint)
     }
-
 }

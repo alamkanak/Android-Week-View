@@ -18,7 +18,6 @@ data class Event(
             .setEndTime(endTime)
             .build()
     }
-
 }
 
 class WeekViewEventSplitterTest {
@@ -83,5 +82,4 @@ class WeekViewEventSplitterTest {
 
         assertEquals(expectedTimes, resultTimes)
     }
-
 }

@@ -271,5 +271,4 @@ internal class EventChipDrawer<T>(
         paint.strokeWidth = event.style.borderWidth.toFloat()
         paint.style = Paint.Style.STROKE
     }
-
 }

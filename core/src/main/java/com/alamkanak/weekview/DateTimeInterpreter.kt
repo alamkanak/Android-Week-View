@@ -37,20 +37,16 @@ internal class DefaultDateTimeInterpreter(
         val time = calendar.withTime(hour, minutes = 0)
         return sdfTime.format(time.time)
     }
-
 }
 
 internal interface DateFormatProvider {
     val is24HourFormat: Boolean
 }
 
-internal class RealDateFormatProvider (
+internal class RealDateFormatProvider(
     private val context: Context
 ) : DateFormatProvider {
 
     override val is24HourFormat: Boolean
         get() = DateFormat.is24HourFormat(context)
-
 }
-
-

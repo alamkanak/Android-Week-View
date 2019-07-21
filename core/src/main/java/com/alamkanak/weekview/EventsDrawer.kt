@@ -34,7 +34,6 @@ internal class SingleEventsDrawer<T>(
             .filter { it.rect != null }
             .forEach { eventChipDrawer.draw(it, canvas, paint) }
     }
-
 }
 
 internal class AllDayEventsDrawer<T>(
@@ -79,5 +78,4 @@ internal class AllDayEventsDrawer<T>(
     override fun clear() {
         cache.clearAllDayEventLayouts()
     }
-
 }

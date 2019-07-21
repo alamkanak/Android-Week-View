@@ -12,5 +12,4 @@ interface OnEventClickListener<T> {
      * @param eventRect The [RectF] of the [EventChip]
      */
     fun onEventClick(data: T, eventRect: RectF)
-
 }

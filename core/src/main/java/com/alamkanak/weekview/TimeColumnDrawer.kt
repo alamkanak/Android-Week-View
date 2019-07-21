@@ -84,5 +84,4 @@ internal class TimeColumnDrawer(
         timeLabelCache.clear()
         cacheTimeLabels()
     }
-
 }

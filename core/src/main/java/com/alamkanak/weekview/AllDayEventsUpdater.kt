@@ -200,10 +200,9 @@ internal class AllDayEventsUpdater<T>(
     }
 
     private val RectF.isValidAllDayEventRect: Boolean
-        get() = (left < right
-            && left < view.width
-            && top < view.height
-            && right > config.timeColumnWidth
-            && bottom > 0)
-
+        get() = (left < right &&
+            left < view.width &&
+            top < view.height &&
+            right > config.timeColumnWidth &&
+            bottom > 0)
 }

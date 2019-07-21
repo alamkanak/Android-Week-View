@@ -38,5 +38,4 @@ class WeekViewAdapter<T>(
 
     val lastVisibleDate: LocalDate?
         get() = weekView.lastVisibleDate?.toLocalDate()
-
 }

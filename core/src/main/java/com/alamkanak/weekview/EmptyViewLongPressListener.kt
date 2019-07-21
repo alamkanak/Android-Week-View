@@ -17,5 +17,4 @@ interface OnEmptyViewLongPressListener {
      * @param time A [Calendar] with the date and time of the clicked position
      */
     fun onEmptyViewLongPress(time: Calendar)
-
 }

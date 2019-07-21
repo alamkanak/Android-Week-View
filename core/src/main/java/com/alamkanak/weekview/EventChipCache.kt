@@ -71,5 +71,4 @@ internal class EventChipCache<T> {
         removeAt(index)
         add(index, element)
     }
-
 }

@@ -65,7 +65,6 @@ class DefaultDateTimeInterpreterTest {
 
         assertEquals(expected, observed)
     }
-
 }
 
 internal class FakeDateFormatProvider(

@@ -11,5 +11,4 @@ interface ScrollListener {
      * @param date The new first visible date
      */
     fun onFirstVisibleDateChanged(date: Calendar)
-
 }

@@ -39,5 +39,4 @@ internal class SavedState : BaseSavedState {
             override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
         }
     }
-
 }

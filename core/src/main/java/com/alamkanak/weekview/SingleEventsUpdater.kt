@@ -40,10 +40,9 @@ internal class SingleEventsUpdater<T>(
     }
 
     private val RectF.isValidSingleEventRect: Boolean
-        get() = (left < right
-            && left < view.width
-            && top < view.height
-            && right > config.timeColumnWidth
-            && bottom > config.headerHeight)
-
+        get() = (left < right &&
+            left < view.width &&
+            top < view.height &&
+            right > config.timeColumnWidth &&
+            bottom > config.headerHeight)
 }

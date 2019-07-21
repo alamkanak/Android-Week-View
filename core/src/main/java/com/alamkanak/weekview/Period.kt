@@ -14,9 +14,7 @@ internal data class FetchRange(
             val current = Period.fromDate(firstVisibleDay)
             return FetchRange(current.previous, current, current.next)
         }
-
     }
-
 }
 
 internal data class Period(val month: Int, val year: Int) {
@@ -36,13 +34,10 @@ internal data class Period(val month: Int, val year: Int) {
         }
 
     internal companion object {
-
         fun fromDate(date: Calendar): Period {
             val month = date.month
             val year = date.year
             return Period(month, year)
         }
-
     }
-
 }

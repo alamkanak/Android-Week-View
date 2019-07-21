@@ -79,5 +79,4 @@ internal class BackgroundGridDrawer(
 
         canvas.drawLines(hourLines, config.hourSeparatorPaint)
     }
-
 }

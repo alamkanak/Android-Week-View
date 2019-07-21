@@ -98,5 +98,4 @@ internal class EventChipsProvider<T>(
         }
         return eventSplitter.split(event).map { EventChip(it, event, null) }
     }
-
 }

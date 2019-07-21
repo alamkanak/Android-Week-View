@@ -192,5 +192,4 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         val minute = time.get(Calendar.MINUTE)
         return String.format("Event of %02d:%02d %s", hour, minute, formattedDate)
     }
-
 }

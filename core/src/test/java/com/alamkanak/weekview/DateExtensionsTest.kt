@@ -34,5 +34,4 @@ class DateExtensionsTest {
         assertEquals(1, secondResult.dayOfMonth)
         assertEquals(Calendar.FEBRUARY, secondResult.month)
     }
-
 }

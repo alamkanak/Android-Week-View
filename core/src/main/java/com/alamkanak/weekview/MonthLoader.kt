@@ -29,5 +29,4 @@ internal class MonthLoader<T>(
             .onMonthChange(startDate, endDate)
             .map { it.toWeekViewEvent() }
     }
-
 }

@@ -44,5 +44,4 @@ class PeriodTest {
         assertEquals(next.month, Calendar.JANUARY)
         assertEquals(next.year, period.year + 1)
     }
-
 }

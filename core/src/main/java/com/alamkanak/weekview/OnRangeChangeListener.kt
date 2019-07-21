@@ -12,5 +12,4 @@ interface OnRangeChangeListener {
      * @param lastVisibleDate The last visible day
      */
     fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar)
-
 }

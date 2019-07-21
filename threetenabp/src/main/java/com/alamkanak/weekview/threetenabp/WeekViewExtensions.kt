@@ -11,12 +11,6 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.util.Calendar
 
-//////////////////////////////////////////////
-//
-//   WeekViewEvent.Builder extensions
-//
-//////////////////////////////////////////////
-
 fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())
 }
@@ -24,12 +18,6 @@ fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekVie
 fun <T> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setEndTime(endTime.toCalendar())
 }
-
-//////////////////////////////////////////////
-//
-//   WeekView extensions
-//
-//////////////////////////////////////////////
 
 val <T> WeekView<T>.adapter: WeekViewAdapter<T>
     get() = WeekViewAdapter(this)

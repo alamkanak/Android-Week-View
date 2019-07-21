@@ -394,5 +394,4 @@ internal class WeekViewGestureHandler<T>(
         fun onScaled()
         fun onScrolled()
     }
-
 }

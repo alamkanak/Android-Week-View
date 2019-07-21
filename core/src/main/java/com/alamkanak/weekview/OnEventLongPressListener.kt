@@ -18,5 +18,4 @@ interface OnEventLongPressListener<T> {
      * @param eventRect The [RectF] of the [EventChip]
      */
     fun onEventLongPress(data: T, eventRect: RectF)
-
 }

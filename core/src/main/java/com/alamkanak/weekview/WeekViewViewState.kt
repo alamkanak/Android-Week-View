@@ -54,5 +54,4 @@ internal class WeekViewViewState(
         fun goToDate(date: Calendar)
         fun goToHour(hour: Int)
     }
-
 }

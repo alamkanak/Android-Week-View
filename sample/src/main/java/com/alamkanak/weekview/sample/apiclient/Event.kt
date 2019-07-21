@@ -40,5 +40,4 @@ class Event(
                 .setData(this)
                 .build()
     }
-
 }

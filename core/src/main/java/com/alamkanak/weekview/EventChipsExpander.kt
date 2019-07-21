@@ -143,7 +143,6 @@ internal class EventChipsExpander<T>(
         fun add(eventChip: EventChip<T>) {
             eventChips.add(eventChip)
         }
-
     }
 
     /**
@@ -173,7 +172,6 @@ internal class EventChipsExpander<T>(
         fun fits(eventChip: EventChip<T>): Boolean {
             return isEmpty || !eventChips.last().event.collidesWith(eventChip.event)
         }
-
     }
 
     private val List<Int>.isContinuous: Boolean
@@ -191,5 +189,4 @@ internal class EventChipsExpander<T>(
         }
         return results
     }
-
 }

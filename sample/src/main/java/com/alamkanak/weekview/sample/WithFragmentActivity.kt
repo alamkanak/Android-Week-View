@@ -1,7 +1,6 @@
 package com.alamkanak.weekview.sample
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -12,8 +11,6 @@ import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.FakeEventsDatabase
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 class WithFragmentActivity : AppCompatActivity() {
 
@@ -38,7 +35,6 @@ class WithFragmentActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
 
 class WeekFragment : Fragment() {
@@ -64,5 +60,4 @@ class WeekFragment : Fragment() {
     companion object {
         fun newInstance() = WeekFragment()
     }
-
 }

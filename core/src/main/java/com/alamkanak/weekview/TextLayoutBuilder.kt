@@ -27,5 +27,4 @@ internal object TextLayoutBuilder {
     } else {
         StaticLayout(text, textPaint, width, alignment, spacingMultiplier, spacingExtra, includePadding)
     }
-
 }

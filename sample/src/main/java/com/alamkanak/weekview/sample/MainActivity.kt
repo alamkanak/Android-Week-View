@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-
         private val SAMPLES = listOf(
             Sample(R.string.title_activity_basic, BaseActivity::class.java),
             Sample(R.string.title_activity_static, StaticActivity::class.java),
@@ -37,7 +36,5 @@ class MainActivity : AppCompatActivity() {
             Sample(R.string.title_activity_asynchronous, AsyncActivity::class.java),
             Sample(R.string.title_activity_with_fragment, WithFragmentActivity::class.java)
         )
-
     }
-
 }

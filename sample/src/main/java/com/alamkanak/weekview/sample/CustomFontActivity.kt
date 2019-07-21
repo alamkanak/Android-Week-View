@@ -135,5 +135,4 @@ open class CustomFontActivity : AppCompatActivity() {
         private const val TYPE_THREE_DAY_VIEW = 2
         private const val TYPE_WEEK_VIEW = 3
     }
-
 }

@@ -66,5 +66,4 @@ internal data class EventChip<T>(
             e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
         } ?: false
     }
-
 }

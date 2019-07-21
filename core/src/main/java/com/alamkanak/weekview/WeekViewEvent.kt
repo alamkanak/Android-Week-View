@@ -187,12 +187,8 @@ data class WeekViewEvent<T> internal constructor(
                 return this
             }
 
-            fun build(): Style {
-                return style
-            }
-
+            fun build(): Style = style
         }
-
     }
 
     class Builder<T> {
@@ -249,10 +245,6 @@ data class WeekViewEvent<T> internal constructor(
             return this
         }
 
-        fun build(): WeekViewEvent<T> {
-            return event
-        }
-
+        fun build(): WeekViewEvent<T> = event
     }
-
 }

@@ -50,5 +50,4 @@ internal class NowLineDrawer(
         val dotMargin = 32f
         canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, config.nowDotPaint)
     }
-
 }

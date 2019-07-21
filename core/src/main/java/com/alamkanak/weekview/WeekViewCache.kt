@@ -15,5 +15,4 @@ internal class WeekViewCache<T> {
         allDayEventLayouts.clear()
         isAllDayEventLayoutsCleared = true
     }
-
 }

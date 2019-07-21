@@ -631,5 +631,4 @@ internal class WeekViewConfigWrapper(
             .map { timeTextPaint.measureText(it) }
             .max() ?: 0f
     }
-
 }

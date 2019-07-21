@@ -115,8 +115,8 @@ class AsyncActivity : AppCompatActivity() {
     }
 
     private fun onMonthChange(
-            startDate: Calendar,
-            endDate: Calendar
+        startDate: Calendar,
+        endDate: Calendar
     ): List<WeekViewDisplayable<ApiEvent>> {
         val newYear = startDate.get(Calendar.YEAR)
         val newMonth = startDate.get(Calendar.MONTH)
@@ -138,10 +138,11 @@ class AsyncActivity : AppCompatActivity() {
      * @return True if the event matches the year and month.
      */
     private fun eventMatches(event: WeekViewEvent<*>, year: Int, month: Int): Boolean {
-        return event.startTime.get(Calendar.YEAR) == year
-                && event.startTime.get(Calendar.MONTH) == month - 1
-                || event.endTime.get(Calendar.YEAR) == year
-                && event.endTime.get(Calendar.MONTH) == month - 1
+        val startsOnDate = event.startTime.get(Calendar.YEAR) == year &&
+            event.startTime.get(Calendar.MONTH) == month - 1
+        val endsOnDate = event.endTime.get(Calendar.YEAR) == year &&
+            event.endTime.get(Calendar.MONTH) == month - 1
+        return startsOnDate || endsOnDate
     }
 
     private fun onEventsFetched(events: List<ApiEvent>) {
@@ -171,5 +172,4 @@ class AsyncActivity : AppCompatActivity() {
         private const val TYPE_THREE_DAY_VIEW = 2
         private const val TYPE_WEEK_VIEW = 3
     }
-
 }

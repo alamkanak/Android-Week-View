@@ -15,9 +15,9 @@ internal class EventCache<T> {
 
     fun covers(fetchRange: FetchRange): Boolean {
         return fetchedRange?.let {
-            it.previous == fetchRange.previous
-                && it.current == fetchRange.current
-                && it.next == fetchRange.next
+            it.previous == fetchRange.previous &&
+                it.current == fetchRange.current &&
+                it.next == fetchRange.next
         } ?: false
     }
 
@@ -49,5 +49,4 @@ internal class EventCache<T> {
         this.nextPeriodEvents = nextPeriodEvents
         this.fetchedRange = fetchedRange
     }
-
 }

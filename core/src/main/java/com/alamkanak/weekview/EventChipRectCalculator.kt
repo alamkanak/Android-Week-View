@@ -67,5 +67,4 @@ internal class EventChipRectCalculator<T>(
 
         return RectF(left, top, right, bottom)
     }
-
 }

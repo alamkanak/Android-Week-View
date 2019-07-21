@@ -18,5 +18,4 @@ interface OnMonthChangeListener<T> {
      * @return The list of [WeekViewDisplayable] of the provided month
      */
     fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<T>>
-
 }

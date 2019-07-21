@@ -26,7 +26,5 @@ internal class Defaults {
             val displayMetrics = context.resources.displayMetrics
             return applyDimension(COMPLEX_UNIT_SP, textSize.toFloat(), displayMetrics).toInt()
         }
-
     }
-
 }

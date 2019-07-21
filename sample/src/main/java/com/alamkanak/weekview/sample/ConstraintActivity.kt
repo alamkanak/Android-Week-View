@@ -109,8 +109,7 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
         }
     }
 
-    companion object {
+    private companion object {
         private const val SEEKBAR_MIN_VALUE = 50
     }
-
 }

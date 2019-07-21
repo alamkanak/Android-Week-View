@@ -54,5 +54,4 @@ internal class HeaderRowDrawer<T>(
 
         canvas.drawLine(0f, topMargin, width.toFloat(), topMargin, paint)
     }
-
 }
