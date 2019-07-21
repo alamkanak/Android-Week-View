@@ -4,7 +4,7 @@ import java.lang.Math.max
 import java.util.Calendar
 
 internal class WeekViewViewState(
-    private val configWrapper: WeekViewConfigWrapper,
+    private val config: WeekViewConfigWrapper,
     private val listener: Listener
 ) {
 
@@ -18,11 +18,11 @@ internal class WeekViewViewState(
     var lastVisibleDate: Calendar? = null
 
     fun update(viewHeight: Int) {
-        val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()
-        val dynamicHourHeight = (viewHeight - totalHeaderHeight) / configWrapper.hoursPerDay
+        val totalHeaderHeight = config.getTotalHeaderHeight().toInt()
+        val dynamicHourHeight = (viewHeight - totalHeaderHeight) / config.hoursPerDay
 
         if (areDimensionsInvalid) {
-            configWrapper.effectiveMinHourHeight = max(configWrapper.minHourHeight, dynamicHourHeight)
+            config.effectiveMinHourHeight = max(config.minHourHeight, dynamicHourHeight)
 
             areDimensionsInvalid = false
             scrollToDate?.let {
@@ -41,7 +41,7 @@ internal class WeekViewViewState(
         }
 
         if (isFirstDraw) {
-            configWrapper.moveCurrentOriginIfFirstDraw()
+            config.moveCurrentOriginIfFirstDraw()
             isFirstDraw = false
         }
     }

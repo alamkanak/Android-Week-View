@@ -7,20 +7,20 @@ import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import java.util.Calendar
 
-data class Event(
-    val startTime: Calendar,
-    val endTime: Calendar
-) : WeekViewDisplayable<Event> {
-
-    override fun toWeekViewEvent(): WeekViewEvent<Event> {
-        return WeekViewEvent.Builder<Event>()
-            .setStartTime(startTime)
-            .setEndTime(endTime)
-            .build()
-    }
-}
-
 class WeekViewEventSplitterTest {
+
+    private data class Event(
+        val startTime: Calendar,
+        val endTime: Calendar
+    ) : WeekViewDisplayable<Event> {
+
+        override fun toWeekViewEvent(): WeekViewEvent<Event> {
+            return WeekViewEvent.Builder<Event>()
+                .setStartTime(startTime)
+                .setEndTime(endTime)
+                .build()
+        }
+    }
 
     private val config = mock(WeekViewConfigWrapper::class.java)
     private val underTest = WeekViewEventSplitter<Event>(config)

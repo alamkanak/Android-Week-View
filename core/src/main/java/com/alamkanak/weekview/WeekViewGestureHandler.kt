@@ -247,7 +247,7 @@ internal class WeekViewGestureHandler<T>(
         val isWithinCalendarArea = e.x > timeColumnWidth && e.y > config.headerHeight
 
         if (onEmptyViewClickListener != null && isWithinCalendarArea) {
-            val selectedTime = touchHandler.calculateTimeFromPoint(e)
+            val selectedTime = touchHandler.calculateTimeFromPoint(e.x, e.y)
             if (selectedTime != null) {
                 onEmptyViewClickListener?.onEmptyViewClicked(selectedTime)
             }
@@ -279,7 +279,7 @@ internal class WeekViewGestureHandler<T>(
         // If the tap was on in an empty space, then trigger the callback.
         onEmptyViewLongPressListener?.let { listener ->
             if (e.x > timeColumnWidth && e.y > config.headerHeight) {
-                val selectedTime = touchHandler.calculateTimeFromPoint(e) ?: return@let
+                val selectedTime = touchHandler.calculateTimeFromPoint(e.x, e.y) ?: return@let
                 listener.onEmptyViewLongPress(selectedTime)
             }
         }
@@ -288,8 +288,7 @@ internal class WeekViewGestureHandler<T>(
     private fun findHitEvent(
         e: MotionEvent
     ): EventChip<T>? {
-        val candidates = chipCache.findHits(e)
-
+        val candidates = chipCache.allEventChips.filter { it.isHit(e) }
         return when {
             candidates.isEmpty() -> null
             // Two events hit. This is most likely because an all-day event was clicked, but a

@@ -1,18 +1,15 @@
 package com.alamkanak.weekview
 
-import android.view.MotionEvent
 import androidx.collection.ArrayMap
 import java.util.Calendar
 
 internal class EventChipCache<T> {
 
-    private val allEventChips: List<EventChip<T>>
+    val allEventChips: List<EventChip<T>>
         get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
 
     private val normalEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
     private val allDayEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
-
-    fun findHits(e: MotionEvent) = allEventChips.filter { it.isHit(e) }
 
     fun groupedByDate(): Map<Calendar, List<EventChip<T>>> {
         return allEventChips.groupBy { it.event.startTime.atStartOfDay }
@@ -26,7 +23,7 @@ internal class EventChipCache<T> {
         return allDayEventChipsByDate[date.atStartOfDay].orEmpty()
     }
 
-    fun put(newChips: List<EventChip<T>>) {
+    private fun put(newChips: List<EventChip<T>>) {
         val (allDay, normal) = newChips.partition { it.event.isAllDay }
 
         normal.forEach {

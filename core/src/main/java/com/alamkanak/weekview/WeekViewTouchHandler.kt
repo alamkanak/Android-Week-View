@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.view.MotionEvent
 import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.max
@@ -12,10 +11,14 @@ internal class WeekViewTouchHandler(
     /**
      * Returns the date and time that the user clicked on.
      *
-     * @param event The [MotionEvent] of the touch event.
-     * @return The [Calendar] with the time and date of the clicked position.
+     * @param touchX The x coordinate of the touch event.
+     * @param touchY The y coordinate of the touch event.
+     * @return The [Calendar] of the clicked position, or null if none was found.
      */
-    fun calculateTimeFromPoint(event: MotionEvent): Calendar? {
+    fun calculateTimeFromPoint(
+        touchX: Float,
+        touchY: Float
+    ): Calendar? {
         val widthPerDay = config.widthPerDay
         val totalDayWidth = widthPerDay + config.columnGap
         val originX = config.currentOrigin.x
@@ -33,13 +36,13 @@ internal class WeekViewTouchHandler(
             val width = end - start
 
             val isVisibleHorizontally = width > 0
-            val isWithinDay = event.x in start..end
+            val isWithinDay = touchX in start..end
 
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now().plusDays(dayNumber - 1)
 
                 val hourHeight = config.hourHeight
-                val pixelsFromMidnight = event.y - config.currentOrigin.y - config.headerHeight
+                val pixelsFromMidnight = touchY - config.currentOrigin.y - config.headerHeight
                 val hour = (pixelsFromMidnight / hourHeight).toInt()
 
                 val pixelsFromFullHour = pixelsFromMidnight - hour * hourHeight
