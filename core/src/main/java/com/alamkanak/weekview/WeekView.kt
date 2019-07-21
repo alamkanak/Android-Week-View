@@ -27,25 +27,24 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
-    private val eventCache: EventCache<T> by lazy {
-        val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-        EventCache(eventSplitter)
-    }
+    private val eventUiCache = EventChipCache<T>()
+    private val eventCache = EventCache<T>()
 
     private val gestureListener = object : WeekViewGestureHandler.Listener {
         override fun onScaled() = invalidate()
         override fun onScrolled() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
     }
 
-    private val cache = WeekViewCache(eventCache)
+    private val cache = WeekViewCache<T>()
 
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler =
-        WeekViewGestureHandler(this, configWrapper, eventCache, gestureListener)
+        WeekViewGestureHandler(this, configWrapper, eventUiCache, gestureListener)
 
     private val drawingContext = DrawingContext(configWrapper)
-    private val eventChipsProvider = EventChipsProvider(eventCache, viewState)
-    private val eventChipsExpander = EventChipsExpander(configWrapper, eventCache)
+    private val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
+    private val eventChipsProvider = EventChipsProvider(eventCache, viewState, eventSplitter, eventUiCache)
+    private val eventChipsExpander = EventChipsExpander(configWrapper, eventUiCache)
 
     private val paint = Paint()
 
@@ -54,8 +53,8 @@ class WeekView<T> @JvmOverloads constructor(
     private val updaters = listOf(
         MultiLineDayLabelHeightUpdater(configWrapper, cache),
         HeaderRowHeightUpdater(configWrapper, eventCache),
-        AllDayEventsUpdater(this, configWrapper, cache),
-        SingleEventsUpdater(this, configWrapper, cache)
+        AllDayEventsUpdater(this, configWrapper, cache, eventUiCache),
+        SingleEventsUpdater(this, configWrapper, eventUiCache)
     )
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -63,7 +62,7 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
-        SingleEventsDrawer(context, configWrapper, cache),
+        SingleEventsDrawer(context, configWrapper, eventUiCache),
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper, cache),
@@ -94,13 +93,17 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     private fun updateDimensions() {
-        updaters
-            .filter { it.isRequired() }
-            .forEach { it.update(drawingContext) }
+        for (updater in updaters) {
+            if (updater.isRequired) {
+                updater.update(drawingContext)
+            }
+        }
     }
 
     private fun performDrawing(canvas: Canvas) {
-        drawers.forEach { it.draw(drawingContext, canvas, paint) }
+        for (drawer in drawers) {
+            drawer.draw(drawingContext, canvas, paint)
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -1096,7 +1099,7 @@ class WeekView<T> @JvmOverloads constructor(
             return
         }
 
-        viewState.shouldRefreshEvents = true
+        eventChipsProvider.shouldRefreshEvents = true
 
         val diff = modifiedDate.daysFromToday
         configWrapper.currentOrigin.x = diff.toFloat() * (-1f) * configWrapper.totalDayWidth
@@ -1107,7 +1110,7 @@ class WeekView<T> @JvmOverloads constructor(
      * Refreshes the view and loads the events again.
      */
     fun notifyDataSetChanged() {
-        viewState.shouldRefreshEvents = true
+        eventChipsProvider.shouldRefreshEvents = true
         invalidate()
     }
 
@@ -1186,9 +1189,7 @@ class WeekView<T> @JvmOverloads constructor(
     fun getMonthChangeListener() = onMonthChangeListener
 
     var onMonthChangeListener: OnMonthChangeListener<T>?
-        get() {
-            return eventChipsProvider.monthLoader?.onMonthChangeListener
-        }
+        get() = eventChipsProvider.monthLoader?.onMonthChangeListener
         set(value) {
             eventChipsProvider.monthLoader = MonthLoader(value)
         }

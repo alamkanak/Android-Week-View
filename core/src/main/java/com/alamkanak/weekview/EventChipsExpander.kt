@@ -2,19 +2,17 @@ package com.alamkanak.weekview
 
 internal class EventChipsExpander<T>(
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>
+    private val chipCache: EventChipCache<T>
 ) {
 
     fun calculateEventChipPositions() {
-        val results = mutableListOf<EventChip<T>>()
-        val groups = cache.groupedByDate()
+        val groups = chipCache.groupedByDate()
+        val groupEventChips = groups.values
 
-        for (eventChips in groups.values) {
+        for (eventChips in groupEventChips) {
             computePositionOfEvents(eventChips)
-            results += eventChips
+            chipCache += eventChips
         }
-
-        cache.put(results)
     }
 
     /**

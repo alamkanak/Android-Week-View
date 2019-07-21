@@ -30,15 +30,13 @@ internal class EventChipDrawer<T>(
         val cornerRadius = config.eventCornerRadius.toFloat()
         setBackgroundPaint(event, paint)
 
-        eventChip.rect?.let {
-            canvas.drawRoundRect(it, cornerRadius, cornerRadius, paint)
-        }
+        val rect = checkNotNull(eventChip.rect)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
 
         if (event.style.hasBorder) {
             setBorderPaint(event, paint)
             val borderWidth = event.style.borderWidth
 
-            val rect = checkNotNull(eventChip.rect)
             val adjustedRect = RectF(
                 rect.left + borderWidth / 2f,
                 rect.top + borderWidth / 2f,

@@ -11,7 +11,8 @@ import android.text.style.StyleSpan
 internal class AllDayEventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val cache: WeekViewCache<T>
+    private val cache: WeekViewCache<T>,
+    private val chipCache: EventChipCache<T>
 ) : Updater {
 
     private val context = view.context
@@ -19,12 +20,13 @@ internal class AllDayEventsUpdater<T>(
 
     private var previousHorizontalOrigin: Float? = null
 
-    override fun isRequired(): Boolean {
-        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-        val isCacheIncomplete = cache.isAllDayEventLayoutsCleared
-        val doRectsNeedRefresh = cache.allDayEventLayouts.map { it.first }.any { it.rect == null }
-        return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh
-    }
+    override val isRequired: Boolean
+        get() {
+            val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+            val isCacheIncomplete = cache.isAllDayEventLayoutsCleared
+            val doRectsNeedRefresh = cache.allDayEventLayouts.map { it.first }.any { it.rect == null }
+            return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh
+        }
 
     /**
      * Compute the StaticLayout for all-day events to update the header height
@@ -41,7 +43,7 @@ internal class AllDayEventsUpdater<T>(
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
-                val eventChips = cache.eventCache.allDayEventChipsByDate(date)
+                val eventChips = chipCache.allDayEventChipsByDate(date)
                 for (eventChip in eventChips) {
                     val layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
                     if (layout != null) {

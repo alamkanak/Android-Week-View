@@ -12,18 +12,19 @@ internal class MultiLineDayLabelHeightUpdater<T>(
 
     private var previousHorizontalOrigin: Float? = null
 
-    override fun isRequired(): Boolean {
-        if (config.singleLineHeader) {
-            return false
+    override val isRequired: Boolean
+        get() {
+            if (config.singleLineHeader) {
+                return false
+            }
+
+            val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
+            val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
+            val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+            val isCacheIncomplete = config.numberOfVisibleDays != cache.allDayEventLayouts.size
+
+            return didTimeColumnChange || didScrollHorizontally || isCacheIncomplete
         }
-
-        val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
-        val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
-        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-        val isCacheIncomplete = config.numberOfVisibleDays != cache.allDayEventLayouts.size
-
-        return didTimeColumnChange || didScrollHorizontally || isCacheIncomplete
-    }
 
     override fun update(drawingContext: DrawingContext) {
         previousHorizontalOrigin = config.currentOrigin.x

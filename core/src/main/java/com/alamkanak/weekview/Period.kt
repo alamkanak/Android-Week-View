@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
-internal data class FetchPeriods(
+internal data class FetchRange(
     val previous: Period,
     val current: Period,
     val next: Period
@@ -10,9 +10,9 @@ internal data class FetchPeriods(
 
     internal companion object {
 
-        fun create(firstVisibleDay: Calendar): FetchPeriods {
+        fun create(firstVisibleDay: Calendar): FetchRange {
             val current = Period.fromDate(firstVisibleDay)
-            return FetchPeriods(current.previous, current, current.next)
+            return FetchRange(current.previous, current, current.next)
         }
 
     }

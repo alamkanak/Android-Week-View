@@ -16,9 +16,7 @@ internal val Calendar.dayOfWeek: Int
     get() = get(Calendar.DAY_OF_WEEK)
 
 internal val Calendar.dayOfMonth: Int
-    get() {
-        return get(Calendar.DAY_OF_MONTH)
-    }
+    get() = get(Calendar.DAY_OF_MONTH)
 
 internal val Calendar.month: Int
     get() = get(Calendar.MONTH)
@@ -26,13 +24,9 @@ internal val Calendar.month: Int
 internal val Calendar.year: Int
     get() = get(Calendar.YEAR)
 
-internal fun Calendar.isEqual(other: Calendar): Boolean {
-    return timeInMillis == other.timeInMillis
-}
+internal fun Calendar.isEqual(other: Calendar) = timeInMillis == other.timeInMillis
 
-internal fun Calendar.isNotEqual(other: Calendar): Boolean {
-    return timeInMillis != other.timeInMillis
-}
+internal fun Calendar.isNotEqual(other: Calendar) = isEqual(other).not()
 
 internal fun Calendar.plusDays(days: Int): Calendar {
     return copy().apply {
@@ -40,9 +34,7 @@ internal fun Calendar.plusDays(days: Int): Calendar {
     }
 }
 
-internal fun Calendar.minusDays(days: Int): Calendar {
-    return plusDays(days * (-1))
-}
+internal fun Calendar.minusDays(days: Int): Calendar = plusDays(days * (-1))
 
 internal fun Calendar.plusHours(hours: Int): Calendar {
     return copy().apply {
@@ -50,9 +42,7 @@ internal fun Calendar.plusHours(hours: Int): Calendar {
     }
 }
 
-internal fun Calendar.minusHours(hours: Int): Calendar {
-    return plusHours(hours * (-1))
-}
+internal fun Calendar.minusHours(hours: Int): Calendar = plusHours(hours * (-1))
 
 internal fun Calendar.plusMillis(millis: Int): Calendar {
     return copy().apply {
@@ -60,17 +50,11 @@ internal fun Calendar.plusMillis(millis: Int): Calendar {
     }
 }
 
-internal fun Calendar.minusMillis(millis: Int): Calendar {
-    return plusMillis(millis * (-1))
-}
+internal fun Calendar.minusMillis(millis: Int): Calendar = plusMillis(millis * (-1))
 
-internal fun Calendar.isBefore(other: Calendar): Boolean {
-    return timeInMillis < other.timeInMillis
-}
+internal fun Calendar.isBefore(other: Calendar) = timeInMillis < other.timeInMillis
 
-internal fun Calendar.isAfter(other: Calendar): Boolean {
-    return timeInMillis > other.timeInMillis
-}
+internal fun Calendar.isAfter(other: Calendar) = timeInMillis > other.timeInMillis
 
 internal val Calendar.isBeforeToday: Boolean
     get() = isBefore(today())
@@ -78,9 +62,7 @@ internal val Calendar.isBeforeToday: Boolean
 internal val Calendar.isToday: Boolean
     get() = isSameDate(today())
 
-internal fun Calendar.toEpochDays(): Int {
-    return (atStartOfDay.timeInMillis / DAY_IN_MILLIS).toInt()
-}
+internal fun Calendar.toEpochDays(): Int = (atStartOfDay.timeInMillis / DAY_IN_MILLIS).toInt()
 
 internal val Calendar.lengthOfMonth: Int
     get() = getActualMaximum(Calendar.DAY_OF_MONTH)
@@ -94,14 +76,10 @@ internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
 }
 
 internal val Calendar.atStartOfDay: Calendar
-    get() {
-        return withTimeAtStartOfPeriod(0)
-    }
+    get() = withTimeAtStartOfPeriod(0)
 
 internal val Calendar.atEndOfDay: Calendar
-    get() {
-        return withTimeAtEndOfPeriod(24)
-    }
+    get() = withTimeAtEndOfPeriod(24)
 
 internal val Calendar.daysFromToday: Int
     get() {
@@ -109,11 +87,9 @@ internal val Calendar.daysFromToday: Int
         return (diff / DAY_IN_MILLIS).roundToInt()
     }
 
-internal fun today(): Calendar = now().atStartOfDay
+internal fun today() = now().atStartOfDay
 
-internal fun now(): Calendar {
-    return Calendar.getInstance()
-}
+internal fun now() = Calendar.getInstance()
 
 internal fun Calendar.isSameDate(other: Calendar): Boolean = toEpochDays() == other.toEpochDays()
 

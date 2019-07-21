@@ -2,35 +2,37 @@ package com.alamkanak.weekview
 
 internal class EventChipsProvider<T>(
     private val cache: EventCache<T>,
-    private val viewState: WeekViewViewState
+    private val viewState: WeekViewViewState,
+    private val eventSplitter: WeekViewEventSplitter<T>,
+    private val chipCache: EventChipCache<T>
 ) {
 
+    var shouldRefreshEvents: Boolean = false
     var monthLoader: MonthLoader<T>? = null
 
     fun loadEventsIfNecessary() {
         val hasNoEvents = cache.hasEvents.not()
-        val shouldRefresh = viewState.shouldRefreshEvents
 
         val firstVisibleDay = checkNotNull(viewState.firstVisibleDate)
-        val fetchPeriods = FetchPeriods.create(firstVisibleDay)
+        val fetchPeriods = FetchRange.create(firstVisibleDay)
 
-        if (hasNoEvents || shouldRefresh || !cache.covers(fetchPeriods)) {
+        if (hasNoEvents || shouldRefreshEvents || !cache.covers(fetchPeriods)) {
             loadEventsAndCalculateEventChipPositions(fetchPeriods)
-            viewState.shouldRefreshEvents = false
+            shouldRefreshEvents = false
         }
     }
 
-    private fun loadEventsAndCalculateEventChipPositions(fetchPeriods: FetchPeriods) {
-        if (viewState.shouldRefreshEvents) {
+    private fun loadEventsAndCalculateEventChipPositions(fetchRange: FetchRange) {
+        if (shouldRefreshEvents) {
             cache.clear()
         }
 
-        loadEvents(fetchPeriods)
+        loadEvents(fetchRange)
     }
 
-    private fun loadEvents(fetchPeriods: FetchPeriods) {
-        val oldFetchPeriods = cache.fetchedPeriods ?: fetchPeriods
-        val newCurrentPeriod = fetchPeriods.current
+    private fun loadEvents(fetchRange: FetchRange) {
+        val oldFetchPeriods = cache.fetchedRange ?: fetchRange
+        val newCurrentPeriod = fetchRange.current
 
         var previousPeriodEvents: List<WeekViewEvent<T>>? = null
         var currentPeriodEvents: List<WeekViewEvent<T>>? = null
@@ -59,18 +61,42 @@ internal class EventChipsProvider<T>(
         }
 
         if (previousPeriodEvents == null) {
-            previousPeriodEvents = loader.load(fetchPeriods.previous)
+            previousPeriodEvents = loader.load(fetchRange.previous)
         }
 
         if (currentPeriodEvents == null) {
-            currentPeriodEvents = loader.load(fetchPeriods.current)
+            currentPeriodEvents = loader.load(fetchRange.current)
         }
 
         if (nextPeriodEvents == null) {
-            nextPeriodEvents = loader.load(fetchPeriods.next)
+            nextPeriodEvents = loader.load(fetchRange.next)
         }
 
-        cache.update(previousPeriodEvents, currentPeriodEvents, nextPeriodEvents, fetchPeriods)
+        cache.update(previousPeriodEvents, currentPeriodEvents, nextPeriodEvents, fetchRange)
+        createAndCacheEventChips(previousPeriodEvents, currentPeriodEvents, nextPeriodEvents)
+    }
+
+    private fun createAndCacheEventChips(
+        previousPeriodEvents: List<WeekViewEvent<T>>,
+        currentPeriodEvents: List<WeekViewEvent<T>>,
+        nextPeriodEvents: List<WeekViewEvent<T>>
+    ) {
+        chipCache += convertEventsToEventChips(previousPeriodEvents)
+        chipCache += convertEventsToEventChips(currentPeriodEvents)
+        chipCache += convertEventsToEventChips(nextPeriodEvents)
+    }
+
+    private fun convertEventsToEventChips(
+        events: List<WeekViewEvent<T>>
+    ): List<EventChip<T>> = events.sorted().map(this::convertEventToEventChips).flatten()
+
+    private fun convertEventToEventChips(
+        event: WeekViewEvent<T>
+    ): List<EventChip<T>> {
+        if (event.startTime >= event.endTime) {
+            return emptyList()
+        }
+        return eventSplitter.split(event).map { EventChip(it, event, null) }
     }
 
 }

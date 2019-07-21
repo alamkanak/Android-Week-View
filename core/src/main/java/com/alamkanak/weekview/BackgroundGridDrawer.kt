@@ -26,10 +26,8 @@ internal class BackgroundGridDrawer(
     private fun createHourLines(): FloatArray {
         val headerHeight = config.getTotalHeaderHeight()
         val gridHeight = view.height - headerHeight.toInt()
-
         val linesPerDay = (gridHeight / config.hourHeight) + 1
         val overallLines = linesPerDay.roundToInt() * (config.numberOfVisibleDays + 1)
-
         return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
     }
 
@@ -47,7 +45,6 @@ internal class BackgroundGridDrawer(
     private fun drawDaySeparators(startPixel: Float, canvas: Canvas) {
         val days = config.numberOfVisibleDays
         val widthPerDay = config.totalDayWidth
-
         val top = config.headerHeight
 
         for (i in 0 until days) {

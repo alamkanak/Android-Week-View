@@ -17,8 +17,6 @@ internal class WeekViewViewState(
     var firstVisibleDate: Calendar? = null
     var lastVisibleDate: Calendar? = null
 
-    var shouldRefreshEvents: Boolean = false
-
     fun update(viewHeight: Int) {
         val totalHeaderHeight = configWrapper.getTotalHeaderHeight().toInt()
         val dynamicHourHeight = (viewHeight - totalHeaderHeight) / configWrapper.hoursPerDay

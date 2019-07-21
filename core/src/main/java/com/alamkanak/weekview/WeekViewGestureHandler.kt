@@ -39,7 +39,7 @@ private enum class Direction {
 internal class WeekViewGestureHandler<T>(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>,
+    private val chipCache: EventChipCache<T>,
     private val listener: Listener
 ) : GestureDetector.SimpleOnGestureListener() {
 
@@ -55,7 +55,7 @@ internal class WeekViewGestureHandler<T>(
         object : ScaleGestureDetector.OnScaleGestureListener {
             override fun onScaleEnd(detector: ScaleGestureDetector) {
                 isZooming = false
-                cache.clearEventChipsCache()
+                chipCache.clearCache()
             }
 
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
@@ -288,7 +288,7 @@ internal class WeekViewGestureHandler<T>(
     private fun findHitEvent(
         e: MotionEvent
     ): EventChip<T>? {
-        val candidates = cache.findHits(e)
+        val candidates = chipCache.findHits(e)
 
         return when {
             candidates.isEmpty() -> null
