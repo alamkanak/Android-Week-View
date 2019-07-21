@@ -1,8 +1,9 @@
 package com.alamkanak.weekview
 
+import java.util.Calendar
+
 internal class EventChipsProvider<T>(
     private val cache: EventCache<T>,
-    private val viewState: WeekViewViewState,
     private val eventSplitter: WeekViewEventSplitter<T>,
     private val chipCache: EventChipCache<T>
 ) {
@@ -10,10 +11,10 @@ internal class EventChipsProvider<T>(
     var shouldRefreshEvents: Boolean = false
     var monthLoader: MonthLoader<T>? = null
 
-    fun loadEventsIfNecessary() {
+    fun loadEventsIfNecessary(firstVisibleDate: Calendar?) {
         val hasNoEvents = cache.hasEvents.not()
 
-        val firstVisibleDay = checkNotNull(viewState.firstVisibleDate)
+        val firstVisibleDay = checkNotNull(firstVisibleDate)
         val fetchPeriods = FetchRange.create(firstVisibleDay)
 
         if (hasNoEvents || shouldRefreshEvents || !cache.covers(fetchPeriods)) {
@@ -26,7 +27,6 @@ internal class EventChipsProvider<T>(
         if (shouldRefreshEvents) {
             cache.clear()
         }
-
         loadEvents(fetchRange)
     }
 
@@ -56,9 +56,8 @@ internal class EventChipsProvider<T>(
             }
         }
 
-        val loader = checkNotNull(monthLoader) {
-            "No OnMonthChangeListener found. Provide one via weekView.setOnMonthChangeListener()."
-        }
+        val loader = checkNotNull(monthLoader) { "No OnMonthChangeListener found. " +
+            "Provide one via weekView.setOnMonthChangeListener()." }
 
         if (previousPeriodEvents == null) {
             previousPeriodEvents = loader.load(fetchRange.previous)

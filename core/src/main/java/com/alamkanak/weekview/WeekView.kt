@@ -43,7 +43,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val drawingContext = DrawingContext(configWrapper)
     private val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-    private val eventChipsProvider = EventChipsProvider(eventCache, viewState, eventSplitter, eventUiCache)
+    private val eventChipsProvider = EventChipsProvider(eventCache, eventSplitter, eventUiCache)
     private val eventChipsExpander = EventChipsExpander(configWrapper, eventUiCache)
 
     private val paint = Paint()
@@ -87,7 +87,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private fun refreshEvents() {
         if (!isInEditMode) {
-            eventChipsProvider.loadEventsIfNecessary()
+            eventChipsProvider.loadEventsIfNecessary(viewState.firstVisibleDate)
             eventChipsExpander.calculateEventChipPositions()
         }
     }
@@ -1213,7 +1213,7 @@ class WeekView<T> @JvmOverloads constructor(
     fun getMonthChangeListener() = onMonthChangeListener
 
     var onMonthChangeListener: OnMonthChangeListener<T>?
-        get() = eventChipsProvider.monthLoader?.onMonthChangeListener
+        get() = eventChipsProvider.monthLoader?.listener
         set(value) {
             eventChipsProvider.monthLoader = MonthLoader(value)
         }

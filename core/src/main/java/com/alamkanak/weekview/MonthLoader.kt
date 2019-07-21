@@ -7,13 +7,12 @@ package com.alamkanak.weekview
  * [WeekViewEvent].
  */
 internal class MonthLoader<T>(
-    var onMonthChangeListener: OnMonthChangeListener<T>?
+    var listener: OnMonthChangeListener<T>?
 ) {
 
     fun load(period: Period): List<WeekViewEvent<T>> {
-        val listener = checkNotNull(onMonthChangeListener) {
-            "No OnMonthChangeListener found. Provide one via weekView.setOnMonthChangeListener()."
-        }
+        val listener = checkNotNull(listener) { "No OnMonthChangeListener found. " +
+            "Provide one via weekView.setOnMonthChangeListener()." }
 
         val startDate = today()
             .withYear(period.year)
