@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help improve WeekView
+about: Report a bug to help improve WeekView
 title: ''
 labels: bug
 assignees: ''
