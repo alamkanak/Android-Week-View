@@ -37,9 +37,15 @@ internal class AllDayEventsUpdater<T>(
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
+                // If we use a horizontal margin in the day view, we need to offset the start pixel.
+                val modifiedStartPixel = when {
+                    config.isSingleDay -> startPixel + config.eventMarginHorizontal.toFloat()
+                    else -> startPixel
+                }
+
                 val eventChips = chipCache.allDayEventChipsByDate(date)
                 for (eventChip in eventChips) {
-                    val layout = calculateLayoutForAllDayEvent(eventChip, startPixel)
+                    val layout = calculateLayoutForAllDayEvent(eventChip, modifiedStartPixel)
                     if (layout != null) {
                         cache.allDayEventLayouts.add(Pair(eventChip, layout))
                     }

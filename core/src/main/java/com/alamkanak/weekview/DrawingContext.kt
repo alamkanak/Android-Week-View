@@ -39,15 +39,8 @@ internal class DrawingContext(
 
     private fun updateStartPixels(config: WeekViewConfigWrapper, startPixel: Float) {
         startPixels.clear()
-
-        val singleDayMargin = config.eventMarginHorizontal.toFloat()
-
-        startPixels += dateRange.indices
-            .map { index -> startPixel + index * config.totalDayWidth }
-            .map {
-                // Add a margin at the start if we're in day view. Otherwise, screen space is too
-                // precious and we refrain from doing so.
-                if (config.isSingleDay) it + singleDayMargin else it
-            }
+        startPixels += dateRange.indices.map {
+            index -> startPixel + index * config.totalDayWidth
+        }
     }
 }

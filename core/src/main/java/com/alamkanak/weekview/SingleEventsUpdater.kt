@@ -19,7 +19,12 @@ internal class SingleEventsUpdater<T>(
         drawingContext
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
-                calculateRectsForEventsOnDate(date, startPixel)
+                // If we use a horizontal margin in the day view, we need to offset the start pixel.
+                val modifiedStartPixel = when {
+                    config.isSingleDay -> startPixel + config.eventMarginHorizontal.toFloat()
+                    else -> startPixel
+                }
+                calculateRectsForEventsOnDate(date, modifiedStartPixel)
             }
     }
 
