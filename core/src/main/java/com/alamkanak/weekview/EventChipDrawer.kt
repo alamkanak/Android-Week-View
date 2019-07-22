@@ -255,6 +255,7 @@ internal class EventChipDrawer<T>(
             is WeekViewEvent.ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
             is WeekViewEvent.ColorResource.Value -> resource.color
         }
+        paint.isAntiAlias = true
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
     }
@@ -268,6 +269,7 @@ internal class EventChipDrawer<T>(
             is WeekViewEvent.ColorResource.Value -> resource.color
             null -> 0
         }
+        paint.isAntiAlias = true
         paint.strokeWidth = event.style.borderWidth.toFloat()
         paint.style = Paint.Style.STROKE
     }
