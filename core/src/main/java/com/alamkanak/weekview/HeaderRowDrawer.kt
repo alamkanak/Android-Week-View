@@ -14,10 +14,9 @@ internal class HeaderRowDrawer<T>(
         paint: Paint
     ) {
         val width = view.width
+        val headerBackground = config.headerBackgroundPaint
 
         canvas.save()
-
-        val headerBackground = config.headerBackgroundPaint
 
         // Hide everything in the top left corner
         val topLeftCornerWidth = config.timeTextWidth + config.timeColumnPadding * 2

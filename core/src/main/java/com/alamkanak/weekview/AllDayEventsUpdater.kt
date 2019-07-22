@@ -28,12 +28,6 @@ internal class AllDayEventsUpdater<T>(
             return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh
         }
 
-    /**
-     * Compute the StaticLayout for all-day events to update the header height
-     *
-     * @param drawingContext The [DrawingContext] to use for drawing
-     * @return The association of [EventChip]s with their [StaticLayout]s
-     */
     override fun update(drawingContext: DrawingContext) {
         previousHorizontalOrigin = config.currentOrigin.x
 

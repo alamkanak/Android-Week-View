@@ -4,6 +4,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_UP
 import android.view.ScaleGestureDetector
+import android.view.View
 import android.view.ViewConfiguration
 import android.widget.OverScroller
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
@@ -74,8 +75,8 @@ internal class WeekViewGestureHandler<T>(
 
     private var isZooming: Boolean = false
 
-    private val minimumFlingVelocity = ViewConfiguration.get(view.context).scaledMinimumFlingVelocity
-    private val scaledTouchSlop = ViewConfiguration.get(view.context).scaledTouchSlop
+    private val minimumFlingVelocity = view.scaledMinimumFlingVelocity
+    private val scaledTouchSlop = view.scaledTouchSlop
 
     var onEventClickListener: OnEventClickListener<T>? = null
     var onEventLongPressListener: OnEventLongPressListener<T>? = null
@@ -234,7 +235,7 @@ internal class WeekViewGestureHandler<T>(
                 return@let
             }
 
-            val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
+            val data = eventChip.originalEvent.data ?: throw NullPointerException(
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
             val rect = checkNotNull(eventChip.rect)
@@ -267,7 +268,7 @@ internal class WeekViewGestureHandler<T>(
                 return@let
             }
 
-            val data = eventChip.originalEvent.data ?: throw NullPointerException("No data to show. " +
+            val data = eventChip.originalEvent.data ?: throw NullPointerException(
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
             val rect = checkNotNull(eventChip.rect)
@@ -388,6 +389,12 @@ internal class WeekViewGestureHandler<T>(
 
     private val MotionEvent.isInHeader: Boolean
         get() = y in view.x..config.headerHeight
+
+    private val View.scaledMinimumFlingVelocity: Int
+        get() = ViewConfiguration.get(context).scaledMinimumFlingVelocity
+
+    private val View.scaledTouchSlop: Int
+        get() = ViewConfiguration.get(context).scaledTouchSlop
 
     internal interface Listener {
         fun onScaled()

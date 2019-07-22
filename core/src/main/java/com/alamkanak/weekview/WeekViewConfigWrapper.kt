@@ -497,7 +497,8 @@ internal class WeekViewConfigWrapper(
     }
 
     fun calculateWidthPerDay() {
-        val availableWidth = view.width.toFloat() - timeColumnWidth - columnGap * numberOfVisibleDays
+        val viewWidth = view.width.toFloat()
+        val availableWidth = viewWidth - timeColumnWidth - columnGap * numberOfVisibleDays
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
@@ -511,7 +512,8 @@ internal class WeekViewConfigWrapper(
     }
 
     fun moveCurrentOriginIfFirstDraw() {
-        // If the week view is being drawn for the first time, then consider the first day of the week.
+        // If the week view is being drawn for the first time, then consider the first day of the
+        // week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
         val currentDayIsNotToday = today.dayOfWeek != firstDayOfWeek
@@ -623,7 +625,7 @@ internal class WeekViewConfigWrapper(
     }
 
     /**
-     * Initialize time column width. Calculate value with all possible hours (supposed widest text).
+     * Initializes the time column width with the widest hour label.
      */
     private fun initTextTimeWidth() {
         timeTextWidth = (0 until hoursPerDay)

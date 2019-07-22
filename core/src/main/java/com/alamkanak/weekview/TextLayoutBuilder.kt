@@ -16,15 +16,15 @@ internal object TextLayoutBuilder {
         alignment: Layout.Alignment = Layout.Alignment.ALIGN_NORMAL,
         spacingMultiplier: Float = 1f,
         spacingExtra: Float = 0f,
-        includePadding: Boolean = false
+        includePad: Boolean = false
     ) = if (SDK_INT >= M) {
         StaticLayout.Builder
             .obtain(text, 0, text.length, textPaint, width)
             .setAlignment(alignment)
             .setLineSpacing(spacingExtra, spacingMultiplier)
-            .setIncludePad(includePadding)
+            .setIncludePad(includePad)
             .build()
     } else {
-        StaticLayout(text, textPaint, width, alignment, spacingMultiplier, spacingExtra, includePadding)
+        StaticLayout(text, textPaint, width, alignment, spacingMultiplier, spacingExtra, includePad)
     }
 }

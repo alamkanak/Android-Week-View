@@ -27,8 +27,8 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
-    private val eventUiCache = EventChipCache<T>()
     private val eventCache = EventCache<T>()
+    private val eventChipCache = EventChipCache<T>()
 
     private val gestureListener = object : WeekViewGestureHandler.Listener {
         override fun onScaled() = invalidate()
@@ -39,12 +39,12 @@ class WeekView<T> @JvmOverloads constructor(
 
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler =
-        WeekViewGestureHandler(this, configWrapper, eventUiCache, gestureListener)
+        WeekViewGestureHandler(this, configWrapper, eventChipCache, gestureListener)
 
     private val drawingContext = DrawingContext(configWrapper)
     private val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-    private val eventChipsProvider = EventChipsProvider(eventCache, eventSplitter, eventUiCache)
-    private val eventChipsExpander = EventChipsExpander(configWrapper, eventUiCache)
+    private val eventChipsProvider = EventChipsProvider(eventCache, eventSplitter, eventChipCache)
+    private val eventChipsExpander = EventChipsExpander(configWrapper, eventChipCache)
 
     private val paint = Paint()
 
@@ -53,8 +53,8 @@ class WeekView<T> @JvmOverloads constructor(
     private val updaters = listOf(
         MultiLineDayLabelHeightUpdater(configWrapper, cache),
         HeaderRowHeightUpdater(configWrapper, eventCache),
-        AllDayEventsUpdater(this, configWrapper, cache, eventUiCache),
-        SingleEventsUpdater(this, configWrapper, eventUiCache)
+        AllDayEventsUpdater(this, configWrapper, cache, eventChipCache),
+        SingleEventsUpdater(this, configWrapper, eventChipCache)
     )
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -62,7 +62,7 @@ class WeekView<T> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
-        SingleEventsDrawer(context, configWrapper, eventUiCache),
+        SingleEventsDrawer(context, configWrapper, eventChipCache),
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper, cache),
