@@ -46,7 +46,7 @@ internal class WeekViewTouchHandler(
                 val hour = (pixelsFromMidnight / hourHeight).toInt()
 
                 val pixelsFromFullHour = pixelsFromMidnight - hour * hourHeight
-                val minutes = (pixelsFromFullHour / hourHeight).toInt() * 60
+                val minutes = ((pixelsFromFullHour / hourHeight) * 60).toInt()
 
                 return day.withTime(config.minHour + hour, minutes)
             }

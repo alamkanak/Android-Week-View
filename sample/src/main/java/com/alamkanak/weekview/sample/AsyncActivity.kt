@@ -12,6 +12,7 @@ import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.apiclient.ApiEvent
 import com.alamkanak.weekview.sample.data.FakeEventsApi
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -139,9 +140,9 @@ class AsyncActivity : AppCompatActivity() {
      */
     private fun eventMatches(event: WeekViewEvent<*>, year: Int, month: Int): Boolean {
         val startsOnDate = event.startTime.get(Calendar.YEAR) == year &&
-            event.startTime.get(Calendar.MONTH) == month - 1
+            event.startTime.get(Calendar.MONTH) == month
         val endsOnDate = event.endTime.get(Calendar.YEAR) == year &&
-            event.endTime.get(Calendar.MONTH) == month - 1
+            event.endTime.get(Calendar.MONTH) == month
         return startsOnDate || endsOnDate
     }
 
@@ -164,7 +165,8 @@ class AsyncActivity : AppCompatActivity() {
     }
 
     private fun onEmptyViewLongPress(time: Calendar) {
-        Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
+        val sdf = SimpleDateFormat.getDateTimeInstance()
+        Toast.makeText(this, "Empty view long pressed: ${sdf.format(time.time)}", Toast.LENGTH_SHORT).show()
     }
 
     companion object {
