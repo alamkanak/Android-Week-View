@@ -33,6 +33,8 @@ data class ApiEvent(
 ) : WeekViewDisplayable<ApiEvent> {
 
     override fun toWeekViewEvent(): WeekViewEvent<ApiEvent> {
+        val id = name.split(" ").last().toLong()
+
         val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
         val start = checkNotNull(sdf.parse(startTime))
         val end = checkNotNull(sdf.parse(endTime))
@@ -58,7 +60,7 @@ data class ApiEvent(
             .build()
 
         return WeekViewEvent.Builder<ApiEvent>()
-            .setId(0)
+            .setId(id)
             .setTitle(name)
             .setStartTime(startTime)
             .setEndTime(endTime)
