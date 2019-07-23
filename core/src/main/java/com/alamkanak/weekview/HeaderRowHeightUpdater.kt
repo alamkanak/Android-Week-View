@@ -9,10 +9,12 @@ internal class HeaderRowHeightUpdater<T>(
 
     override val isRequired: Boolean
         get() {
-            val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
+            return true
+            // Fixme
+            /*val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
             val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
             val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-            return didTimeColumnChange || didScrollHorizontally
+            return didTimeColumnChange || didScrollHorizontally*/
         }
 
     override fun update(drawingContext: DrawingContext) {

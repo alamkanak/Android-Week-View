@@ -22,10 +22,12 @@ internal class AllDayEventsUpdater<T>(
 
     override val isRequired: Boolean
         get() {
-            val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+            return true
+            // Fixme
+            /*val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
             val isCacheIncomplete = cache.isAllDayEventLayoutsCleared
             val doRectsNeedRefresh = cache.allDayEventLayouts.map { it.first }.any { it.rect == null }
-            return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh
+            return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh*/
         }
 
     override fun update(drawingContext: DrawingContext) {
