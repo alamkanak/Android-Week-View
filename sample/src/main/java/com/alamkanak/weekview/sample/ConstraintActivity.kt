@@ -7,9 +7,9 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.DateTimeInterpreter
-import com.alamkanak.weekview.OnEmptyViewLongPressListener
+import com.alamkanak.weekview.OnEmptyViewLongClickListener
 import com.alamkanak.weekview.OnEventClickListener
-import com.alamkanak.weekview.OnEventLongPressListener
+import com.alamkanak.weekview.OnEventLongClickListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
@@ -23,7 +23,7 @@ import java.util.Calendar
 import java.util.Locale
 
 class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
-    OnMonthChangeListener<Event>, OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
+    OnMonthChangeListener<Event>, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {
 
     private val weekView: WeekView<Event> by lazy { findViewById<WeekView<Event>>(R.id.weekView) }
     private val database: EventsDatabase by lazy { FakeEventsDatabase(this) }
@@ -34,8 +34,8 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
 
         weekView.onEventClickListener = this
         weekView.onMonthChangeListener = this
-        weekView.onEventLongPressListener = this
-        weekView.onEmptyViewLongPressListener = this
+        weekView.onEventLongClickListener = this
+        weekView.onEmptyViewLongClickListener = this
 
         setupSeekBarAction()
         setupDateTimeInterpreter()
@@ -52,11 +52,11 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
         Toast.makeText(this, "Clicked " + data.title, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEventLongPress(data: Event, eventRect: RectF) {
+    override fun onEventLongClick(data: Event, eventRect: RectF) {
         Toast.makeText(this, "Long pressed event: " + data.title, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onEmptyViewLongPress(time: Calendar) {
+    override fun onEmptyViewLongClick(time: Calendar) {
         val sdf = SimpleDateFormat.getDateTimeInstance()
         Toast.makeText(this, "Empty view long pressed: " +
             sdf.format(time.time), Toast.LENGTH_SHORT).show()

@@ -38,9 +38,9 @@ class AsyncActivity : AppCompatActivity() {
 
         weekView = findViewById(R.id.weekView)
         weekView.setOnEventClickListener(this::onEventClick)
-        weekView.setOnEventLongPressListener(this::onEventLongPress)
+        weekView.setOnEventLongClickListener(this::onEventLongPress)
         weekView.setOnMonthChangeListener(this::onMonthChange)
-        weekView.setOnEmptyViewLongPressListener(this::onEmptyViewLongPress)
+        weekView.setOnEmptyViewLongClickListener(this::onEmptyViewLongPress)
 
         progressDialog.show()
     }

@@ -1,7 +1,7 @@
 package com.alamkanak.weekview.jodatime
 
 import com.alamkanak.weekview.OnEmptyViewClickListener
-import com.alamkanak.weekview.OnEmptyViewLongPressListener
+import com.alamkanak.weekview.OnEmptyViewLongClickListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
@@ -62,11 +62,11 @@ fun <T> WeekView<T>.setOnEmptyViewClickListener(
     }
 }
 
-fun <T> WeekView<T>.setOnEmptyViewLongPressListener(
+fun <T> WeekView<T>.setOnEmptyViewLongClickListener(
     block: (time: LocalDateTime) -> Unit
 ) {
-    onEmptyViewLongPressListener = object : OnEmptyViewLongPressListener {
-        override fun onEmptyViewLongPress(time: Calendar) {
+    onEmptyViewLongClickListener = object : OnEmptyViewLongClickListener {
+        override fun onEmptyViewLongClick(time: Calendar) {
             block(time.toLocalDateTime())
         }
     }

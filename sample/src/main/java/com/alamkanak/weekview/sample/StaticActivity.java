@@ -12,9 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.alamkanak.weekview.OnEmptyViewLongPressListener;
+import com.alamkanak.weekview.OnEmptyViewLongClickListener;
 import com.alamkanak.weekview.OnEventClickListener;
-import com.alamkanak.weekview.OnEventLongPressListener;
+import com.alamkanak.weekview.OnEventLongClickListener;
 import com.alamkanak.weekview.OnMonthChangeListener;
 import com.alamkanak.weekview.ScrollListener;
 import com.alamkanak.weekview.WeekView;
@@ -35,7 +35,7 @@ import static androidx.core.util.Preconditions.checkNotNull;
 
 public class StaticActivity extends AppCompatActivity
         implements OnEventClickListener<Event>, OnMonthChangeListener<Event>,
-        OnEventLongPressListener<Event>, OnEmptyViewLongPressListener {
+        OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {
 
     WeekView<Event> mWeekView;
     private EventsDatabase mDatabase;
@@ -53,8 +53,8 @@ public class StaticActivity extends AppCompatActivity
         mWeekView = findViewById(R.id.weekView);
         mWeekView.setOnEventClickListener(this);
         mWeekView.setOnMonthChangeListener(this);
-        mWeekView.setOnEventLongPressListener(this);
-        mWeekView.setOnEmptyViewLongPressListener(this);
+        mWeekView.setOnEventLongClickListener(this);
+        mWeekView.setOnEmptyViewLongClickListener(this);
 
         ImageView left = findViewById(R.id.left_arrow);
         left.setOnClickListener(new OnClickListener() {
@@ -97,12 +97,12 @@ public class StaticActivity extends AppCompatActivity
     }
 
     @Override
-    public void onEventLongPress(Event event, @NotNull RectF eventRect) {
+    public void onEventLongClick(Event event, @NotNull RectF eventRect) {
         Toast.makeText(this, "Long pressed event: " + event.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onEmptyViewLongPress(@NotNull Calendar time) {
+    public void onEmptyViewLongClick(@NotNull Calendar time) {
         DateFormat sdf = SimpleDateFormat.getDateTimeInstance();
         Toast.makeText(this, "Empty view long pressed: "
                 + sdf.format(time.getTime()), Toast.LENGTH_SHORT).show();

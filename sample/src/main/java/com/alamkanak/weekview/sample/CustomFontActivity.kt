@@ -30,8 +30,8 @@ open class CustomFontActivity : AppCompatActivity() {
         weekView = findViewById(R.id.weekView)
         weekView.setOnEventClickListener(this::onEventClick)
         weekView.setOnMonthChangeListener(this::onMonthChange)
-        weekView.setOnEventLongPressListener(this::onEventLongPress)
-        weekView.setOnEmptyViewLongPressListener(this::onEmptyViewLongPress)
+        weekView.setOnEventLongClickListener(this::onEventLongPress)
+        weekView.setOnEmptyViewLongClickListener(this::onEmptyViewLongPress)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

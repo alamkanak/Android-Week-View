@@ -1240,30 +1240,50 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     @Deprecated(
-        "Use onEventLongPressListener",
-        ReplaceWith("onEventLongPressListener")
+        "Use onEventLongClickListener",
+        ReplaceWith("onEventLongClickListener")
     )
-    val eventLongPressListener = onEventLongPressListener
+    val eventLongPressListener = onEventLongClickListener
 
     @Deprecated(
-        "Use onEventLongPressListener",
-        ReplaceWith("onEventLongPressListener")
+        "Use onEventLongClickListener",
+        ReplaceWith("onEventLongClickListener")
     )
     fun setEventLongPressListener(listener: EventLongPressListener<T>) {
-        onEventLongPressListener = listener
+        onEventLongClickListener = listener
     }
 
+    @Deprecated(
+        "Use onEventLongClickListener",
+        ReplaceWith("onEventLongClickListener")
+    )
     var onEventLongPressListener: OnEventLongPressListener<T>?
+        get() = onEventLongClickListener
+        set(value) {
+            onEventLongClickListener = value
+        }
+
+    var onEventLongClickListener: OnEventLongClickListener<T>?
         get() = gestureHandler.onEventLongPressListener
         set(value) {
             gestureHandler.onEventLongPressListener = value
         }
 
+    @Deprecated(
+        "Use setOnEventLongClickListener",
+        ReplaceWith("setOnEventLongClickListener(data, rect)")
+    )
     fun setOnEventLongPressListener(
         block: (data: T, rect: RectF) -> Unit
     ) {
-        onEventLongPressListener = object : OnEventLongPressListener<T> {
-            override fun onEventLongPress(data: T, eventRect: RectF) {
+        setOnEventLongClickListener(block)
+    }
+
+    fun setOnEventLongClickListener(
+        block: (data: T, rect: RectF) -> Unit
+    ) {
+        onEventLongClickListener = object : OnEventLongClickListener<T> {
+            override fun onEventLongClick(data: T, eventRect: RectF) {
                 block(data, eventRect)
             }
         }
@@ -1300,30 +1320,50 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     @Deprecated(
-        "Use onEmptyViewLongPressListener",
-        ReplaceWith("onEmptyViewLongPressListener")
+        "Use onEmptyViewLongClickListener",
+        ReplaceWith("onEmptyViewLongClickListener")
     )
-    val emptyViewLongPressListener = onEmptyViewLongPressListener
+    val emptyViewLongPressListener = onEmptyViewLongClickListener
 
+    @Deprecated(
+        "Use onEmptyViewLongClickListener",
+        ReplaceWith("onEmptyViewLongClickListener")
+    )
     var onEmptyViewLongPressListener: OnEmptyViewLongPressListener?
+        get() = onEmptyViewLongClickListener
+        set(value) {
+            onEmptyViewLongClickListener = value
+        }
+
+    var onEmptyViewLongClickListener: OnEmptyViewLongClickListener?
         get() = gestureHandler.onEmptyViewLongPressListener
         set(value) {
             gestureHandler.onEmptyViewLongPressListener = value
         }
 
     @Deprecated(
-        "Use onEmptyViewLongPressListener",
-        ReplaceWith("onEmptyViewLongPressListener")
+        "Use onEmptyViewLongClickListener",
+        ReplaceWith("onEmptyViewLongClickListener")
     )
     fun setEmptyViewLongPressListener(listener: EmptyViewLongPressListener) {
-        onEmptyViewLongPressListener = listener
+        onEmptyViewLongClickListener = listener
     }
 
+    @Deprecated(
+        "Use setOnEmptyViewLongClickListener",
+        ReplaceWith("setOnEmptyViewLongClickListener(block)")
+    )
     fun setOnEmptyViewLongPressListener(
         block: (time: Calendar) -> Unit
     ) {
-        onEmptyViewLongPressListener = object : OnEmptyViewLongPressListener {
-            override fun onEmptyViewLongPress(time: Calendar) {
+        setOnEmptyViewLongClickListener(block)
+    }
+
+    fun setOnEmptyViewLongClickListener(
+        block: (time: Calendar) -> Unit
+    ) {
+        onEmptyViewLongClickListener = object : OnEmptyViewLongClickListener {
+            override fun onEmptyViewLongClick(time: Calendar) {
                 block(time)
             }
         }
