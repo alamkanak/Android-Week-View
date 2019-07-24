@@ -273,6 +273,7 @@ internal class WeekViewGestureHandler<T>(
 
             val rect = checkNotNull(eventChip.rect)
             listener.onEventLongPress(data, rect)
+            return
         }
 
         val timeColumnWidth = config.timeColumnWidth

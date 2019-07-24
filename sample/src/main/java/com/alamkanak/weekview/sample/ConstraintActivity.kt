@@ -41,15 +41,10 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
         setupDateTimeInterpreter()
     }
 
-    private fun getEventTitle(time: Calendar): String {
-        val hour = time.get(Calendar.HOUR_OF_DAY)
-        val minute = time.get(Calendar.MINUTE)
-        val month = time.get(Calendar.MONTH) + 1
-        val dayOfMonth = time.get(Calendar.DAY_OF_MONTH)
-        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth)
-    }
-
-    override fun onMonthChange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<Event>> {
+    override fun onMonthChange(
+        startDate: Calendar,
+        endDate: Calendar
+    ): List<WeekViewDisplayable<Event>> {
         return database.getEventsInRange(startDate, endDate)
     }
 
@@ -62,7 +57,9 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
     }
 
     override fun onEmptyViewLongPress(time: Calendar) {
-        Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
+        val sdf = SimpleDateFormat.getDateTimeInstance()
+        Toast.makeText(this, "Empty view long pressed: " +
+            sdf.format(time.time), Toast.LENGTH_SHORT).show()
     }
 
     private fun setupSeekBarAction() {

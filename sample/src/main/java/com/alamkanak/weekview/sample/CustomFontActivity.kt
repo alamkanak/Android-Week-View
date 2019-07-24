@@ -11,8 +11,8 @@ import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.FakeEventsDatabase
+import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 open class CustomFontActivity : AppCompatActivity() {
 
@@ -95,14 +95,6 @@ open class CustomFontActivity : AppCompatActivity() {
         weekView.numberOfVisibleDays = 7
     }
 
-    private fun getEventTitle(time: Calendar): String {
-        val hour = time.get(Calendar.HOUR_OF_DAY)
-        val minute = time.get(Calendar.MINUTE)
-        val month = time.get(Calendar.MONTH) + 1
-        val dayOfMonth = time.get(Calendar.DAY_OF_MONTH)
-        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth)
-    }
-
     private fun onMonthChange(
         startDate: Calendar,
         endDate: Calendar
@@ -127,7 +119,9 @@ open class CustomFontActivity : AppCompatActivity() {
     private fun onEmptyViewLongPress(
         time: Calendar
     ) {
-        Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show()
+        val sdf = SimpleDateFormat.getDateTimeInstance()
+        Toast.makeText(this, "Empty view long pressed: " +
+            sdf.format(time.time), Toast.LENGTH_SHORT).show()
     }
 
     private companion object {

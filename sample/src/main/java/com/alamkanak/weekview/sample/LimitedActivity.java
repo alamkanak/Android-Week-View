@@ -21,9 +21,10 @@ import com.alamkanak.weekview.sample.data.FakeEventsDatabase;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -131,14 +132,6 @@ public class LimitedActivity extends AppCompatActivity
         mWeekView.setNumberOfVisibleDays(7);
     }
 
-    private String getEventTitle(Calendar time) {
-        int hour = time.get(Calendar.HOUR_OF_DAY);
-        int minute = time.get(Calendar.MINUTE);
-        int month = time.get(Calendar.MONTH) + 1;
-        int dayOfMonth = time.get(DAY_OF_MONTH);
-        return String.format(Locale.getDefault(), "Event of %02d:%02d %s/%d", hour, minute, month, dayOfMonth);
-    }
-
     @NotNull
     @Override
     public List<WeekViewDisplayable<Event>> onMonthChange(@NonNull Calendar startDate,
@@ -158,7 +151,9 @@ public class LimitedActivity extends AppCompatActivity
 
     @Override
     public void onEmptyViewLongPress(@NonNull Calendar time) {
-        Toast.makeText(this, "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+        DateFormat sdf = SimpleDateFormat.getDateTimeInstance();
+        Toast.makeText(this, "Empty view long pressed: "
+                + sdf.format(time.getTime()), Toast.LENGTH_SHORT).show();
     }
 
 }
