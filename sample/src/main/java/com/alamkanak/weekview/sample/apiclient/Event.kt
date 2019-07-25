@@ -3,6 +3,7 @@ package com.alamkanak.weekview.sample.apiclient
 import android.graphics.Color
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
+import com.alamkanak.weekview.sample.R
 import java.util.Calendar
 
 class Event(
@@ -19,25 +20,25 @@ class Event(
     override fun toWeekViewEvent(): WeekViewEvent<Event> {
         val backgroundColor = if (!isCanceled) color else Color.WHITE
         val textColor = if (!isCanceled) Color.WHITE else color
-        val borderWidth = if (!isCanceled) 0 else 4
+        val borderWidthResId = if (!isCanceled) R.dimen.no_border_width else R.dimen.border_width
 
         val style = WeekViewEvent.Style.Builder()
-                .setTextColor(textColor)
-                .setBackgroundColor(backgroundColor)
-                .setTextStrikeThrough(isCanceled)
-                .setBorderWidth(borderWidth)
-                .setBorderColor(color)
-                .build()
+            .setTextColor(textColor)
+            .setBackgroundColor(backgroundColor)
+            .setTextStrikeThrough(isCanceled)
+            .setBorderWidthResource(borderWidthResId)
+            .setBorderColor(color)
+            .build()
 
         return WeekViewEvent.Builder<Event>()
-                .setId(id)
-                .setTitle(title)
-                .setStartTime(startTime)
-                .setEndTime(endTime)
-                .setLocation(location)
-                .setAllDay(isAllDay)
-                .setStyle(style)
-                .setData(this)
-                .build()
+            .setId(id)
+            .setTitle(title)
+            .setStartTime(startTime)
+            .setEndTime(endTime)
+            .setLocation(location)
+            .setAllDay(isAllDay)
+            .setStyle(style)
+            .setData(this)
+            .build()
     }
 }

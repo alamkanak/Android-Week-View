@@ -5,6 +5,8 @@ import android.graphics.Paint
 import android.text.TextPaint
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.Calendar
@@ -119,13 +121,18 @@ data class WeekViewEvent<T> internal constructor(
     override fun toWeekViewEvent(): WeekViewEvent<T> = this
 
     internal sealed class ColorResource {
-        data class Value(val color: Int) : ColorResource()
-        data class Id(val resId: Int) : ColorResource()
+        data class Value(@ColorInt val color: Int) : ColorResource()
+        data class Id(@ColorRes val resId: Int) : ColorResource()
     }
 
     internal sealed class TextResource {
         data class Value(val text: String) : TextResource()
-        data class Id(val resId: Int) : TextResource()
+        data class Id(@StringRes val resId: Int) : TextResource()
+    }
+
+    internal sealed class DimenResource {
+        data class Value(val value: Int) : DimenResource()
+        data class Id(@DimenRes val resId: Int) : DimenResource()
     }
 
     class Style {
@@ -133,14 +140,22 @@ data class WeekViewEvent<T> internal constructor(
         internal var backgroundColorResource: ColorResource? = null
         internal var textColorResource: ColorResource? = null
         internal var isTextStrikeThrough: Boolean = false
-        internal var borderWidth: Int = 0
+        internal var borderWidthResource: DimenResource? = null
         internal var borderColorResource: ColorResource? = null
 
         internal val hasBorder: Boolean
-            get() = borderWidth > 0
+            get() = borderWidthResource != null
 
         internal fun getBackgroundColorOrDefault(config: WeekViewConfigWrapper): ColorResource {
             return backgroundColorResource ?: ColorResource.Value(config.defaultEventColor)
+        }
+
+        internal fun getBorderWidth(
+            context: Context
+        ): Int = when (val resource = borderWidthResource) {
+            is DimenResource.Id -> context.resources.getDimensionPixelSize(resource.resId)
+            is DimenResource.Value -> resource.value
+            null -> throw IllegalStateException("Invalid border width resource: $resource")
         }
 
         class Builder {
@@ -173,7 +188,12 @@ data class WeekViewEvent<T> internal constructor(
             }
 
             fun setBorderWidth(width: Int): Builder {
-                style.borderWidth = width
+                style.borderWidthResource = DimenResource.Value(width)
+                return this
+            }
+
+            fun setBorderWidthResource(@DimenRes resId: Int): Builder {
+                style.borderWidthResource = DimenResource.Id(resId)
                 return this
             }
 
