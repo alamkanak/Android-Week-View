@@ -4,8 +4,9 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
+import android.text.TextPaint
+import android.text.TextUtils
 import android.text.TextUtils.TruncateAt
-import android.text.TextUtils.ellipsize
 import android.text.style.StyleSpan
 
 internal class TextFitter<T>(
@@ -24,7 +25,7 @@ internal class TextFitter<T>(
 
         val fitsIntoChip = chipHeight >= textLayout.height
         if (fitsIntoChip) {
-            return textLayout.ellipsize(eventChip, text, chipHeight, chipWidth)
+            return ellipsize(eventChip, textLayout, text, chipHeight, chipWidth)
         }
 
         val isMultiLine = text.contains("\n")
@@ -34,14 +35,15 @@ internal class TextFitter<T>(
         val isAdaptive = config.adaptiveEventTextSize
 
         return when {
-            fitsIntoChipNow -> textLayout.ellipsize(eventChip, finalText, chipHeight, chipWidth)
-            isAdaptive -> textLayout.scaleToFit(eventChip, finalText, chipHeight, chipWidth)
+            fitsIntoChipNow -> ellipsize(eventChip, textLayout, finalText, chipHeight, chipWidth)
+            isAdaptive -> scaleToFit(eventChip, finalText, chipHeight)
             else -> textLayout
         }
     }
 
-    private fun StaticLayout.ellipsize(
+    private fun ellipsize(
         eventChip: EventChip<T>,
+        textLayout: StaticLayout,
         text: SpannableStringBuilder,
         availableHeight: Int,
         availableWidth: Int
@@ -50,21 +52,21 @@ internal class TextFitter<T>(
         val rect = checkNotNull(eventChip.rect)
 
         // The text fits into the chip, so we just need to ellipsize it
-        var textLayout = this
+        var newTextLayout = textLayout
         val textPaint = event.getTextPaint(context, config)
 
-        var availableLineCount = availableHeight / textLayout.lineHeight
+        var availableLineCount = availableHeight / newTextLayout.lineHeight
         val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
 
         do {
             // Ellipsize text to fit into event rect
             val availableArea = availableLineCount * availableWidth * 1f
-            val ellipsized = ellipsize(text, textPaint, availableArea, TruncateAt.END)
-            textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
+            val ellipsized = TextUtils.ellipsize(text, textPaint, availableArea, TruncateAt.END)
+            newTextLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
             availableLineCount--
-        } while (textLayout.height > availableHeight)
+        } while (newTextLayout.height > availableHeight)
 
-        return textLayout
+        return newTextLayout
     }
 
     private fun SpannableStringBuilder.replaceNewLineWithSpace(): SpannableStringBuilder {
@@ -80,31 +82,31 @@ internal class TextFitter<T>(
         return modifiedText
     }
 
-    private fun StaticLayout.scaleToFit(
+    private fun scaleToFit(
         eventChip: EventChip<T>,
         text: SpannableStringBuilder,
-        availableHeight: Int,
-        availableWidth: Int
+        availableHeight: Int
     ): StaticLayout {
         val event = eventChip.event
         val rect = checkNotNull(eventChip.rect)
 
-        // The text doesn't fit into the chip, so we need to gradually reduce its size until it does
-        var textLayout = this
         val textPaint = event.getTextPaint(context, config)
+        val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+
+        var textLayout: StaticLayout
 
         do {
-            textPaint.textSize -= 1f
-
-            val adaptiveLineCount = availableHeight / textLayout.lineHeight
-            val availableArea = adaptiveLineCount * availableWidth * 1f
-            val ellipsized = ellipsize(text, textPaint, availableArea, TruncateAt.END)
-
-            val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
-            textLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
+            // The text doesn't fit into the chip, so we need to gradually
+            // reduce its size until it does
+            textPaint.reduceSize()
+            textLayout = TextLayoutBuilder.build(text, textPaint, width)
         } while (availableHeight < textLayout.height)
 
         return textLayout
+    }
+
+    private fun TextPaint.reduceSize() {
+        textSize -= 1
     }
 
     private fun <T> List<T>.toPair(): Pair<T, T> {
