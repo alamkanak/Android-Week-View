@@ -183,7 +183,8 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         color: Int,
         isAllDay: Boolean,
         isCanceled: Boolean
-    ) = Event(id, getEventTitle(startTime), startTime, endTime, "", color, isAllDay, isCanceled)
+    ) = Event(id, getEventTitle(startTime), startTime,
+        endTime, "Location $id", color, isAllDay, isCanceled)
 
     private fun getEventTitle(time: Calendar): String {
         val sdf = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
