@@ -35,7 +35,9 @@ internal class TextFitter<T>(
         val isAdaptive = config.adaptiveEventTextSize
 
         return when {
-            fitsIntoChipNow -> ellipsize(eventChip, textLayout, finalText, chipHeight, chipWidth)
+            fitsIntoChipNow || !isAdaptive -> {
+                ellipsize(eventChip, textLayout, finalText, chipHeight, chipWidth)
+            }
             isAdaptive -> scaleToFit(eventChip, finalText, chipHeight)
             else -> textLayout
         }
