@@ -30,7 +30,7 @@ class Event(
             .setBorderColor(color)
             .build()
 
-        return WeekViewEvent.Builder<Event>()
+        return WeekViewEvent.Builder<Event>(this)
             .setId(id)
             .setTitle(title)
             .setStartTime(startTime)
@@ -38,7 +38,6 @@ class Event(
             .setLocation(location)
             .setAllDay(isAllDay)
             .setStyle(style)
-            .setData(this)
             .build()
     }
 }

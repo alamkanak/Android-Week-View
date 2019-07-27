@@ -213,6 +213,15 @@ data class WeekViewEvent<T> internal constructor(
 
     class Builder<T> {
 
+        @Deprecated(
+            "Pass the data (likely \"this\") to WeekViewEvent.Builder in the constructor"
+        )
+        constructor()
+
+        constructor(data: T) : this() {
+            event.data = data
+        }
+
         private val event = WeekViewEvent<T>()
 
         fun setId(id: Long): Builder<T> {
@@ -260,6 +269,9 @@ data class WeekViewEvent<T> internal constructor(
             return this
         }
 
+        @Deprecated(
+            "Pass the data (likely \"this\") to WeekViewEvent.Builder in the constructor"
+        )
         fun setData(data: T): Builder<T> {
             event.data = data
             return this

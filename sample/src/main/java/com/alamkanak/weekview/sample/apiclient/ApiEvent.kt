@@ -59,14 +59,13 @@ data class ApiEvent(
             .setBackgroundColor(color)
             .build()
 
-        return WeekViewEvent.Builder<ApiEvent>()
+        return WeekViewEvent.Builder<ApiEvent>(this)
             .setId(id)
             .setTitle(name)
             .setStartTime(startTime)
             .setEndTime(endTime)
             .setAllDay(false)
             .setStyle(style)
-            .setData(this)
             .build()
     }
 }
