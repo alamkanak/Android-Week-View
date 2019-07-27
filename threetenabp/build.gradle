@@ -23,4 +23,9 @@ dependencies {
     implementation libraries.kotlin
     implementation libraries.appCompat
     implementation libraries.threeTenAbp
+
+    testImplementation libraries.threeTen
+    testImplementation libraries.jUnit
+    testImplementation libraries.mockitoCore
+    testImplementation libraries.mockitoInline
 }

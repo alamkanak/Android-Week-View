@@ -22,5 +22,10 @@ dependencies {
 
     implementation libraries.kotlin
     implementation libraries.appCompat
-    implementation libraries.jodaTime
+    implementation libraries.jodaTimeAndroid
+
+    testImplementation libraries.jodaTime
+    testImplementation libraries.jUnit
+    testImplementation libraries.mockitoCore
+    testImplementation libraries.mockitoInline
 }

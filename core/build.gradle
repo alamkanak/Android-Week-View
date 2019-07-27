@@ -23,7 +23,7 @@ dependencies {
     implementation libraries.kotlin
     implementation libraries.appCompat
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.28.2'
-    testImplementation 'org.mockito:mockito-inline:2.28.2'
+    testImplementation libraries.jUnit
+    testImplementation libraries.mockitoCore
+    testImplementation libraries.mockitoInline
 }
