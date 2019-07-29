@@ -9,8 +9,6 @@ interface WeekViewDisplayable<T> {
 
     /**
      * Returns a [WeekViewEvent] for use in [WeekView].
-     *
-     * @return A [WeekViewEvent]
      */
     fun toWeekViewEvent(): WeekViewEvent<T>
 }

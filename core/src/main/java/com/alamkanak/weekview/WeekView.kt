@@ -1264,9 +1264,9 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     var onEventLongClickListener: OnEventLongClickListener<T>?
-        get() = gestureHandler.onEventLongPressListener
+        get() = gestureHandler.onEventLongClickListener
         set(value) {
-            gestureHandler.onEventLongPressListener = value
+            gestureHandler.onEventLongClickListener = value
         }
 
     @Deprecated(
@@ -1336,9 +1336,9 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
     var onEmptyViewLongClickListener: OnEmptyViewLongClickListener?
-        get() = gestureHandler.onEmptyViewLongPressListener
+        get() = gestureHandler.onEmptyViewLongClickListener
         set(value) {
-            gestureHandler.onEmptyViewLongPressListener = value
+            gestureHandler.onEmptyViewLongClickListener = value
         }
 
     @Deprecated(

@@ -79,10 +79,10 @@ internal class WeekViewGestureHandler<T>(
     private val scaledTouchSlop = view.scaledTouchSlop
 
     var onEventClickListener: OnEventClickListener<T>? = null
-    var onEventLongPressListener: OnEventLongPressListener<T>? = null
+    var onEventLongClickListener: OnEventLongClickListener<T>? = null
 
     var onEmptyViewClickListener: OnEmptyViewClickListener? = null
-    var onEmptyViewLongPressListener: OnEmptyViewLongPressListener? = null
+    var onEmptyViewLongClickListener: OnEmptyViewLongClickListener? = null
 
     var scrollListener: ScrollListener? = null
 
@@ -260,7 +260,7 @@ internal class WeekViewGestureHandler<T>(
     override fun onLongPress(e: MotionEvent) {
         super.onLongPress(e)
 
-        onEventLongPressListener?.let { listener ->
+        onEventLongClickListener?.let { listener ->
             val eventChip = findHitEvent(e) ?: return@let
             if (eventChip.event.isNotAllDay && e.isInHeader) {
                 // The user tapped in the header area and a single event that is rendered below it
@@ -272,17 +272,17 @@ internal class WeekViewGestureHandler<T>(
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
             val rect = checkNotNull(eventChip.rect)
-            listener.onEventLongPress(data, rect)
+            listener.onEventLongClick(data, rect)
             return
         }
 
         val timeColumnWidth = config.timeColumnWidth
 
         // If the tap was on in an empty space, then trigger the callback.
-        onEmptyViewLongPressListener?.let { listener ->
+        onEmptyViewLongClickListener?.let { listener ->
             if (e.x > timeColumnWidth && e.y > config.headerHeight) {
                 val selectedTime = touchHandler.calculateTimeFromPoint(e.x, e.y) ?: return@let
-                listener.onEmptyViewLongPress(selectedTime)
+                listener.onEmptyViewLongClick(selectedTime)
             }
         }
     }
