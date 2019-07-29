@@ -54,7 +54,10 @@
         <attr name="eventTextSize" format="dimension" />
         <attr name="adaptiveEventTextSize" format="boolean" />
         <attr name="eventTextColor" format="color" />
+        <!-- {@deprecated Use eventPaddingHorizontal and eventPaddingVertical instead.} -->
         <attr name="eventPadding" format="dimension" />
+        <attr name="eventPaddingHorizontal" format="dimension" />
+        <attr name="eventPaddingVertical" format="dimension" />
         <attr name="defaultEventColor" format="color" />
         <attr name="allDayEventTextSize" format="dimension" />
 

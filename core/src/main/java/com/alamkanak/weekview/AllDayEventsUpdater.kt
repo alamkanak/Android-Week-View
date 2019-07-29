@@ -82,8 +82,11 @@ internal class AllDayEventsUpdater<T>(
         val right = rect.right
         val bottom = rect.bottom
 
-        val width = right - left - (config.eventPadding * 2)
-        val height = bottom - top - (config.eventPadding * 2)
+        val fullHorizontalPadding = config.eventPaddingHorizontal * 2
+        val fullVerticalPadding = config.eventPaddingVertical * 2
+
+        val width = right - left - fullHorizontalPadding
+        val height = bottom - top - fullVerticalPadding
 
         if (height < 0f) {
             return null
@@ -92,7 +95,7 @@ internal class AllDayEventsUpdater<T>(
         if (width < 0f) {
             // This is needed if there are many all-day events
             val dummyTextLayout = createDummyTextLayout(event)
-            val chipHeight = dummyTextLayout.height + config.eventPadding * 2
+            val chipHeight = dummyTextLayout.height + fullVerticalPadding
             rect.bottom = rect.top + chipHeight
             setAllDayEventHeight(chipHeight)
             return dummyTextLayout
@@ -127,11 +130,11 @@ internal class AllDayEventsUpdater<T>(
         val lineHeight = textLayout.height / textLayout.lineCount
 
         // For an all day event, we display just one line
-        val chipHeight = lineHeight + config.eventPadding * 2
+        val chipHeight = lineHeight + fullVerticalPadding
         rect.bottom = rect.top + chipHeight
 
         // Compute the available height on the right size of the chip
-        val availableHeight = (rect.bottom - top - (config.eventPadding * 2).toFloat()).toInt()
+        val availableHeight = (rect.bottom - top - fullVerticalPadding.toFloat()).toInt()
 
         val finalTextLayout = if (availableHeight >= lineHeight) {
             ellipsizeTextToFitChip(
@@ -184,7 +187,7 @@ internal class AllDayEventsUpdater<T>(
             // Ellipsize text to fit into event rect.
             val availableArea = availableLineCount * availableWidth
             val ellipsized = TextUtils.ellipsize(text, textPaint, availableArea.toFloat(), END)
-            val width = (right - left - (config.eventPadding * 2).toFloat()).toInt()
+            val width = (right - left - (config.eventPaddingHorizontal * 2).toFloat()).toInt()
 
             if (eventChip.event.isAllDay && width < 0) {
                 // This day contains too many all-day events. We only draw the event chips,

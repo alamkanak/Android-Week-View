@@ -37,9 +37,13 @@ internal data class EventChip<T>(
     private var availableWidthCache: Int = 0
     private var availableHeightCache: Int = 0
 
-    fun didAvailableAreaChange(area: RectF, eventPadding: Int): Boolean {
-        val availableWidth = (area.right - area.left - (eventPadding * 2f)).toInt()
-        val availableHeight = (area.bottom - area.top - (eventPadding * 2f)).toInt()
+    fun didAvailableAreaChange(
+        area: RectF,
+        horizontalPadding: Int,
+        verticalPadding: Int
+    ): Boolean {
+        val availableWidth = (area.right - area.left - horizontalPadding).toInt()
+        val availableHeight = (area.bottom - area.top - verticalPadding).toInt()
         return availableWidth != availableWidthCache || availableHeight != availableHeightCache
     }
 

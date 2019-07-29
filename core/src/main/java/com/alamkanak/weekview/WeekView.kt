@@ -538,10 +538,32 @@ class WeekView<T> @JvmOverloads constructor(
     /**
      * Returns the padding within an [EventChip].
      */
+    @Deprecated("Use eventPaddingHorizontal and eventPaddingVertical")
     var eventPadding: Int
-        get() = configWrapper.eventPadding
+        get() = configWrapper.eventPaddingVertical
         set(value) {
-            configWrapper.eventPadding = value
+            configWrapper.eventPaddingHorizontal = value
+            configWrapper.eventPaddingVertical = value
+            invalidate()
+        }
+
+    /**
+     * Returns the horizontal padding within an [EventChip].
+     */
+    var eventPaddingHorizontal: Int
+        get() = configWrapper.eventPaddingHorizontal
+        set(value) {
+            configWrapper.eventPaddingHorizontal = value
+            invalidate()
+        }
+
+    /**
+     * Returns the vertical padding within an [EventChip].
+     */
+    var eventPaddingVertical: Int
+        get() = configWrapper.eventPaddingVertical
+        set(value) {
+            configWrapper.eventPaddingVertical = value
             invalidate()
         }
 

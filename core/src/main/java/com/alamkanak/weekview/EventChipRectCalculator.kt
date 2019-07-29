@@ -46,7 +46,7 @@ internal class EventChipRectCalculator<T>(
         startPixel: Float
     ): RectF {
         val top = config.headerTextHeight + config.headerRowPadding * 1.5f
-        val height = config.allDayEventTextPaint.textSize + config.eventPadding
+        val height = config.allDayEventTextPaint.textSize + config.eventPaddingVertical * 2
         val bottom = top + height
 
         val widthPerDay = config.widthPerDay

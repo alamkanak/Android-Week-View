@@ -17,6 +17,7 @@ internal class EventChipDrawer<T>(
     private val config: WeekViewConfigWrapper
 ) {
 
+    private val textFitter = TextFitter<T>(context, config)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
 
     internal fun draw(
@@ -110,7 +111,10 @@ internal class EventChipDrawer<T>(
         val rect = checkNotNull(eventChip.rect)
         canvas.apply {
             save()
-            translate(rect.left + config.eventPadding, rect.top + config.eventPadding)
+            translate(
+                rect.left + config.eventPaddingHorizontal,
+                rect.top + config.eventPaddingVertical
+            )
             textLayout.draw(this)
             restore()
         }
@@ -123,8 +127,11 @@ internal class EventChipDrawer<T>(
         val event = eventChip.event
         val rect = checkNotNull(eventChip.rect)
 
-        val negativeWidth = rect.right - rect.left - (config.eventPadding * 2f) < 0
-        val negativeHeight = rect.bottom - rect.top - (config.eventPadding * 2f) < 0
+        val fullHorizontalPadding = config.eventPaddingHorizontal * 2
+        val fullVerticalPadding = config.eventPaddingVertical * 2
+
+        val negativeWidth = rect.right - rect.left - fullHorizontalPadding < 0
+        val negativeHeight = rect.bottom - rect.top - fullVerticalPadding < 0
         if (negativeWidth || negativeHeight) {
             return
         }
@@ -147,14 +154,15 @@ internal class EventChipDrawer<T>(
             text.appendln().append(it)
         }
 
-        val chipHeight = (rect.bottom - rect.top - (config.eventPadding * 2f)).toInt()
-        val chipWidth = (rect.right - rect.left - (config.eventPadding * 2f)).toInt()
+        val chipHeight = (rect.bottom - rect.top - fullVerticalPadding).toInt()
+        val chipWidth = (rect.right - rect.left - fullHorizontalPadding).toInt()
 
         if (chipHeight == 0 || chipWidth == 0) {
             return
         }
 
-        val didAvailableAreaChange = eventChip.didAvailableAreaChange(rect, config.eventPadding)
+        val didAvailableAreaChange =
+            eventChip.didAvailableAreaChange(rect, fullHorizontalPadding, fullVerticalPadding)
         val isCached = textLayoutCache.containsKey(event.id)
 
         if (didAvailableAreaChange || !isCached) {
@@ -167,8 +175,6 @@ internal class EventChipDrawer<T>(
             drawEventTitle(eventChip, textLayout, canvas)
         }
     }
-
-    private val textFitter = TextFitter<T>(context, config)
 
     private fun setBackgroundPaint(
         event: WeekViewEvent<T>,

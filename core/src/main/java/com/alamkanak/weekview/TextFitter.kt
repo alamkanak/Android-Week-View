@@ -58,7 +58,8 @@ internal class TextFitter<T>(
         val textPaint = event.getTextPaint(context, config)
 
         var availableLineCount = availableHeight / newTextLayout.lineHeight
-        val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+        val fullHorizontalPadding = config.eventPaddingHorizontal * 2f
+        val width = (rect.right - rect.left - fullHorizontalPadding).toInt()
 
         do {
             // Ellipsize text to fit into event rect
@@ -93,7 +94,8 @@ internal class TextFitter<T>(
         val rect = checkNotNull(eventChip.rect)
 
         val textPaint = event.getTextPaint(context, config)
-        val width = (rect.right - rect.left - (config.eventPadding * 2).toFloat()).toInt()
+        val fullHorizontalPadding = config.eventPaddingHorizontal * 2f
+        val width = (rect.right - rect.left - fullHorizontalPadding).toInt()
 
         var textLayout: StaticLayout
 

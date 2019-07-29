@@ -439,10 +439,16 @@ internal class WeekViewConfigWrapper(
             config.eventCornerRadius = value
         }
 
-    var eventPadding: Int
-        get() = config.eventPadding
+    var eventPaddingHorizontal: Int
+        get() = config.eventPaddingHorizontal
         set(value) {
-            config.eventPadding = value
+            config.eventPaddingHorizontal = value
+        }
+
+    var eventPaddingVertical: Int
+        get() = config.eventPaddingVertical
+        set(value) {
+            config.eventPaddingVertical = value
         }
 
     var defaultEventColor: Int
