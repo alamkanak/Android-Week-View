@@ -407,6 +407,7 @@ internal class WeekViewConfigWrapper(
         get() = config.headerRowBackgroundColor
         set(value) {
             config.headerRowBackgroundColor = value
+            headerBackgroundPaint.color = value
         }
 
     var headerRowTextColor: Int
