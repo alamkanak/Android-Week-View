@@ -15,7 +15,7 @@ class WeekViewEventTest {
     ) : WeekViewDisplayable<Event> {
 
         override fun toWeekViewEvent(): WeekViewEvent<Event> {
-            return WeekViewEvent.Builder<Event>()
+            return WeekViewEvent.Builder(this)
                 .setStartTime(startTime)
                 .setEndTime(endTime)
                 .build()

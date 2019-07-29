@@ -229,6 +229,11 @@ data class WeekViewEvent<T> internal constructor(
             return this
         }
 
+        /*
+        error computing cache key: template: cacheKey:1:38: executing "cacheKey" at <checksum "app/build....>:
+        error calling checksum: open /home/circleci/code/app/build.gradle: no such file or directory
+         */
+
         fun setTitle(title: String): Builder<T> {
             event.titleResource = TextResource.Value(title)
             return this

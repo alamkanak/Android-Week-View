@@ -34,11 +34,15 @@ buildscript {
     repositories {
         jcenter()
         google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'org.jlleitschuh.gradle:ktlint-gradle:8.2.0'
     }
 }
 
@@ -48,6 +52,8 @@ allprojects {
         options.addStringOption('encoding', 'UTF-8')
         options.addStringOption('charSet', 'UTF-8')
     }
+
+    apply plugin: 'org.jlleitschuh.gradle.ktlint'
 
     repositories {
         jcenter()

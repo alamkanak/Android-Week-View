@@ -9,7 +9,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}
+                   -{{ checksum "core/build.gradle" }}
+                   -{{ checksum "jodatime/build.gradle" }}
+                   -{{ checksum "jsr310/build.gradle" }}
+                   -{{ checksum "sample/build.gradle" }}
+                   -{{ checksum "threetenabp/build.gradle" }}
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this. 
 #         command: sudo chmod +x ./gradlew
@@ -19,7 +24,15 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}
+                   -{{ checksum "core/build.gradle" }}
+                   -{{ checksum "jodatime/build.gradle" }}
+                   -{{ checksum "jsr310/build.gradle" }}
+                   -{{ checksum "sample/build.gradle" }}
+                   -{{ checksum "threetenabp/build.gradle" }}
+      - run: 
+          name: Run ktlintCheck
+          command: ./gradlew --continue ktlintCheck
       - run:
           name: Run Tests
           command: ./gradlew lint test

@@ -6,7 +6,6 @@ version = '4.0.0'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply from: '../ktlint.gradle'
 
 android {
     compileSdkVersion buildConfig.compileSdk
