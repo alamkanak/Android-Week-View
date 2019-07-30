@@ -78,20 +78,13 @@ class ConstraintActivity : AppCompatActivity(), OnEventClickListener<Event>,
     private fun setupDateTimeInterpreter() {
         weekView.dateTimeInterpreter = object : DateTimeInterpreter {
 
-            private val sdfDate = SimpleDateFormat("E dd", Locale.getDefault())
+            private val sdfDate = SimpleDateFormat("E\ndd", Locale.getDefault())
 
-            override fun interpretDate(date: Calendar): String {
-                val result = sdfDate.format(date.time).replace(" ".toRegex(), "\n")
-                return result.substring(0, 1).toUpperCase(Locale.getDefault()) + result.substring(1)
-            }
+            override fun interpretDate(date: Calendar) = sdfDate.format(date.time)
 
             override fun interpretTime(hour: Int): String {
-                val calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, hour)
-                calendar.set(Calendar.MINUTE, 0)
-
-                val sdfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
-                return sdfTime.format(calendar.time)
+                val formattedHour = String.format("%02d", hour)
+                return "$formattedHour:00"
             }
         }
     }

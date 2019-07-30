@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
-    tools:context=".BaseActivity">
+    tools:context=".BasicActivity">
 
     <com.alamkanak.weekview.WeekView
         android:id="@+id/weekView"

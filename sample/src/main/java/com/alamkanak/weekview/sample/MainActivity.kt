@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         private val SAMPLES = listOf(
-            Sample(R.string.title_activity_basic, BaseActivity::class.java),
+            Sample(R.string.title_activity_basic, BasicActivity::class.java),
             Sample(R.string.title_activity_static, StaticActivity::class.java),
             Sample(R.string.title_activity_constraint, ConstraintActivity::class.java),
             Sample(R.string.title_activity_limited, LimitedActivity::class.java),

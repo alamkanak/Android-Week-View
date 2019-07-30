@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BaseActivity"
+            android:name=".BasicActivity"
             android:label="@string/week_view"
             android:parentActivityName=".MainActivity">
             <meta-data

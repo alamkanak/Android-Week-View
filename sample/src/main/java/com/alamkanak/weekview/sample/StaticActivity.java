@@ -16,7 +16,7 @@ import com.alamkanak.weekview.OnEmptyViewLongClickListener;
 import com.alamkanak.weekview.OnEventClickListener;
 import com.alamkanak.weekview.OnEventLongClickListener;
 import com.alamkanak.weekview.OnMonthChangeListener;
-import com.alamkanak.weekview.ScrollListener;
+import com.alamkanak.weekview.OnRangeChangeListener;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.apiclient.Event;
@@ -40,6 +40,7 @@ public class StaticActivity extends AppCompatActivity
     WeekView<Event> mWeekView;
     private EventsDatabase mDatabase;
 
+    private SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private TextView mDateTV;
 
     @Override
@@ -76,10 +77,11 @@ public class StaticActivity extends AppCompatActivity
             }
         });
 
-        mWeekView.setScrollListener(new ScrollListener() {
+        mWeekView.setOnRangeChangeListener(new OnRangeChangeListener() {
             @Override
-            public void onFirstVisibleDateChanged(@Nullable Calendar date) {
-                updateDateText();
+            public void onRangeChanged(@NotNull Calendar firstVisibleDate,
+                                       @NotNull Calendar lastVisibleDate) {
+                updateDateText(firstVisibleDate, lastVisibleDate);
             }
         });
     }
@@ -108,19 +110,9 @@ public class StaticActivity extends AppCompatActivity
                 + sdf.format(time.getTime()), Toast.LENGTH_SHORT).show();
     }
 
-    void updateDateText() {
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-        String formattedFirstDay = "none";
-        if (mWeekView.getFirstVisibleDate() != null) {
-            formattedFirstDay = format.format(mWeekView.getFirstVisibleDate().getTime());
-        }
-
-        String formattedLastDay = "none";
-        if (mWeekView.getLastVisibleDate() != null) {
-            formattedLastDay = format.format(mWeekView.getLastVisibleDate().getTime());
-        }
-
+    void updateDateText(Calendar firstVisibleDate, Calendar lastVisibleDate) {
+        String formattedFirstDay = dateFormatter.format(firstVisibleDate.getTime());
+        String formattedLastDay = dateFormatter.format(lastVisibleDate.getTime());
         mDateTV.setText(getString(R.string.date_infos, formattedFirstDay, formattedLastDay));
     }
 
