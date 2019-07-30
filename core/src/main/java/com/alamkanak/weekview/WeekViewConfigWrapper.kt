@@ -562,7 +562,27 @@ internal class WeekViewConfigWrapper(
         currentOrigin.y = verticalOffset * -1
     }
 
-    fun computeDifferenceWithFirstDayOfWeek(
+    /**
+     * Returns the provided date, if it is within [minDate] and [maxDate]. Otherwise, it returns
+     * [minDate] or [maxDate].
+     */
+    fun getDateWithinDateRange(date: Calendar): Calendar {
+        val minDate = minDate ?: date
+        val maxDate = maxDate ?: date
+
+        return if (date.isBefore(minDate)) {
+            minDate
+        } else if (date.isAfter(maxDate)) {
+            maxDate.plusDays(1 - numberOfVisibleDays)
+        } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
+            val diff = computeDifferenceWithFirstDayOfWeek(date)
+            date.minusDays(diff)
+        } else {
+            date
+        }
+    }
+
+    private fun computeDifferenceWithFirstDayOfWeek(
         date: Calendar
     ): Int = date.dayOfWeek - firstDayOfWeek
 

@@ -1116,34 +1116,20 @@ class WeekView<T> @JvmOverloads constructor(
      * @param date The date to show.
      */
     override fun goToDate(date: Calendar) {
-        val minDate = configWrapper.minDate
-        val maxDate = configWrapper.maxDate
-
-        val numberOfVisibleDays = configWrapper.numberOfVisibleDays
-        val showFirstDayOfWeekFirst = configWrapper.showFirstDayOfWeekFirst
-
-        // If a minimum or maximum date is set, don't allow to go beyond them.
-        val modifiedDate = if (minDate != null && date.isBefore(minDate)) {
-            minDate
-        } else if (maxDate != null && date.isAfter(maxDate)) {
-            maxDate.plusDays(1 - numberOfVisibleDays)
-        } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
-            val diff = configWrapper.computeDifferenceWithFirstDayOfWeek(date)
-            date.minusDays(diff)
-        } else {
-            date
-        }
-
+        val adjustedDate = configWrapper.getDateWithinDateRange(date)
         gestureHandler.forceScrollFinished()
 
-        if (viewState.areDimensionsInvalid) {
-            viewState.scrollToDate = modifiedDate
+        val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
+        if (viewState.areDimensionsInvalid || isWaitingToBeLaidOut) {
+            // If the view's dimensions have just changed or if it hasn't been laid out yet, we
+            // postpone the action until onDraw() is called the next time.
+            viewState.scrollToDate = adjustedDate
             return
         }
 
         eventChipsProvider.shouldRefreshEvents = true
 
-        val diff = modifiedDate.daysFromToday
+        val diff = adjustedDate.daysFromToday
         configWrapper.currentOrigin.x = diff.toFloat() * (-1f) * configWrapper.totalDayWidth
         invalidate()
     }
