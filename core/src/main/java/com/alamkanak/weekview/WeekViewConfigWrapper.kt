@@ -113,6 +113,7 @@ internal class WeekViewConfigWrapper(
         style = Paint.Style.FILL
         strokeWidth = config.nowLineDotRadius.toFloat()
         color = config.nowLineDotColor
+        isAntiAlias = true
     }
 
     var timeColumnWidth: Float = UNINITIALIZED
