@@ -34,6 +34,8 @@ internal class TextFitter<T>(
         val fitsIntoChipNow = chipHeight >= textLayout.height
         val isAdaptive = config.adaptiveEventTextSize
 
+        // TODO: Refactor adaptiveTextSize and ellipsize behavior
+
         return when {
             fitsIntoChipNow || !isAdaptive -> {
                 ellipsize(eventChip, textLayout, finalText, chipHeight, chipWidth)
@@ -67,7 +69,7 @@ internal class TextFitter<T>(
             val ellipsized = TextUtils.ellipsize(text, textPaint, availableArea, TruncateAt.END)
             newTextLayout = TextLayoutBuilder.build(ellipsized, textPaint, width)
             availableLineCount--
-        } while (newTextLayout.height > availableHeight)
+        } while (newTextLayout.height > availableHeight && availableLineCount > 0)
 
         return newTextLayout
     }
