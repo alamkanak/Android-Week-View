@@ -8,8 +8,8 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import com.alamkanak.weekview.Constants.MINUTES_PER_HOUR
 import java.util.Calendar
+import kotlin.math.roundToInt
 
 data class WeekViewEvent<T> internal constructor(
     var id: Long = 0L,
@@ -37,18 +37,11 @@ data class WeekViewEvent<T> internal constructor(
     val isNotAllDay: Boolean
         get() = isAllDay.not()
 
+    val durationInMinutes: Int
+        get() = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
+
     internal val isMultiDay: Boolean
         get() = isSameDay(endTime).not()
-
-    internal fun getEffectiveStartMinutes(config: WeekViewConfigWrapper): Int {
-        val startHour = startTime.hour - config.minHour
-        return startHour * MINUTES_PER_HOUR.toInt() + startTime.minute
-    }
-
-    internal fun getEffectiveEndMinutes(config: WeekViewConfigWrapper): Int {
-        val endHour = endTime.hour - config.minHour
-        return endHour * MINUTES_PER_HOUR.toInt() + endTime.minute
-    }
 
     internal fun isSameDay(other: Calendar): Boolean {
         return startTime.isSameDate(other)
@@ -228,11 +221,6 @@ data class WeekViewEvent<T> internal constructor(
             event.id = id
             return this
         }
-
-        /*
-        error computing cache key: template: cacheKey:1:38: executing "cacheKey" at <checksum "app/build....>:
-        error calling checksum: open /home/circleci/code/app/build.gradle: no such file or directory
-         */
 
         fun setTitle(title: String): Builder<T> {
             event.titleResource = TextResource.Value(title)

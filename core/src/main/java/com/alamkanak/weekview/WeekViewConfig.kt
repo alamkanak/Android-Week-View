@@ -173,7 +173,7 @@ internal class WeekViewConfig(
             // Event margins
             columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)
             overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0)
-            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 3)
+            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 2)
             eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0)
 
             // Colors

@@ -11,12 +11,16 @@ internal class EventChipRectCalculator<T>(
         startPixel: Float
     ): RectF {
         val widthPerDay = config.widthPerDay
+        val singleVerticalMargin = config.eventMarginVertical / 2
 
-        val top = calculateVerticalDistanceFromTopOrBottom(eventChip.top)
-        val bottom = calculateVerticalDistanceFromTopOrBottom(eventChip.bottom)
+        val minutesFromStart = eventChip.minutesFromStartHour
+        val top = calculateDistanceFromTop(minutesFromStart) + singleVerticalMargin
 
-        var left = startPixel + eventChip.left * widthPerDay
-        var right = left + eventChip.width * widthPerDay
+        val bottomMinutesFromStart = minutesFromStart + eventChip.event.durationInMinutes
+        val bottom = calculateDistanceFromTop(bottomMinutesFromStart) - singleVerticalMargin
+
+        var left = startPixel + eventChip.relativeStart * widthPerDay
+        var right = left + eventChip.relativeWidth * widthPerDay
 
         if (left > startPixel) {
             left += config.overlappingEventGap / 2
@@ -34,11 +38,12 @@ internal class EventChipRectCalculator<T>(
         return RectF(left, top, right, bottom)
     }
 
-    private fun calculateVerticalDistanceFromTopOrBottom(
-        value: Float
+    private fun calculateDistanceFromTop(
+        minutesFromStart: Int
     ): Float = with(config) {
-        val pixelsFromTop = hourHeight * hoursPerDay * value / minutesPerDay
-        return pixelsFromTop + currentOrigin.y + headerHeight - eventMarginVertical
+        val portionOfDay = minutesFromStart.toFloat() / minutesPerDay
+        val pixelsFromTop = hourHeight * hoursPerDay * portionOfDay
+        return pixelsFromTop + currentOrigin.y + headerHeight // - eventMarginVertical
     }
 
     fun calculateAllDayEvent(
@@ -51,8 +56,8 @@ internal class EventChipRectCalculator<T>(
 
         val widthPerDay = config.widthPerDay
 
-        var left = startPixel + eventChip.left * widthPerDay
-        var right = left + eventChip.width * widthPerDay
+        var left = startPixel + eventChip.relativeStart * widthPerDay
+        var right = left + eventChip.relativeWidth * widthPerDay
 
         if (left > startPixel) {
             left += config.overlappingEventGap / 2f

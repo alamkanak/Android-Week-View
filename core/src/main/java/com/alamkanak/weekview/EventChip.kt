@@ -29,10 +29,26 @@ internal data class EventChip<T>(
     var rect: RectF?
 ) {
 
-    var left = 0f
-    var width = 0f
-    var top = 0f
-    var bottom = 0f
+    /**
+     * The relative start position of the [EventChip].
+     *
+     * For instance, if there are four columns of events, possible values are 0.0, 0.25, 0.5 and
+     * 0.75.
+     */
+    var relativeStart: Float = 0f
+
+    /**
+     * The relative width of the [EventChip].
+     *
+     * For instance, if there are four columns of events, possible values are:
+     * - 0.25: spanning a single column
+     * - 0.50: spanning two columns
+     * - 0.75: spanning three columns
+     * - 1.00: spanning all four columns
+     */
+    var relativeWidth: Float = 0f
+
+    var minutesFromStartHour: Int = 0
 
     private var availableWidthCache: Int = 0
     private var availableHeightCache: Int = 0
@@ -56,13 +72,6 @@ internal data class EventChip<T>(
         rect = null
         availableWidthCache = 0
         availableHeightCache = 0
-    }
-
-    fun calculateTopAndBottom(config: WeekViewConfigWrapper) {
-        if (event.isNotAllDay) {
-            top = event.getEffectiveStartMinutes(config).toFloat()
-            bottom = event.getEffectiveEndMinutes(config).toFloat()
-        }
     }
 
     fun isHit(e: MotionEvent): Boolean {

@@ -35,20 +35,18 @@ internal class EventChipsExpander<T>(
         }
 
         for (collisionGroup in collisionGroups) {
-            expandEventsToMaxWidth(collisionGroup.eventChips)
+            expandEventsToMaxWidth(collisionGroup)
         }
     }
 
     /**
-     * Expand all [EventChip]s in a [CollisionGroup] to their maximum width.
-     *
-     * @param eventChips The [EventChip]s of a [CollisionGroup]
+     * Expands all [EventChip]s in a [CollisionGroup] to their maximum width.
      */
-    private fun expandEventsToMaxWidth(eventChips: List<EventChip<T>>) {
+    private fun expandEventsToMaxWidth(collisionGroup: CollisionGroup<T>) {
         val columns = mutableListOf<Column<T>>()
         columns += Column(index = 0)
 
-        for (eventChip in eventChips) {
+        for (eventChip in collisionGroup.eventChips) {
             val fittingColumns = columns.filter { it.fits(eventChip) }
             when (fittingColumns.size) {
                 0 -> {
@@ -87,9 +85,19 @@ internal class EventChipsExpander<T>(
             }
         }
 
-        for (eventChip in eventChips) {
-            eventChip.calculateTopAndBottom(config)
+        for (eventChip in collisionGroup.eventChips) {
+            calculateMinutesFromStart(eventChip)
         }
+    }
+
+    private fun calculateMinutesFromStart(eventChip: EventChip<T>) {
+        val event = eventChip.event
+        if (event.isAllDay) {
+            return
+        }
+
+        val hoursFromStart = event.startTime.hour - config.minHour
+        eventChip.minutesFromStartHour = hoursFromStart * 60 + event.startTime.minute
     }
 
     private fun expandColumnEventToMaxWidth(
@@ -105,16 +113,16 @@ internal class EventChipsExpander<T>(
         val duplicateInPreviousColumn = previous?.findDuplicate(eventChip)
 
         if (duplicateInPreviousColumn != null) {
-            duplicateInPreviousColumn.width += columnWidth
+            duplicateInPreviousColumn.relativeWidth += columnWidth
         } else {
             // Every column gets the same width. For instance, if there are four columns,
             // then each column's width is 0.25.
-            eventChip.width = columnWidth
+            eventChip.relativeWidth = columnWidth
 
             // The start position is calculated based on the index of the column. For
-            // instance, if there are four columns, the start positions will be 0, 0.25, 0.5
+            // instance, if there are four columns, the start positions will be 0.0, 0.25, 0.5
             // and 0.75.
-            eventChip.left = index.toFloat() / columns
+            eventChip.relativeStart = index.toFloat() / columns
         }
     }
 
