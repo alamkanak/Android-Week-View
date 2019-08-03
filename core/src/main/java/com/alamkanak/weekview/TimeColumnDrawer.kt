@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.util.SparseArray
 
 internal class TimeColumnDrawer(
@@ -23,8 +22,7 @@ internal class TimeColumnDrawer(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) = with(config) {
         var topMargin = headerHeight
         val bottom = view.height.toFloat()

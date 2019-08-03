@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.Paint
 
 internal interface Updater {
     val isRequired: Boolean
@@ -11,8 +10,7 @@ internal interface Updater {
 internal interface Drawer {
     fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) = Unit
 }
 

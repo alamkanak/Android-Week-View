@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.Paint
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -14,8 +13,7 @@ internal class BackgroundGridDrawer(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) {
         drawingContext.dateRangeWithStartPixels.forEach { (_, startPixel) ->
             val startX = max(startPixel, config.timeColumnWidth)

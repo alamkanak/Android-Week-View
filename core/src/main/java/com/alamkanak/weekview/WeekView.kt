@@ -3,7 +3,6 @@ package com.alamkanak.weekview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.os.Parcelable
@@ -45,8 +44,6 @@ class WeekView<T> @JvmOverloads constructor(
     private val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
     private val eventChipsProvider = EventChipsProvider(eventCache, eventSplitter, eventChipCache)
     private val eventChipsExpander = EventChipsExpander(configWrapper, eventChipCache)
-
-    private val paint = Paint()
 
     // Be careful when changing the order of the updaters, as the calculation of any updater might
     // depend on results of previous updaters
@@ -102,7 +99,7 @@ class WeekView<T> @JvmOverloads constructor(
 
     private fun performDrawing(canvas: Canvas) {
         for (drawer in drawers) {
-            drawer.draw(drawingContext, canvas, paint)
+            drawer.draw(drawingContext, canvas)
         }
     }
 

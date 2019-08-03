@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.Paint
 
 internal class HeaderRowDrawer<T>(
     private val view: WeekView<T>,
@@ -10,8 +9,7 @@ internal class HeaderRowDrawer<T>(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) {
         val width = view.width
         val headerBackground = config.headerBackgroundPaint
@@ -40,17 +38,13 @@ internal class HeaderRowDrawer<T>(
         canvas.save()
 
         if (config.showHeaderRowBottomLine) {
-            drawHeaderBottomLine(width, canvas, paint)
+            drawHeaderBottomLine(width, canvas)
         }
     }
 
-    private fun drawHeaderBottomLine(width: Int, canvas: Canvas, paint: Paint) {
-        val headerRowBottomLineWidth = config.headerRowBottomLinePaint.strokeWidth
-        val topMargin = config.headerHeight - headerRowBottomLineWidth
-
-        paint.strokeWidth = headerRowBottomLineWidth
-        paint.color = config.headerRowBottomLinePaint.color
-
-        canvas.drawLine(0f, topMargin, width.toFloat(), topMargin, paint)
+    private fun drawHeaderBottomLine(width: Int, canvas: Canvas) {
+        val strokeWidth = config.headerRowBottomLinePaint.strokeWidth
+        val top = config.headerHeight - strokeWidth
+        canvas.drawLine(0f, top, width.toFloat(), top, config.headerRowBottomLinePaint)
     }
 }

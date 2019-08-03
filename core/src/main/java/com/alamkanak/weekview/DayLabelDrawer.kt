@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.util.SparseArray
 import java.util.Calendar
 
@@ -12,8 +11,7 @@ internal class DayLabelDrawer<T>(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) {
         drawingContext
             .dateRangeWithStartPixels

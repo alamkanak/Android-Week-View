@@ -2,7 +2,6 @@ package com.alamkanak.weekview
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import java.util.Calendar
 
 internal class SingleEventsDrawer<T>(
@@ -15,24 +14,22 @@ internal class SingleEventsDrawer<T>(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) = with(drawingContext) {
         val dateRange = dateRangeWithStartPixels.map { it.first }
         for (date in dateRange) {
-            drawEventsForDate(date, canvas, paint)
+            drawEventsForDate(date, canvas)
         }
     }
 
     private fun drawEventsForDate(
         date: Calendar,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) {
         chipCache
             .normalEventChipsByDate(date)
             .filter { it.rect != null }
-            .forEach { eventChipDrawer.draw(it, canvas, paint) }
+            .forEach { eventChipDrawer.draw(it, canvas) }
     }
 }
 
@@ -46,14 +43,13 @@ internal class AllDayEventsDrawer<T>(
 
     override fun draw(
         drawingContext: DrawingContext,
-        canvas: Canvas,
-        paint: Paint
+        canvas: Canvas
     ) {
         val eventChips = cache.allDayEventLayouts
         for (pair in eventChips) {
             val eventChip = pair.first
             val textLayout = pair.second
-            eventChipDrawer.draw(eventChip, canvas, paint, textLayout)
+            eventChipDrawer.draw(eventChip, canvas, textLayout)
         }
 
         // Hide events when they are in the top left corner

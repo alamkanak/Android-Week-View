@@ -20,22 +20,24 @@ internal class EventChipDrawer<T>(
     private val textFitter = TextFitter<T>(context, config)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
 
+    private val backgroundPaint = Paint()
+    private val borderPaint = Paint()
+
     internal fun draw(
         eventChip: EventChip<T>,
         canvas: Canvas,
-        paint: Paint,
         textLayout: StaticLayout? = null
     ) {
         val event = eventChip.event
 
         val cornerRadius = config.eventCornerRadius.toFloat()
-        setBackgroundPaint(event, paint)
+        updateBackgroundPaint(event, backgroundPaint)
 
         val rect = checkNotNull(eventChip.rect)
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint)
 
         if (event.style.hasBorder) {
-            setBorderPaint(event, paint)
+            updateBorderPaint(event, borderPaint)
 
             val borderWidth = event.style.getBorderWidth(context)
             val adjustedRect = RectF(
@@ -43,11 +45,11 @@ internal class EventChipDrawer<T>(
                 rect.top + borderWidth / 2f,
                 rect.right - borderWidth / 2f,
                 rect.bottom - borderWidth / 2f)
-            canvas.drawRoundRect(adjustedRect, cornerRadius, cornerRadius, paint)
+            canvas.drawRoundRect(adjustedRect, cornerRadius, cornerRadius, borderPaint)
         }
 
         if (event.isNotAllDay) {
-            drawCornersForMultiDayEvents(eventChip, paint, cornerRadius, canvas)
+            drawCornersForMultiDayEvents(eventChip, cornerRadius, canvas)
         }
 
         textLayout?.let {
@@ -58,13 +60,14 @@ internal class EventChipDrawer<T>(
 
     private fun drawCornersForMultiDayEvents(
         eventChip: EventChip<T>,
-        backgroundPaint: Paint,
         cornerRadius: Float,
         canvas: Canvas
     ) {
         val event = eventChip.event
         val originalEvent = eventChip.originalEvent
         val rect = checkNotNull(eventChip.rect)
+
+        updateBackgroundPaint(event, backgroundPaint)
 
         if (event.startsOnEarlierDay(originalEvent)) {
             val topRect = RectF(rect.left, rect.top, rect.right, rect.top + cornerRadius)
@@ -76,15 +79,26 @@ internal class EventChipDrawer<T>(
             canvas.drawRect(bottomRect, backgroundPaint)
         }
 
-        if (!event.style.hasBorder) {
-            return
+        if (event.style.hasBorder) {
+            drawStroke(eventChip, canvas)
         }
+    }
+
+    private fun drawStroke(
+        eventChip: EventChip<T>,
+        canvas: Canvas
+    ) {
+        val event = eventChip.event
+        val originalEvent = eventChip.originalEvent
+        val rect = checkNotNull(eventChip.rect)
 
         val borderWidth = event.style.getBorderWidth(context)
         val innerWidth = rect.width() - borderWidth * 2
 
         val borderStartX = rect.left + borderWidth
         val borderEndX = borderStartX + innerWidth
+
+        updateBorderPaint(event, backgroundPaint)
 
         if (event.startsOnEarlierDay(originalEvent)) {
             // Remove top rounded corners by drawing a rectangle
@@ -176,7 +190,7 @@ internal class EventChipDrawer<T>(
         }
     }
 
-    private fun setBackgroundPaint(
+    private fun updateBackgroundPaint(
         event: WeekViewEvent<T>,
         paint: Paint
     ) {
@@ -190,7 +204,7 @@ internal class EventChipDrawer<T>(
         paint.style = Paint.Style.FILL
     }
 
-    private fun setBorderPaint(
+    private fun updateBorderPaint(
         event: WeekViewEvent<T>,
         paint: Paint
     ) {
