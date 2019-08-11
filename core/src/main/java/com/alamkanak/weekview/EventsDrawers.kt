@@ -51,24 +51,6 @@ internal class AllDayEventsDrawer<T>(
             val textLayout = pair.second
             eventChipDrawer.draw(eventChip, canvas, textLayout)
         }
-
-        // Hide events when they are in the top left corner
-        val headerBackground = config.headerBackgroundPaint
-
-        val headerRowBottomLine = if (config.showHeaderRowBottomLine) {
-            config.headerRowBottomLinePaint.strokeWidth
-        } else {
-            0f
-        }
-
-        val height = config.headerHeight - headerRowBottomLine * 1.5f
-        val width = config.timeTextWidth + config.timeColumnPadding * 2
-
-        canvas.clipRect(0f, 0f, width, height)
-        canvas.drawRect(0f, 0f, width, height, headerBackground)
-
-        canvas.restore()
-        canvas.save()
     }
 
     override fun clear() {

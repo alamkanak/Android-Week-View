@@ -61,10 +61,10 @@ class WeekView<T> @JvmOverloads constructor(
         BackgroundGridDrawer(this, configWrapper),
         SingleEventsDrawer(context, configWrapper, eventChipCache),
         NowLineDrawer(configWrapper),
+        TimeColumnDrawer(this, configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper, cache),
-        AllDayEventsDrawer(context, configWrapper, cache),
-        TimeColumnDrawer(this, configWrapper)
+        AllDayEventsDrawer(context, configWrapper, cache)
     )
 
     override fun onDraw(canvas: Canvas) {

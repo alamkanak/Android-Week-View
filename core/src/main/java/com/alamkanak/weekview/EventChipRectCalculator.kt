@@ -43,7 +43,7 @@ internal class EventChipRectCalculator<T>(
     ): Float = with(config) {
         val portionOfDay = minutesFromStart.toFloat() / minutesPerDay
         val pixelsFromTop = hourHeight * hoursPerDay * portionOfDay
-        return pixelsFromTop + currentOrigin.y + headerHeight // - eventMarginVertical
+        return pixelsFromTop + currentOrigin.y + headerHeight
     }
 
     fun calculateAllDayEvent(

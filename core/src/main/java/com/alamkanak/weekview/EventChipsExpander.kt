@@ -127,8 +127,8 @@ internal class EventChipsExpander<T>(
     }
 
     /**
-     * This class encapsulates [EventChip]s that collide with each other, meaning that they overlap
-     * from a time perspective.
+     * This class encapsulates [EventChip]s that collide with each other, meaning that
+     * they overlap from a time perspective.
      *
      */
     private class CollisionGroup<T>(

@@ -327,6 +327,9 @@ internal class WeekViewConfigWrapper(
             config.showHeaderRowBottomLine = value
         }
 
+    val headerRowBottomLineWidth: Float
+        get() = if (showHeaderRowBottomLine) headerRowBottomLinePaint.strokeWidth else 0f
+
     val singleLineHeader: Boolean
         get() = config.singleLineHeader
 
