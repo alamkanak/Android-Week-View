@@ -13,11 +13,16 @@ internal class DayLabelDrawer<T>(
         drawingContext: DrawingContext,
         canvas: Canvas
     ) {
-        drawingContext
-            .dateRangeWithStartPixels
-            .forEach { (date, startPixel) ->
-                drawLabel(date, startPixel, canvas)
+        val left = config.timeColumnWidth
+        val top = 0f
+        val right = canvas.width.toFloat()
+        val bottom = config.getTotalHeaderHeight()
+
+        canvas.drawInRect(left, top, right, bottom) {
+            drawingContext.dateRangeWithStartPixels.forEach { (date, startPixel) ->
+                drawLabel(date, startPixel, this)
             }
+        }
     }
 
     private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
@@ -39,8 +44,8 @@ internal class DayLabelDrawer<T>(
         }
 
         val staticLayout = cache.multiLineDayLabelCache.get(key)
-        canvas.perform {
-            translate(x, config.headerRowPadding.toFloat())
+        val y = config.headerRowPadding.toFloat()
+        canvas.withTranslation(x, y) {
             staticLayout.draw(this)
         }
     }
@@ -54,12 +59,6 @@ internal class DayLabelDrawer<T>(
     override fun clear() {
         cache.dayLabelCache.clear()
         cache.multiLineDayLabelCache.clear()
-    }
-
-    private fun Canvas.perform(block: Canvas.() -> Unit) {
-        save()
-        block()
-        restore()
     }
 
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {
