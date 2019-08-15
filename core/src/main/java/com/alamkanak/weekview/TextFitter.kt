@@ -16,10 +16,12 @@ internal class TextFitter<T>(
 
     fun fit(
         eventChip: EventChip<T>,
-        text: SpannableStringBuilder,
+        title: String,
+        location: String?,
         chipHeight: Int,
         chipWidth: Int
     ): StaticLayout {
+        val text = createText(title, location, isMultiLine = true)
         val textPaint = eventChip.event.getTextPaint(context, config)
         val textLayout = TextLayoutBuilder.build(text, textPaint, chipWidth)
 
@@ -28,21 +30,39 @@ internal class TextFitter<T>(
             return ellipsize(eventChip, textLayout, text, chipHeight, chipWidth)
         }
 
-        val isMultiLine = text.contains("\n")
-        val finalText = if (isMultiLine) text.replaceNewLineWithSpace() else text
+        val modifiedText = createText(title, location, isMultiLine = false)
+        val modifiedTextLayout = TextLayoutBuilder.build(text, textPaint, chipWidth)
 
-        val fitsIntoChipNow = chipHeight >= textLayout.height
+        val fitsIntoChipNow = chipHeight >= modifiedTextLayout.height
         val isAdaptive = config.adaptiveEventTextSize
 
         // TODO: Refactor adaptiveTextSize and ellipsize behavior
 
         return when {
             fitsIntoChipNow || !isAdaptive -> {
-                ellipsize(eventChip, textLayout, finalText, chipHeight, chipWidth)
+                ellipsize(eventChip, modifiedTextLayout, modifiedText, chipHeight, chipWidth)
             }
-            isAdaptive -> scaleToFit(eventChip, finalText, chipHeight)
-            else -> textLayout
+            isAdaptive -> scaleToFit(eventChip, modifiedText, chipHeight)
+            else -> modifiedTextLayout
         }
+    }
+
+    private fun createText(
+        title: String,
+        location: String?,
+        isMultiLine: Boolean
+    ): SpannableStringBuilder {
+        val text = SpannableStringBuilder(title)
+        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
+        location?.let {
+            if (isMultiLine) {
+                text.appendln()
+            } else {
+                text.append(" ")
+            }
+            text.append(it)
+        }
+        return text
     }
 
     private fun ellipsize(
@@ -74,19 +94,6 @@ internal class TextFitter<T>(
         return newTextLayout
     }
 
-    private fun SpannableStringBuilder.replaceNewLineWithSpace(): SpannableStringBuilder {
-        val (title, location) = split("\n").toPair()
-        val modifiedText = SpannableStringBuilder(title)
-        modifiedText.setSpan(StyleSpan(Typeface.BOLD))
-
-        if (location.isNotEmpty()) {
-            modifiedText.append(" ")
-            modifiedText.append(location)
-        }
-
-        return modifiedText
-    }
-
     private fun scaleToFit(
         eventChip: EventChip<T>,
         text: SpannableStringBuilder,
@@ -113,10 +120,5 @@ internal class TextFitter<T>(
 
     private fun TextPaint.reduceSize() {
         textSize -= 1
-    }
-
-    private fun <T> List<T>.toPair(): Pair<T, T> {
-        check(size == 2)
-        return first() to last()
     }
 }

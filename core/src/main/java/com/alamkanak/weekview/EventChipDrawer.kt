@@ -180,7 +180,7 @@ internal class EventChipDrawer<T>(
         val isCached = textLayoutCache.containsKey(event.id)
 
         if (didAvailableAreaChange || !isCached) {
-            textLayoutCache[event.id] = textFitter.fit(eventChip, text, chipHeight, chipWidth)
+            textLayoutCache[event.id] = textFitter.fit(eventChip, title, location, chipHeight, chipWidth)
             eventChip.updateAvailableArea(chipWidth, chipHeight)
         }
 
