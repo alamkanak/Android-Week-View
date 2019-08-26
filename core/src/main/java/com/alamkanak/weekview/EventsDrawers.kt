@@ -16,7 +16,6 @@ internal class SingleEventsDrawer<T>(
         drawingContext: DrawingContext,
         canvas: Canvas
     ) = with(drawingContext) {
-        val dateRange = dateRangeWithStartPixels.map { it.first }
         for (date in dateRange) {
             drawEventsForDate(date, canvas)
         }

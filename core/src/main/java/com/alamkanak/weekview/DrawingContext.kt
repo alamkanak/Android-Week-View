@@ -8,9 +8,9 @@ internal class DrawingContext(
 ) {
 
     private var startPixel = 0f
-    private val dateRange = mutableListOf<Calendar>()
-    private val startPixels = mutableListOf<Float>()
 
+    val startPixels = mutableListOf<Float>()
+    val dateRange = mutableListOf<Calendar>()
     val dateRangeWithStartPixels = mutableListOf<Pair<Calendar, Float>>()
 
     fun update() {

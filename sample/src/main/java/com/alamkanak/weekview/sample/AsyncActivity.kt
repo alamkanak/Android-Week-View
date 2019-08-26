@@ -1,30 +1,57 @@
 package com.alamkanak.weekview.sample
 
 import android.app.ProgressDialog
-import android.graphics.RectF
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.WeekViewDisplayable
-import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.apiclient.ApiEvent
+import com.alamkanak.weekview.sample.data.EventsApi
 import com.alamkanak.weekview.sample.data.FakeEventsApi
 import java.text.SimpleDateFormat
-import java.util.Calendar
+
+private data class AsyncViewState(
+    val events: List<ApiEvent> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+private class AsyncViewModel(
+    private val eventsApi: EventsApi
+) {
+    val viewState = MutableLiveData<AsyncViewState>()
+
+    init {
+        viewState.value = AsyncViewState(isLoading = true)
+        fetchEvents()
+    }
+
+    fun fetchEvents() = eventsApi.fetchEvents {
+        viewState.value = AsyncViewState(it)
+    }
+
+    fun remove(event: ApiEvent) {
+        val allEvents = viewState.value?.events ?: return
+        viewState.value = AsyncViewState(events = allEvents.minus(event))
+    }
+}
 
 class AsyncActivity : AppCompatActivity() {
 
-    private val events = arrayListOf<WeekViewDisplayable<ApiEvent>>()
-    private var calledNetwork = false
     private var weekViewType = TYPE_THREE_DAY_VIEW
 
-    private lateinit var weekView: WeekView<ApiEvent>
+    private val weekView: WeekView<ApiEvent> by lazy {
+        findViewById<WeekView<ApiEvent>>(R.id.weekView)
+    }
 
-    private val apiService = FakeEventsApi(this)
+    private val viewModel: AsyncViewModel by lazy {
+        AsyncViewModel(FakeEventsApi(this))
+    }
 
+    @Suppress("DEPRECATION")
     private val progressDialog: ProgressDialog by lazy {
         ProgressDialog(this).apply {
             setCancelable(false)
@@ -36,13 +63,33 @@ class AsyncActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_base)
 
-        weekView = findViewById(R.id.weekView)
-        weekView.setOnEventClickListener(this::onEventClick)
-        weekView.setOnEventLongClickListener(this::onEventLongPress)
-        weekView.setOnMonthChangeListener(this::onMonthChange)
-        weekView.setOnEmptyViewLongClickListener(this::onEmptyViewLongPress)
+        viewModel.viewState.observe(this, Observer { viewState ->
+            if (viewState.isLoading) {
+                progressDialog.show()
+            } else {
+                progressDialog.dismiss()
+            }
 
-        progressDialog.show()
+            weekView.submit(viewState.events)
+        })
+
+        weekView.setOnEventClickListener { data, rect ->
+            viewModel.remove(data)
+            Toast.makeText(this, "Removed ${data.name}", Toast.LENGTH_SHORT).show()
+        }
+
+        weekView.setOnEventLongClickListener { data, rect ->
+            Toast.makeText(this, "Long pressed event: ${data.name}", Toast.LENGTH_SHORT).show()
+        }
+
+        weekView.setOnEmptyViewLongClickListener { time ->
+            val sdf = SimpleDateFormat.getDateTimeInstance()
+            Toast.makeText(
+                this,
+                "Empty view long pressed: ${sdf.format(time.time)}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -104,61 +151,6 @@ class AsyncActivity : AppCompatActivity() {
         item.isChecked = item.isChecked.not()
         weekViewType = TYPE_WEEK_VIEW
         weekView.numberOfVisibleDays = 7
-    }
-
-    private fun onMonthChange(
-        startDate: Calendar,
-        endDate: Calendar
-    ): List<WeekViewDisplayable<ApiEvent>> {
-        val newYear = startDate.get(Calendar.YEAR)
-        val newMonth = startDate.get(Calendar.MONTH)
-
-        // Fetch events from network if it hasn't been done already
-        if (!calledNetwork) {
-            apiService.fetchEvents(this::onEventsFetched)
-            calledNetwork = true
-        }
-
-        return events.filter { eventMatches(it.toWeekViewEvent(), newYear, newMonth) }
-    }
-
-    /**
-     * Checks if an event falls into a specific year and month.
-     * @param event The event to check for.
-     * @param year The year.
-     * @param month The month.
-     * @return True if the event matches the year and month.
-     */
-    private fun eventMatches(event: WeekViewEvent<*>, year: Int, month: Int): Boolean {
-        val startsOnDate = event.startTime.get(Calendar.YEAR) == year &&
-            event.startTime.get(Calendar.MONTH) == month
-        val endsOnDate = event.endTime.get(Calendar.YEAR) == year &&
-            event.endTime.get(Calendar.MONTH) == month
-        return startsOnDate || endsOnDate
-    }
-
-    private fun onEventsFetched(events: List<ApiEvent>) {
-        this.events.clear()
-        this.events.addAll(events)
-
-        progressDialog.dismiss()
-        weekView.notifyDataSetChanged()
-    }
-
-    private fun onEventClick(event: ApiEvent, eventRect: RectF) {
-        Toast.makeText(this, "Removing ${event.name} ...", Toast.LENGTH_SHORT).show()
-        events.remove(event)
-        weekView.notifyDataSetChanged()
-    }
-
-    private fun onEventLongPress(event: ApiEvent, eventRect: RectF) {
-        Toast.makeText(this, "Long pressed event: " + event.name, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onEmptyViewLongPress(time: Calendar) {
-        val sdf = SimpleDateFormat.getDateTimeInstance()
-        Toast.makeText(this, "Empty view long pressed: " +
-            sdf.format(time.time), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -12,27 +12,25 @@ internal class MultiLineDayLabelHeightUpdater<T>(
 
     private var previousHorizontalOrigin: Float? = null
 
-    override val isRequired: Boolean
-        get() {
-            if (config.singleLineHeader) {
-                return false
-            }
-
-            val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
-            val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
-            val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-            val isCacheIncomplete = config.numberOfVisibleDays != cache.allDayEventLayouts.size
-
-            return didTimeColumnChange || didScrollHorizontally || isCacheIncomplete
+    override fun isRequired(drawingContext: DrawingContext): Boolean {
+        if (config.singleLineHeader) {
+            return false
         }
+
+        val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
+        val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
+        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+        val isCacheIncomplete = config.numberOfVisibleDays != cache.allDayEventLayouts.size
+
+        return didTimeColumnChange || didScrollHorizontally || isCacheIncomplete
+    }
 
     override fun update(drawingContext: DrawingContext) {
         previousHorizontalOrigin = config.currentOrigin.x
 
-        val multiDayLabels = drawingContext
-            .dateRangeWithStartPixels
-            .map { it.first }
-            .map { it to calculateStaticLayoutForDate(it) }
+        val multiDayLabels = drawingContext.dateRange.map {
+            it to calculateStaticLayoutForDate(it)
+        }
 
         for ((date, multiDayLabel) in multiDayLabels) {
             val key = date.toEpochDays()

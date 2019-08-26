@@ -15,7 +15,7 @@ internal class BackgroundGridDrawer(
         drawingContext: DrawingContext,
         canvas: Canvas
     ) {
-        drawingContext.dateRangeWithStartPixels.forEach { (_, startPixel) ->
+        drawingContext.startPixels.forEach { startPixel ->
             val startX = max(startPixel, config.timeColumnWidth)
             drawGrid(startX, startPixel, canvas)
         }

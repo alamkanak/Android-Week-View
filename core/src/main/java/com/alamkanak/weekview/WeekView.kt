@@ -26,31 +26,35 @@ class WeekView<T> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
-    private val eventCache = EventCache<T>()
-    private val eventChipCache = EventChipCache<T>()
-
     private val gestureListener = object : WeekViewGestureHandler.Listener {
         override fun onScaled() = invalidate()
         override fun onScrolled() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
     }
 
     private val cache = WeekViewCache<T>()
+    private val eventCache = EventCache<T>()
+    private val eventChipCache = EventChipCache<T>()
 
     private val viewState = WeekViewViewState(configWrapper, this)
     private val gestureHandler =
         WeekViewGestureHandler(this, configWrapper, eventChipCache, gestureListener)
 
     private val drawingContext = DrawingContext(configWrapper)
-    private val eventSplitter = WeekViewEventSplitter<T>(configWrapper)
-    private val eventChipsProvider = EventChipsProvider(eventCache, eventSplitter, eventChipCache)
+
+    private val eventsLoader = EventsLoader(eventCache)
+    private val eventChipsLoader = EventChipsLoader(configWrapper, eventChipCache)
     private val eventChipsExpander = EventChipsExpander(configWrapper, eventChipCache)
+
+    private val asyncLoader: AsyncLoader<T> by lazy {
+        AsyncLoader(eventCache, eventChipsLoader)
+    }
 
     // Be careful when changing the order of the updaters, as the calculation of any updater might
     // depend on results of previous updaters
     private val updaters = listOf(
         MultiLineDayLabelHeightUpdater(configWrapper, cache),
+        AllDayEventsUpdater(this, configWrapper, cache, eventCache, eventChipCache),
         HeaderRowHeightUpdater(configWrapper, eventCache),
-        AllDayEventsUpdater(this, configWrapper, cache, eventChipCache),
         SingleEventsUpdater(this, configWrapper, eventChipCache)
     )
 
@@ -83,15 +87,22 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     private fun refreshEvents() {
-        if (!isInEditMode) {
-            eventChipsProvider.loadEventsIfNecessary(viewState.firstVisibleDate)
+        if (isInEditMode) {
+            return
+        }
+
+        val events = eventsLoader.loadEventsIfNecessary(viewState.firstVisibleDate)
+        if (events.isNullOrEmpty()) {
+            eventChipCache.clear()
+        } else {
+            eventChipsLoader.createAndCacheEventChips(events)
             eventChipsExpander.calculateEventChipPositions()
         }
     }
 
     private fun updateDimensions() {
         for (updater in updaters) {
-            if (updater.isRequired) {
+            if (updater.isRequired(drawingContext)) {
                 updater.update(drawingContext)
             }
         }
@@ -1124,7 +1135,7 @@ class WeekView<T> @JvmOverloads constructor(
             return
         }
 
-        eventChipsProvider.shouldRefreshEvents = true
+        eventsLoader.shouldRefreshEvents = true
 
         val diff = adjustedDate.daysFromToday
         configWrapper.currentOrigin.x = diff.toFloat() * (-1f) * configWrapper.totalDayWidth
@@ -1135,7 +1146,7 @@ class WeekView<T> @JvmOverloads constructor(
      * Refreshes the view and loads the events again.
      */
     fun notifyDataSetChanged() {
-        eventChipsProvider.shouldRefreshEvents = true
+        eventsLoader.shouldRefreshEvents = true
         invalidate()
     }
 
@@ -1218,9 +1229,12 @@ class WeekView<T> @JvmOverloads constructor(
     fun getMonthChangeListener() = onMonthChangeListener
 
     var onMonthChangeListener: OnMonthChangeListener<T>?
-        get() = eventChipsProvider.monthLoader?.listener
+        get() = eventsLoader.onMonthChangeListener
         set(value) {
-            eventChipsProvider.monthLoader = MonthLoader(value)
+            check(value == null || asyncLoader.onLoadMoreListener == null) {
+                "You can't use both onLoadMore() and OnMonthChangeListener."
+            }
+            eventsLoader.onMonthChangeListener = value
         }
 
     @Deprecated(
@@ -1240,6 +1254,41 @@ class WeekView<T> @JvmOverloads constructor(
                 endDate: Calendar
             ): List<WeekViewDisplayable<T>> {
                 return block(startDate, endDate)
+            }
+        }
+    }
+
+    /**
+     * Submits a list of [WeekViewDisplayable]s to [WeekView]. If the new events fall into the
+     * currently displayed date range, this method will also redraw [WeekView].
+     */
+    fun submit(items: List<WeekViewDisplayable<T>>) {
+        val dateRange = drawingContext.dateRange
+        val shouldInvalidate = asyncLoader.submit(items, dateRange)
+        if (shouldInvalidate) {
+            invalidate()
+        }
+    }
+
+    var onLoadMoreListener: OnLoadMoreListener?
+        get() = asyncLoader.onLoadMoreListener
+        set(value) {
+            check(value == null || onMonthChangeListener == null) {
+                "You can't use both onLoadMore() and OnMonthChangeListener."
+            }
+            asyncLoader.onLoadMoreListener = value
+        }
+
+    /**
+     * Registers a block that is called whenever [WeekView] needs to load more events. This is
+     * similar to an [OnMonthChangeListener], but does not require anything to be returned.
+     */
+    fun setOnLoadMoreListener(
+        block: (startDate: Calendar, endDate: Calendar) -> Unit
+    ) {
+        onLoadMoreListener = object : OnLoadMoreListener {
+            override fun onLoadMore(startDate: Calendar, endDate: Calendar) {
+                block(startDate, endDate)
             }
         }
     }

@@ -11,7 +11,7 @@ internal class SingleEventsUpdater<T>(
 
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
-    override val isRequired = true
+    override fun isRequired(drawingContext: DrawingContext) = true
 
     override fun update(drawingContext: DrawingContext) {
         chipCache.clearCache()

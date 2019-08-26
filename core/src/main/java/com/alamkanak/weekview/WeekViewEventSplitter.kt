@@ -7,6 +7,10 @@ internal class WeekViewEventSplitter<T>(
     fun split(event: WeekViewEvent<T>): List<WeekViewEvent<T>> {
         // Check whether the end date of the event is exactly 12 AM. If so, the event will be
         // shortened by a millisecond.
+        if (event.startTime >= event.endTime) {
+            return emptyList()
+        }
+
         val isAtStartOfNextPeriod = config.minHour == 0 &&
             event.endTime.isAtStartOfNextDay(event.startTime)
 

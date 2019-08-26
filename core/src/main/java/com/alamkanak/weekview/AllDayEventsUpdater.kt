@@ -12,6 +12,7 @@ internal class AllDayEventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
+    private val eventCache: EventCache<T>,
     private val chipCache: EventChipCache<T>
 ) : Updater {
 
@@ -19,20 +20,22 @@ internal class AllDayEventsUpdater<T>(
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
     private var previousHorizontalOrigin: Float? = null
+    private val previousAllDayEventIds = mutableSetOf<Long>()
 
-    override val isRequired: Boolean
-        get() {
-            return true
-            // Fixme
-            /*val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-            val isCacheIncomplete = cache.isAllDayEventLayoutsCleared
-            val doRectsNeedRefresh = cache.allDayEventLayouts.map { it.first }.any { it.rect == null }
-            return didScrollHorizontally || isCacheIncomplete || doRectsNeedRefresh*/
+    override fun isRequired(drawingContext: DrawingContext): Boolean {
+        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
+        val allDayEvents = eventCache[drawingContext.dateRange].filter { it.isAllDay }
+        val allDayEventIds = allDayEvents.map { it.id }.toSet()
+        val didEventsChange = allDayEventIds != previousAllDayEventIds
+
+        return (didScrollHorizontally || didEventsChange).also {
+            previousAllDayEventIds.clear()
+            previousAllDayEventIds += allDayEventIds
         }
+    }
 
     override fun update(drawingContext: DrawingContext) {
         previousHorizontalOrigin = config.currentOrigin.x
-
         config.setCurrentAllDayEventHeight(0)
         cache.clearAllDayEventLayouts()
 
@@ -50,11 +53,10 @@ internal class AllDayEventsUpdater<T>(
                     val layout = calculateLayoutForAllDayEvent(eventChip, modifiedStartPixel)
                     if (layout != null) {
                         cache.allDayEventLayouts.add(Pair(eventChip, layout))
+                        previousAllDayEventIds.add(eventChip.event.id)
                     }
                 }
             }
-
-        cache.isAllDayEventLayoutsCleared = false
     }
 
     private fun calculateLayoutForAllDayEvent(

@@ -4,6 +4,10 @@ import java.util.Calendar
 
 internal class EventCache<T> {
 
+    val allEvents: List<WeekViewEvent<T>>
+        get() = previousPeriodEvents.orEmpty() +
+            currentPeriodEvents.orEmpty() + nextPeriodEvents.orEmpty()
+
     var previousPeriodEvents: List<WeekViewEvent<T>>? = null
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
     var nextPeriodEvents: List<WeekViewEvent<T>>? = null
@@ -13,7 +17,7 @@ internal class EventCache<T> {
     val hasEvents: Boolean
         get() = fetchedRange != null
 
-    fun covers(fetchRange: FetchRange): Boolean {
+    operator fun contains(fetchRange: FetchRange): Boolean {
         return fetchedRange?.let {
             it.previous == fetchRange.previous &&
                 it.current == fetchRange.current &&
@@ -21,14 +25,32 @@ internal class EventCache<T> {
         } ?: false
     }
 
-    fun getAllDayEventsInRange(dateRange: List<Calendar>): List<WeekViewEvent<T>> {
-        val events = previousPeriodEvents.orEmpty() +
-            currentPeriodEvents.orEmpty() + nextPeriodEvents.orEmpty()
-        val results = mutableListOf<WeekViewEvent<T>>()
-        for (date in dateRange) {
-            results += events.filter { it.isAllDay && it.isSameDay(date) }
+    operator fun get(
+        dateRange: List<Calendar>
+    ) = allEvents.filter { dateRange.contains(it.startTime.atStartOfDay) }
+
+    operator fun get(
+        period: Period
+    ): List<WeekViewEvent<T>>? {
+        val range = checkNotNull(fetchedRange)
+        return when (period) {
+            range.previous -> previousPeriodEvents
+            range.current -> currentPeriodEvents
+            range.next -> nextPeriodEvents
+            else -> throw IllegalStateException("Requesting events for invalid period $period")
         }
-        return results
+    }
+
+    operator fun set(
+        period: Period,
+        events: List<WeekViewEvent<T>>
+    ) {
+        val range = checkNotNull(fetchedRange)
+        when (period) {
+            range.previous -> previousPeriodEvents = events
+            range.current -> currentPeriodEvents = events
+            range.next -> nextPeriodEvents = events
+        }
     }
 
     fun clear() {
@@ -36,17 +58,5 @@ internal class EventCache<T> {
         currentPeriodEvents = null
         nextPeriodEvents = null
         fetchedRange = null
-    }
-
-    fun update(
-        previousPeriodEvents: List<WeekViewEvent<T>>,
-        currentPeriodEvents: List<WeekViewEvent<T>>,
-        nextPeriodEvents: List<WeekViewEvent<T>>,
-        fetchedRange: FetchRange
-    ) {
-        this.previousPeriodEvents = previousPeriodEvents
-        this.currentPeriodEvents = currentPeriodEvents
-        this.nextPeriodEvents = nextPeriodEvents
-        this.fetchedRange = fetchedRange
     }
 }

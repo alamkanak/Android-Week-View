@@ -8,32 +8,29 @@ internal class EventChipCache<T> {
     val allEventChips: List<EventChip<T>>
         get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
 
-    private val normalEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
-    private val allDayEventChipsByDate = ArrayMap<Calendar, MutableList<EventChip<T>>>()
+    private val normalEventChipsByDate = ArrayMap<Long, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ArrayMap<Long, MutableList<EventChip<T>>>()
 
     fun groupedByDate(): Map<Calendar, List<EventChip<T>>> {
         return allEventChips.groupBy { it.event.startTime.atStartOfDay }
     }
 
     fun normalEventChipsByDate(date: Calendar): List<EventChip<T>> {
-        return normalEventChipsByDate[date.atStartOfDay].orEmpty()
+        return normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
     }
 
     fun allDayEventChipsByDate(date: Calendar): List<EventChip<T>> {
-        return allDayEventChipsByDate[date.atStartOfDay].orEmpty()
+        return allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
     }
 
     private fun put(newChips: List<EventChip<T>>) {
-        val (allDay, normal) = newChips.partition { it.event.isAllDay }
-
-        normal.forEach {
-            val key = it.event.startTime.atStartOfDay
-            normalEventChipsByDate.add(key, it)
-        }
-
-        allDay.forEach {
-            val key = it.event.startTime.atStartOfDay
-            allDayEventChipsByDate.add(key, it)
+        for (eventChip in newChips) {
+            val key = eventChip.event.startTime.atStartOfDay.timeInMillis
+            if (eventChip.event.isAllDay) {
+                allDayEventChipsByDate.addOrReplace(key, eventChip)
+            } else {
+                normalEventChipsByDate.addOrReplace(key, eventChip)
+            }
         }
     }
 
@@ -46,26 +43,5 @@ internal class EventChipCache<T> {
     fun clear() {
         allDayEventChipsByDate.clear()
         normalEventChipsByDate.clear()
-    }
-
-    private fun ArrayMap<Calendar, MutableList<EventChip<T>>>.add(
-        key: Calendar,
-        eventChip: EventChip<T>
-    ) {
-        val results = getOrElse(key) { mutableListOf() }
-        val indexOfExisting = results.indexOfFirst { it.event.id == eventChip.event.id }
-        if (indexOfExisting != -1) {
-            // If an event with the same ID already exists, replace it. The new event will likely be
-            // more up-to-date.
-            results.replace(indexOfExisting, eventChip)
-        } else {
-            results.add(eventChip)
-        }
-        this[key] = results
-    }
-
-    private fun <T> MutableList<T>.replace(index: Int, element: T) {
-        removeAt(index)
-        add(index, element)
     }
 }

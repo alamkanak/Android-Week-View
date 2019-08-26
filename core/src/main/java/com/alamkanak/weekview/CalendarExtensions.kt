@@ -56,6 +56,18 @@ internal fun Calendar.isBefore(other: Calendar) = timeInMillis < other.timeInMil
 
 internal fun Calendar.isAfter(other: Calendar) = timeInMillis > other.timeInMillis
 
+internal fun Calendar.isBetween(
+    lhs: Calendar,
+    rhs: Calendar,
+    inclusive: Boolean = false
+): Boolean {
+    return if (inclusive) {
+        timeInMillis >= lhs.timeInMillis && timeInMillis <= rhs.timeInMillis
+    } else {
+        timeInMillis > lhs.timeInMillis && timeInMillis < rhs.timeInMillis
+    }
+}
+
 internal val Calendar.isBeforeToday: Boolean
     get() = isBefore(today())
 
@@ -68,11 +80,21 @@ internal val Calendar.lengthOfMonth: Int
     get() = getActualMaximum(Calendar.DAY_OF_MONTH)
 
 internal fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
-    return withHour(hour).withMinutes(0).withSeconds(0).withMillis(0)
+    return copy().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
 }
 
 internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
-    return withHour(hour - 1).withMinutes(59).withSeconds(59).withMillis(999)
+    return copy().apply {
+        set(Calendar.HOUR_OF_DAY, hour - 1)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }
 }
 
 internal val Calendar.atStartOfDay: Calendar
@@ -94,9 +116,10 @@ internal fun now() = Calendar.getInstance()
 internal fun Calendar.isSameDate(other: Calendar): Boolean = toEpochDays() == other.toEpochDays()
 
 internal fun firstDayOfYear(): Calendar {
-    return today()
-        .withMonth(Calendar.JANUARY)
-        .withDayOfMonth(1)
+    return today().apply {
+        set(Calendar.MONTH, Calendar.JANUARY)
+        set(Calendar.DAY_OF_MONTH, 1)
+    }
 }
 
 internal fun getDateRange(start: Int, end: Int): List<Calendar> {
@@ -119,7 +142,12 @@ internal fun Calendar.withDayOfMonth(day: Int): Calendar {
 }
 
 internal fun Calendar.withTime(hour: Int, minutes: Int): Calendar {
-    return withHour(hour).withMinutes(minutes).withSeconds(0).withMillis(0)
+    return copy().apply {
+        set(Calendar.HOUR_OF_DAY, hour)
+        set(Calendar.MINUTE, minutes)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
 }
 
 internal fun Calendar.withHour(hour: Int): Calendar {
@@ -128,14 +156,6 @@ internal fun Calendar.withHour(hour: Int): Calendar {
 
 internal fun Calendar.withMinutes(minute: Int): Calendar {
     return copy().apply { set(Calendar.MINUTE, minute) }
-}
-
-internal fun Calendar.withSeconds(seconds: Int): Calendar {
-    return copy().apply { set(Calendar.SECOND, seconds) }
-}
-
-internal fun Calendar.withMillis(millis: Int): Calendar {
-    return copy().apply { set(Calendar.MILLISECOND, millis) }
 }
 
 internal fun Calendar.copy(): Calendar = clone() as Calendar
