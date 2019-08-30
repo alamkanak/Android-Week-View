@@ -39,8 +39,9 @@ internal class EventsLoader<T>(
         val fetchPeriods = FetchRange.create(firstVisibleDay)
 
         return if (hasNoEvents || shouldRefreshEvents || fetchPeriods !in cache) {
-            shouldRefreshEvents = false
-            loadEvents(fetchPeriods)
+            loadEvents(fetchPeriods).also {
+                shouldRefreshEvents = false
+            }
         } else {
             cache.allEvents
         }
