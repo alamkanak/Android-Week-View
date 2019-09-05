@@ -591,16 +591,24 @@ internal class WeekViewConfigWrapper(
     ): Int = date.dayOfWeek - firstDayOfWeek
 
     private fun refreshAfterZooming() {
-        if (newHourHeight > 0 && !showCompleteDay) {
+        if (showCompleteDay) {
+            return
+        }
+
+        val height = view.height
+        val dayHeight = hourHeight * hoursPerDay
+
+        val isNotFillingEntireHeight = dayHeight < height
+        val didZoom = newHourHeight > 0
+
+        if (isNotFillingEntireHeight || didZoom) {
             newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
             newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
 
-            // potentialMinHourHeight
-            // the minimal height of an hour when zoomed completely out
-            // needed to suppress the zooming below 24:00
-            val height = view.height
-            val potentialMinHourHeight = (height - headerHeight) / hoursPerDay
-            newHourHeight = max(newHourHeight, potentialMinHourHeight)
+            // Compute a minimum hour height so that users can't zoom out further
+            // than the desired hours per day
+            val minHourHeight = (height - headerHeight) / hoursPerDay
+            newHourHeight = max(newHourHeight, minHourHeight)
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
             hourHeight = newHourHeight
