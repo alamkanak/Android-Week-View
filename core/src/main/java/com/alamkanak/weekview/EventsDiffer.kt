@@ -1,7 +1,17 @@
 package com.alamkanak.weekview
 
+import android.os.Handler
+import android.os.Looper
 import java.util.Calendar
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+
+class MainExecutor : Executor {
+    private val handler = Handler(Looper.getMainLooper())
+    override fun execute(runnable: Runnable) {
+        handler.post(runnable)
+    }
+}
 
 /**
  * A helper class that caches the submitted [WeekViewEvent]s and creates [EventChip]s on a
@@ -12,7 +22,8 @@ internal class EventsDiffer<T>(
     private val eventChipsLoader: EventChipsLoader<T>
 ) {
 
-    private val executor = Executors.newSingleThreadExecutor()
+    private val backgroundExecutor = Executors.newSingleThreadExecutor()
+    private val mainThreadExecutor = MainExecutor()
 
     /**
      * Updates the [EventsCache] with the provided [WeekViewDisplayable]s and creates [EventChip]s.
@@ -26,9 +37,11 @@ internal class EventsDiffer<T>(
         dateRange: List<Calendar>,
         onFinished: (Boolean) -> Unit
     ) {
-        executor.execute {
+        backgroundExecutor.execute {
             val result = submitItems(items, dateRange)
-            onFinished(result)
+            mainThreadExecutor.execute {
+                onFinished(result)
+            }
         }
     }
 
