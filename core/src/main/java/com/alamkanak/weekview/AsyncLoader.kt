@@ -10,7 +10,7 @@ import java.util.Calendar
  * provides a [submit] method.
  */
 internal class AsyncLoader<T>(
-    private val eventCache: EventCache<T>,
+    private val eventsCache: EventsCache<T>,
     private val eventChipsLoader: EventChipsLoader<T>
 ) : OnMonthChangeListener<T> {
 
@@ -44,8 +44,8 @@ internal class AsyncLoader<T>(
             // If these are null, this would indicate that the submitted list of events is empty.
             // The new items are empty, but it's possible that WeekView is currently displaying
             // events.
-            val currentEvents = eventCache[dateRange]
-            eventCache.clear()
+            val currentEvents = eventsCache[dateRange]
+            eventsCache.clear()
             return currentEvents.isNotEmpty()
         }
 
@@ -55,7 +55,7 @@ internal class AsyncLoader<T>(
             // If no OnLoadMoreListener is set, the consumer of the library is not using paged event
             // loading. Therefore, we clear the event cache before adding the new events. Otherwise,
             // we would simply add the submitted events to the events already in the cache.
-            eventCache.clear()
+            eventsCache.clear()
         }
 
         updateEventsCache(eventsByPeriod)
@@ -69,16 +69,16 @@ internal class AsyncLoader<T>(
     ) = events.groupBy { Period.fromDate(it.startTime) }
 
     private fun updateEventsCache(eventsByPeriod: Map<Period, List<WeekViewEvent<T>>>) {
-        val periods = eventsByPeriod.keys.sorted()
-        eventCache.fetchedRange = when (periods.size) {
+        /*val periods = eventsByPeriod.keys.sorted()
+        eventsCache.fetchedRange = when (periods.size) {
             3 -> FetchRange.fromList(periods)
             1 -> FetchRange.create(periods.single())
             else -> throw IllegalStateException("AsyncLoader attempted to cache " +
                 "${periods.size} periods, which should not be possible.")
-        }
+        }*/
 
         for ((period, events) in eventsByPeriod) {
-            eventCache[period] = events
+            eventsCache[period] = events
         }
     }
 

@@ -2,11 +2,9 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
-internal class EventCache<T> {
+internal class EventsCache<T> {
 
-    val allEvents: List<WeekViewEvent<T>>
-        get() = previousPeriodEvents.orEmpty() +
-            currentPeriodEvents.orEmpty() + nextPeriodEvents.orEmpty()
+    var allEvents: MutableSet<WeekViewEvent<T>>? = null
 
     var previousPeriodEvents: List<WeekViewEvent<T>>? = null
     var currentPeriodEvents: List<WeekViewEvent<T>>? = null
@@ -14,8 +12,8 @@ internal class EventCache<T> {
 
     var fetchedRange: FetchRange? = null
 
-    val hasEvents: Boolean
-        get() = fetchedRange != null
+    val isEmpty: Boolean
+        get() = allEvents == null
 
     operator fun contains(fetchRange: FetchRange): Boolean {
         return fetchedRange?.let {
@@ -27,7 +25,7 @@ internal class EventCache<T> {
 
     operator fun get(
         dateRange: List<Calendar>
-    ) = allEvents.filter { dateRange.contains(it.startTime.atStartOfDay) }
+    ) = allEvents.orEmpty().filter { dateRange.contains(it.startTime.atStartOfDay) }
 
     operator fun get(
         period: Period
@@ -45,15 +43,22 @@ internal class EventCache<T> {
         period: Period,
         events: List<WeekViewEvent<T>>
     ) {
-        val range = checkNotNull(fetchedRange)
-        when (period) {
-            range.previous -> previousPeriodEvents = events
-            range.current -> currentPeriodEvents = events
-            range.next -> nextPeriodEvents = events
+        fetchedRange?.let { range ->
+            when (period) {
+                range.previous -> previousPeriodEvents = events
+                range.current -> currentPeriodEvents = events
+                range.next -> nextPeriodEvents = events
+            }
         }
+
+        if (allEvents == null) {
+            allEvents = mutableSetOf()
+        }
+        allEvents?.addAll(events)
     }
 
     fun clear() {
+        allEvents = null
         previousPeriodEvents = null
         currentPeriodEvents = null
         nextPeriodEvents = null

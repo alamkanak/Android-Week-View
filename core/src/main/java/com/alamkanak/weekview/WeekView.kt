@@ -32,7 +32,7 @@ class WeekView<T> @JvmOverloads constructor(
     }
 
     private val cache = WeekViewCache<T>()
-    private val eventCache = EventCache<T>()
+    private val eventCache = EventsCache<T>()
     private val eventChipCache = EventChipCache<T>()
 
     private val viewState = WeekViewViewState(configWrapper, this)

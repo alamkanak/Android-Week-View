@@ -13,7 +13,7 @@ private fun <T> EventsTriple<T>.shiftRight(): EventsTriple<T> = EventsTriple(nul
  * displayed month changes. Asynchronous event loading can be performed via [AsyncLoader].
  */
 internal class EventsLoader<T>(
-    private val cache: EventCache<T>
+    private val cache: EventsCache<T>
 ) {
 
     var shouldRefreshEvents: Boolean = false
@@ -29,26 +29,25 @@ internal class EventsLoader<T>(
      */
     fun loadEventsIfNecessary(firstVisibleDate: Calendar?): List<WeekViewEvent<T>>? {
         if (onMonthChangeListener == null) {
-            // No OnMonthChangeListener is set. This is possible if WeekView.setOnLoadMoreListener()
+            // No OnMonthChangeListener is set. This is possible if an OnLoadMoreListener
             // is used instead of an OnMonthChangeListener.
-            return cache.allEvents
+            return cache.allEvents.orEmpty().toList()
         }
 
-        val hasNoEvents = cache.hasEvents.not()
+        val hasNoEvents = cache.isEmpty
         val firstVisibleDay = checkNotNull(firstVisibleDate)
         val fetchPeriods = FetchRange.create(firstVisibleDay)
 
         return if (hasNoEvents || shouldRefreshEvents || fetchPeriods !in cache) {
-            loadEvents(fetchPeriods).also {
-                shouldRefreshEvents = false
-            }
+            loadEvents(fetchPeriods)
         } else {
-            cache.allEvents
+            cache.allEvents.orEmpty().toList()
         }
     }
 
     private fun loadEvents(fetchRange: FetchRange): List<WeekViewEvent<T>> {
         if (shouldRefreshEvents) {
+            shouldRefreshEvents = false
             cache.clear()
         }
 

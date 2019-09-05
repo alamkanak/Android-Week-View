@@ -12,7 +12,7 @@ internal class AllDayEventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
-    private val eventCache: EventCache<T>,
+    private val eventsCache: EventsCache<T>,
     private val chipCache: EventChipCache<T>
 ) : Updater {
 
@@ -24,7 +24,7 @@ internal class AllDayEventsUpdater<T>(
 
     override fun isRequired(drawingContext: DrawingContext): Boolean {
         val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-        val allDayEvents = eventCache[drawingContext.dateRange].filter { it.isAllDay }
+        val allDayEvents = eventsCache[drawingContext.dateRange].filter { it.isAllDay }
         val allDayEventIds = allDayEvents.map { it.id }.toSet()
         val didEventsChange = allDayEventIds != previousAllDayEventIds
 

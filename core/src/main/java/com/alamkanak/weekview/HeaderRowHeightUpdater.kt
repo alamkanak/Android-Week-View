@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 internal class HeaderRowHeightUpdater<T>(
     private val config: WeekViewConfigWrapper,
-    private val cache: EventCache<T>
+    private val cache: EventsCache<T>
 ) : Updater {
 
     private var previousHorizontalOrigin: Float? = null
