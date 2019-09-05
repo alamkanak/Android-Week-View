@@ -45,12 +45,8 @@ internal abstract class EventsLoader<T> {
      * Called whenever [WeekView] is drawn to the screen.
      *
      * @param firstVisibleDate The first date that is currently visible
-     * @param onRefreshComplete Callback to provide the loaded [WeekViewEvent]s back to the caller
      */
-    abstract fun refresh(
-        firstVisibleDate: Calendar,
-        onRefreshComplete: (List<WeekViewEvent<T>>) -> Unit
-    )
+    abstract fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>>
 
     /**
      * Instructs an [EventsLoader] that it should reload events when called the next time.
@@ -71,13 +67,9 @@ internal class CachingEventsLoader<T>(
     private val simpleCache: SimpleEventsCache<T>
         get() = cacheWrapper.get() as SimpleEventsCache<T>
 
-    override fun refresh(
-        firstVisibleDate: Calendar,
-        onRefreshComplete: (List<WeekViewEvent<T>>) -> Unit
-    ) {
+    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
-        val eventsInRange = simpleCache[fetchRange]
-        onRefreshComplete(eventsInRange)
+        return simpleCache[fetchRange]
     }
 }
 
@@ -95,19 +87,16 @@ internal class PagedEventsLoader<T>(
     private val pagedCache: PagedEventsCache<T>
         get() = cacheWrapper.get() as PagedEventsCache<T>
 
-    override fun refresh(
-        firstVisibleDate: Calendar,
-        onRefreshComplete: (List<WeekViewEvent<T>>) -> Unit
-    ) {
+    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
         val needsRefresh = pagedCache.isEmpty || shouldRefreshEvents || fetchRange !in pagedCache
 
         if (needsRefresh) {
             val periods = determinePeriodsToFetch(fetchRange)
             fetchPeriods(periods)
-        } else {
-            onRefreshComplete(pagedCache.allEvents)
         }
+
+        return pagedCache.allEvents
     }
 
     private fun determinePeriodsToFetch(
@@ -135,20 +124,17 @@ internal class LegacyEventsLoader<T>(
     private val pagedCache: PagedEventsCache<T>
         get() = cacheWrapper.get() as PagedEventsCache<T>
 
-    override fun refresh(
-        firstVisibleDate: Calendar,
-        onRefreshComplete: (List<WeekViewEvent<T>>) -> Unit
-    ) {
+    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
         val needsRefresh = pagedCache.isEmpty || shouldRefreshEvents || fetchRange !in pagedCache
 
-        if (needsRefresh) {
+        return if (needsRefresh) {
             prepareCache(fetchRange)
             val periods = determinePeriodsToFetch(fetchRange)
             val events = fetchPeriods(periods)
-            onRefreshComplete(events)
+            events
         } else {
-            onRefreshComplete(pagedCache.allEvents)
+            pagedCache.allEvents
         }
     }
 

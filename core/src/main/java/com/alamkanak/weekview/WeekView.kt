@@ -94,14 +94,14 @@ class WeekView<T> @JvmOverloads constructor(
         }
 
         val firstVisibleDate = checkNotNull(viewState.firstVisibleDate)
-        eventsLoader.refresh(firstVisibleDate) { events ->
-            // This can either be newly loaded events or previously cached events
-            if (events.isNullOrEmpty()) {
-                eventChipCache.clear()
-            } else {
-                eventChipsLoader.createAndCacheEventChips(events)
-                eventChipsExpander.calculateEventChipPositions()
-            }
+        val events = eventsLoader.refresh(firstVisibleDate)
+
+        // These can either be newly loaded events or previously cached events
+        if (events.isNullOrEmpty()) {
+            eventChipCache.clear()
+        } else {
+            eventChipsLoader.createAndCacheEventChips(events)
+            eventChipsExpander.calculateEventChipPositions()
         }
     }
 
