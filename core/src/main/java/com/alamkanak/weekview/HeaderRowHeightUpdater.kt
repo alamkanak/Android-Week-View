@@ -2,23 +2,28 @@ package com.alamkanak.weekview
 
 internal class HeaderRowHeightUpdater<T>(
     private val config: WeekViewConfigWrapper,
-    private val cache: EventsCache<T>
+    private val eventsCacheWrapper: EventsCacheWrapper<T>
 ) : Updater {
 
     private var previousHorizontalOrigin: Float? = null
     private val previousAllDayEventIds = mutableSetOf<Long>()
 
+    private val eventsCache: EventsCache<T>
+        get() = eventsCacheWrapper.get()
+
     override fun isRequired(drawingContext: DrawingContext): Boolean {
         val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
         val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
         val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
-        val allDayEvents = cache[drawingContext.dateRange].filter { it.isAllDay }
-        val allDayEventIds = allDayEvents.map { it.id }.toSet()
-        val didEventsChange = allDayEventIds != previousAllDayEventIds
+        val allDayEvents = eventsCache[drawingContext.dateRange]
+            .filter { it.isAllDay }
+            .map { it.id }
+            .toSet()
+        val didEventsChange = allDayEvents.hashCode() != previousAllDayEventIds.hashCode()
 
         return (didScrollHorizontally || didTimeColumnChange || didEventsChange).also {
             previousAllDayEventIds.clear()
-            previousAllDayEventIds += allDayEventIds
+            previousAllDayEventIds += allDayEvents
         }
     }
 
@@ -30,7 +35,7 @@ internal class HeaderRowHeightUpdater<T>(
 
     private fun refreshHeaderHeight(drawingContext: DrawingContext) {
         val dateRange = drawingContext.dateRange
-        val visibleEvents = cache[dateRange].filter { it.isAllDay }
+        val visibleEvents = eventsCache[dateRange].filter { it.isAllDay }
         config.hasEventInHeader = visibleEvents.isNotEmpty()
         config.refreshHeaderHeight()
     }

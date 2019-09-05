@@ -8,14 +8,11 @@ internal data class FetchRange(
     val next: Period
 ) {
 
-    val periods: List<Period>
-        get() = listOf(previous, current, next)
+    val periods: List<Period> = listOf(previous, current, next)
+
+    fun isEqual(other: FetchRange) = this == other
 
     internal companion object {
-
-        fun fromList(periods: List<Period>) = FetchRange(periods[0], periods[1], periods[2])
-
-        fun create(period: Period): FetchRange = FetchRange(period.previous, period, period.next)
 
         fun create(firstVisibleDay: Calendar): FetchRange {
             val current = Period.fromDate(firstVisibleDay)
@@ -42,6 +39,12 @@ internal data class Period(
             val month = if (month == Calendar.DECEMBER) Calendar.JANUARY else month + 1
             return Period(month, year)
         }
+
+    val startDate: Calendar
+        get() = today().withYear(year).withMonth(month).withDayOfMonth(1)
+
+    val endDate: Calendar
+        get() = today().withYear(year).withMonth(month).withDayOfMonth(today().lengthOfMonth)
 
     override fun compareTo(other: Period): Int {
         return when {
