@@ -8,12 +8,28 @@
     app:cardCornerRadius="8dp"
     app:contentPadding="@dimen/default_space">
 
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:textSize="16sp"
-        tools:text="Lorem ipsum" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            tools:text="Lorem ipsum" />
+
+        <TextView
+            android:id="@+id/details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:lineSpacingMultiplier="1.1"
+            android:textSize="15sp"
+            tools:text="Lorem ipsum\nDolor sit amet" />
+
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

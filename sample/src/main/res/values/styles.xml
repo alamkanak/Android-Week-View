@@ -1,20 +1,14 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/toolbar</item>
         <item name="colorPrimaryDark">#BBB</item>
+        <item name="android:windowBackground">@android:color/white</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColorPrimary">@color/toolbar_text</item>
         <item name="actionMenuTextColor">@color/toolbar_text</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="colorControlActivated">@color/accent</item>
-    </style>
-
-    <style name="Button">
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:gravity">left|center_vertical</item>
-        <item name="android:padding">@dimen/default_space</item>
-        <item name="android:textAllCaps">false</item>
     </style>
 
 </resources>

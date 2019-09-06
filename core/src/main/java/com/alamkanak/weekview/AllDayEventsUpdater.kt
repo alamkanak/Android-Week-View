@@ -67,13 +67,13 @@ internal class AllDayEventsUpdater<T>(
         startPixel: Float
     ): StaticLayout? {
         val chipRect = rectCalculator.calculateAllDayEvent(eventChip, startPixel)
-        if (chipRect.isValidAllDayEventRect) {
+        return if (chipRect.isValidAllDayEventRect) {
             eventChip.rect = chipRect
-            return calculateChipTextLayout(eventChip)
+            calculateChipTextLayout(eventChip)
         } else {
             eventChip.rect = null
+            null
         }
-        return null
     }
 
     private fun calculateChipTextLayout(

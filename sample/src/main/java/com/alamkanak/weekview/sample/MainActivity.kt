@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alamkanak.weekview.sample.util.EqualSpacingItemDecoration
 import kotlinx.android.synthetic.main.activity_main.recyclerView
+import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
@@ -13,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = SamplesAdapter(SAMPLES, this::onItemClick)
@@ -28,13 +30,13 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         private val SAMPLES = listOf(
-            Sample(R.string.title_activity_basic, BasicActivity::class.java),
-            Sample(R.string.title_activity_static, StaticActivity::class.java),
-            Sample(R.string.title_activity_constraint, ConstraintActivity::class.java),
-            Sample(R.string.title_activity_limited, LimitedActivity::class.java),
-            Sample(R.string.title_activity_custom_font, CustomFontActivity::class.java),
-            Sample(R.string.title_activity_asynchronous, AsyncActivity::class.java),
-            Sample(R.string.title_activity_with_fragment, WithFragmentActivity::class.java)
+            Sample(R.string.title_activity_basic, "Asynchronous events fetching\nThreeTenABP extension", BasicActivity::class.java),
+            Sample(R.string.title_activity_static, "Static week without horizontal scrolling", StaticActivity::class.java),
+            Sample(R.string.title_activity_limited, "Shows only the current month\nLimits days from 8AM to 8PM", LimitedActivity::class.java),
+            Sample(R.string.title_activity_custom_font, "Custom font in WeekView", CustomFontActivity::class.java),
+            Sample(R.string.title_activity_asynchronous, "Asynchronous events fetching from an API", AsyncActivity::class.java),
+            Sample(R.string.title_activity_with_fragment, "Displays WeekView within a Fragment", WithFragmentActivity::class.java),
+            Sample(R.string.title_activity_legacy, "Implemented in Java\nUses synchronous events fetching", LegacyActivity::class.java)
         )
     }
 }

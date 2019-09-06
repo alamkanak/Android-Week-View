@@ -40,7 +40,6 @@ internal class EventsCacheWrapper<T> {
 internal abstract class EventsCache<T> {
 
     abstract val allEvents: List<WeekViewEvent<T>>
-    abstract val isEmpty: Boolean
     abstract fun clear()
 
     operator fun get(
@@ -69,9 +68,6 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
     override val allEvents: List<WeekViewEvent<T>>
         get() = _allEvents.orEmpty()
 
-    override val isEmpty: Boolean
-        get() = _allEvents.isNullOrEmpty()
-
     fun update(events: List<WeekViewEvent<T>>) {
         _allEvents = events
     }
@@ -97,12 +93,9 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
     private var nextPeriodEvents: List<WeekViewEvent<T>>? = null
     private var fetchedRange: FetchRange? = null
 
-    override val isEmpty: Boolean
-        get() = fetchedRange == null
+    operator fun contains(period: Period) = fetchedRange?.periods?.contains(period) ?: false
 
-    operator fun contains(fetchRange: FetchRange): Boolean {
-        return fetchedRange?.isEqual(fetchRange) ?: false
-    }
+    operator fun contains(fetchRange: FetchRange) = fetchedRange?.isEqual(fetchRange) ?: false
 
     override fun get(period: Period): List<WeekViewEvent<T>>? {
         val range = checkNotNull(fetchedRange)

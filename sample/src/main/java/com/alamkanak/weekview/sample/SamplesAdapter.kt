@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.list_item_sample.view.text
+import kotlinx.android.synthetic.main.list_item_sample.view.details
+import kotlinx.android.synthetic.main.list_item_sample.view.title
 
 data class Sample(
     val labelResId: Int,
+    val details: String,
     val activity: Class<out AppCompatActivity>
 )
 
@@ -31,7 +33,8 @@ class SamplesAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(sample: Sample, onClick: (Sample) -> Unit) = with(itemView) {
-            text.text = context.getString(sample.labelResId)
+            title.text = context.getString(sample.labelResId)
+            details.text = sample.details
             setOnClickListener { onClick(sample) }
         }
     }

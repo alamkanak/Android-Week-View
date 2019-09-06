@@ -2,6 +2,7 @@ package com.alamkanak.weekview.threetenabp
 
 import com.alamkanak.weekview.OnEmptyViewClickListener
 import com.alamkanak.weekview.OnEmptyViewLongClickListener
+import com.alamkanak.weekview.OnLoadMoreListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
@@ -32,6 +33,17 @@ fun <T> WeekView<T>.setOnMonthChangeListener(
         ): List<WeekViewDisplayable<T>> {
             return block(startDate.toLocalDate(), endDate.toLocalDate())
         }
+    }
+}
+
+fun <T> WeekView<T>.setOnLoadMoreListener(
+    block: (startDate: LocalDate, endDate: LocalDate) -> Unit
+) {
+    onLoadMoreListener = object : OnLoadMoreListener {
+        override fun onLoadMore(
+            startDate: Calendar,
+            endDate: Calendar
+        ) = block(startDate.toLocalDate(), endDate.toLocalDate())
     }
 }
 

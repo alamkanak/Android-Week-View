@@ -89,19 +89,31 @@ internal class PagedEventsLoader<T>(
 
     override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
-        val needsRefresh = pagedCache.isEmpty || shouldRefreshEvents || fetchRange !in pagedCache
+        val needsRefresh = shouldRefreshEvents || fetchRange !in pagedCache
 
         if (needsRefresh) {
             val periods = determinePeriodsToFetch(fetchRange)
+            prepareCache(fetchRange)
             fetchPeriods(periods)
         }
+
+        // TODO AdjustToFetchedRange() needed?
 
         return pagedCache.allEvents
     }
 
+    private fun prepareCache(fetchRange: FetchRange) {
+        if (shouldRefreshEvents) {
+            shouldRefreshEvents = false
+            pagedCache.clear()
+        }
+
+        pagedCache.adjustToFetchRange(fetchRange)
+    }
+
     private fun determinePeriodsToFetch(
         fetchRange: FetchRange
-    ) = fetchRange.periods.filter { pagedCache[it] == null }
+    ) = fetchRange.periods.filter { it !in pagedCache }
 
     private fun fetchPeriods(periods: List<Period>) {
         periods.forEach { period ->
@@ -126,7 +138,7 @@ internal class LegacyEventsLoader<T>(
 
     override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
-        val needsRefresh = pagedCache.isEmpty || shouldRefreshEvents || fetchRange !in pagedCache
+        val needsRefresh = shouldRefreshEvents || fetchRange !in pagedCache
 
         return if (needsRefresh) {
             prepareCache(fetchRange)

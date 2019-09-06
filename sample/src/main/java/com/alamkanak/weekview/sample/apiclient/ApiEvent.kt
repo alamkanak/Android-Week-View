@@ -17,7 +17,7 @@ import java.util.Locale
 data class ApiEvent(
     @Expose
     @SerializedName("name")
-    var name: String,
+    var title: String,
     @Expose
     @SerializedName("dayOfMonth")
     var dayOfMonth: Int,
@@ -33,7 +33,8 @@ data class ApiEvent(
 ) : WeekViewDisplayable<ApiEvent> {
 
     override fun toWeekViewEvent(): WeekViewEvent<ApiEvent> {
-        val id = name.split(" ").last().toLong()
+        // Titles have the format "Event 123"
+        val id = title.split(" ").last().toLong()
 
         val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
         val start = checkNotNull(sdf.parse(startTime))
@@ -54,14 +55,13 @@ data class ApiEvent(
         endTime.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH))
 
         val color = Color.parseColor(color)
-
         val style = WeekViewEvent.Style.Builder()
             .setBackgroundColor(color)
             .build()
 
-        return WeekViewEvent.Builder<ApiEvent>(this)
+        return WeekViewEvent.Builder(this)
             .setId(id)
-            .setTitle(name)
+            .setTitle(title)
             .setStartTime(startTime)
             .setEndTime(endTime)
             .setAllDay(false)

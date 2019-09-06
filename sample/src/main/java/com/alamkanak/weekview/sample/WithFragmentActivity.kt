@@ -1,22 +1,22 @@
 package com.alamkanak.weekview.sample
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.sample.apiclient.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.FakeEventsDatabase
+import com.alamkanak.weekview.sample.util.lazyView
+import com.alamkanak.weekview.sample.util.setupWithWeekView
+import com.google.android.material.appbar.MaterialToolbar
+import java.util.Calendar
 
-class WithFragmentActivity : AppCompatActivity() {
+class WithFragmentActivity : AppCompatActivity(R.layout.activity_with_fragment) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_with_fragment)
 
         if (savedInstanceState == null) {
             supportFragmentManager
@@ -25,36 +25,40 @@ class WithFragmentActivity : AppCompatActivity() {
                 .commit()
         }
     }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
 
-class WeekFragment : Fragment() {
+class WeekFragment : Fragment(R.layout.fragment_week) {
 
-    private val weekView: WeekView<Event> by lazy {
-        requireActivity().findViewById<WeekView<Event>>(R.id.weekView)
-    }
+    private val toolbar: MaterialToolbar by lazyView(R.id.toolbar)
+    private val weekView: WeekView<Event> by lazyView(R.id.weekView)
 
     private val database: EventsDatabase by lazy {
         FakeEventsDatabase(requireContext())
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_week, container, false)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        weekView.setOnMonthChangeListener(database::getEventsInRange)
+        toolbar.setupWithWeekView(weekView)
+
+        val start = getStartDate()
+        val end = getEndDate()
+
+        val events = database.getEventsInRange(start, end)
+        weekView.submit(events)
+
+        // Limit WeekView to the current month
+        weekView.minDate = start
+        weekView.maxDate = end
+    }
+
+    private fun getStartDate(): Calendar = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+    }
+
+    private fun getEndDate(): Calendar = Calendar.getInstance().apply {
+        val daysInMonth = getActualMaximum(Calendar.DAY_OF_MONTH)
+        set(Calendar.DAY_OF_MONTH, daysInMonth)
+        set(Calendar.HOUR_OF_DAY, 23)
     }
 
     companion object {

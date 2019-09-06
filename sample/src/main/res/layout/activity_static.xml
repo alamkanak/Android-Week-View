@@ -6,13 +6,15 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:orientation="vertical">
 
+    <include layout="@layout/view_toolbar" />
+
     <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal">
 
         <ImageView
-          android:id="@+id/left_arrow"
+          android:id="@+id/previousWeekButton"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"
@@ -21,7 +23,7 @@
           app:srcCompat="@drawable/ic_chevron_left_black_24dp"/>
 
         <TextView
-          android:id="@+id/dates"
+          android:id="@+id/dateRangeTextView"
           android:layout_width="0dp"
           android:layout_height="match_parent"
           android:layout_weight="5"
@@ -33,7 +35,7 @@
           tools:text="01/01/2018"/>
 
         <ImageView
-          android:id="@+id/right_arrow"
+          android:id="@+id/nextWeekButton"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"

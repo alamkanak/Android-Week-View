@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/toolbar</item>
         <item name="colorPrimaryDark">#BBB</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -14,4 +14,5 @@
         <item name="android:navigationBarDividerColor">#EEE</item>
         <item name="android:navigationBarColor">@android:color/white</item>
     </style>
+
 </resources>
