@@ -2,15 +2,6 @@ package com.alamkanak.weekview
 
 import androidx.collection.ArrayMap
 
-internal fun <T> ArrayMap<Period, MutableList<WeekViewEvent<T>>>.add(
-    key: Period,
-    event: WeekViewEvent<T>
-) {
-    val results = getOrElse(key) { mutableListOf() }
-    results.add(event)
-    this[key] = results
-}
-
 internal fun <T> ArrayMap<Long, MutableList<EventChip<T>>>.addOrReplace(
     key: Long,
     eventChip: EventChip<T>

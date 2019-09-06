@@ -55,8 +55,8 @@ internal class AllDayEventsUpdater<T>(
                 for (eventChip in eventChips) {
                     val layout = calculateLayoutForAllDayEvent(eventChip, modifiedStartPixel)
                     if (layout != null) {
-                        cache.allDayEventLayouts.add(Pair(eventChip, layout))
-                        previousAllDayEventIds.add(eventChip.event.id)
+                        cache.allDayEventLayouts[eventChip] = layout
+                        previousAllDayEventIds += eventChip.event.id
                     }
                 }
             }

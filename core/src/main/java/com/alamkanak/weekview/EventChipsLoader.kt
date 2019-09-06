@@ -18,5 +18,5 @@ internal class EventChipsLoader<T>(
 
     private fun convertEventToEventChips(
         event: WeekViewEvent<T>
-    ): List<EventChip<T>> = eventSplitter.split(event).map { EventChip(it, event, null) }
+    ): List<EventChip<T>> = eventSplitter.split(event).map { EventChip(it, event) }
 }

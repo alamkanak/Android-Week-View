@@ -20,12 +20,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Calendar.DAY_OF_MONTH
 
-/**
- * This is a base activity which contains week view and all the codes necessary to initialize the
- * week view.
- * Added Min and Max Date
- * Created by cs8898 on 2/11/2019.
- */
 class LimitedActivity : AppCompatActivity(), OnEventClickListener<Event>,
     OnMonthChangeListener<Event>, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {
 

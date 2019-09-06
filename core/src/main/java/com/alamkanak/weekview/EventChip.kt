@@ -22,12 +22,13 @@ internal data class EventChip<T>(
     /**
      * The original [WeekViewEvent], which may be a multi-day event.
      */
-    val originalEvent: WeekViewEvent<T>,
+    val originalEvent: WeekViewEvent<T>
+) {
+
     /**
      * The rectangle in which the [WeekViewEvent] will be drawn.
      */
-    var rect: RectF?
-) {
+    var rect: RectF? = null
 
     /**
      * The relative start position of the [EventChip].

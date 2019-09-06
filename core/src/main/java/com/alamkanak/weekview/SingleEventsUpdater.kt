@@ -33,7 +33,7 @@ internal class SingleEventsUpdater<T>(
         startPixel: Float
     ) {
         chipCache.normalEventChipsByDate(date)
-            .filter { it.event.isWithin(config.minHour, config.maxHour) }
+            .filter { it.event.isNotAllDay && it.event.isWithin(config.minHour, config.maxHour) }
             .forEach {
                 val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
                 if (chipRect.isValidSingleEventRect) {
