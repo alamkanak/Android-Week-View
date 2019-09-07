@@ -1,8 +1,8 @@
 package com.alamkanak.weekview
 
-import androidx.collection.ArrayMap
+import java.util.concurrent.ConcurrentHashMap
 
-internal fun <T> ArrayMap<Long, MutableList<EventChip<T>>>.addOrReplace(
+internal fun <T> ConcurrentHashMap<Long, MutableList<EventChip<T>>>.addOrReplace(
     key: Long,
     eventChip: EventChip<T>
 ) {
@@ -15,6 +15,7 @@ internal fun <T> ArrayMap<Long, MutableList<EventChip<T>>>.addOrReplace(
     } else {
         results.add(eventChip)
     }
+
     this[key] = results
 }
 

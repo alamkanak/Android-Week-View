@@ -1,15 +1,15 @@
 package com.alamkanak.weekview
 
-import androidx.collection.ArrayMap
 import java.util.Calendar
+import java.util.concurrent.ConcurrentHashMap
 
 internal class EventChipCache<T> {
 
     val allEventChips: List<EventChip<T>>
         get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
 
-    private val normalEventChipsByDate = ArrayMap<Long, MutableList<EventChip<T>>>()
-    private val allDayEventChipsByDate = ArrayMap<Long, MutableList<EventChip<T>>>()
+    private val normalEventChipsByDate = ConcurrentHashMap<Long, MutableList<EventChip<T>>>()
+    private val allDayEventChipsByDate = ConcurrentHashMap<Long, MutableList<EventChip<T>>>()
 
     fun groupedByDate(): Map<Calendar, List<EventChip<T>>> {
         return allEventChips.groupBy { it.event.startTime.atStartOfDay }
