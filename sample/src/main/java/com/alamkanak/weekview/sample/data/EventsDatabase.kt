@@ -22,6 +22,8 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         val newYear = startDate.get(Calendar.YEAR)
         val newMonth = startDate.get(Calendar.MONTH)
 
+        val idOffset = newYear + 10L * newMonth
+
         val color1 = ContextCompat.getColor(context, R.color.event_color_01)
         val color2 = ContextCompat.getColor(context, R.color.event_color_02)
         val color3 = ContextCompat.getColor(context, R.color.event_color_03)
@@ -39,7 +41,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = createEvent(1, startTime, endTime, color1, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 1, startTime, endTime, color1, isAllDay = false, isCanceled = false)
         events.add(event)
 
         // Add multi-day event
@@ -54,7 +56,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = createEvent(2, startTime, endTime, color4, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 2, startTime, endTime, color4, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -67,7 +69,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.MINUTE, 30)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = createEvent(3, startTime, endTime, color2, isAllDay = false, isCanceled = true)
+        event = createEvent(idOffset + 3, startTime, endTime, color2, isAllDay = false, isCanceled = true)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -79,7 +81,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.set(Calendar.HOUR_OF_DAY, 5)
         endTime.set(Calendar.MINUTE, 0)
 
-        event = createEvent(4, startTime, endTime, color3, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 4, startTime, endTime, color3, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -91,7 +93,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 2)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = createEvent(5, startTime, endTime, color2, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 5, startTime, endTime, color2, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -104,7 +106,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime.add(Calendar.HOUR_OF_DAY, 3)
         endTime.set(Calendar.MONTH, newMonth)
 
-        event = createEvent(6, startTime, endTime, color3, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 6, startTime, endTime, color3, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -116,7 +118,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = createEvent(7, startTime, endTime, color4, isAllDay = false, isCanceled = true)
+        event = createEvent(idOffset + 7, startTime, endTime, color4, isAllDay = false, isCanceled = true)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -128,7 +130,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = createEvent(8, startTime, endTime, color1, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 8, startTime, endTime, color1, isAllDay = false, isCanceled = false)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -140,7 +142,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 3)
 
-        event = createEvent(9, startTime, endTime, color2, isAllDay = false, isCanceled = false)
+        event = createEvent(idOffset + 9, startTime, endTime, color2, isAllDay = false, isCanceled = false)
         events.add(event)
 
         // All-day event
@@ -152,10 +154,10 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 23)
 
-        event = createEvent(10, startTime, endTime, color4, isAllDay = true, isCanceled = false)
+        event = createEvent(idOffset + 10, startTime, endTime, color4, isAllDay = true, isCanceled = false)
         events.add(event)
 
-        event = createEvent(11, startTime, endTime, color2, isAllDay = true, isCanceled = false)
+        event = createEvent(idOffset + 11, startTime, endTime, color2, isAllDay = true, isCanceled = false)
         events.add(event)
 
         // All-day event until 00:00 next days
@@ -170,7 +172,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         endTime = startTime.clone() as Calendar
         endTime.set(Calendar.DAY_OF_MONTH, 11)
 
-        event = createEvent(12, startTime, endTime, color1, isAllDay = true, isCanceled = false)
+        event = createEvent(idOffset + 12, startTime, endTime, color1, isAllDay = true, isCanceled = false)
         events.add(event)
 
         return events

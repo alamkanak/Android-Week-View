@@ -55,7 +55,7 @@ class WeekView<T> @JvmOverloads constructor(
     // depend on results of previous updaters
     private val updaters = listOf(
         MultiLineDayLabelHeightUpdater(configWrapper, cache),
-        AllDayEventsUpdater(this, configWrapper, cache, eventsCacheWrapper, eventChipCache),
+        AllDayEventsUpdater(this, configWrapper, cache, eventChipCache),
         HeaderRowHeightUpdater(configWrapper, eventsCacheWrapper),
         SingleEventsUpdater(this, configWrapper, eventChipCache)
     )

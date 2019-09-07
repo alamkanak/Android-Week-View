@@ -12,7 +12,6 @@ internal class AllDayEventsUpdater<T>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
-    private val eventsCacheWrapper: EventsCacheWrapper<T>,
     private val chipCache: EventChipCache<T>
 ) : Updater {
 
@@ -20,25 +19,15 @@ internal class AllDayEventsUpdater<T>(
     private val rectCalculator = EventChipRectCalculator<T>(config)
 
     private var previousHorizontalOrigin: Float? = null
-    private val previousAllDayEventIds = mutableSetOf<Long>()
-
-    private val eventsCache: EventsCache<T>
-        get() = eventsCacheWrapper.get()
 
     override fun isRequired(drawingContext: DrawingContext): Boolean {
         val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-        val allDayEvents = eventsCache[drawingContext.dateRange].filter { it.isAllDay }
-        val allDayEventIds = allDayEvents.map { it.id }.toSet()
-        val didEventsChange = allDayEventIds != previousAllDayEventIds
-
-        return (didScrollHorizontally || didEventsChange).also {
-            previousAllDayEventIds.clear()
-            previousAllDayEventIds += allDayEventIds
-        }
+        val dateRange = drawingContext.dateRange
+        val containsNewChips = chipCache.allDayEventChipsInDateRange(dateRange).any { it.rect == null }
+        return didScrollHorizontally || containsNewChips
     }
 
     override fun update(drawingContext: DrawingContext) {
-        previousHorizontalOrigin = config.currentOrigin.x
         config.setCurrentAllDayEventHeight(0)
         cache.clearAllDayEventLayouts()
 
@@ -53,16 +42,19 @@ internal class AllDayEventsUpdater<T>(
 
                 val eventChips = chipCache.allDayEventChipsByDate(date)
                 for (eventChip in eventChips) {
-                    val layout = calculateLayoutForAllDayEvent(eventChip, modifiedStartPixel)
-                    if (layout != null) {
-                        cache.allDayEventLayouts[eventChip] = layout
-                        previousAllDayEventIds += eventChip.event.id
-                    }
+                    calculateAndStoreTextLayout(eventChip, modifiedStartPixel)
                 }
             }
     }
 
-    private fun calculateLayoutForAllDayEvent(
+    private fun calculateAndStoreTextLayout(eventChip: EventChip<T>, startPixel: Float) {
+        val layout = calculateTextLayout(eventChip, startPixel)
+        if (layout != null) {
+            cache.allDayEventLayouts[eventChip] = layout
+        }
+    }
+
+    private fun calculateTextLayout(
         eventChip: EventChip<T>,
         startPixel: Float
     ): StaticLayout? {

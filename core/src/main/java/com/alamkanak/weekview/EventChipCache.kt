@@ -15,12 +15,22 @@ internal class EventChipCache<T> {
         return allEventChips.groupBy { it.event.startTime.atStartOfDay }
     }
 
-    fun normalEventChipsByDate(date: Calendar): List<EventChip<T>> {
-        return normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
-    }
+    fun normalEventChipsByDate(
+        date: Calendar
+    ): List<EventChip<T>> = normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
 
-    fun allDayEventChipsByDate(date: Calendar): List<EventChip<T>> {
-        return allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+    fun allDayEventChipsByDate(
+        date: Calendar
+    ): List<EventChip<T>> = allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+
+    fun allDayEventChipsInDateRange(
+        dateRange: List<Calendar>
+    ): List<EventChip<T>> {
+        val results = mutableListOf<EventChip<T>>()
+        for (date in dateRange) {
+            results += allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+        }
+        return results
     }
 
     private fun put(newChips: List<EventChip<T>>) {
