@@ -1,26 +1,13 @@
 package com.alamkanak.weekview
 
+import com.alamkanak.weekview.model.Event
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
-import java.util.Calendar
 
 class WeekViewEventSplitterTest {
-
-    private data class Event(
-        val startTime: Calendar,
-        val endTime: Calendar
-    ) : WeekViewDisplayable<Event> {
-
-        override fun toWeekViewEvent(): WeekViewEvent<Event> {
-            return WeekViewEvent.Builder(this)
-                .setStartTime(startTime)
-                .setEndTime(endTime)
-                .build()
-        }
-    }
 
     private val config = mock(WeekViewConfigWrapper::class.java)
     private val underTest = WeekViewEventSplitter<Event>(config)

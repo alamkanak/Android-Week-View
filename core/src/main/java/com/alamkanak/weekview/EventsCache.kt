@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import androidx.annotation.VisibleForTesting
 import java.util.Calendar
 
 /**
@@ -91,7 +92,9 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
     private var previousPeriodEvents: List<WeekViewEvent<T>>? = null
     private var currentPeriodEvents: List<WeekViewEvent<T>>? = null
     private var nextPeriodEvents: List<WeekViewEvent<T>>? = null
-    private var fetchedRange: FetchRange? = null
+
+    @VisibleForTesting
+    internal var fetchedRange: FetchRange? = null
 
     operator fun contains(period: Period) = fetchedRange?.periods?.contains(period) ?: false
 

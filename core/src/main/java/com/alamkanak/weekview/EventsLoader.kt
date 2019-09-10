@@ -13,7 +13,7 @@ internal class EventsLoaderWrapper<T>(
     private val pagedEventsLoader = PagedEventsLoader(cache)
     private val legacyEventsLoader = LegacyEventsLoader(cache)
 
-    private var currentEventsLoader: EventsLoader<T> = cachingEventsLoader
+    internal var currentEventsLoader: EventsLoader<T> = cachingEventsLoader
 
     fun get() = currentEventsLoader
 
