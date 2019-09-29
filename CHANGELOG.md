@@ -3,6 +3,7 @@ Changelog
 
 ## Versioon 4.0.0
 *(2019-09-29)*
+
 This release includes many new features and breaking changes.
 - New: Providing events to `WeekView` is now easier. Check out the [wiki](https://github.com/thellmund/Android-Week-View/wiki) to find out more.
 - New: You can use JodaTime, JSR-310, and ThreeTenABP with `WeekView`. Check out the [wiki](https://github.com/thellmund/Android-Week-View/wiki/Extensions) to find out more. 
