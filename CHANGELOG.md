@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Versioon 4.0.0
+## Version 4.0.0
 *(2019-09-29)*
 
 This release includes many new features and breaking changes.
