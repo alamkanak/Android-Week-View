@@ -1,6 +1,30 @@
 Changelog
 =========
 
+## Versioon 4.0.0
+*(2019-09-29)*
+This release includes many new features and breaking changes.
+- New: Providing events to `WeekView` is now easier. Check out the [wiki](https://github.com/thellmund/Android-Week-View/wiki) to find out more.
+- New: You can use JodaTime, JSR-310, and ThreeTenABP with `WeekView`. Check out the [wiki](https://github.com/thellmund/Android-Week-View/wiki/Extensions) to find out more. 
+- New: When building a `WeekViewEvent` via `WeekViewEvent.Builder`, you can pass in resource IDs for the title and location.
+- New: When declaring the style of a `WeekViewEvent` via `WeekViewEvent.Style.Builder`, you can pass in resource IDs for color and dimension properties.
+- New: You can use custom fonts with `WeekView` by setting `fontFamily`, `typeface`, and `textStyle` in the XML layout file.
+- New: You can set the text in event chips to adapt to the chip’s height by setting `isAdaptiveEventTextSize = true` or `app:adaptiveEventTextSize="true"`.
+- Changed: `WeekView` now uses AndroidX instead of the old Support Library.
+- Changed: `WeekView` is now a 100% Kotlin project.
+- Changed: `WeekViewLoader` is removed; use any of the new `EventsLoader`s instead.
+- Changed: The naming of various listeners and setter methods is more unified. Check out the [wiki](https://github.com/thellmund/Android-Week-View/wiki/Listeners) to find out more.
+- Changed: Use more extensive caching and reduce redundant `Canvas` operations for better performance.
+- Changed: The “now line” is now drawn over the entire width of a day. 
+- Changed: Event chips use anti-aliasing for smoother corner radiuses.
+- Changed: The event location is displayed underneath the event title if there is enough space.
+- Fixed: Live preview of `WeekView` in Android Studio is working again.
+- Fixed: Text is no longer being drawn outside of a too-small event chip.
+- Fixed: Event clicks are no longer ignored or attributed to the wrong event.
+- Fixed: A situation where both `OnEventLongClickListener` and `OnEmptyViewLongClickListener` were called no longer occurs.
+
+Thanks to everyone who contributed to this release and reported issues!
+
 ## Version 3.4.1
 *(2019-05-10)*
 - Changed: The `columnGap` attribute is now applied to all days currently visible. Previously, it was not applied to the last day.
