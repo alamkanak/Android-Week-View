@@ -163,7 +163,7 @@ internal class EventChipDrawer<T>(
         }
 
         val text = SpannableStringBuilder(title)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
+        text.setSpan(StyleSpan(Typeface.BOLD))
         location?.let {
             text.appendln().append(it)
         }

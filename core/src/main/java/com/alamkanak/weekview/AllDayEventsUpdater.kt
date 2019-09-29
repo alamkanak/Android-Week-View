@@ -105,7 +105,7 @@ internal class AllDayEventsUpdater<T>(
         }
 
         val text = SpannableStringBuilder(title)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
+        text.setSpan(StyleSpan(Typeface.BOLD))
 
         val location = when (val resource = event.locationResource) {
             is WeekViewEvent.TextResource.Id -> context.getString(resource.resId)

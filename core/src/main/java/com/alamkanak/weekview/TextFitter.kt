@@ -53,7 +53,7 @@ internal class TextFitter<T>(
         isMultiLine: Boolean
     ): SpannableStringBuilder {
         val text = SpannableStringBuilder(title)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, text.length, 0)
+        text.setSpan(StyleSpan(Typeface.BOLD))
         location?.let {
             if (isMultiLine) {
                 text.appendln()
