@@ -15,8 +15,6 @@ Features
 * Interactive via click and scroll listeners
 * Written in Kotlin
 
-#### [&rightarrow; Get started with WeekView](https://github.com/thellmund/Android-Week-View/wiki)
-
 Getting started
 ---------
 * Check out [the wiki](https://github.com/thellmund/Android-Week-View/wiki) on how to get started.
