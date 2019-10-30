@@ -100,6 +100,7 @@ class WeekView<T> @JvmOverloads constructor(
         if (events.isNullOrEmpty()) {
             eventChipCache.clear()
         } else {
+            eventChipCache.clear()
             eventChipsLoader.createAndCacheEventChips(events)
             eventChipsExpander.calculateEventChipPositions()
         }

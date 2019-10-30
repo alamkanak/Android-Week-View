@@ -93,7 +93,8 @@ internal class PagedEventsLoader<T>(
 
         if (needsRefresh) {
             val periods = determinePeriodsToFetch(fetchRange)
-            prepareCache(fetchRange)
+            val needsToFetchAllPeriods = periods.size == 3
+            prepareCache(fetchRange, needsToFetchAllPeriods)
             fetchPeriods(periods)
         }
 
@@ -102,12 +103,12 @@ internal class PagedEventsLoader<T>(
         return pagedCache.allEvents
     }
 
-    private fun prepareCache(fetchRange: FetchRange) {
-        if (shouldRefreshEvents) {
-            shouldRefreshEvents = false
+    private fun prepareCache(fetchRange: FetchRange, needsToFetchAllPeriods: Boolean) {
+        if (shouldRefreshEvents && needsToFetchAllPeriods) {
             pagedCache.clear()
         }
 
+        shouldRefreshEvents = false
         pagedCache.adjustToFetchRange(fetchRange)
     }
 
