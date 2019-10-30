@@ -40,11 +40,8 @@ internal data class Period(
             return Period(month, year)
         }
 
-    val startDate: Calendar
-        get() = today().withYear(year).withMonth(month).withDayOfMonth(1)
-
-    val endDate: Calendar
-        get() = today().withYear(year).withMonth(month).withDayOfMonth(today().lengthOfMonth)
+    val startDate: Calendar = newDate(year, month, dayOfMonth = 1)
+    val endDate: Calendar = startDate.withDayOfMonth(startDate.lengthOfMonth)
 
     override fun compareTo(other: Period): Int {
         return when {

@@ -79,6 +79,14 @@ internal fun Calendar.toEpochDays(): Int = (atStartOfDay.timeInMillis / DAY_IN_M
 internal val Calendar.lengthOfMonth: Int
     get() = getActualMaximum(Calendar.DAY_OF_MONTH)
 
+internal fun newDate(year: Int, month: Int, dayOfMonth: Int): Calendar {
+    return today().apply {
+        set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        set(Calendar.MONTH, month)
+        set(Calendar.YEAR, year)
+    }
+}
+
 internal fun Calendar.withTimeAtStartOfPeriod(hour: Int): Calendar {
     return copy().apply {
         set(Calendar.HOUR_OF_DAY, hour)

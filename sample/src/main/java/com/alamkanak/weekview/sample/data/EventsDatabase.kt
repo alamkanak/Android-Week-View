@@ -97,14 +97,13 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DATE, 17)
         startTime.set(Calendar.HOUR_OF_DAY, 11)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth)
         startTime.set(Calendar.YEAR, newYear)
-        startTime.add(Calendar.DATE, 1)
         endTime = startTime.clone() as Calendar
         endTime.add(Calendar.HOUR_OF_DAY, 4)
-        endTime.set(Calendar.MONTH, newMonth)
 
         event = createEvent(idOffset + 6, startTime, endTime, color3, isAllDay = false, isCanceled = false)
         events.add(event)
@@ -134,6 +133,8 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.YEAR, newYear)
+        startTime.set(Calendar.MONTH, newMonth)
         startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH))
         startTime.set(Calendar.HOUR_OF_DAY, 15)
         startTime.set(Calendar.MINUTE, 0)
@@ -160,9 +161,9 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         event = createEvent(idOffset + 11, startTime, endTime, color2, isAllDay = true, isCanceled = false)
         events.add(event)
 
-        // All-day event until 00:00 next days
+        // All-day event until 00:00 next day
         startTime = Calendar.getInstance()
-        startTime.add(Calendar.DAY_OF_MONTH, 2)
+        startTime.set(Calendar.DAY_OF_MONTH, 14)
         startTime.set(Calendar.HOUR_OF_DAY, 0)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.SECOND, 0)
@@ -188,7 +189,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
     ) = Event(id, buildEventTitle(startTime), startTime, endTime, "Location $id", color, isAllDay, isCanceled)
 
     private fun buildEventTitle(time: Calendar): String {
-        val sdf = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
+        val sdf = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
         val formattedDate = sdf.format(time.time)
         val hour = time.get(Calendar.HOUR_OF_DAY)
         val minute = time.get(Calendar.MINUTE)

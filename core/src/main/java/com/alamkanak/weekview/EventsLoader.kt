@@ -116,9 +116,7 @@ internal class PagedEventsLoader<T>(
     ) = fetchRange.periods.filter { it !in pagedCache }
 
     private fun fetchPeriods(periods: List<Period>) {
-        periods.forEach { period ->
-            onLoadMoreListener.onLoadMore(period.startDate, period.endDate)
-        }
+        periods.forEach { onLoadMoreListener.onLoadMore(it.startDate, it.endDate) }
     }
 }
 
