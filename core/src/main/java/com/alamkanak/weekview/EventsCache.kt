@@ -45,7 +45,11 @@ internal abstract class EventsCache<T> {
 
     operator fun get(
         dateRange: List<Calendar>
-    ) = allEvents.filter { dateRange.contains(it.startTime.atStartOfDay) }
+    ): List<WeekViewEvent<T>> {
+        val startDate = checkNotNull(dateRange.min())
+        val endDate = checkNotNull(dateRange.max())
+        return allEvents.filter { it.endTime >= startDate || it.startTime <= endDate }
+    }
 
     operator fun get(
         fetchRange: FetchRange

@@ -10,14 +10,20 @@ import com.alamkanak.weekview.sample.R
 private enum class WeekViewType(val value: Int) {
     DayView(1),
     ThreeDayView(3),
-    WeekView(7)
+    WeekView(7);
+
+    companion object {
+        fun create(
+            numberOfVisibleDays: Int
+        ): WeekViewType = values().first { it.value == numberOfVisibleDays }
+    }
 }
 
 fun Toolbar.setupWithWeekView(weekView: WeekView<*>) {
     val activity = context as Activity
     title = activity.label
 
-    var currentViewType = WeekViewType.DayView
+    var currentViewType = WeekViewType.create(weekView.numberOfVisibleDays)
 
     inflateMenu(R.menu.menu_main)
     setOnMenuItemClickListener { item ->
@@ -27,7 +33,7 @@ fun Toolbar.setupWithWeekView(weekView: WeekView<*>) {
                 true
             }
             else -> {
-                val viewType = mapMenuItemToWeekViewType(item)
+                val viewType = item.mapToWeekViewType()
                 if (viewType != currentViewType) {
                     item.isChecked = !item.isChecked
                     currentViewType = viewType
@@ -48,11 +54,11 @@ fun Toolbar.setupWithWeekView(weekView: WeekView<*>) {
 private val Activity.label: String
     get() = getString(packageManager.getActivityInfo(componentName, 0).labelRes)
 
-private fun mapMenuItemToWeekViewType(menuItem: MenuItem): WeekViewType {
-    return when (menuItem.itemId) {
+private fun MenuItem.mapToWeekViewType(): WeekViewType {
+    return when (itemId) {
         R.id.action_day_view -> WeekViewType.DayView
         R.id.action_three_day_view -> WeekViewType.ThreeDayView
         R.id.action_week_view -> WeekViewType.WeekView
-        else -> throw IllegalArgumentException("Invalid menu item ID ${menuItem.itemId}")
+        else -> throw IllegalArgumentException("Invalid menu item ID $itemId")
     }
 }
