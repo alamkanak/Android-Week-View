@@ -5,9 +5,8 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.apiclient.Event
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
-import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.google.android.material.appbar.MaterialToolbar
@@ -32,9 +31,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
     private val toolbar: MaterialToolbar by lazyView(R.id.toolbar)
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
 
-    private val database: EventsDatabase by lazy {
-        FakeEventsDatabase(requireContext())
-    }
+    private val database: EventsDatabase by lazy { EventsDatabase(requireContext()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         toolbar.setupWithWeekView(weekView)

@@ -4,18 +4,19 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.R
-import com.alamkanak.weekview.sample.apiclient.Event
+import com.alamkanak.weekview.sample.data.model.Event
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-interface EventsDatabase {
-    fun getEventsInRange(startDate: Calendar, endDate: Calendar): List<WeekViewDisplayable<Event>>
-}
+class EventsDatabase(context: Context) {
 
-class FakeEventsDatabase(private val context: Context) : EventsDatabase {
+    private val color1 = ContextCompat.getColor(context, R.color.event_color_01)
+    private val color2 = ContextCompat.getColor(context, R.color.event_color_02)
+    private val color3 = ContextCompat.getColor(context, R.color.event_color_03)
+    private val color4 = ContextCompat.getColor(context, R.color.event_color_04)
 
-    override fun getEventsInRange(
+    fun getEventsInRange(
         startDate: Calendar,
         endDate: Calendar
     ): List<WeekViewDisplayable<Event>> {
@@ -24,15 +25,11 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
 
         val idOffset = newYear + 10L * newMonth
 
-        val color1 = ContextCompat.getColor(context, R.color.event_color_01)
-        val color2 = ContextCompat.getColor(context, R.color.event_color_02)
-        val color3 = ContextCompat.getColor(context, R.color.event_color_03)
-        val color4 = ContextCompat.getColor(context, R.color.event_color_04)
-
         val events = mutableListOf<WeekViewDisplayable<Event>>()
         var event: Event
 
         var startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 16)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth)
@@ -46,6 +43,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
 
         // Add multi-day event
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 20)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth)
@@ -60,6 +58,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 9)
         startTime.set(Calendar.MINUTE, 30)
         startTime.set(Calendar.MONTH, newMonth)
@@ -73,6 +72,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 10)
         startTime.set(Calendar.MINUTE, 30)
         startTime.set(Calendar.MONTH, newMonth)
@@ -85,6 +85,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 12)
         startTime.set(Calendar.MINUTE, 30)
         startTime.set(Calendar.MONTH, newMonth)
@@ -97,7 +98,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
         events.add(event)
 
         startTime = Calendar.getInstance()
-        startTime.set(Calendar.DATE, 17)
+        startTime.set(Calendar.DAY_OF_MONTH, 17)
         startTime.set(Calendar.HOUR_OF_DAY, 11)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth)
@@ -148,6 +149,7 @@ class FakeEventsDatabase(private val context: Context) : EventsDatabase {
 
         // All-day event
         startTime = Calendar.getInstance()
+        startTime.set(Calendar.DAY_OF_MONTH, 28)
         startTime.set(Calendar.HOUR_OF_DAY, 0)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth)

@@ -6,9 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.apiclient.ApiEvent
 import com.alamkanak.weekview.sample.data.EventsApi
-import com.alamkanak.weekview.sample.data.FakeEventsApi
+import com.alamkanak.weekview.sample.data.model.ApiEvent
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
@@ -45,7 +44,7 @@ class AsyncActivity : AppCompatActivity() {
     private val weekView: WeekView<ApiEvent> by lazyView(R.id.weekView)
 
     private val viewModel: AsyncViewModel by lazy {
-        AsyncViewModel(FakeEventsApi(this))
+        AsyncViewModel(EventsApi(this))
     }
 
     @Suppress("DEPRECATION")

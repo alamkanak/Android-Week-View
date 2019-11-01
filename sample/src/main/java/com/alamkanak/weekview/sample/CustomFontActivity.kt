@@ -3,9 +3,8 @@ package com.alamkanak.weekview.sample
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.apiclient.Event
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
-import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
@@ -16,7 +15,7 @@ import java.util.Calendar
 class CustomFontActivity : AppCompatActivity() {
 
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
-    private val database: EventsDatabase by lazy { FakeEventsDatabase(this) }
+    private val database: EventsDatabase by lazy { EventsDatabase(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

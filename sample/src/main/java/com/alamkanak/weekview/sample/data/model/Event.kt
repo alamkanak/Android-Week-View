@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample.apiclient
+package com.alamkanak.weekview.sample.data.model
 
 import android.graphics.Color
 import com.alamkanak.weekview.WeekViewDisplayable

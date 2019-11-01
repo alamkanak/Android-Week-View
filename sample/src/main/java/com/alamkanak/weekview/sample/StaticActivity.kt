@@ -11,9 +11,8 @@ import com.alamkanak.weekview.OnEventLongClickListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.OnRangeChangeListener
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.apiclient.Event
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
-import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
@@ -30,7 +29,7 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
 
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
 
-    private val database: EventsDatabase by lazy { FakeEventsDatabase(this) }
+    private val database: EventsDatabase by lazy { EventsDatabase(this) }
     private val dateFormatter = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
-import com.alamkanak.weekview.sample.apiclient.Event
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
-import com.alamkanak.weekview.sample.data.FakeEventsDatabase
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.observe
 import com.alamkanak.weekview.sample.util.setupWithWeekView
@@ -36,7 +35,7 @@ class BasicActivity : AppCompatActivity() {
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
 
     private val viewModel: ViewModel by lazy {
-        ViewModel(FakeEventsDatabase(this))
+        ViewModel(EventsDatabase(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
