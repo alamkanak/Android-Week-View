@@ -20,175 +20,194 @@ class EventsDatabase(context: Context) {
         startDate: Calendar,
         endDate: Calendar
     ): List<WeekViewDisplayable<Event>> {
-        val newYear = startDate.get(Calendar.YEAR)
-        val newMonth = startDate.get(Calendar.MONTH)
+        val year = startDate.get(Calendar.YEAR)
+        val month = startDate.get(Calendar.MONTH)
 
-        val idOffset = newYear + 10L * newMonth
-
+        val idOffset = year + 10L * month
         val events = mutableListOf<WeekViewDisplayable<Event>>()
-        var event: Event
 
-        var startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 16)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        var endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.MINUTE, 90)
-        endTime.set(Calendar.MONTH, newMonth)
-
-        event = createEvent(idOffset + 1, startTime, endTime, color1, isAllDay = false, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 1,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 16,
+            minute = 0,
+            duration = 90,
+            color = color1
+        )
 
         // Add multi-day event
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 20)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.DAY_OF_MONTH, 1)
-        endTime.set(Calendar.HOUR_OF_DAY, 1)
-        endTime.set(Calendar.MINUTE, 0)
-        endTime.set(Calendar.MONTH, newMonth)
+        events += newEvent(
+            id = idOffset + 2,
+            year = year,
+            month = month,
+            dayOfMonth = 27,
+            hour = 20,
+            minute = 0,
+            duration = 5 * 60,
+            color = color4
+        )
 
-        event = createEvent(idOffset + 2, startTime, endTime, color4, isAllDay = false, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 3,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 9,
+            minute = 30,
+            duration = 60,
+            color = color4,
+            isCanceled = true
+        )
 
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 9)
-        startTime.set(Calendar.MINUTE, 30)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.set(Calendar.HOUR_OF_DAY, 10)
-        endTime.set(Calendar.MINUTE, 30)
-        endTime.set(Calendar.MONTH, newMonth)
+        events += newEvent(
+            id = idOffset + 3,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 9,
+            minute = 30,
+            duration = 60,
+            color = color2
+        )
 
-        event = createEvent(idOffset + 3, startTime, endTime, color2, isAllDay = false, isCanceled = true)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 4,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 10,
+            minute = 30,
+            duration = 45,
+            color = color3
+        )
 
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 10)
-        startTime.set(Calendar.MINUTE, 30)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.set(Calendar.HOUR_OF_DAY, 11)
-        endTime.set(Calendar.MINUTE, 15)
+        events += newEvent(
+            id = idOffset + 5,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 12,
+            minute = 30,
+            duration = 2 * 60,
+            color = color2
+        )
 
-        event = createEvent(idOffset + 4, startTime, endTime, color3, isAllDay = false, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 6,
+            year = year,
+            month = month,
+            dayOfMonth = 17,
+            hour = 11,
+            minute = 0,
+            duration = 4 * 60,
+            color = color3
+        )
 
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 12)
-        startTime.set(Calendar.MINUTE, 30)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 2)
-        endTime.set(Calendar.MONTH, newMonth)
+        events += newEvent(
+            id = idOffset + 7,
+            year = year,
+            month = month,
+            dayOfMonth = 15,
+            hour = 3,
+            minute = 0,
+            duration = 3 * 60,
+            color = color4,
+            isCanceled = true
+        )
 
-        event = createEvent(idOffset + 5, startTime, endTime, color2, isAllDay = false, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 8,
+            year = year,
+            month = month,
+            dayOfMonth = 1,
+            hour = 9,
+            minute = 0,
+            duration = 3 * 60,
+            color = color1
+        )
 
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 17)
-        startTime.set(Calendar.HOUR_OF_DAY, 11)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 4)
-
-        event = createEvent(idOffset + 6, startTime, endTime, color3, isAllDay = false, isCanceled = false)
-        events.add(event)
-
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 15)
-        startTime.set(Calendar.HOUR_OF_DAY, 3)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 3)
-
-        event = createEvent(idOffset + 7, startTime, endTime, color4, isAllDay = false, isCanceled = true)
-        events.add(event)
-
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 1)
-        startTime.set(Calendar.HOUR_OF_DAY, 9)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 3)
-
-        event = createEvent(idOffset + 8, startTime, endTime, color1, isAllDay = false, isCanceled = false)
-        events.add(event)
-
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.YEAR, newYear)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH))
-        startTime.set(Calendar.HOUR_OF_DAY, 15)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 3)
-
-        event = createEvent(idOffset + 9, startTime, endTime, color2, isAllDay = false, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 9,
+            year = year,
+            month = month,
+            dayOfMonth = startDate.getActualMaximum(Calendar.DAY_OF_MONTH),
+            hour = 15,
+            minute = 0,
+            duration = 3 * 60,
+            color = color2
+        )
 
         // All-day event
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 28)
-        startTime.set(Calendar.HOUR_OF_DAY, 0)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.HOUR_OF_DAY, 23)
+        events += newEvent(
+            id = idOffset + 10,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 0,
+            minute = 0,
+            duration = 24 * 60,
+            isAllDay = true,
+            color = color4
+        )
 
-        event = createEvent(idOffset + 10, startTime, endTime, color4, isAllDay = true, isCanceled = false)
-        events.add(event)
-
-        event = createEvent(idOffset + 11, startTime, endTime, color2, isAllDay = true, isCanceled = false)
-        events.add(event)
+        // All-day event
+        events += newEvent(
+            id = idOffset + 11,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 0,
+            minute = 0,
+            duration = 24 * 60,
+            isAllDay = true,
+            color = color2
+        )
 
         // All-day event until 00:00 next day
-        startTime = Calendar.getInstance()
-        startTime.set(Calendar.DAY_OF_MONTH, 14)
-        startTime.set(Calendar.HOUR_OF_DAY, 0)
-        startTime.set(Calendar.MINUTE, 0)
-        startTime.set(Calendar.SECOND, 0)
-        startTime.set(Calendar.MILLISECOND, 0)
-        startTime.set(Calendar.MONTH, newMonth)
-        startTime.set(Calendar.YEAR, newYear)
-        endTime = startTime.clone() as Calendar
-        endTime.add(Calendar.DAY_OF_MONTH, 1)
-
-        event = createEvent(idOffset + 12, startTime, endTime, color1, isAllDay = true, isCanceled = false)
-        events.add(event)
+        events += newEvent(
+            id = idOffset + 12,
+            year = year,
+            month = month,
+            dayOfMonth = 14,
+            hour = 0,
+            minute = 0,
+            duration = 10 * 60,
+            isAllDay = true,
+            color = color4
+        )
 
         return events
     }
 
-    private fun createEvent(
+    private fun newEvent(
         id: Long,
-        startTime: Calendar,
-        endTime: Calendar,
+        year: Int,
+        month: Int,
+        dayOfMonth: Int,
+        hour: Int,
+        minute: Int,
+        duration: Int,
         color: Int,
-        isAllDay: Boolean,
-        isCanceled: Boolean
-    ) = Event(id, buildEventTitle(startTime), startTime, endTime, "Location $id", color, isAllDay, isCanceled)
+        isAllDay: Boolean = false,
+        isCanceled: Boolean = false
+    ): Event {
+        val startTime = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val endTime = startTime.clone() as Calendar
+        endTime.add(Calendar.MINUTE, duration)
+
+        val title = buildEventTitle(startTime)
+        return Event(id, title, startTime, endTime, "Location $id", color, isAllDay, isCanceled)
+    }
 
     private fun buildEventTitle(time: Calendar): String {
         val sdf = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
