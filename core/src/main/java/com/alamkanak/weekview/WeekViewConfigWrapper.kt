@@ -517,7 +517,7 @@ internal class WeekViewConfigWrapper(
         return -1f * date.daysFromToday * totalDayWidth
     }
 
-    fun setCurrentAllDayEventHeight(height: Int) {
+    fun updateAllDayEventHeight(height: Int) {
         currentAllDayEventHeight = height
         refreshHeaderHeight()
     }

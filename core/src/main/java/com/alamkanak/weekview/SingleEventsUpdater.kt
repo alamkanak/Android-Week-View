@@ -14,7 +14,7 @@ internal class SingleEventsUpdater<T>(
     override fun isRequired(drawingContext: DrawingContext) = true
 
     override fun update(drawingContext: DrawingContext) {
-        chipCache.clearCache()
+        chipCache.clearSingleEventsCache()
 
         drawingContext
             .dateRangeWithStartPixels
@@ -37,9 +37,9 @@ internal class SingleEventsUpdater<T>(
             .forEach {
                 val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
                 if (chipRect.isValidSingleEventRect) {
-                    it.rect = chipRect
+                    it.bounds = chipRect
                 } else {
-                    it.rect = null
+                    it.bounds = null
                 }
             }
     }

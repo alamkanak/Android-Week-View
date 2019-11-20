@@ -73,7 +73,7 @@ internal class TextFitter<T>(
         availableWidth: Int
     ): StaticLayout {
         val event = eventChip.event
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
 
         // The text fits into the chip, so we just need to ellipsize it
         var newTextLayout = textLayout
@@ -100,7 +100,7 @@ internal class TextFitter<T>(
         availableHeight: Int
     ): StaticLayout {
         val event = eventChip.event
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
 
         val textPaint = event.getTextPaint(context, config)
         val fullHorizontalPadding = config.eventPaddingHorizontal * 2f

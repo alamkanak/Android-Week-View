@@ -31,13 +31,13 @@ internal class DrawingContext(
         dateRange.clear()
         dateRange += getDateRange(start, modifiedEnd)
 
-        updateStartPixels(config, startPixel)
+        updateStartPixels()
 
         dateRangeWithStartPixels.clear()
         dateRangeWithStartPixels += dateRange.zip(startPixels)
     }
 
-    private fun updateStartPixels(config: WeekViewConfigWrapper, startPixel: Float) {
+    private fun updateStartPixels() {
         startPixels.clear()
         startPixels += dateRange.indices.map {
             index -> startPixel + index * config.totalDayWidth

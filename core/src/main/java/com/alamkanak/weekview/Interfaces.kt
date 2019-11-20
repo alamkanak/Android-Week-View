@@ -8,10 +8,7 @@ internal interface Updater {
 }
 
 internal interface Drawer {
-    fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) = Unit
+    fun draw(drawingContext: DrawingContext, canvas: Canvas)
 }
 
 internal interface CachingDrawer : Drawer {

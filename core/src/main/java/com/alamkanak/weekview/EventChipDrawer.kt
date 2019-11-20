@@ -33,7 +33,7 @@ internal class EventChipDrawer<T>(
         val cornerRadius = config.eventCornerRadius.toFloat()
         updateBackgroundPaint(event, backgroundPaint)
 
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
         canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint)
 
         if (event.style.hasBorder) {
@@ -65,7 +65,7 @@ internal class EventChipDrawer<T>(
     ) {
         val event = eventChip.event
         val originalEvent = eventChip.originalEvent
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
 
         updateBackgroundPaint(event, backgroundPaint)
 
@@ -90,7 +90,7 @@ internal class EventChipDrawer<T>(
     ) {
         val event = eventChip.event
         val originalEvent = eventChip.originalEvent
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
 
         val borderWidth = event.style.getBorderWidth(context)
         val innerWidth = rect.width() - borderWidth * 2
@@ -122,7 +122,7 @@ internal class EventChipDrawer<T>(
         textLayout: StaticLayout,
         canvas: Canvas
     ) {
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
         canvas.apply {
             save()
             translate(
@@ -139,7 +139,7 @@ internal class EventChipDrawer<T>(
         canvas: Canvas
     ) {
         val event = eventChip.event
-        val rect = checkNotNull(eventChip.rect)
+        val rect = checkNotNull(eventChip.bounds)
 
         val fullHorizontalPadding = config.eventPaddingHorizontal * 2
         val fullVerticalPadding = config.eventPaddingVertical * 2

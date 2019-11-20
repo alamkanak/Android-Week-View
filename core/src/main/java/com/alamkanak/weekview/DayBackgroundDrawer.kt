@@ -16,21 +16,29 @@ internal class DayBackgroundDrawer(
         canvas: Canvas
     ) {
         drawingContext.dateRangeWithStartPixels.forEach { (date, startPixel) ->
-            val startX = max(startPixel, config.timeColumnWidth)
-            drawDayBackground(date, startX, startPixel, canvas)
+            drawDayBackground(date, startPixel, canvas)
         }
     }
 
+    /**
+     * Draws a day's background color in the corresponding bounds.
+     *
+     * @param day The [Calendar] indicating the date
+     * @param startPixel The x-coordinate on which to start drawing the background
+     * @param canvas The [Canvas] on which to draw the background
+     */
     private fun drawDayBackground(
         day: Calendar,
-        startX: Float,
         startPixel: Float,
         canvas: Canvas
     ) {
-        if (config.widthPerDay + startPixel - startX <= 0) {
+        val endPixel = startPixel + config.widthPerDay
+        val isCompletelyHiddenByTimeColumn = endPixel <= config.timeColumnWidth
+        if (isCompletelyHiddenByTimeColumn) {
             return
         }
 
+        val actualStartPixel = max(startPixel, config.timeColumnWidth)
         val height = view.height.toFloat()
 
         if (config.showDistinctPastFutureColor) {
@@ -42,14 +50,14 @@ internal class DayBackgroundDrawer(
             val endX = startPixel + config.widthPerDay
 
             when {
-                day.isToday -> drawPastAndFutureRect(startX, startY, endX, pastPaint, futurePaint, height, canvas)
-                day.isBeforeToday -> canvas.drawRect(startX, startY, endX, height, pastPaint)
-                else -> canvas.drawRect(startX, startY, endX, height, futurePaint)
+                day.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
+                day.isBeforeToday -> canvas.drawRect(actualStartPixel, startY, endX, height, pastPaint)
+                else -> canvas.drawRect(actualStartPixel, startY, endX, height, futurePaint)
             }
         } else {
             val todayPaint = config.getDayBackgroundPaint(day.isToday)
             val right = startPixel + config.widthPerDay
-            canvas.drawRect(startX, config.headerHeight, right, height, todayPaint)
+            canvas.drawRect(actualStartPixel, config.headerHeight, right, height, todayPaint)
         }
     }
 

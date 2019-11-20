@@ -28,7 +28,7 @@ internal data class EventChip<T>(
     /**
      * The rectangle in which the [WeekViewEvent] will be drawn.
      */
-    var rect: RectF? = null
+    var bounds: RectF? = null
 
     /**
      * The relative start position of the [EventChip].
@@ -70,13 +70,13 @@ internal data class EventChip<T>(
     }
 
     fun clearCache() {
-        rect = null
+        bounds = null
         availableWidthCache = 0
         availableHeightCache = 0
     }
 
     fun isHit(e: MotionEvent): Boolean {
-        return rect?.let {
+        return bounds?.let {
             e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
         } ?: false
     }

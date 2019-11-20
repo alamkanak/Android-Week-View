@@ -56,7 +56,7 @@ internal class WeekViewGestureHandler<T>(
         object : ScaleGestureDetector.OnScaleGestureListener {
             override fun onScaleEnd(detector: ScaleGestureDetector) {
                 isZooming = false
-                chipCache.clearCache()
+                chipCache.clearSingleEventsCache()
             }
 
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
@@ -238,7 +238,7 @@ internal class WeekViewGestureHandler<T>(
             val data = eventChip.originalEvent.data ?: throw NullPointerException(
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
-            val rect = checkNotNull(eventChip.rect)
+            val rect = checkNotNull(eventChip.bounds)
             listener.onEventClick(data, rect)
             return super.onSingleTapConfirmed(e)
         }
@@ -271,7 +271,7 @@ internal class WeekViewGestureHandler<T>(
             val data = eventChip.originalEvent.data ?: throw NullPointerException(
                 "Did you pass the original object into the constructor of WeekViewEvent?")
 
-            val rect = checkNotNull(eventChip.rect)
+            val rect = checkNotNull(eventChip.bounds)
             listener.onEventLongClick(data, rect)
             return
         }

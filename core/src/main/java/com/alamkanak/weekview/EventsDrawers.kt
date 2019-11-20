@@ -12,11 +12,8 @@ internal class SingleEventsDrawer<T>(
 
     private val eventChipDrawer = EventChipDrawer<T>(context, config)
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) = with(drawingContext) {
-        for (date in dateRange) {
+    override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
+        for (date in drawingContext.dateRange) {
             drawEventsForDate(date, canvas)
         }
     }
@@ -27,7 +24,7 @@ internal class SingleEventsDrawer<T>(
     ) {
         chipCache
             .normalEventChipsByDate(date)
-            .filter { it.rect != null }
+            .filter { it.bounds != null }
             .forEach { eventChipDrawer.draw(it, canvas) }
     }
 }

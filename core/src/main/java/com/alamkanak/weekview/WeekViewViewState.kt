@@ -1,7 +1,7 @@
 package com.alamkanak.weekview
 
-import java.lang.Math.max
 import java.util.Calendar
+import kotlin.math.max
 
 internal class WeekViewViewState(
     private val config: WeekViewConfigWrapper,

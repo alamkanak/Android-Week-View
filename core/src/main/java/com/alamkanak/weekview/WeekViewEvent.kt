@@ -22,30 +22,26 @@ data class WeekViewEvent<T> internal constructor(
     var data: T? = null
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
 
-    val title: String?
-        get() = (titleResource as? TextResource.Value)?.text
+//    val title: String?
+//        get() = (titleResource as? TextResource.Value)?.text
+//
+//    val titleResId: Int?
+//        get() = (titleResource as? TextResource.Id)?.resId
+//
+//    val location: String?
+//        get() = (locationResource as? TextResource.Value)?.text
+//
+//    val locationResId: Int?
+//        get() = (locationResource as? TextResource.Id)?.resId
 
-    val titleResId: Int?
-        get() = (titleResource as? TextResource.Id)?.resId
-
-    val location: String?
-        get() = (locationResource as? TextResource.Value)?.text
-
-    val locationResId: Int?
-        get() = (locationResource as? TextResource.Id)?.resId
-
-    val isNotAllDay: Boolean
+    internal val isNotAllDay: Boolean
         get() = isAllDay.not()
 
-    val durationInMinutes: Int
+    internal val durationInMinutes: Int
         get() = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
 
     internal val isMultiDay: Boolean
-        get() = isSameDay(endTime).not()
-
-    internal fun isSameDay(other: Calendar): Boolean {
-        return startTime.isSameDate(other)
-    }
+        get() = startTime.isSameDate(endTime).not()
 
     internal fun isWithin(minHour: Int, maxHour: Int): Boolean {
         return startTime.hour >= minHour && endTime.hour <= maxHour

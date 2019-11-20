@@ -61,13 +61,6 @@ internal class DayLabelDrawer<T>(
         cache.multiLineDayLabelCache.clear()
     }
 
-    private fun Canvas.withTranslation(dx: Float, dy: Float, block: Canvas.() -> Unit) {
-        save()
-        translate(dx, dy)
-        block()
-        restore()
-    }
-
     private fun <E> SparseArray<E>.get(key: Int, providerIfEmpty: () -> E): E {
         return get(key) ?: providerIfEmpty.invoke()
     }

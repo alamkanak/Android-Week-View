@@ -22,11 +22,10 @@ internal class NowLineDrawer(
             .map { (_, startPixel) -> startPixel }
             .firstOrNull() ?: return
 
-        val startX = max(startPixel, config.timeColumnWidth)
-        drawLine(startX, startPixel, canvas)
+        drawLine(startPixel, canvas)
     }
 
-    private fun drawLine(startX: Float, startPixel: Float, canvas: Canvas) {
+    private fun drawLine(startPixel: Float, canvas: Canvas) {
         val top = config.headerHeight + config.currentOrigin.y
         val now = now()
 
@@ -34,6 +33,7 @@ internal class NowLineDrawer(
         val portionOfDayInPixels = portionOfDay * config.hourHeight
         val verticalOffset = top + portionOfDayInPixels
 
+        val startX = max(startPixel, config.timeColumnWidth)
         val endX = startPixel + config.totalDayWidth
         canvas.drawLine(startX, verticalOffset, endX, verticalOffset, config.nowLinePaint)
 
