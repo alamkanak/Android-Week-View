@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 4.0.1
+*(2019-11-01)*
+- Fixed: Event chips no longer disappear when scrolling in some cases.
+- Fixed: Multi-day all-day events are no longer cut off after the first day.
+
+Thanks for reporting issues, [MohammadB72](https://github.com/MohammadB72) and [verzhbitski](https://github.com/verzhbitski)!
+
 ## Version 4.0.0
 *(2019-09-29)*
 
