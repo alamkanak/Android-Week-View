@@ -22,18 +22,6 @@ data class WeekViewEvent<T> internal constructor(
     var data: T? = null
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
 
-//    val title: String?
-//        get() = (titleResource as? TextResource.Value)?.text
-//
-//    val titleResId: Int?
-//        get() = (titleResource as? TextResource.Id)?.resId
-//
-//    val location: String?
-//        get() = (locationResource as? TextResource.Value)?.text
-//
-//    val locationResId: Int?
-//        get() = (locationResource as? TextResource.Id)?.resId
-
     internal val isNotAllDay: Boolean
         get() = isAllDay.not()
 
@@ -115,7 +103,7 @@ data class WeekViewEvent<T> internal constructor(
     }
 
     internal sealed class TextResource {
-        data class Value(val text: String) : TextResource()
+        data class Value(val text: CharSequence) : TextResource()
         data class Id(@StringRes val resId: Int) : TextResource()
     }
 
@@ -218,7 +206,7 @@ data class WeekViewEvent<T> internal constructor(
             return this
         }
 
-        fun setTitle(title: String): Builder<T> {
+        fun setTitle(title: CharSequence): Builder<T> {
             event.titleResource = TextResource.Value(title)
             return this
         }
@@ -238,7 +226,7 @@ data class WeekViewEvent<T> internal constructor(
             return this
         }
 
-        fun setLocation(location: String): Builder<T> {
+        fun setLocation(location: CharSequence): Builder<T> {
             event.locationResource = TextResource.Value(location)
             return this
         }

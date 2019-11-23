@@ -214,6 +214,6 @@ class EventsDatabase(context: Context) {
         val formattedDate = sdf.format(time.time)
         val hour = time.get(Calendar.HOUR_OF_DAY)
         val minute = time.get(Calendar.MINUTE)
-        return String.format("Event of %02d:%02d %s", hour, minute, formattedDate)
+        return String.format("🦄 Event of %02d:%02d %s", hour, minute, formattedDate)
     }
 }

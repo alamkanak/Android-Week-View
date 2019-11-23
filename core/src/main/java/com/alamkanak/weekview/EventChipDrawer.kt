@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.style.StyleSpan
 import androidx.core.content.ContextCompat
+import androidx.emoji.text.EmojiCompat
 import com.alamkanak.weekview.WeekViewEvent.ColorResource
 import com.alamkanak.weekview.WeekViewEvent.TextResource
 
@@ -16,6 +17,8 @@ internal class EventChipDrawer<T>(
     private val context: Context,
     private val config: WeekViewConfigWrapper
 ) {
+
+    private val emojiCompat = EmojiCompat.get()
 
     private val textFitter = TextFitter<T>(context, config)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
@@ -52,10 +55,12 @@ internal class EventChipDrawer<T>(
             drawCornersForMultiDayEvents(eventChip, cornerRadius, canvas)
         }
 
-        textLayout?.let {
+        if (textLayout != null) {
             // The text height has already been calculated
-            drawEventTitle(eventChip, it, canvas)
-        } ?: calculateTextHeightAndDrawTitle(eventChip, canvas)
+            drawEventTitle(eventChip, textLayout, canvas)
+        } else {
+            calculateTextHeightAndDrawTitle(eventChip, canvas)
+        }
     }
 
     private fun drawCornersForMultiDayEvents(
@@ -162,10 +167,13 @@ internal class EventChipDrawer<T>(
             null -> null
         }
 
-        val text = SpannableStringBuilder(title)
+        val modifiedTitle = emojiCompat.process(title)
+        val text = SpannableStringBuilder(modifiedTitle)
         text.setSpan(StyleSpan(Typeface.BOLD))
-        location?.let {
-            text.appendln().append(it)
+
+        val modifiedLocation = location?.let { emojiCompat.process(it) }
+        if (modifiedLocation != null) {
+            text.appendln().append(modifiedLocation)
         }
 
         val chipHeight = (rect.bottom - rect.top - fullVerticalPadding).toInt()
@@ -180,7 +188,13 @@ internal class EventChipDrawer<T>(
         val isCached = textLayoutCache.containsKey(event.id)
 
         if (didAvailableAreaChange || !isCached) {
-            textLayoutCache[event.id] = textFitter.fit(eventChip, title, location, chipHeight, chipWidth)
+            textLayoutCache[event.id] = textFitter.fit(
+                eventChip = eventChip,
+                title = modifiedTitle,
+                location = modifiedLocation,
+                chipHeight = chipHeight,
+                chipWidth = chipWidth
+            )
             eventChip.updateAvailableArea(chipWidth, chipHeight)
         }
 

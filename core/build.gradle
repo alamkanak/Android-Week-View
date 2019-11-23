@@ -24,6 +24,7 @@ android {
 dependencies {
     implementation libraries.kotlin
     implementation libraries.appCompat
+    implementation libraries.emoji
 
     testImplementation libraries.jUnit
     testImplementation libraries.mockitoCore

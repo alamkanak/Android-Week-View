@@ -16,8 +16,8 @@ internal class TextFitter<T>(
 
     fun fit(
         eventChip: EventChip<T>,
-        title: String,
-        location: String?,
+        title: CharSequence,
+        location: CharSequence?,
         chipHeight: Int,
         chipWidth: Int
     ): StaticLayout {
@@ -48,8 +48,8 @@ internal class TextFitter<T>(
     }
 
     private fun createText(
-        title: String,
-        location: String?,
+        title: CharSequence,
+        location: CharSequence?,
         isMultiLine: Boolean
     ): SpannableStringBuilder {
         val text = SpannableStringBuilder(title)
