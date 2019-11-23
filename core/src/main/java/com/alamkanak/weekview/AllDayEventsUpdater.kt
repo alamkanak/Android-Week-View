@@ -12,7 +12,7 @@ import androidx.emoji.text.EmojiCompat
 import com.alamkanak.weekview.WeekViewEvent.TextResource
 import kotlin.math.roundToInt
 
-internal class AllDayEventsUpdater<T>(
+internal class AllDayEventsUpdater<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,

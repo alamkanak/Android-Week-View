@@ -20,10 +20,10 @@ fun <T> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEve
     return setEndTime(endTime.toCalendar())
 }
 
-val <T> WeekView<T>.adapter: WeekViewAdapter<T>
+val <T : Any> WeekView<T>.adapter: WeekViewAdapter<T>
     get() = WeekViewAdapter(this)
 
-fun <T> WeekView<T>.setOnMonthChangeListener(
+fun <T : Any> WeekView<T>.setOnMonthChangeListener(
     block: (
         startDate: LocalDate,
         endDate: LocalDate
@@ -39,7 +39,7 @@ fun <T> WeekView<T>.setOnMonthChangeListener(
     }
 }
 
-fun <T> WeekView<T>.setOnLoadMoreListener(
+fun <T : Any> WeekView<T>.setOnLoadMoreListener(
     block: (startDate: LocalDate, endDate: LocalDate) -> Unit
 ) {
     onLoadMoreListener = object : OnLoadMoreListener {
@@ -50,11 +50,11 @@ fun <T> WeekView<T>.setOnLoadMoreListener(
     }
 }
 
-fun <T> WeekView<T>.goToDate(date: LocalDate) {
+fun <T : Any> WeekView<T>.goToDate(date: LocalDate) {
     goToDate(date.toCalendar())
 }
 
-fun <T> WeekView<T>.setScrollListener(block: (date: LocalDate) -> Unit) {
+fun <T : Any> WeekView<T>.setScrollListener(block: (date: LocalDate) -> Unit) {
     scrollListener = object : ScrollListener {
         override fun onFirstVisibleDateChanged(
             date: Calendar
@@ -64,7 +64,7 @@ fun <T> WeekView<T>.setScrollListener(block: (date: LocalDate) -> Unit) {
     }
 }
 
-fun <T> WeekView<T>.setOnEmptyViewClickListener(
+fun <T : Any> WeekView<T>.setOnEmptyViewClickListener(
     block: (time: LocalDateTime) -> Unit
 ) {
     onEmptyViewClickListener = object : OnEmptyViewClickListener {
@@ -74,7 +74,7 @@ fun <T> WeekView<T>.setOnEmptyViewClickListener(
     }
 }
 
-fun <T> WeekView<T>.setOnEmptyViewLongClickListener(
+fun <T : Any> WeekView<T>.setOnEmptyViewLongClickListener(
     block: (time: LocalDateTime) -> Unit
 ) {
     onEmptyViewLongClickListener = object : OnEmptyViewLongClickListener {

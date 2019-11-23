@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import android.graphics.RectF
 import java.util.Calendar
 
-internal class SingleEventsUpdater<T>(
+internal class SingleEventsUpdater<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val chipCache: EventChipCache<T>

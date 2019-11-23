@@ -105,6 +105,11 @@ data class WeekViewEvent<T> internal constructor(
     internal sealed class TextResource {
         data class Value(val text: CharSequence) : TextResource()
         data class Id(@StringRes val resId: Int) : TextResource()
+
+        fun resolve(context: Context): CharSequence = when (this) {
+            is Id -> context.getString(resId)
+            is Value -> text
+        }
     }
 
     internal sealed class DimenResource {

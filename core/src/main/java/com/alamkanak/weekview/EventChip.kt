@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.RectF
-import android.view.MotionEvent
 
 /**
  * This class encapsulates a [WeekViewEvent] and its visual representation, a [RectF]
@@ -75,9 +74,9 @@ internal data class EventChip<T>(
         availableHeightCache = 0
     }
 
-    fun isHit(e: MotionEvent): Boolean {
+    fun isHit(x: Float, y: Float): Boolean {
         return bounds?.let {
-            e.x > it.left && e.x < it.right && e.y > it.top && e.y < it.bottom
+            x > it.left && x < it.right && y > it.top && y < it.bottom
         } ?: false
     }
 }

@@ -210,7 +210,7 @@ class EventsDatabase(context: Context) {
     }
 
     private fun buildEventTitle(time: Calendar): String {
-        val sdf = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+        val sdf = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
         val formattedDate = sdf.format(time.time)
         val hour = time.get(Calendar.HOUR_OF_DAY)
         val minute = time.get(Calendar.MINUTE)

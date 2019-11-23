@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 
-internal class HeaderRowDrawer<T>(
+internal class HeaderRowDrawer<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper
 ) : Drawer {

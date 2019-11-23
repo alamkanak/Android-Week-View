@@ -37,7 +37,7 @@ private enum class Direction {
         get() = this != NONE
 }
 
-internal class WeekViewGestureHandler<T>(
+internal class WeekViewGestureHandler<T : Any>(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
     private val chipCache: EventChipCache<T>,
@@ -228,7 +228,7 @@ internal class WeekViewGestureHandler<T>(
         e: MotionEvent
     ): Boolean {
         onEventClickListener?.let { listener ->
-            val eventChip = findHitEvent(e) ?: return@let
+            val eventChip = findHitEvent(e.x, e.y) ?: return@let
             if (eventChip.event.isNotAllDay && e.isInHeader) {
                 // The user tapped in the header area and a single event that is rendered below it
                 // has recognized the tap. We ignore this.
@@ -240,6 +240,7 @@ internal class WeekViewGestureHandler<T>(
 
             val rect = checkNotNull(eventChip.bounds)
             listener.onEventClick(data, rect)
+
             return super.onSingleTapConfirmed(e)
         }
 
@@ -261,7 +262,7 @@ internal class WeekViewGestureHandler<T>(
         super.onLongPress(e)
 
         onEventLongClickListener?.let { listener ->
-            val eventChip = findHitEvent(e) ?: return@let
+            val eventChip = findHitEvent(e.x, e.y) ?: return@let
             if (eventChip.event.isNotAllDay && e.isInHeader) {
                 // The user tapped in the header area and a single event that is rendered below it
                 // has recognized the tap. We ignore this.
@@ -287,10 +288,8 @@ internal class WeekViewGestureHandler<T>(
         }
     }
 
-    private fun findHitEvent(
-        e: MotionEvent
-    ): EventChip<T>? {
-        val candidates = chipCache.allEventChips.filter { it.isHit(e) }
+    internal fun findHitEvent(x: Float, y: Float): EventChip<T>? {
+        val candidates = chipCache.allEventChips.filter { it.isHit(x, y) }
         return when {
             candidates.isEmpty() -> null
             // Two events hit. This is most likely because an all-day event was clicked, but a
