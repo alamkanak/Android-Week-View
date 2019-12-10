@@ -19,7 +19,8 @@ class MainExecutor : Executor {
  */
 internal class EventsDiffer<T>(
     private val eventsCacheWrapper: EventsCacheWrapper<T>,
-    private val eventChipsLoader: EventChipsLoader<T>
+    private val eventChipsLoader: EventChipsLoader<T>,
+    private val drawingContext: DrawingContext
 ) {
 
     private val backgroundExecutor = Executors.newSingleThreadExecutor()
@@ -29,15 +30,21 @@ internal class EventsDiffer<T>(
      * Updates the [EventsCache] with the provided [WeekViewDisplayable]s and creates [EventChip]s.
      *
      * @param items The list of new [WeekViewDisplayable]s
-     * @param dateRange The list of currently visible dates
      * @param onFinished Callback to inform the caller whether [WeekView] should invalidate.
      */
     fun submit(
         items: List<WeekViewDisplayable<T>>,
-        dateRange: List<Calendar>,
         onFinished: (Boolean) -> Unit
     ) {
         backgroundExecutor.execute {
+            val dateRange = drawingContext.dateRange
+            // It's possible that weekView.submit() is called before the date range has been
+            // initialized. Therefor, waiting until the date range is actually set may be required.
+            while (dateRange.isEmpty()) {
+                Thread.sleep(100L)
+                continue
+            }
+
             val result = submitItems(items, dateRange)
             mainThreadExecutor.execute {
                 onFinished(result)

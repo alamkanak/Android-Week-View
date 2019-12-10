@@ -38,7 +38,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
     private val viewState = WeekViewViewState(configWrapper, this)
     private val drawingContext = DrawingContext(configWrapper)
 
-    private val gestureHandler = WeekViewGestureHandler(this, configWrapper, eventChipCache, gestureListener)
+    private val gestureHandler =
+        WeekViewGestureHandler(this, configWrapper, eventChipCache, gestureListener)
 
     private var accessibilityTouchHelper = WeekViewAccessibilityTouchHelper(
         this, configWrapper, drawingContext, gestureHandler, eventChipCache)
@@ -49,7 +50,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     internal val eventsCacheWrapper = EventsCacheWrapper<T>()
     internal val eventsLoaderWrapper = EventsLoaderWrapper(eventsCacheWrapper)
 
-    private val eventsDiffer = EventsDiffer(eventsCacheWrapper, eventChipsLoader)
+    private val eventsDiffer = EventsDiffer(eventsCacheWrapper, eventChipsLoader, drawingContext)
 
     private val eventsLoader: EventsLoader<T>
         get() = eventsLoaderWrapper.get()
@@ -1288,8 +1289,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * currently displayed date range, this method will also redraw [WeekView].
      */
     fun submit(items: List<WeekViewDisplayable<T>>) {
-        val dateRange = drawingContext.dateRange
-        eventsDiffer.submit(items, dateRange) { shouldInvalidate ->
+        eventsDiffer.submit(items) { shouldInvalidate ->
             if (shouldInvalidate) {
                 invalidate()
             }
