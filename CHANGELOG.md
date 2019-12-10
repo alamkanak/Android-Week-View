@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 4.1
+*(2019-12-09)*
+- New: Emojis in event titles and locations are now displayed correctly.
+- New: When [TalkBack](https://support.google.com/accessibility/android/answer/6283677?hl=en) is turned on, `WeekView` now provides accessibility support for interacting with events.
+
 ## Version 4.0.1
 *(2019-11-01)*
 - Fixed: Event chips no longer disappear when scrolling in some cases.
