@@ -193,18 +193,9 @@ data class WeekViewEvent<T> internal constructor(
         }
     }
 
-    class Builder<T> {
+    class Builder<T>(data: T) {
 
-        @Deprecated(
-            "Pass the data (likely \"this\") to WeekViewEvent.Builder in the constructor"
-        )
-        constructor()
-
-        constructor(data: T) : this() {
-            event.data = data
-        }
-
-        private val event = WeekViewEvent<T>()
+        private val event = WeekViewEvent(data = data)
 
         fun setId(id: Long): Builder<T> {
             event.id = id
@@ -248,14 +239,6 @@ data class WeekViewEvent<T> internal constructor(
 
         fun setAllDay(isAllDay: Boolean): Builder<T> {
             event.isAllDay = isAllDay
-            return this
-        }
-
-        @Deprecated(
-            "Pass the data (likely \"this\") to WeekViewEvent.Builder in the constructor"
-        )
-        fun setData(data: T): Builder<T> {
-            event.data = data
             return this
         }
 

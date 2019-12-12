@@ -164,11 +164,9 @@ internal class WeekViewConfig(
             defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR)
             allDayEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventTextSize, eventTextSize)
 
-            // The attribute "eventPadding" is deprecated. However, if "eventPaddingHorizontal" or
-            // "eventPaddingVertical" are not provided, we fall back to it.
-            val eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, 8)
-            eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, eventPadding)
-            eventPaddingVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, eventPadding)
+            // Event padding
+            eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, 8)
+            eventPaddingVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, 8)
 
             // Event margins
             columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)

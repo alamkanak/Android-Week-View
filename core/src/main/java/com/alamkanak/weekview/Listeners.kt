@@ -15,18 +15,6 @@ interface OnEventClickListener<T> {
     fun onEventClick(data: T, eventRect: RectF)
 }
 
-@Deprecated(
-    "Use OnEventLongClickListener",
-    ReplaceWith("OnEventLongClickListener")
-)
-typealias EventLongPressListener<T> = OnEventLongClickListener<T>
-
-@Deprecated(
-    "Use OnEventLongClickListener",
-    ReplaceWith("OnEventLongClickListener")
-)
-typealias OnEventLongPressListener<T> = OnEventLongClickListener<T>
-
 @FunctionalInterface
 interface OnEventLongClickListener<T> {
 
@@ -39,21 +27,6 @@ interface OnEventLongClickListener<T> {
     fun onEventLongClick(data: T, eventRect: RectF)
 }
 
-@Deprecated(
-    "Use onEventLongClick",
-    ReplaceWith("onEventLongClick(data, eventRect)")
-)
-fun <T> OnEventLongClickListener<T>.onEventLongPress(
-    data: T,
-    eventRect: RectF
-) = onEventLongClick(data, eventRect)
-
-@Deprecated(
-    "Use OnEmptyViewClickListener",
-    ReplaceWith("OnEmptyViewClickListener")
-)
-typealias EmptyViewClickListener = OnEmptyViewClickListener
-
 @FunctionalInterface
 interface OnEmptyViewClickListener {
 
@@ -65,18 +38,6 @@ interface OnEmptyViewClickListener {
     fun onEmptyViewClicked(time: Calendar)
 }
 
-@Deprecated(
-    "Use OnEmptyViewLongClickListener",
-    ReplaceWith("OnEmptyViewLongClickListener")
-)
-typealias EmptyViewLongPressListener = OnEmptyViewLongClickListener
-
-@Deprecated(
-    "Use OnEmptyViewLongClickListener",
-    ReplaceWith("OnEmptyViewLongClickListener")
-)
-typealias OnEmptyViewLongPressListener = OnEmptyViewLongClickListener
-
 @FunctionalInterface
 interface OnEmptyViewLongClickListener {
 
@@ -87,14 +48,6 @@ interface OnEmptyViewLongClickListener {
      */
     fun onEmptyViewLongClick(time: Calendar)
 }
-
-@Deprecated(
-    "Use onEmptyViewLongClick",
-    ReplaceWith("onEmptyViewLongClick(time)")
-)
-fun OnEmptyViewLongClickListener.onEmptyViewLongPress(
-    time: Calendar
-) = onEmptyViewLongClick(time)
 
 @FunctionalInterface
 interface OnLoadMoreListener {
@@ -118,12 +71,6 @@ interface OnRangeChangeListener {
      */
     fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar)
 }
-
-@Deprecated(
-    "Use OnMonthChangeListener",
-    ReplaceWith("OnMonthChangeListener")
-)
-typealias MonthChangeListener<T> = OnMonthChangeListener<T>
 
 @FunctionalInterface
 interface OnMonthChangeListener<T> {
