@@ -5,14 +5,14 @@ import org.junit.Test
 
 class DefaultDateTimeInterpreterTest {
 
-    private val date = firstDayOfYear().withHour(1)
+    private val date = firstDayOfYear().withYear(2020).withHour(1)
 
     @Test
     fun `correct date when in day view`() {
         val dateFormatProvider = FakeDateFormatProvider()
         val underTest = DefaultDateTimeInterpreter(dateFormatProvider, numberOfDays = 1)
 
-        val expected = "TUESDAY 1/01"
+        val expected = "WEDNESDAY 1/01"
         val observed = underTest.interpretDate(date)
 
         assertEquals(expected, observed)
@@ -23,7 +23,7 @@ class DefaultDateTimeInterpreterTest {
         val dateFormatProvider = FakeDateFormatProvider()
         val underTest = DefaultDateTimeInterpreter(dateFormatProvider, numberOfDays = 3)
 
-        val expected = "TUE 1/01"
+        val expected = "WED 1/01"
         val observed = underTest.interpretDate(date)
 
         assertEquals(expected, observed)
