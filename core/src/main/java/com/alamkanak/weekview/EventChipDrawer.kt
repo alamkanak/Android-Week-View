@@ -9,16 +9,14 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.style.StyleSpan
 import androidx.core.content.ContextCompat
-import androidx.emoji.text.EmojiCompat
 import com.alamkanak.weekview.WeekViewEvent.ColorResource
 import com.alamkanak.weekview.WeekViewEvent.TextResource
 
 internal class EventChipDrawer<T>(
     private val context: Context,
-    private val config: WeekViewConfigWrapper
+    private val config: WeekViewConfigWrapper,
+    private val emojiTextProcessor: EmojiTextProcessor = EmojiTextProcessor()
 ) {
-
-    private val emojiCompat = EmojiCompat.get()
 
     private val textFitter = TextFitter<T>(context, config)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
@@ -167,11 +165,11 @@ internal class EventChipDrawer<T>(
             null -> null
         }
 
-        val modifiedTitle = emojiCompat.process(title)
+        val modifiedTitle = emojiTextProcessor.process(title)
         val text = SpannableStringBuilder(modifiedTitle)
         text.setSpan(StyleSpan(Typeface.BOLD))
 
-        val modifiedLocation = location?.let { emojiCompat.process(it) }
+        val modifiedLocation = location?.let { emojiTextProcessor.process(it) }
         if (modifiedLocation != null) {
             text.appendln().append(modifiedLocation)
         }

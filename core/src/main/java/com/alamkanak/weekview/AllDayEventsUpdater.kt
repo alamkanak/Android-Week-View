@@ -8,7 +8,6 @@ import android.text.TextPaint
 import android.text.TextUtils
 import android.text.TextUtils.TruncateAt.END
 import android.text.style.StyleSpan
-import androidx.emoji.text.EmojiCompat
 import com.alamkanak.weekview.WeekViewEvent.TextResource
 import kotlin.math.roundToInt
 
@@ -16,10 +15,9 @@ internal class AllDayEventsUpdater<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
-    private val chipCache: EventChipCache<T>
+    private val chipCache: EventChipCache<T>,
+    private val emojiTextProcessor: EmojiTextProcessor = EmojiTextProcessor()
 ) : Updater {
-
-    private val emojiCompat = EmojiCompat.get()
 
     private val context = view.context
     private val rectCalculator = EventChipRectCalculator<T>(config)
@@ -104,7 +102,7 @@ internal class AllDayEventsUpdater<T : Any>(
             null -> ""
         }
 
-        val modifiedTitle = emojiCompat.process(title)
+        val modifiedTitle = emojiTextProcessor.process(title)
         val text = SpannableStringBuilder(modifiedTitle)
         text.setSpan(StyleSpan(Typeface.BOLD))
 
@@ -115,7 +113,7 @@ internal class AllDayEventsUpdater<T : Any>(
         }
 
         if (location != null) {
-            val modifiedLocation = emojiCompat.process(location)
+            val modifiedLocation = emojiTextProcessor.process(location)
             text.append(' ').append(modifiedLocation)
         }
 
