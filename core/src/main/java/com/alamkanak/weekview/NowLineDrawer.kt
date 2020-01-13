@@ -12,7 +12,7 @@ internal class NowLineDrawer(
         drawingContext: DrawingContext,
         canvas: Canvas
     ) {
-        if (config.showNowLineDot.not()) {
+        if (config.showNowLine.not()) {
             return
         }
 
