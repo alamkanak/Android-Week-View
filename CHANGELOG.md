@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## Version 4.1.1
+*(2020-01-13)*
+- Fixed: WeekView no longer crashes when `EmojiCompat` is not used in the application.
+
+Thanks for reporting this, [Huakas](https://github.com/Huakas)!
+
 ## Version 4.1
 *(2019-12-09)*
 - New: Emojis in event titles and locations are now displayed correctly.
