@@ -356,6 +356,7 @@ internal class WeekViewConfigWrapper(
     var timeColumnBackgroundColor: Int
         get() = config.timeColumnBackgroundColor
         set(value) {
+            timeColumnBackgroundPaint.color = value
             config.timeColumnBackgroundColor = value
         }
 

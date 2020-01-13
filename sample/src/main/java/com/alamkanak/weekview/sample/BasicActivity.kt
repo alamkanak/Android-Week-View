@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
-import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.observe
 import com.alamkanak.weekview.sample.util.setupWithWeekView
