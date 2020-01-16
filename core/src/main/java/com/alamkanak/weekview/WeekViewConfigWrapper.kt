@@ -10,6 +10,8 @@ import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
 
+private const val DAYS_PER_WEEK = 7
+
 internal class WeekViewConfigWrapper(
     private val view: WeekView<*>,
     private val config: WeekViewConfig
@@ -310,7 +312,7 @@ internal class WeekViewConfigWrapper(
         }
 
     var firstDayOfWeek: Int
-        get() = config.firstDayOfWeek
+        get() = config.firstDayOfWeek ?: now().firstDayOfWeek
         set(value) {
             config.firstDayOfWeek = value
         }
@@ -589,7 +591,16 @@ internal class WeekViewConfigWrapper(
 
     private fun computeDifferenceWithFirstDayOfWeek(
         date: Calendar
-    ): Int = date.dayOfWeek - firstDayOfWeek
+    ): Int {
+        val firstDayOfWeek = firstDayOfWeek
+        return if (firstDayOfWeek == Calendar.MONDAY && date.dayOfWeek == Calendar.SUNDAY) {
+            // Special case, because Calendar.MONDAY has constant value 2 and Calendar.SUNDAY has
+            // constant value 1. The correct result to return is 6 days, not -1 days.
+            6
+        } else {
+            date.dayOfWeek - firstDayOfWeek
+        }
+    }
 
     private fun refreshAfterZooming() {
         if (showCompleteDay) {

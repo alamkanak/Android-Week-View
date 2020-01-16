@@ -1,10 +1,10 @@
 package com.alamkanak.weekview
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
-import java.util.Calendar
 
 internal class WeekViewConfig(
     context: Context,
@@ -12,7 +12,7 @@ internal class WeekViewConfig(
 ) {
 
     // Calendar configuration
-    var firstDayOfWeek: Int = 0
+    var firstDayOfWeek: Int? = null
     var numberOfVisibleDays: Int = 0
     var restoreNumberOfVisibleDays: Boolean = true
     var showFirstDayOfWeekFirst: Boolean = false
@@ -116,115 +116,115 @@ internal class WeekViewConfig(
 
     init {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
-
-        try {
+        a.use {
             // Calendar configuration
-            firstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, Calendar.MONDAY)
-            numberOfVisibleDays = a.getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
-            restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
-            showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
-            showCurrentTimeFirst = a.getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false)
+            if (a.hasValue(R.styleable.WeekView_firstDayOfWeek)) {
+                firstDayOfWeek = getInteger(R.styleable.WeekView_firstDayOfWeek, 0)
+            }
+
+            numberOfVisibleDays = getInteger(R.styleable.WeekView_numberOfVisibleDays, 3)
+            restoreNumberOfVisibleDays = getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
+            showFirstDayOfWeekFirst = getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
+            showCurrentTimeFirst = getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false)
 
             // Header bottom line
-            showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false)
-            headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, Defaults.GRID_COLOR)
-            headerRowBottomLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, 1)
+            showHeaderRowBottomLine = getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false)
+            headerRowBottomLineColor = getColor(R.styleable.WeekView_headerRowBottomLineColor, Defaults.GRID_COLOR)
+            headerRowBottomLineWidth = getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, 1)
 
             // Time column
-            timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK)
-            timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, Color.WHITE)
-            timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10)
-            timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, Defaults.textSize(context))
-            showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, false)
-            showTimeColumnHourSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false)
-            timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1)
+            timeColumnTextColor = getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK)
+            timeColumnBackgroundColor = getColor(R.styleable.WeekView_timeColumnBackgroundColor, Color.WHITE)
+            timeColumnPadding = getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10)
+            timeColumnTextSize = getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, Defaults.textSize(context))
+            showMidnightHour = getBoolean(R.styleable.WeekView_showMidnightHour, false)
+            showTimeColumnHourSeparator = getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false)
+            timeColumnHoursInterval = getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1)
 
             // Time column separator
-            showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false)
-            timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, Defaults.GRID_COLOR)
-            timeColumnSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1)
+            showTimeColumnSeparator = getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false)
+            timeColumnSeparatorColor = getColor(R.styleable.WeekView_timeColumnSeparatorColor, Defaults.GRID_COLOR)
+            timeColumnSeparatorStrokeWidth = getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1)
 
             // Time range
-            minHour = a.getInt(R.styleable.WeekView_minHour, 0)
-            maxHour = a.getInt(R.styleable.WeekView_maxHour, 24)
+            minHour = getInt(R.styleable.WeekView_minHour, 0)
+            maxHour = getInt(R.styleable.WeekView_maxHour, 24)
 
             // Header row
-            headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, Color.BLACK)
-            headerRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, Color.WHITE)
-            headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context))
-            headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10)
-            todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR)
-            singleLineHeader = a.getBoolean(R.styleable.WeekView_singleLineHeader, true)
+            headerRowTextColor = getColor(R.styleable.WeekView_headerRowTextColor, Color.BLACK)
+            headerRowBackgroundColor = getColor(R.styleable.WeekView_headerRowBackgroundColor, Color.WHITE)
+            headerRowTextSize = getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context))
+            headerRowPadding = getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10)
+            todayHeaderTextColor = getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR)
+            singleLineHeader = getBoolean(R.styleable.WeekView_singleLineHeader, true)
 
             // Event chips
-            eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0)
-            eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context))
-            adaptiveEventTextSize = a.getBoolean(R.styleable.WeekView_adaptiveEventTextSize, false)
-            eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK)
-            defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR)
-            allDayEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventTextSize, eventTextSize)
+            eventCornerRadius = getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0)
+            eventTextSize = getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context))
+            adaptiveEventTextSize = getBoolean(R.styleable.WeekView_adaptiveEventTextSize, false)
+            eventTextColor = getColor(R.styleable.WeekView_eventTextColor, Color.BLACK)
+            defaultEventColor = getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR)
+            allDayEventTextSize = getDimensionPixelSize(R.styleable.WeekView_allDayEventTextSize, eventTextSize)
 
             // Event padding
-            eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, 8)
-            eventPaddingVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, 8)
+            eventPaddingHorizontal = getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, 8)
+            eventPaddingVertical = getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, 8)
 
             // Event margins
-            columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)
-            overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0)
-            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 2)
-            eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0)
+            columnGap = getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)
+            overlappingEventGap = getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0)
+            eventMarginVertical = getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 2)
+            eventMarginHorizontal = getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0)
 
             // Colors
-            dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Defaults.BACKGROUND_COLOR)
-            todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, Defaults.BACKGROUND_COLOR)
-            showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false)
-            showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, false)
-            pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, Defaults.PAST_BACKGROUND_COLOR)
-            futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, Defaults.FUTURE_BACKGROUND_COLOR)
-            pastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, pastBackgroundColor)
-            futureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor)
+            dayBackgroundColor = getColor(R.styleable.WeekView_dayBackgroundColor, Defaults.BACKGROUND_COLOR)
+            todayBackgroundColor = getColor(R.styleable.WeekView_todayBackgroundColor, Defaults.BACKGROUND_COLOR)
+            showDistinctPastFutureColor = getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false)
+            showDistinctWeekendColor = getBoolean(R.styleable.WeekView_showDistinctWeekendColor, false)
+            pastBackgroundColor = getColor(R.styleable.WeekView_pastBackgroundColor, Defaults.PAST_BACKGROUND_COLOR)
+            futureBackgroundColor = getColor(R.styleable.WeekView_futureBackgroundColor, Defaults.FUTURE_BACKGROUND_COLOR)
+            pastWeekendBackgroundColor = getColor(R.styleable.WeekView_pastWeekendBackgroundColor, pastBackgroundColor)
+            futureWeekendBackgroundColor = getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor)
 
             // Hour height
-            hourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, 50).toFloat()
-            minHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0)
-            maxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 400)
+            hourHeight = getDimension(R.styleable.WeekView_hourHeight, 50f)
+            minHourHeight = getDimensionPixelSize(R.styleable.WeekView_minHourHeight, 0)
+            maxHourHeight = getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, 400)
             effectiveMinHourHeight = minHourHeight
-            showCompleteDay = a.getBoolean(R.styleable.WeekView_showCompleteDay, false)
+            showCompleteDay = getBoolean(R.styleable.WeekView_showCompleteDay, false)
 
             // Now line
-            showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, false)
-            nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, Defaults.NOW_COLOR)
-            nowLineStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_nowLineStrokeWidth, 5)
+            showNowLine = getBoolean(R.styleable.WeekView_showNowLine, false)
+            nowLineColor = getColor(R.styleable.WeekView_nowLineColor, Defaults.NOW_COLOR)
+            nowLineStrokeWidth = getDimensionPixelSize(R.styleable.WeekView_nowLineStrokeWidth, 5)
 
             // Now line dot
-            showNowLineDot = a.getBoolean(R.styleable.WeekView_showNowLineDot, false)
-            nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, Defaults.NOW_COLOR)
-            nowLineDotRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, 16)
+            showNowLineDot = getBoolean(R.styleable.WeekView_showNowLineDot, false)
+            nowLineDotColor = getColor(R.styleable.WeekView_nowLineDotColor, Defaults.NOW_COLOR)
+            nowLineDotRadius = getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, 16)
 
             // Hour separators
-            showHourSeparator = a.getBoolean(R.styleable.WeekView_showHourSeparator, true)
-            hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, Defaults.SEPARATOR_COLOR)
-            hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, 2)
+            showHourSeparator = getBoolean(R.styleable.WeekView_showHourSeparator, true)
+            hourSeparatorColor = getColor(R.styleable.WeekView_hourSeparatorColor, Defaults.SEPARATOR_COLOR)
+            hourSeparatorStrokeWidth = getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, 2)
 
             // Day separators
-            showDaySeparator = a.getBoolean(R.styleable.WeekView_showDaySeparator, true)
-            daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, Defaults.SEPARATOR_COLOR)
-            daySeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, 2)
+            showDaySeparator = getBoolean(R.styleable.WeekView_showDaySeparator, true)
+            daySeparatorColor = getColor(R.styleable.WeekView_daySeparatorColor, Defaults.SEPARATOR_COLOR)
+            daySeparatorStrokeWidth = getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, 2)
 
             // Scrolling
-            xScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, 1f)
-            horizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, true)
-            horizontalScrollingEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, true)
-            verticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, true)
-            scrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, 250)
+            xScrollingSpeed = getFloat(R.styleable.WeekView_xScrollingSpeed, 1f)
+            horizontalFlingEnabled = getBoolean(R.styleable.WeekView_horizontalFlingEnabled, true)
+            horizontalScrollingEnabled = getBoolean(R.styleable.WeekView_horizontalScrollingEnabled, true)
+            verticalFlingEnabled = getBoolean(R.styleable.WeekView_verticalFlingEnabled, true)
+            scrollDuration = getInt(R.styleable.WeekView_scrollDuration, 250)
 
             // Font
-            val fontFamily: String? = a.getString(R.styleable.WeekView_fontFamily)
-            val typeface = a.getInteger(R.styleable.WeekView_typeface, 0)
-            val textStyle = a.getInteger(R.styleable.WeekView_textStyle, 0)
+            val fontFamily = getString(R.styleable.WeekView_fontFamily)
+            val typeface = getInteger(R.styleable.WeekView_typeface, 0)
+            val textStyle = getInteger(R.styleable.WeekView_textStyle, 0)
             setTypefaceFromAttrs(fontFamily, typeface, textStyle)
-        } finally {
-            a.recycle()
         }
     }
 
@@ -253,5 +253,13 @@ internal class WeekViewConfig(
         private const val SANS = 1
         private const val SERIF = 2
         private const val MONOSPACE = 3
+    }
+}
+
+private fun TypedArray.use(block: TypedArray.() -> Unit) {
+    try {
+        block()
+    } finally {
+        recycle()
     }
 }
