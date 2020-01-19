@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 4.1.2
+*(2020-01-19)*
+- Fixed: Dynamically setting the time column background via `setTimeColumnBackgroundColor()` didn't work.
+- Fixed: When `showFirstDayOfWeekFirst`, WeekView would sometimes show the incorrect week.
+
+Thanks for reporting these issues, [Huakas](https://github.com/Huakas)!
+
 ## Version 4.1.1
 *(2020-01-13)*
 - Fixed: WeekView no longer crashes when `EmojiCompat` is not used in the application.
