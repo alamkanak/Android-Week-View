@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
-import android.text.TextPaint
 import android.text.TextUtils
 import android.text.TextUtils.TruncateAt
 import android.text.style.StyleSpan
@@ -111,14 +110,10 @@ internal class TextFitter<T>(
         do {
             // The text doesn't fit into the chip, so we need to gradually
             // reduce its size until it does
-            textPaint.reduceSize()
+            textPaint.textSize -= 1
             textLayout = TextLayoutBuilder.build(text, textPaint, width)
         } while (availableHeight < textLayout.height)
 
         return textLayout
-    }
-
-    private fun TextPaint.reduceSize() {
-        textSize -= 1
     }
 }

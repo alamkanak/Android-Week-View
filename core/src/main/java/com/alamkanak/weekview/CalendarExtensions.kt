@@ -6,6 +6,25 @@ import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToInt
 
+internal interface Duration {
+    val inMillis: Int
+}
+
+internal inline class Days(val days: Int) : Duration {
+    override val inMillis: Int
+        get() = days * (24 * 60 * 60 * 1_000)
+}
+
+internal inline class Hours(val hours: Int) : Duration {
+    override val inMillis: Int
+        get() = hours * (60 * 60 * 1_000)
+}
+
+internal inline class Millis(val millis: Int) : Duration {
+    override val inMillis: Int
+        get() = millis
+}
+
 internal val Calendar.hour: Int
     get() = get(Calendar.HOUR_OF_DAY)
 
@@ -28,29 +47,65 @@ internal fun Calendar.isEqual(other: Calendar) = timeInMillis == other.timeInMil
 
 internal fun Calendar.isNotEqual(other: Calendar) = isEqual(other).not()
 
-internal fun Calendar.plusDays(days: Int): Calendar {
+internal operator fun Calendar.plus(days: Days): Calendar {
     return copy().apply {
-        add(Calendar.DATE, days)
+        add(Calendar.DATE, days.days)
     }
 }
 
-internal fun Calendar.minusDays(days: Int): Calendar = plusDays(days * (-1))
+internal operator fun Calendar.plusAssign(days: Days) {
+    add(Calendar.DATE, days.days)
+}
 
-internal fun Calendar.plusHours(hours: Int): Calendar {
+internal operator fun Calendar.minus(days: Days): Calendar {
     return copy().apply {
-        add(Calendar.HOUR_OF_DAY, hours)
+        add(Calendar.DATE, days.days * (-1))
     }
 }
 
-internal fun Calendar.minusHours(hours: Int): Calendar = plusHours(hours * (-1))
+internal operator fun Calendar.minusAssign(days: Days) {
+    add(Calendar.DATE, days.days * (-1))
+}
 
-internal fun Calendar.plusMillis(millis: Int): Calendar {
+internal operator fun Calendar.plus(hours: Hours): Calendar {
     return copy().apply {
-        add(Calendar.MILLISECOND, millis)
+        add(Calendar.HOUR_OF_DAY, hours.hours)
     }
 }
 
-internal fun Calendar.minusMillis(millis: Int): Calendar = plusMillis(millis * (-1))
+internal operator fun Calendar.plusAssign(hours: Hours) {
+    add(Calendar.HOUR_OF_DAY, hours.hours)
+}
+
+internal operator fun Calendar.minus(hours: Hours): Calendar {
+    return copy().apply {
+        add(Calendar.HOUR_OF_DAY, hours.hours * (-1))
+    }
+}
+
+internal operator fun Calendar.minusAssign(hours: Hours) {
+    add(Calendar.HOUR_OF_DAY, hours.hours * (-1))
+}
+
+internal operator fun Calendar.plus(millis: Millis): Calendar {
+    return copy().apply {
+        add(Calendar.MILLISECOND, millis.millis)
+    }
+}
+
+internal operator fun Calendar.plusAssign(millis: Millis) {
+    add(Calendar.MILLISECOND, millis.millis)
+}
+
+internal operator fun Calendar.minus(millis: Millis): Calendar {
+    return copy().apply {
+        add(Calendar.MILLISECOND, millis.millis * (-1))
+    }
+}
+
+internal operator fun Calendar.minusAssign(millis: Millis) {
+    add(Calendar.MILLISECOND, millis.millis * (-1))
+}
 
 internal fun Calendar.isBefore(other: Calendar) = timeInMillis < other.timeInMillis
 
@@ -131,7 +186,7 @@ internal fun firstDayOfYear(): Calendar {
 }
 
 internal fun getDateRange(start: Int, end: Int): List<Calendar> {
-    return (start..end).map { today().plusDays(it - 1) }
+    return (start..end).map { today() + Days(it - 1) }
 }
 
 internal val Calendar.isWeekend: Boolean
@@ -177,7 +232,8 @@ internal fun Calendar.copy(): Calendar = clone() as Calendar
  */
 internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
     return if (isEqual(atStartOfDay)) {
-        minusMillis(1).isSameDate(startDate)
+        val endOfPreviousDay = this - Millis(1)
+        endOfPreviousDay.isSameDate(startDate)
     } else {
         false
     }

@@ -245,7 +245,7 @@ internal class WeekViewConfig(
             SANS -> Typeface.SANS_SERIF
             SERIF -> Typeface.SERIF
             MONOSPACE -> Typeface.MONOSPACE
-            else -> typeface
+            else -> Typeface.DEFAULT
         }
     }
 

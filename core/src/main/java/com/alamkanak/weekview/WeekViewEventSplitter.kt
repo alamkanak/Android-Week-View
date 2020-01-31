@@ -43,13 +43,12 @@ internal class WeekViewEventSplitter<T>(
         val daysInBetween = diff / Constants.DAY_IN_MILLIS
 
         if (daysInBetween > 0) {
-            var start = firstEventEnd.withTimeAtStartOfPeriod(config.minHour).plusDays(1)
-
+            val start = firstEventEnd.withTimeAtStartOfPeriod(config.minHour) + Days(1)
             while (start.isSameDate(lastEventStart).not()) {
                 val intermediateStart = start.withTimeAtStartOfPeriod(config.minHour)
                 val intermediateEnd = start.withTimeAtEndOfPeriod(config.maxHour)
                 results += event.copy(startTime = intermediateStart, endTime = intermediateEnd)
-                start = start.plusDays(1)
+                start += Days(1)
             }
         }
 

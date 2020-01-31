@@ -21,7 +21,7 @@ class WeekViewEventSplitterTest {
     @Test
     fun `single-day event is not split`() {
         val startTime = today().withHour(11)
-        val endTime = startTime.plusHours(2)
+        val endTime = startTime + Hours(2)
         val event = Event(startTime, endTime).toWeekViewEvent()
 
         val results = underTest.split(event)
@@ -33,7 +33,7 @@ class WeekViewEventSplitterTest {
     @Test
     fun `two-day event is split correctly`() {
         val startTime = today().withHour(11)
-        val endTime = startTime.plusDays(1).withHour(2)
+        val endTime = (startTime + Days(1)).withHour(2)
 
         val event = Event(startTime, endTime).toWeekViewEvent()
         val results = underTest.split(event)
@@ -52,12 +52,12 @@ class WeekViewEventSplitterTest {
     @Test
     fun `three-day event is split correctly`() {
         val startTime = today().withHour(11)
-        val endTime = startTime.plusDays(2).withHour(2)
+        val endTime = (startTime + Days(2)).withHour(2)
 
         val event = Event(startTime, endTime).toWeekViewEvent()
         val results = underTest.split(event)
 
-        val intermediateDate = startTime.plusDays(1)
+        val intermediateDate = startTime + Days(1)
         val expected = listOf(
             Event(startTime, startTime.atEndOfDay),
             Event(intermediateDate.atStartOfDay, intermediateDate.atEndOfDay),

@@ -181,8 +181,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
         val daysScrolled = configWrapper.currentOrigin.x / totalDayWidth
         val delta = daysScrolled.roundToInt() * (-1)
 
-        val firstVisibleDate = today().plusDays(delta)
-        val lastVisibleDate = firstVisibleDate.plusDays(visibleDays - 1)
+        val firstVisibleDate = today() + Days(delta)
+        val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
 
         viewState.firstVisibleDate = firstVisibleDate
         viewState.lastVisibleDate = lastVisibleDate

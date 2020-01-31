@@ -20,8 +20,8 @@ class WeekViewEventTest {
 
     @Test
     fun `single-day event is recognized correctly`() {
-        val startTime = today().plusDays(1).withHour(6).withMinutes(0)
-        val endTime = startTime.plusHours(10)
+        val startTime = (today() + Days(1)).withHour(6).withMinutes(0)
+        val endTime = startTime + Hours(10)
         val event = Event(startTime, endTime)
 
         val originalEvent = event.toWeekViewEvent()
@@ -35,8 +35,8 @@ class WeekViewEventTest {
 
     @Test
     fun `two-day event is recognized correctly`() {
-        val startTime = today().plusDays(1).withHour(14).withMinutes(0)
-        val endTime = today().plusDays(2).withHour(14).withMinutes(0)
+        val startTime = (today() + Days(1)).withHour(14).withMinutes(0)
+        val endTime = (today() + Days(2)).withHour(14).withMinutes(0)
         val event = Event(startTime, endTime)
 
         val originalEvent = event.toWeekViewEvent()
@@ -55,8 +55,8 @@ class WeekViewEventTest {
 
     @Test
     fun `multi-day event is recognized correctly`() {
-        val startTime = today().plusDays(1).withHour(14).withMinutes(0)
-        val endTime = today().plusDays(3).withHour(1).withMinutes(0)
+        val startTime = (today() + Days(1)).withHour(14).withMinutes(0)
+        val endTime = (today() + Days(3)).withHour(1).withMinutes(0)
         val event = Event(startTime, endTime)
 
         val originalEvent = event.toWeekViewEvent()
@@ -79,11 +79,11 @@ class WeekViewEventTest {
     @Test
     fun `non-colliding events are recognized correctly`() {
         val firstStartTime = now()
-        val firstEndTime = firstStartTime.plusHours(1)
+        val firstEndTime = firstStartTime + Hours(1)
         val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
 
-        val secondStartTime = firstStartTime.plusHours(2)
-        val secondEndTime = secondStartTime.plusHours(1)
+        val secondStartTime = firstStartTime + Hours(2)
+        val secondEndTime = secondStartTime + Hours(1)
         val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
 
         assertFalse(first.collidesWith(second))
@@ -92,11 +92,11 @@ class WeekViewEventTest {
     @Test
     fun `overlapping events are recognized as colliding`() {
         val firstStartTime = now()
-        val firstEndTime = firstStartTime.plusHours(1)
+        val firstEndTime = firstStartTime + Hours(1)
         val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
 
-        val secondStartTime = firstStartTime.minusHours(1)
-        val secondEndTime = firstEndTime.plusHours(1)
+        val secondStartTime = firstStartTime - Hours(1)
+        val secondEndTime = firstEndTime + Hours(1)
         val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
 
         assertTrue(first.collidesWith(second))
@@ -105,11 +105,11 @@ class WeekViewEventTest {
     @Test
     fun `partly-overlapping events are recognized as colliding`() {
         val firstStartTime = now().withMinutes(0)
-        val firstEndTime = firstStartTime.plusHours(1)
+        val firstEndTime = firstStartTime + Hours(1)
         val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
 
         val secondStartTime = firstStartTime.withMinutes(30)
-        val secondEndTime = secondStartTime.plusHours(1)
+        val secondEndTime = secondStartTime + Hours(1)
         val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
 
         assertTrue(first.collidesWith(second))

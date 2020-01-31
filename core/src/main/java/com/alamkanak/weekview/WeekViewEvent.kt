@@ -12,14 +12,14 @@ import java.util.Calendar
 import kotlin.math.roundToInt
 
 data class WeekViewEvent<T> internal constructor(
-    var id: Long = 0L,
-    internal var titleResource: TextResource? = null,
-    var startTime: Calendar = now(),
-    var endTime: Calendar = now(),
-    internal var locationResource: TextResource? = null,
-    var isAllDay: Boolean = false,
-    var style: Style = Style(),
-    var data: T? = null
+    val id: Long = 0L,
+    internal val titleResource: TextResource? = null,
+    val startTime: Calendar = now(),
+    val endTime: Calendar = now(),
+    internal val locationResource: TextResource? = null,
+    val isAllDay: Boolean = false,
+    val style: Style = Style(),
+    val data: T? = null
 ) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
 
     internal val isNotAllDay: Boolean
@@ -31,9 +31,10 @@ data class WeekViewEvent<T> internal constructor(
     internal val isMultiDay: Boolean
         get() = startTime.isSameDate(endTime).not()
 
-    internal fun isWithin(minHour: Int, maxHour: Int): Boolean {
-        return startTime.hour >= minHour && endTime.hour <= maxHour
-    }
+    internal fun isWithin(
+        minHour: Int,
+        maxHour: Int
+    ): Boolean = startTime.hour >= minHour && endTime.hour <= maxHour
 
     internal fun getTextPaint(
         context: Context,
@@ -70,22 +71,22 @@ data class WeekViewEvent<T> internal constructor(
 
         // Resolve collisions by shortening the preceding event by 1 ms
         if (endTime.isEqual(other.startTime)) {
-            endTime = endTime.minusMillis(1)
+            endTime -= Millis(1)
             return false
         } else if (startTime.isEqual(other.endTime)) {
-            other.endTime = other.endTime.minusMillis(1)
+            other.endTime -= Millis(1)
         }
 
         return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime)
     }
 
-    internal fun startsOnEarlierDay(originalEvent: WeekViewEvent<T>): Boolean {
-        return startTime.isNotEqual(originalEvent.startTime)
-    }
+    internal fun startsOnEarlierDay(
+        originalEvent: WeekViewEvent<T>
+    ): Boolean = startTime.isNotEqual(originalEvent.startTime)
 
-    internal fun endsOnLaterDay(originalEvent: WeekViewEvent<T>): Boolean {
-        return endTime.isNotEqual(originalEvent.endTime)
-    }
+    internal fun endsOnLaterDay(
+        originalEvent: WeekViewEvent<T>
+    ): Boolean = endTime.isNotEqual(originalEvent.endTime)
 
     override fun compareTo(other: WeekViewEvent<T>): Int {
         var comparator = startTime.compareTo(other.startTime)
@@ -193,55 +194,73 @@ data class WeekViewEvent<T> internal constructor(
         }
     }
 
-    class Builder<T>(data: T) {
+    class Builder<T : Any> @JvmOverloads constructor(
+        private var data: T? = null
+    ) {
 
-        private val event = WeekViewEvent(data = data)
+        // private val event = WeekViewEvent(data = data)
+
+        private var id: Long? = null
+        private var title: TextResource? = null
+        private var location: TextResource? = null
+        private var startTime: Calendar? = null
+        private var endTime: Calendar? = null
+        private var style: Style? = null
+        private var isAllDay: Boolean = false
 
         fun setId(id: Long): Builder<T> {
-            event.id = id
+            this.id = id
             return this
         }
 
         fun setTitle(title: CharSequence): Builder<T> {
-            event.titleResource = TextResource.Value(title)
+            this.title = TextResource.Value(title)
             return this
         }
 
         fun setTitle(resId: Int): Builder<T> {
-            event.titleResource = TextResource.Id(resId)
+            this.title = TextResource.Id(resId)
             return this
         }
 
         fun setStartTime(startTime: Calendar): Builder<T> {
-            event.startTime = startTime
+            this.startTime = startTime
             return this
         }
 
         fun setEndTime(endTime: Calendar): Builder<T> {
-            event.endTime = endTime
+            this.endTime = endTime
             return this
         }
 
         fun setLocation(location: CharSequence): Builder<T> {
-            event.locationResource = TextResource.Value(location)
+            this.location = TextResource.Value(location)
             return this
         }
 
         fun setLocation(resId: Int): Builder<T> {
-            event.locationResource = TextResource.Id(resId)
+            this.location = TextResource.Id(resId)
             return this
         }
 
         fun setStyle(style: Style): Builder<T> {
-            event.style = style
+            this.style = style
             return this
         }
 
         fun setAllDay(isAllDay: Boolean): Builder<T> {
-            event.isAllDay = isAllDay
+            this.isAllDay = isAllDay
             return this
         }
 
-        fun build(): WeekViewEvent<T> = event
+        fun build(): WeekViewEvent<T> {
+            val id = checkNotNull(id) { "id == null" }
+            val title = checkNotNull(title) { "title == null" }
+            val startTime = checkNotNull(startTime) { "startTime == null" }
+            val endTime = checkNotNull(endTime) { "endTime == null" }
+            val data = checkNotNull(data) { "data == null" }
+            val style = this.style ?: Style.Builder().build()
+            return WeekViewEvent(id, title, startTime, endTime, location, isAllDay, style, data)
+        }
     }
 }

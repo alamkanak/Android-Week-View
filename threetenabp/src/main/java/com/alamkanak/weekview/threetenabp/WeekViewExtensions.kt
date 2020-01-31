@@ -12,11 +12,11 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import java.util.Calendar
 
-fun <T> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
+fun <T : Any> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())
 }
 
-fun <T> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
+fun <T : Any> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setEndTime(endTime.toCalendar())
 }
 
