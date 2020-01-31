@@ -28,8 +28,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     }
 
     private val gestureListener = object : WeekViewGestureHandler.Listener {
-        override fun onScaled() = invalidate()
-        override fun onScrolled() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
+        override fun requireInvalidation() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
     }
 
     private val cache = WeekViewCache<T>()

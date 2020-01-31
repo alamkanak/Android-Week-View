@@ -56,7 +56,7 @@ internal class WeekViewGestureHandler<T : Any>(
         object : ScaleGestureDetector.OnScaleGestureListener {
             override fun onScaleEnd(detector: ScaleGestureDetector) {
                 isZooming = false
-                chipCache.clearSingleEventsCache()
+                listener.requireInvalidation()
             }
 
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
@@ -68,7 +68,7 @@ internal class WeekViewGestureHandler<T : Any>(
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 val hourHeight = config.hourHeight
                 config.newHourHeight = hourHeight * detector.scaleFactor
-                listener.onScaled()
+                listener.requireInvalidation()
                 return true
             }
         })
@@ -138,11 +138,11 @@ internal class WeekViewGestureHandler<T : Any>(
                 config.currentOrigin.x -= distanceX * config.xScrollingSpeed
                 config.currentOrigin.x = min(config.currentOrigin.x, config.maxX)
                 config.currentOrigin.x = max(config.currentOrigin.x, config.minX)
-                listener.onScrolled()
+                listener.requireInvalidation()
             }
             currentScrollDirection.isVertical -> {
                 config.currentOrigin.y -= distanceY
-                listener.onScrolled()
+                listener.requireInvalidation()
             }
             else -> Unit
         }
@@ -178,7 +178,7 @@ internal class WeekViewGestureHandler<T : Any>(
             else -> Unit
         }
 
-        listener.onScrolled()
+        listener.requireInvalidation()
         return true
     }
 
@@ -331,7 +331,7 @@ internal class WeekViewGestureHandler<T : Any>(
             val duration = (daysScrolled * config.scrollDuration).toInt()
 
             scroller.startScroll(startX, startY, distanceX, distanceY, duration)
-            listener.onScrolled()
+            listener.requireInvalidation()
         }
 
         // Reset scrolling and fling direction.
@@ -378,7 +378,7 @@ internal class WeekViewGestureHandler<T : Any>(
             } else if (scroller.computeScrollOffset()) {
                 config.currentOrigin.y = scroller.currY.toFloat()
                 config.currentOrigin.x = scroller.currX.toFloat()
-                listener.onScrolled()
+                listener.requireInvalidation()
             }
         }
     }
@@ -397,7 +397,6 @@ internal class WeekViewGestureHandler<T : Any>(
         get() = ViewConfiguration.get(context).scaledTouchSlop
 
     internal interface Listener {
-        fun onScaled()
-        fun onScrolled()
+        fun requireInvalidation()
     }
 }

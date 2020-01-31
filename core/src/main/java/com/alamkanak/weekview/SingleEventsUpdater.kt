@@ -45,9 +45,10 @@ internal class SingleEventsUpdater<T : Any>(
     }
 
     private val RectF.isValidSingleEventRect: Boolean
-        get() = (left < right &&
-            left < view.width &&
-            top < view.height &&
-            right > config.timeColumnWidth &&
-            bottom > config.headerHeight)
+        get() {
+            val hasCorrectWidth = left < right && left < view.width
+            val hasCorrectHeight = top < view.height
+            val isNotHiddenByChrome = right > config.timeColumnWidth && bottom > config.headerHeight
+            return hasCorrectWidth && hasCorrectHeight && isNotHiddenByChrome
+        }
 }
