@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## Version 4.1.3
+*(2020-01-30)*
+- Fixed: Clicks on event chips weren't recognized after zooming in some cases.
+
+Thanks for reporting these issues, [Mkryglikov](https://github.com/Mkryglikov)!
+
 ## Version 4.1.2
 *(2020-01-19)*
 - Fixed: Dynamically setting the time column background via `setTimeColumnBackgroundColor()` didn't work.
