@@ -198,8 +198,6 @@ data class WeekViewEvent<T> internal constructor(
         private var data: T? = null
     ) {
 
-        // private val event = WeekViewEvent(data = data)
-
         private var id: Long? = null
         private var title: TextResource? = null
         private var location: TextResource? = null

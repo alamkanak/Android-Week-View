@@ -10,8 +10,6 @@ import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
 
-private const val DAYS_PER_WEEK = 7
-
 internal class WeekViewConfigWrapper(
     private val view: WeekView<*>,
     private val config: WeekViewConfig
@@ -253,6 +251,9 @@ internal class WeekViewConfigWrapper(
         set(value) {
             config.maxHour = value
         }
+
+    val timeRange: IntRange
+        get() = minHour..maxHour
 
     var xScrollingSpeed: Float
         get() = config.xScrollingSpeed

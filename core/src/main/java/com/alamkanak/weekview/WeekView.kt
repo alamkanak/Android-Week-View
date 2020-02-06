@@ -1114,7 +1114,10 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Scrolls to a specific hour.
      *
-     * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
+     * @param hour The hour to scroll to, in 24-hour format. Supported values are 0-24.
+     *
+     * @throws IllegalArgumentException Throws exception if the provided hour is smaller than
+     *                                   [minHour] or larger than [maxHour].
      */
     override fun goToHour(hour: Int) {
         if (viewState.areDimensionsInvalid) {
@@ -1122,16 +1125,23 @@ class WeekView<T : Any> @JvmOverloads constructor(
             return
         }
 
-        val modifiedHour = min(hour, configWrapper.hoursPerDay)
-        var verticalOffset = configWrapper.hourHeight * modifiedHour
+        if (hour !in configWrapper.timeRange) {
+            throw IllegalArgumentException(
+                "The provided hour ($hour) is outside of the set time range " +
+                    "(${configWrapper.minHour} – ${configWrapper.maxHour})"
+            )
+        }
 
-        val dayHeight = configWrapper.totalDayHeight
-        val viewHeight = height.toDouble()
+        val hourHeight = configWrapper.hourHeight
+        val desiredOffset = hourHeight * (hour - configWrapper.minHour)
 
-        val desiredOffset = dayHeight - viewHeight
-        verticalOffset = min(desiredOffset.toFloat(), verticalOffset)
+        // We make sure that WeekView doesn't "over-scroll" by limiting the offset to the total day
+        // height minus the height of WeekView, which would result in scrolling all the way to the
+        // bottom.
+        val maxOffset = configWrapper.totalDayHeight - height
+        val finalOffset = min(maxOffset, desiredOffset)
 
-        configWrapper.currentOrigin.y = -verticalOffset
+        configWrapper.currentOrigin.y = finalOffset * (-1)
         invalidate()
     }
 
