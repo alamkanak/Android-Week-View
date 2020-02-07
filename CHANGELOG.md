@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 4.1.4
+*(2020-02-06)*
+- Fixed: `goToHour(hour)` scrolled to the wrong time if `minHour` was set.
+- Changed: `goToHour(hour)` now throws an `IllegalArgumentException` if `hour` is outside of the time range constructed by `minHour` and `maxHour`.
+
+Thanks for reporting the issue, [Mkryglikov](https://github.com/Mkryglikov)!
+
 ## Version 4.1.3
 *(2020-01-30)*
 - Fixed: Clicks on event chips weren't recognized after zooming in some cases.
