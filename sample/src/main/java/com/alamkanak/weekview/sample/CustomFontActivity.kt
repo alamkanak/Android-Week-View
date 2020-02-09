@@ -3,8 +3,8 @@ package com.alamkanak.weekview.sample
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
@@ -25,8 +25,8 @@ class CustomFontActivity : AppCompatActivity() {
 
         weekView.setOnMonthChangeListener(this::onMonthChange)
         weekView.setOnEventClickListener { data, _ -> onEventClick(data) }
-        weekView.setOnEventLongClickListener { data, _ -> onEventLongPress(data) }
-        weekView.setOnEmptyViewLongClickListener(this::onEmptyViewLongPress)
+        weekView.setOnEventLongClickListener { data, _ -> onEventLongClick(data) }
+        weekView.setOnEmptyViewLongClickListener(this::onEmptyViewLongClick)
     }
 
     private fun onMonthChange(
@@ -38,12 +38,12 @@ class CustomFontActivity : AppCompatActivity() {
         showToast("Clicked ${event.title}")
     }
 
-    private fun onEventLongPress(event: Event) {
+    private fun onEventLongClick(event: Event) {
         showToast("Long-clicked ${event.title}")
     }
 
-    private fun onEmptyViewLongPress(time: Calendar) {
+    private fun onEmptyViewLongClick(time: Calendar) {
         val sdf = SimpleDateFormat.getDateTimeInstance()
-        showToast("Empty view clicked at ${sdf.format(time.time)}")
+        showToast("Empty view long-clicked at ${sdf.format(time.time)}")
     }
 }

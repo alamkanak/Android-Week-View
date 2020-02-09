@@ -182,6 +182,5 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
         previousPeriodEvents = null
         currentPeriodEvents = null
         nextPeriodEvents = null
-        fetchedRange = null
     }
 }

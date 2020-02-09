@@ -82,7 +82,7 @@ class AsyncActivity : AppCompatActivity() {
 
         weekView.setOnEmptyViewLongClickListener { time ->
             val sdf = SimpleDateFormat.getDateTimeInstance()
-            showToast("Empty view clicked at ${sdf.format(time.time)}")
+            showToast("Empty view long-clicked at ${sdf.format(time.time)}")
         }
     }
 }

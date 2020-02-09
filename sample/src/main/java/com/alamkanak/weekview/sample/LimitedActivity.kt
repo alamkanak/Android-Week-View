@@ -9,8 +9,8 @@ import com.alamkanak.weekview.OnEventClickListener
 import com.alamkanak.weekview.OnEventLongClickListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
@@ -67,6 +67,6 @@ class LimitedActivity : AppCompatActivity(), OnEventClickListener<Event>,
 
     override fun onEmptyViewLongClick(time: Calendar) {
         val sdf = SimpleDateFormat.getDateTimeInstance()
-        showToast("Empty view clicked at ${sdf.format(time.time)}")
+        showToast("Empty view long-clicked at ${sdf.format(time.time)}")
     }
 }

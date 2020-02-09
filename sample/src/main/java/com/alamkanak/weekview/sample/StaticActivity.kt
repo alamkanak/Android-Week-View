@@ -79,7 +79,7 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
 
     override fun onEmptyViewLongClick(time: Calendar) {
         val sdf = SimpleDateFormat.getDateTimeInstance()
-        showToast("Empty view clicked at ${sdf.format(time.time)}")
+        showToast("Empty view long-clicked at ${sdf.format(time.time)}")
     }
 
     internal fun updateDateText(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
