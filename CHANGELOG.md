@@ -1,6 +1,13 @@
 Changelog
 =========
 
+
+## Version 4.1.5
+*(2020-02-09)*
+- Fixed: WeekView would crash on submitting new events when the previous submit was an empty list of events.
+
+Thanks for reporting the issue, [michaelbukachi](https://github.com/michaelbukachi)!
+
 ## Version 4.1.4
 *(2020-02-06)*
 - Fixed: `goToHour(hour)` scrolled to the wrong time if `minHour` was set.
