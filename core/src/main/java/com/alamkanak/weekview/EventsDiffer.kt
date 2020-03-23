@@ -58,7 +58,7 @@ internal class EventsDiffer<T>(
     ): Boolean {
         val events = items.map { it.toWeekViewEvent() }
         val startDate = events.map { it.startTime.atStartOfDay }.min()
-        val endDate = events.map { it.startTime.atEndOfDay }.max()
+        val endDate = events.map { it.endTime.atEndOfDay }.max()
 
         val eventsCache = eventsCacheWrapper.get()
 
