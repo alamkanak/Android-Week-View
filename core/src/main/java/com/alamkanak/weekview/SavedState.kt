@@ -23,7 +23,7 @@ internal class SavedState : BaseSavedState {
 
     constructor(source: Parcel) : super(source) {
         numberOfVisibleDays = source.readInt()
-        firstVisibleDate = source.readSerializable() as Calendar
+        firstVisibleDate = source.readSerializable() as? Calendar
     }
 
     override fun writeToParcel(out: Parcel, flags: Int) {
