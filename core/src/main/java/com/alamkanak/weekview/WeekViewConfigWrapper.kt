@@ -330,6 +330,24 @@ internal class WeekViewConfigWrapper(
     val headerRowBottomLineWidth: Float
         get() = if (showHeaderRowBottomLine) headerRowBottomLinePaint.strokeWidth else 0f
 
+    var showHeaderRowBottomShadow: Boolean
+        get() = config.showHeaderRowBottomShadow
+        set(value) {
+            config.showHeaderRowBottomShadow = value
+        }
+
+    var headerRowBottomShadowColor: Int
+        get() = config.headerRowBottomShadowColor
+        set(value) {
+            config.headerRowBottomShadowColor = value
+        }
+
+    var headerRowBottomShadowRadius: Int
+        get() = config.headerRowBottomShadowRadius
+        set(value) {
+            config.headerRowBottomShadowRadius = value
+        }
+
     var showWeekNumber: Boolean
         get() = config.showWeekNumber
         set(value) {

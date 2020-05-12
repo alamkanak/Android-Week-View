@@ -22,10 +22,10 @@ internal class NowLineDrawer(
             .map { (_, startPixel) -> startPixel }
             .firstOrNull() ?: return
 
-        drawLine(startPixel, canvas)
+        canvas.drawLine(startPixel)
     }
 
-    private fun drawLine(startPixel: Float, canvas: Canvas) {
+    private fun Canvas.drawLine(startPixel: Float) {
         val top = config.headerHeight + config.currentOrigin.y
         val now = now()
 
@@ -35,17 +35,24 @@ internal class NowLineDrawer(
 
         val startX = max(startPixel, config.timeColumnWidth)
         val endX = startPixel + config.totalDayWidth
-        canvas.drawLine(startX, verticalOffset, endX, verticalOffset, config.nowLinePaint)
+        drawLine(startX, verticalOffset, endX, verticalOffset, config.nowLinePaint)
 
         if (config.showNowLineDot) {
-            drawDot(startPixel, verticalOffset, canvas)
+            drawDot(startPixel, verticalOffset)
         }
     }
 
-    private fun drawDot(startPixel: Float, lineStartY: Float, canvas: Canvas) {
-        // We use a margin to prevent the dot from sticking on the left side of the screen
+    private fun Canvas.drawDot(startPixel: Float, lineStartY: Float) {
         val dotRadius = config.nowDotPaint.strokeWidth
-        val dotMargin = 32f
-        canvas.drawCircle(startPixel + dotMargin, lineStartY, dotRadius, config.nowDotPaint)
+        val actualStartPixel = max(startPixel, config.timeColumnWidth)
+
+        val fullLineWidth = config.totalDayWidth
+        val actualEndPixel = startPixel + fullLineWidth
+
+        val currentlyDisplayedWidth = actualEndPixel - actualStartPixel
+        val currentlyDisplayedPortion = currentlyDisplayedWidth / fullLineWidth
+
+        val adjustedRadius = currentlyDisplayedPortion * dotRadius
+        drawCircle(actualStartPixel, lineStartY, adjustedRadius, config.nowDotPaint)
     }
 }

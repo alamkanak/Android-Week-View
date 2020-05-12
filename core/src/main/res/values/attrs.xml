@@ -23,6 +23,11 @@
         <attr name="headerRowBottomLineColor" format="color" />
         <attr name="headerRowBottomLineWidth" format="dimension" />
 
+        <!-- Header bottom shadow -->
+        <attr name="showHeaderRowBottomShadow" format="boolean" />
+        <attr name="headerRowBottomShadowColor" format="color" />
+        <attr name="headerRowBottomShadowRadius" format="dimension" />
+
         <!-- Time column -->
         <attr name="timeColumnTextColor" format="color" />
         <attr name="timeColumnBackgroundColor" format="color" />

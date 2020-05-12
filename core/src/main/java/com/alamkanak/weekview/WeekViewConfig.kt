@@ -23,6 +23,11 @@ internal class WeekViewConfig(
     var headerRowBottomLineColor: Int = 0
     var headerRowBottomLineWidth: Int = 0
 
+    // Header bottom shadow
+    var showHeaderRowBottomShadow: Boolean = false
+    var headerRowBottomShadowColor: Int = 0
+    var headerRowBottomShadowRadius: Int = 0
+
     // Time column
     var timeColumnTextColor: Int = 0
     var timeColumnBackgroundColor: Int = 0
@@ -138,6 +143,11 @@ internal class WeekViewConfig(
             showHeaderRowBottomLine = getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false)
             headerRowBottomLineColor = getColor(R.styleable.WeekView_headerRowBottomLineColor, Defaults.GRID_COLOR)
             headerRowBottomLineWidth = getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, 1)
+
+            // Header bottom shadow
+            showHeaderRowBottomShadow = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomShadow, false)
+            headerRowBottomShadowColor = a.getColor(R.styleable.WeekView_headerRowBottomShadowColor, Color.LTGRAY)
+            headerRowBottomShadowRadius = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomShadowRadius, 2)
 
             // Time column
             timeColumnTextColor = getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK)

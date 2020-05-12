@@ -10,4 +10,5 @@
     <color name="accent">#2789e4</color>
     <color name="divider">#E2E2E2</color>
     <color name="dark_gray">#aeaeae</color>
+    <color name="light_gray">#CCCCCC</color>
 </resources>

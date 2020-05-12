@@ -85,6 +85,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
         if (isAccessibilityHelperActive) {
             ViewCompat.setAccessibilityDelegate(this, accessibilityTouchHelper)
         }
+
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -93,11 +95,11 @@ class WeekView<T : Any> @JvmOverloads constructor(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
         SingleEventsDrawer(context, configWrapper, eventChipCache),
-        NowLineDrawer(configWrapper),
         TimeColumnDrawer(this, configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelDrawer(configWrapper, cache),
-        AllDayEventsDrawer(context, configWrapper, cache)
+        AllDayEventsDrawer(context, configWrapper, cache),
+        NowLineDrawer(configWrapper)
     )
 
     override fun onDraw(canvas: Canvas) {

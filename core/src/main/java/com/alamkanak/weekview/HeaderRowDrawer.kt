@@ -16,7 +16,15 @@ internal class HeaderRowDrawer<T : Any>(
         canvas: Canvas
     ) {
         val width = view.width.toFloat()
-        canvas.drawRect(0f, 0f, width, config.headerHeight, config.headerBackgroundPaint)
+
+        val backgroundPaint = if (config.showHeaderRowBottomShadow) {
+            config.headerBackgroundPaint.withShadow(
+                radius = config.headerRowBottomShadowRadius,
+                color = config.headerRowBottomShadowColor
+            )
+        } else config.headerBackgroundPaint
+
+        canvas.drawRect(0f, 0f, width, config.headerHeight, backgroundPaint)
 
         if (config.showWeekNumber) {
             canvas.drawWeekNumber(drawingContext)
@@ -57,11 +65,17 @@ internal class HeaderRowDrawer<T : Any>(
     }
 }
 
-internal val Paint.textHeight: Int
+private val Paint.textHeight: Int
     get() = (descent() - ascent()).roundToInt()
 
-internal fun Paint.getTextBounds(text: String): Rect {
+private fun Paint.getTextBounds(text: String): Rect {
     val rect = Rect()
     getTextBounds(text, 0, text.length, rect)
     return rect
+}
+
+private fun Paint.withShadow(radius: Int, color: Int): Paint {
+    return Paint(this).apply {
+        setShadowLayer(radius.toFloat(), 0f, 0f, color)
+    }
 }
