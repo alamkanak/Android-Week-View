@@ -14,8 +14,7 @@ internal class WeekViewViewState(
     private var isFirstDraw = true
     var areDimensionsInvalid = true
 
-    var firstVisibleDate: Calendar? = null
-    var lastVisibleDate: Calendar? = null
+    var firstVisibleDate: Calendar = today()
 
     fun update(viewHeight: Int) {
         val totalHeaderHeight = config.getTotalHeaderHeight().toInt()

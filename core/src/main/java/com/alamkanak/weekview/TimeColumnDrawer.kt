@@ -15,8 +15,8 @@ internal class TimeColumnDrawer(
     }
 
     private fun cacheTimeLabels() = with(config) {
-        for (hour in startHour until hoursPerDay step timeColumnHoursInterval) {
-            timeLabelCache.put(hour, dateTimeInterpreter.interpretTime(hour + minHour))
+        for (hour in timeRange step timeColumnHoursInterval) {
+            timeLabelCache.put(hour, dateTimeInterpreter.interpretTime(hour))
         }
     }
 
@@ -32,8 +32,8 @@ internal class TimeColumnDrawer(
         val hourLines = FloatArray(hoursPerDay * 4)
         val hourStep = timeColumnHoursInterval
 
-        for (hour in startHour until hoursPerDay step hourStep) {
-            val heightOfHour = (hourHeight * hour)
+        for (hour in timeRange step hourStep) {
+            val heightOfHour = hourHeight * (hour - minHour)
             topMargin = headerHeight + currentOrigin.y + heightOfHour
 
             val isOutsideVisibleArea = topMargin > bottom
@@ -49,7 +49,9 @@ internal class TimeColumnDrawer(
                 y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
-            canvas.drawText(timeLabelCache[hour], x, y, timeTextPaint)
+            if (hour in timeLabelCache) {
+                canvas.drawText(timeLabelCache[hour], x, y, timeTextPaint)
+            }
 
             if (showTimeColumnHourSeparator && hour > 0) {
                 val j = hour - 1
@@ -77,3 +79,5 @@ internal class TimeColumnDrawer(
         cacheTimeLabels()
     }
 }
+
+private operator fun <E> SparseArray<E>.contains(key: Int): Boolean = indexOfKey(key) >= 0

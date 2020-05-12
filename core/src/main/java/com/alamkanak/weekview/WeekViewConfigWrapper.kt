@@ -51,8 +51,7 @@ internal class WeekViewConfigWrapper(
         color = config.todayHeaderTextColor
     }
 
-    var currentAllDayEventHeight: Int = 0
-        private set
+    private var currentAllDayEventHeight: Int = 0
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
@@ -252,9 +251,6 @@ internal class WeekViewConfigWrapper(
             config.maxHour = value
         }
 
-    val timeRange: IntRange
-        get() = minHour..maxHour
-
     var xScrollingSpeed: Float
         get() = config.xScrollingSpeed
         set(value) {
@@ -439,8 +435,13 @@ internal class WeekViewConfigWrapper(
     val minutesPerDay: Int
         get() = (hoursPerDay * Constants.MINUTES_PER_HOUR).toInt()
 
-    val startHour: Int
-        get() = if (showMidnightHour && showTimeColumnHourSeparator) minHour else timeColumnHoursInterval
+    val timeRange: IntRange
+        get() {
+            val includeMidnightHour = showTimeColumnHourSeparator && showMidnightHour
+            val padding = if (includeMidnightHour) 0 else timeColumnHoursInterval
+            val startHour = minHour + padding
+            return startHour until maxHour
+        }
 
     var eventCornerRadius: Int
         get() = config.eventCornerRadius
@@ -517,7 +518,7 @@ internal class WeekViewConfigWrapper(
         widthPerDay = availableWidth / numberOfVisibleDays
     }
 
-    private fun getXOriginForDate(date: Calendar): Float {
+    fun getXOriginForDate(date: Calendar): Float {
         return -1f * date.daysFromToday * totalDayWidth
     }
 
@@ -534,12 +535,12 @@ internal class WeekViewConfigWrapper(
         val currentDayIsNotToday = today.dayOfWeek != firstDayOfWeek
 
         if (isWeekView && currentDayIsNotToday && showFirstDayOfWeekFirst) {
-            val difference = computeDifferenceWithFirstDayOfWeek(today)
+            val difference = today.computeDifferenceWithFirstDayOfWeek()
             currentOrigin.x += (widthPerDay + columnGap) * difference
         }
 
         if (showCurrentTimeFirst) {
-            computeDifferenceWithCurrentTime(view)
+            scrollToCurrentTime(view)
         }
 
         // Overwrites the origin when today is out of date range
@@ -547,27 +548,22 @@ internal class WeekViewConfigWrapper(
         currentOrigin.x = max(currentOrigin.x, minX)
     }
 
-    private fun computeDifferenceWithCurrentTime(view: WeekView<*>) {
-        val now = now()
-
-        val desired = if (now.hour > 0) {
+    private fun scrollToCurrentTime(view: WeekView<*>) {
+        val desired = now()
+        if (desired.hour > minHour) {
             // Add some padding above the current time (and thus: the now line)
-            now - Hours(1)
-        } else {
-            now.atStartOfDay
+            desired -= Hours(1)
         }
 
-        val hour = desired.hour
-        val minutes = desired.minute
-        val fraction = minutes.toFloat() / Constants.MINUTES_PER_HOUR
+        val minTime = now().withTime(hour = minHour, minutes = 0)
+        val maxTime = now().withTime(hour = maxHour, minutes = 0)
+        desired.limitBy(minTime, maxTime)
 
-        var verticalOffset = hourHeight * (hour + fraction)
-        val viewHeight = view.height.toDouble()
+        val fraction = desired.minute.toFloat() / Constants.MINUTES_PER_HOUR
+        val verticalOffset = hourHeight * (desired.hour + fraction)
+        val desiredOffset = totalDayHeight - view.height
 
-        val desiredOffset = totalDayHeight - viewHeight
-        verticalOffset = min(desiredOffset.toFloat(), verticalOffset)
-
-        currentOrigin.y = verticalOffset * -1
+        currentOrigin.y = min(desiredOffset, verticalOffset) * -1
     }
 
     /**
@@ -583,23 +579,21 @@ internal class WeekViewConfigWrapper(
         } else if (date.isAfter(maxDate)) {
             maxDate + Days(1 - numberOfVisibleDays)
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
-            val diff = computeDifferenceWithFirstDayOfWeek(date)
+            val diff = date.computeDifferenceWithFirstDayOfWeek()
             date - Days(diff)
         } else {
             date
         }
     }
 
-    private fun computeDifferenceWithFirstDayOfWeek(
-        date: Calendar
-    ): Int {
+    private fun Calendar.computeDifferenceWithFirstDayOfWeek(): Int {
         val firstDayOfWeek = firstDayOfWeek
-        return if (firstDayOfWeek == Calendar.MONDAY && date.dayOfWeek == Calendar.SUNDAY) {
+        return if (firstDayOfWeek == Calendar.MONDAY && dayOfWeek == Calendar.SUNDAY) {
             // Special case, because Calendar.MONDAY has constant value 2 and Calendar.SUNDAY has
             // constant value 1. The correct result to return is 6 days, not -1 days.
             6
         } else {
-            date.dayOfWeek - firstDayOfWeek
+            dayOfWeek - firstDayOfWeek
         }
     }
 

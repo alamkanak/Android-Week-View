@@ -17,6 +17,7 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     private val config: WeekViewConfigWrapper,
     private val drawingContext: DrawingContext,
     private val gestureHandler: WeekViewGestureHandler<T>,
+    private val touchHandler: WeekViewTouchHandler<T>,
     private val eventChipCache: EventChipCache<T>
 ) : ExploreByTouchHelper(view) {
 
@@ -25,7 +26,6 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     private val dateFormatter = SimpleDateFormat.getDateInstance(LONG)
     private val dateTimeFormatter = SimpleDateFormat.getDateTimeInstance(LONG, SHORT)
 
-    private val touchHandler = WeekViewTouchHandler(config)
     private val store = VirtualViewIdStore<T>()
 
     override fun getVirtualViewAt(x: Float, y: Float): Int {
@@ -79,12 +79,12 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
 
         return when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                gestureHandler.onEventClickListener?.onEventClick(data, rect)
+                touchHandler.onEventClickListener?.onEventClick(data, rect)
                 sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
                 true
             }
             AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-                gestureHandler.onEventLongClickListener?.onEventLongClick(data, rect)
+                touchHandler.onEventLongClickListener?.onEventLongClick(data, rect)
                 sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
                 true
             }
@@ -99,12 +99,12 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     ): Boolean {
         return when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                gestureHandler.onEmptyViewClickListener?.onEmptyViewClicked(date)
+                touchHandler.onEmptyViewClickListener?.onEmptyViewClicked(date)
                 sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
                 true
             }
             AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-                gestureHandler.onEmptyViewLongClickListener?.onEmptyViewLongClick(date)
+                touchHandler.onEmptyViewLongClickListener?.onEmptyViewLongClick(date)
                 sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
                 true
             }

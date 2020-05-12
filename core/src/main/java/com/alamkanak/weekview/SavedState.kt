@@ -8,14 +8,14 @@ import java.util.Calendar
 internal class SavedState : BaseSavedState {
 
     var numberOfVisibleDays: Int = 0
-    var firstVisibleDate: Calendar? = null
+    var firstVisibleDate: Calendar = today()
 
     constructor(superState: Parcelable) : super(superState)
 
     constructor(
         superState: Parcelable,
         numberOfVisibleDays: Int,
-        firstVisibleDate: Calendar?
+        firstVisibleDate: Calendar
     ) : super(superState) {
         this.numberOfVisibleDays = numberOfVisibleDays
         this.firstVisibleDate = firstVisibleDate
@@ -23,7 +23,7 @@ internal class SavedState : BaseSavedState {
 
     constructor(source: Parcel) : super(source) {
         numberOfVisibleDays = source.readInt()
-        firstVisibleDate = source.readSerializable() as? Calendar
+        firstVisibleDate = source.readSerializable() as Calendar
     }
 
     override fun writeToParcel(out: Parcel, flags: Int) {

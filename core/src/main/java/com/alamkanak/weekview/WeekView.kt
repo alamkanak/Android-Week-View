@@ -27,21 +27,30 @@ class WeekView<T : Any> @JvmOverloads constructor(
         WeekViewConfigWrapper(this, config)
     }
 
-    private val gestureListener = object : WeekViewGestureHandler.Listener {
-        override fun requireInvalidation() = ViewCompat.postInvalidateOnAnimation(this@WeekView)
-    }
-
     private val cache = WeekViewCache<T>()
     private val eventChipCache = EventChipCache<T>()
 
     private val viewState = WeekViewViewState(configWrapper, this)
     private val drawingContext = DrawingContext(configWrapper)
 
-    private val gestureHandler =
-        WeekViewGestureHandler(this, configWrapper, eventChipCache, gestureListener)
+    private val touchHandler = WeekViewTouchHandler(configWrapper, eventChipCache)
+    private val gestureHandler = WeekViewGestureHandler(
+        view = this,
+        config = configWrapper,
+        viewState = viewState,
+        chipCache = eventChipCache,
+        touchHandler = touchHandler,
+        onInvalidation = { ViewCompat.postInvalidateOnAnimation(this) }
+    )
 
     private var accessibilityTouchHelper = WeekViewAccessibilityTouchHelper(
-        this, configWrapper, drawingContext, gestureHandler, eventChipCache)
+        view = this,
+        config = configWrapper,
+        drawingContext = drawingContext,
+        gestureHandler = gestureHandler,
+        touchHandler = touchHandler,
+        eventChipCache = eventChipCache
+    )
 
     private val eventChipsLoader = EventChipsLoader(configWrapper, eventChipCache)
     private val eventChipsExpander = EventChipsExpander(configWrapper, eventChipCache)
@@ -111,10 +120,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
             return
         }
 
-        val firstVisibleDate = checkNotNull(viewState.firstVisibleDate)
-
         // These can either be newly loaded events or previously cached events
-        val events = eventsLoader.refresh(firstVisibleDate)
+        val events = eventsLoader.refresh(viewState.firstVisibleDate)
         eventChipCache.clear()
 
         if (events.isNotEmpty()) {
@@ -156,9 +163,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             configWrapper.numberOfVisibleDays = savedState.numberOfVisibleDays
         }
 
-        savedState.firstVisibleDate?.let {
-            goToDate(it)
-        }
+        goToDate(savedState.firstVisibleDate)
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -182,17 +187,13 @@ class WeekView<T : Any> @JvmOverloads constructor(
         val delta = daysScrolled.roundToInt() * (-1)
 
         val firstVisibleDate = today() + Days(delta)
-        val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
-
         viewState.firstVisibleDate = firstVisibleDate
-        viewState.lastVisibleDate = lastVisibleDate
 
-        val hasFirstVisibleDayChanged = oldFirstVisibleDay?.let {
-            firstVisibleDate.isSameDate(it).not()
-        } ?: true
-
+        val hasFirstVisibleDayChanged = oldFirstVisibleDay.toEpochDays() != firstVisibleDate.toEpochDays()
         if (hasFirstVisibleDayChanged) {
             scrollListener?.onFirstVisibleDateChanged(firstVisibleDate)
+
+            val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
             onRangeChangeListener?.onRangeChanged(firstVisibleDate, lastVisibleDate)
         }
     }
@@ -224,6 +225,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * [java.util.Calendar.WEDNESDAY], [java.util.Calendar.THURSDAY],
      * [java.util.Calendar.FRIDAY], [java.util.Calendar.SATURDAY].
      */
+    @PublicApi
     var firstDayOfWeek: Int
         get() = configWrapper.firstDayOfWeek
         set(value) {
@@ -234,6 +236,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the number of visible days.
      */
+    @PublicApi
     var numberOfVisibleDays: Int
         get() = configWrapper.numberOfVisibleDays
         set(value) {
@@ -241,10 +244,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
             dateTimeInterpreter.onSetNumberOfDays(value)
             clearCaches()
 
-            viewState.firstVisibleDate?.let {
-                // Scroll to first visible day after changing the number of visible days
-                viewState.scrollToDate = it
-            }
+            // Scroll to first visible day after changing the number of visible days
+            viewState.scrollToDate = viewState.firstVisibleDate
 
             calculateWidthPerDay()
             invalidate()
@@ -254,6 +255,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns whether the first day of the week should be displayed at the left-most position
      * when WeekView is displayed for the first time.
      */
+    @PublicApi
     var isShowFirstDayOfWeekFirst: Boolean
         get() = configWrapper.showFirstDayOfWeekFirst
         set(value) {
@@ -268,6 +270,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      ***********************************************************************************************
      */
 
+    @PublicApi
     var isShowHeaderRowBottomLine: Boolean
         /**
          * Returns whether a horizontal line should be displayed at the bottom of the header row.
@@ -281,6 +284,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             invalidate()
         }
 
+    @PublicApi
     var headerRowBottomLineColor: Int
         /**
          * Returns the color of the horizontal line at the bottom of the header row.
@@ -295,6 +299,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             invalidate()
         }
 
+    @PublicApi
     var headerRowBottomLineWidth: Int
         /**
          * Returns the stroke width of the horizontal line at the bottom of the header row.
@@ -320,6 +325,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the padding in the time column to the left and right side of the time label.
      */
+    @PublicApi
     var timeColumnPadding: Int
         get() = configWrapper.timeColumnPadding
         set(value) {
@@ -330,6 +336,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text color of the labels in the time column.
      */
+    @PublicApi
     var timeColumnTextColor: Int
         get() = configWrapper.timeColumnTextColor
         set(value) {
@@ -340,6 +347,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the background color of the time column.
      */
+    @PublicApi
     var timeColumnBackgroundColor: Int
         get() = configWrapper.timeColumnBackgroundColor
         set(value) {
@@ -350,6 +358,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text size of the labels in the time column.
      */
+    @PublicApi
     var timeColumnTextSize: Int
         get() = configWrapper.timeColumnTextSize
         set(value) {
@@ -361,6 +370,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns whether the label for the midnight hour is displayed in the time column. This setting
      * is only considered if [isShowTimeColumnHourSeparator] is set to true.
      */
+    @PublicApi
     var isShowMidnightHour: Boolean
         get() = configWrapper.showMidnightHour
         set(value) {
@@ -371,6 +381,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether a horizontal line is displayed for each hour in the time column.
      */
+    @PublicApi
     var isShowTimeColumnHourSeparator: Boolean
         get() = configWrapper.showTimeColumnHourSeparator
         set(value) {
@@ -381,6 +392,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the interval in which time labels are displayed in the time column.
      */
+    @PublicApi
     var timeColumnHoursInterval: Int
         get() = configWrapper.timeColumnHoursInterval
         set(value) {
@@ -399,6 +411,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether a vertical line is displayed at the end of the time column.
      */
+    @PublicApi
     var isShowTimeColumnSeparator: Boolean
         get() = configWrapper.showTimeColumnSeparator
         set(value) {
@@ -409,6 +422,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the color of the time column separator.
      */
+    @PublicApi
     var timeColumnSeparatorColor: Int
         get() = configWrapper.timeColumnSeparatorColor
         set(value) {
@@ -419,6 +433,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the stroke width of the time column separator.
      */
+    @PublicApi
     var timeColumnSeparatorWidth: Int
         get() = configWrapper.timeColumnSeparatorStrokeWidth
         set(value) {
@@ -437,6 +452,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the header row padding, which is applied above and below the all-day event chips.
      */
+    @PublicApi
     var headerRowPadding: Int
         get() = configWrapper.headerRowPadding
         set(value) {
@@ -447,6 +463,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the header row background color.
      */
+    @PublicApi
     var headerRowBackgroundColor: Int
         get() = configWrapper.headerRowBackgroundColor
         set(value) {
@@ -457,6 +474,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text color used for all date labels except today.
      */
+    @PublicApi
     var headerRowTextColor: Int
         get() = configWrapper.headerRowTextColor
         set(value) {
@@ -467,6 +485,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text color used for today's date label.
      */
+    @PublicApi
     var todayHeaderTextColor: Int
         get() = configWrapper.todayHeaderTextColor
         set(value) {
@@ -477,6 +496,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text size of all date labels.
      */
+    @PublicApi
     var headerRowTextSize: Int
         get() = configWrapper.headerRowTextSize
         set(value) {
@@ -495,6 +515,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the corner radius of an [EventChip].
      */
+    @PublicApi
     var eventCornerRadius: Int
         get() = configWrapper.eventCornerRadius
         set(value) {
@@ -505,6 +526,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text size of a single-event [EventChip].
      */
+    @PublicApi
     var eventTextSize: Int
         get() = configWrapper.eventTextPaint.textSize.toInt()
         set(value) {
@@ -515,6 +537,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether the text size of the [EventChip] is adapting to the [EventChip] height.
      */
+    @PublicApi
     var isAdaptiveEventTextSize: Boolean
         get() = configWrapper.adaptiveEventTextSize
         set(value) {
@@ -525,6 +548,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the text size of an all-day [EventChip].
      */
+    @PublicApi
     var allDayEventTextSize: Int
         get() = configWrapper.allDayEventTextPaint.textSize.toInt()
         set(value) {
@@ -535,6 +559,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the default text color of an [EventChip].
      */
+    @PublicApi
     var defaultEventTextColor: Int
         get() = configWrapper.eventTextPaint.color
         set(value) {
@@ -545,6 +570,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the horizontal padding within an [EventChip].
      */
+    @PublicApi
     var eventPaddingHorizontal: Int
         get() = configWrapper.eventPaddingHorizontal
         set(value) {
@@ -555,6 +581,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the vertical padding within an [EventChip].
      */
+    @PublicApi
     var eventPaddingVertical: Int
         get() = configWrapper.eventPaddingVertical
         set(value) {
@@ -565,6 +592,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the default text color of an [EventChip].
      */
+    @PublicApi
     var defaultEventColor: Int
         get() = configWrapper.defaultEventColor
         set(value) {
@@ -583,6 +611,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the column gap at the end of each day.
      */
+    @PublicApi
     var columnGap: Int
         get() = configWrapper.columnGap
         set(value) {
@@ -593,6 +622,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the horizontal gap between overlapping [EventChip]s.
      */
+    @PublicApi
     var overlappingEventGap: Int
         get() = configWrapper.overlappingEventGap
         set(value) {
@@ -603,6 +633,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the vertical margin of an [EventChip].
      */
+    @PublicApi
     var eventMarginVertical: Int
         get() = configWrapper.eventMarginVertical
         set(value) {
@@ -614,6 +645,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the horizontal margin of an [EventChip]. This margin is only applied in single-day
      * view and if there are no overlapping events.
      */
+    @PublicApi
     var eventMarginHorizontal: Int
         get() = configWrapper.eventMarginHorizontal
         set(value) {
@@ -632,6 +664,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the background color of a day.
      */
+    @PublicApi
     var dayBackgroundColor: Int
         get() = configWrapper.dayBackgroundPaint.color
         set(value) {
@@ -642,6 +675,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the background color of the current date.
      */
+    @PublicApi
     var todayBackgroundColor: Int
         get() = configWrapper.todayBackgroundPaint.color
         set(value) {
@@ -655,6 +689,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * The weekend background colors can be defined by [pastWeekendBackgroundColor] and
      * [futureWeekendBackgroundColor].
      */
+    @PublicApi
     var isShowDistinctWeekendColor: Boolean
         get() = configWrapper.showDistinctWeekendColor
         set(value) {
@@ -669,6 +704,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * The past and future day colors can be defined by [pastBackgroundColor] and
      * [futureBackgroundColor].
      */
+    @PublicApi
     var isShowDistinctPastFutureColor: Boolean
         get() = configWrapper.showDistinctPastFutureColor
         set(value) {
@@ -680,6 +716,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the background color for past dates. If not explicitly set, WeekView will used
      * [dayBackgroundColor].
      */
+    @PublicApi
     var pastBackgroundColor: Int
         get() = configWrapper.pastBackgroundPaint.color
         set(value) {
@@ -691,6 +728,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the background color for past weekend dates. If not explicitly set, WeekView will
      * used [pastBackgroundColor].
      */
+    @PublicApi
     var pastWeekendBackgroundColor: Int
         get() = configWrapper.pastWeekendBackgroundPaint.color
         set(value) {
@@ -702,6 +740,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the background color for future dates. If not explicitly set, WeekView will used
      * [dayBackgroundColor].
      */
+    @PublicApi
     var futureBackgroundColor: Int
         get() = configWrapper.futureBackgroundPaint.color
         set(value) {
@@ -713,6 +752,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the background color for future weekend dates. If not explicitly set, WeekView will
      * used [futureBackgroundColor].
      */
+    @PublicApi
     var futureWeekendBackgroundColor: Int
         get() = configWrapper.futureWeekendBackgroundPaint.color
         set(value) {
@@ -731,6 +771,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the current height of an hour.
      */
+    @PublicApi
     var hourHeight: Float
         get() = configWrapper.hourHeight
         set(value) {
@@ -741,6 +782,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the minimum height of an hour.
      */
+    @PublicApi
     var minHourHeight: Int
         get() = configWrapper.minHourHeight
         set(value) {
@@ -751,6 +793,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the maximum height of an hour.
      */
+    @PublicApi
     var maxHourHeight: Int
         get() = configWrapper.maxHourHeight
         set(value) {
@@ -762,6 +805,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns whether the complete day should be shown, in which case [hourHeight] automatically
      * adjusts to accommodate all hours between [minHour] and [maxHour].
      */
+    @PublicApi
     var isShowCompleteDay: Boolean
         get() = configWrapper.showCompleteDay
         set(value) {
@@ -780,6 +824,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether a horizontal line should be displayed at the current time.
      */
+    @PublicApi
     var isShowNowLine: Boolean
         get() = configWrapper.showNowLine
         set(value) {
@@ -790,6 +835,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the color of the horizontal "now" line.
      */
+    @PublicApi
     var nowLineColor: Int
         get() = configWrapper.nowLinePaint.color
         set(value) {
@@ -800,6 +846,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the stroke width of the horizontal "now" line.
      */
+    @PublicApi
     var nowLineStrokeWidth: Int
         get() = configWrapper.nowLinePaint.strokeWidth.toInt()
         set(value) {
@@ -811,6 +858,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns whether a dot at the start of the "now" line is displayed. The dot is only displayed
      * if [isShowNowLine] is set to true.
      */
+    @PublicApi
     var isShowNowLineDot: Boolean
         get() = configWrapper.showNowLineDot
         set(value) {
@@ -821,6 +869,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the color of the dot at the start of the "now" line.
      */
+    @PublicApi
     var nowLineDotColor: Int
         get() = configWrapper.nowDotPaint.color
         set(value) {
@@ -831,6 +880,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the radius of the dot at the start of the "now" line.
      */
+    @PublicApi
     var nowLineDotRadius: Int
         get() = configWrapper.nowDotPaint.strokeWidth.toInt()
         set(value) {
@@ -846,6 +896,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      ***********************************************************************************************
      */
 
+    @PublicApi
     var isShowHourSeparators: Boolean
         get() = configWrapper.showHourSeparators
         set(value) {
@@ -853,6 +904,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             invalidate()
         }
 
+    @PublicApi
     var hourSeparatorColor: Int
         get() = configWrapper.hourSeparatorPaint.color
         set(value) {
@@ -860,6 +912,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             invalidate()
         }
 
+    @PublicApi
     var hourSeparatorStrokeWidth: Int
         get() = configWrapper.hourSeparatorPaint.strokeWidth.toInt()
         set(value) {
@@ -878,6 +931,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether vertical lines are displayed as separators between dates.
      */
+    @PublicApi
     var isShowDaySeparators: Boolean
         get() = configWrapper.showDaySeparators
         set(value) {
@@ -888,6 +942,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the color of the separators between dates.
      */
+    @PublicApi
     var daySeparatorColor: Int
         get() = configWrapper.daySeparatorPaint.color
         set(value) {
@@ -898,6 +953,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the stroke color of the separators between dates.
      */
+    @PublicApi
     var daySeparatorStrokeWidth: Int
         get() = configWrapper.daySeparatorPaint.strokeWidth.toInt()
         set(value) {
@@ -917,6 +973,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the minimum date that [WeekView] will display, or null if none is set. Events before
      * this date will not be shown.
      */
+    @PublicApi
     var minDate: Calendar?
         get() = configWrapper.minDate?.copy()
         set(value) {
@@ -933,6 +990,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the maximum date that [WeekView] will display, or null if none is set. Events after
      * this date will not be shown.
      */
+    @PublicApi
     var maxDate: Calendar?
         get() = configWrapper.maxDate?.copy()
         set(value) {
@@ -957,6 +1015,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the minimum hour that [WeekView] will display. Events before this time will not be
      * shown.
      */
+    @PublicApi
     var minHour: Int
         get() = configWrapper.minHour
         set(value) {
@@ -972,6 +1031,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the maximum hour that [WeekView] will display. Events before this time will not be
      * shown.
      */
+    @PublicApi
     var maxHour: Int
         get() = configWrapper.maxHour
         set(value) {
@@ -994,6 +1054,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the scrolling speed factor in horizontal direction.
      */
+    @PublicApi
     var xScrollingSpeed: Float
         get() = configWrapper.xScrollingSpeed
         set(value) {
@@ -1003,6 +1064,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether WeekView can fling horizontally.
      */
+    @PublicApi
     var isHorizontalFlingEnabled: Boolean
         get() = configWrapper.horizontalFlingEnabled
         set(value) {
@@ -1012,6 +1074,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether WeekView can scroll horizontally.
      */
+    @PublicApi
     var isHorizontalScrollingEnabled: Boolean
         get() = configWrapper.horizontalScrollingEnabled
         set(value) {
@@ -1021,12 +1084,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether WeekView can fling vertically.
      */
+    @PublicApi
     var isVerticalFlingEnabled: Boolean
         get() = configWrapper.verticalFlingEnabled
         set(value) {
             configWrapper.verticalFlingEnabled = value
         }
 
+    @PublicApi
     var scrollDuration: Int
         get() = configWrapper.scrollDuration
         set(value) {
@@ -1035,11 +1100,6 @@ class WeekView<T : Any> @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean = gestureHandler.onTouchEvent(event)
-
-    override fun computeScroll() {
-        super.computeScroll()
-        gestureHandler.computeScroll()
-    }
 
     /*
      ***********************************************************************************************
@@ -1052,18 +1112,21 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the first visible date.
      */
-    val firstVisibleDate: Calendar?
-        get() = viewState.firstVisibleDate?.copy()
+    @PublicApi
+    val firstVisibleDate: Calendar
+        get() = viewState.firstVisibleDate.copy()
 
     /**
      * Returns the last visible date.
      */
-    val lastVisibleDate: Calendar?
-        get() = viewState.lastVisibleDate?.copy()
+    @PublicApi
+    val lastVisibleDate: Calendar
+        get() = viewState.firstVisibleDate.copy() + Days(configWrapper.numberOfVisibleDays - 1)
 
     /**
      * Shows the current date.
      */
+    @PublicApi
     fun goToToday() {
         goToDate(today())
     }
@@ -1071,6 +1134,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Shows the current date and time.
      */
+    @PublicApi
     fun goToCurrentTime() {
         now().apply {
             goToDate(this)
@@ -1084,6 +1148,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      *
      * @param date The date to show.
      */
+    @PublicApi
     override fun goToDate(date: Calendar) {
         val adjustedDate = configWrapper.getDateWithinDateRange(date)
         gestureHandler.forceScrollFinished()
@@ -1106,6 +1171,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Refreshes the view and loads the events again.
      */
+    @PublicApi
     fun notifyDataSetChanged() {
         eventsLoader.requireRefresh()
         invalidate()
@@ -1119,13 +1185,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * @throws IllegalArgumentException Throws exception if the provided hour is smaller than
      *                                   [minHour] or larger than [maxHour].
      */
+    @PublicApi
     override fun goToHour(hour: Int) {
         if (viewState.areDimensionsInvalid) {
             viewState.scrollToHour = hour
             return
         }
 
-        if (hour !in configWrapper.timeRange) {
+        if (hour !in configWrapper.minHour..configWrapper.maxHour) {
             throw IllegalArgumentException(
                 "The provided hour ($hour) is outside of the set time range " +
                     "(${configWrapper.minHour} – ${configWrapper.maxHour})"
@@ -1148,6 +1215,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the first hour that is visible on the screen.
      */
+    @PublicApi
     val firstVisibleHour: Double
         get() = (configWrapper.currentOrigin.y * -1 / configWrapper.hourHeight).toDouble()
 
@@ -1162,6 +1230,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns the typeface used for events, time labels and date labels.
      */
+    @PublicApi
     var typeface: Typeface
         get() = configWrapper.typeface
         set(value) {
@@ -1177,12 +1246,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
      ***********************************************************************************************
      */
 
+    @PublicApi
     var onEventClickListener: OnEventClickListener<T>?
-        get() = gestureHandler.onEventClickListener
+        get() = touchHandler.onEventClickListener
         set(value) {
-            gestureHandler.onEventClickListener = value
+            touchHandler.onEventClickListener = value
         }
 
+    @PublicApi
     fun setOnEventClickListener(
         block: (data: T, rect: RectF) -> Unit
     ) {
@@ -1193,6 +1264,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var onMonthChangeListener: OnMonthChangeListener<T>?
         get() = (eventsLoader as? LegacyEventsLoader)?.onMonthChangeListener
         set(value) {
@@ -1200,6 +1272,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             eventsLoaderWrapper.onListenerChanged(value)
         }
 
+    @PublicApi
     fun setOnMonthChangeListener(
         block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
     ) {
@@ -1217,6 +1290,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Submits a list of [WeekViewDisplayable]s to [WeekView]. If the new events fall into the
      * currently displayed date range, this method will also redraw [WeekView].
      */
+    @PublicApi
     fun submit(items: List<WeekViewDisplayable<T>>) {
         eventsDiffer.submit(items) { shouldInvalidate ->
             if (shouldInvalidate) {
@@ -1225,6 +1299,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var onLoadMoreListener: OnLoadMoreListener?
         get() = (eventsLoader as? PagedEventsLoader)?.onLoadMoreListener
         set(value) {
@@ -1236,6 +1311,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Registers a block that is called whenever [WeekView] needs to load more events. This is
      * similar to an [OnMonthChangeListener], but does not require anything to be returned.
      */
+    @PublicApi
     fun setOnLoadMoreListener(
         block: (startDate: Calendar, endDate: Calendar) -> Unit
     ) {
@@ -1246,12 +1322,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var onEventLongClickListener: OnEventLongClickListener<T>?
-        get() = gestureHandler.onEventLongClickListener
+        get() = touchHandler.onEventLongClickListener
         set(value) {
-            gestureHandler.onEventLongClickListener = value
+            touchHandler.onEventLongClickListener = value
         }
 
+    @PublicApi
     fun setOnEventLongClickListener(
         block: (data: T, rect: RectF) -> Unit
     ) {
@@ -1262,12 +1340,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var onEmptyViewClickListener: OnEmptyViewClickListener?
-        get() = gestureHandler.onEmptyViewClickListener
+        get() = touchHandler.onEmptyViewClickListener
         set(value) {
-            gestureHandler.onEmptyViewClickListener = value
+            touchHandler.onEmptyViewClickListener = value
         }
 
+    @PublicApi
     fun setOnEmptyViewClickListener(
         block: (time: Calendar) -> Unit
     ) {
@@ -1278,12 +1358,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var onEmptyViewLongClickListener: OnEmptyViewLongClickListener?
-        get() = gestureHandler.onEmptyViewLongClickListener
+        get() = touchHandler.onEmptyViewLongClickListener
         set(value) {
-            gestureHandler.onEmptyViewLongClickListener = value
+            touchHandler.onEmptyViewLongClickListener = value
         }
 
+    @PublicApi
     fun setOnEmptyViewLongClickListener(
         block: (time: Calendar) -> Unit
     ) {
@@ -1294,24 +1376,28 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var scrollListener: ScrollListener?
         get() = gestureHandler.scrollListener
         set(value) {
             gestureHandler.scrollListener = value
         }
 
+    @PublicApi
     fun setScrollListener(
         block: (date: Calendar) -> Unit
     ) {
         scrollListener = object : ScrollListener {
             override fun onFirstVisibleDateChanged(date: Calendar) {
-                block(checkNotNull(firstVisibleDate))
+                block(firstVisibleDate)
             }
         }
     }
 
+    @PublicApi
     var onRangeChangeListener: OnRangeChangeListener? = null
 
+    @PublicApi
     fun setOnRangeChangeListener(
         block: (firstVisibleDate: Calendar, lastVisibleDate: Calendar) -> Unit
     ) {
@@ -1322,6 +1408,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @PublicApi
     var dateTimeInterpreter: DateTimeInterpreter
         get() = configWrapper.dateTimeInterpreter
         set(value) {

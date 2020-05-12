@@ -4,7 +4,6 @@ import android.graphics.RectF
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.util.Preconditions.checkNotNull
 import com.alamkanak.weekview.OnEmptyViewLongClickListener
 import com.alamkanak.weekview.OnEventClickListener
 import com.alamkanak.weekview.OnEventLongClickListener
@@ -44,13 +43,13 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
         weekView.onEmptyViewLongClickListener = this
 
         previousWeekButton.setOnClickListener {
-            val cal = checkNotNull(weekView.firstVisibleDate)
+            val cal = weekView.firstVisibleDate
             cal.add(Calendar.DATE, -7)
             weekView.goToDate(cal)
         }
 
         nextWeekButton.setOnClickListener {
-            val cal = checkNotNull(weekView.firstVisibleDate)
+            val cal = weekView.firstVisibleDate
             cal.add(Calendar.DATE, 7)
             weekView.goToDate(cal)
         }
@@ -68,13 +67,13 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
         endDate: Calendar
     ) = database.getEventsInRange(startDate, endDate)
 
-    override fun onEventClick(event: Event, eventRect: RectF) {
-        showToast("Clicked ${event.title}")
+    override fun onEventClick(data: Event, eventRect: RectF) {
+        showToast("Clicked ${data.title}")
     }
 
-    override fun onEventLongClick(event: Event, eventRect: RectF) {
-        showToast("Long-clicked ${event.title}")
-        Toast.makeText(this, "Long pressed event: " + event.title, Toast.LENGTH_SHORT).show()
+    override fun onEventLongClick(data: Event, eventRect: RectF) {
+        showToast("Long-clicked ${data.title}")
+        Toast.makeText(this, "Long pressed event: " + data.title, Toast.LENGTH_SHORT).show()
     }
 
     override fun onEmptyViewLongClick(time: Calendar) {

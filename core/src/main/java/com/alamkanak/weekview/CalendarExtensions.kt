@@ -25,11 +25,17 @@ internal inline class Millis(val millis: Int) : Duration {
         get() = millis
 }
 
-internal val Calendar.hour: Int
+internal var Calendar.hour: Int
     get() = get(Calendar.HOUR_OF_DAY)
+    set(value) {
+        set(Calendar.HOUR_OF_DAY, value)
+    }
 
-internal val Calendar.minute: Int
+internal var Calendar.minute: Int
     get() = get(Calendar.MINUTE)
+    set(value) {
+        set(Calendar.MINUTE, value)
+    }
 
 internal val Calendar.dayOfWeek: Int
     get() = get(Calendar.DAY_OF_WEEK)
@@ -257,4 +263,14 @@ internal fun Calendar.format(
 ): String {
     val sdf = SimpleDateFormat.getDateInstance(format)
     return sdf.format(time)
+}
+
+internal fun Calendar.limitBy(minTime: Calendar, maxTime: Calendar) {
+    if (this < minTime) {
+        hour = minTime.hour
+        minute = 0
+    } else if (this > maxTime) {
+        hour = maxTime.hour
+        minute = 0
+    }
 }
