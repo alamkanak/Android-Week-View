@@ -92,9 +92,11 @@ internal class WeekViewGestureHandler<T : Any>(
         // Calculate the new origin after scroll.
         when (currentScrollDirection) {
             Left, Right -> {
-                config.currentOrigin.x -= distanceX * config.xScrollingSpeed
-                config.currentOrigin.x = min(config.currentOrigin.x, config.maxX)
-                config.currentOrigin.x = max(config.currentOrigin.x, config.minX)
+                config.currentOrigin.x -= distanceX
+                config.currentOrigin.x = config.currentOrigin.x.limit(
+                    minValue = config.minX,
+                    maxValue = config.maxX
+                )
                 onInvalidation()
             }
             Vertical -> {
@@ -113,11 +115,7 @@ internal class WeekViewGestureHandler<T : Any>(
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        if (currentFlingDirection.isHorizontal && !config.horizontalFlingEnabled) {
-            return true
-        }
-
-        if (currentFlingDirection.isVertical && !config.verticalFlingEnabled) {
+        if (currentFlingDirection.isHorizontal && !config.horizontalScrollingEnabled) {
             return true
         }
 

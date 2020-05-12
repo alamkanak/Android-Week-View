@@ -113,10 +113,14 @@ internal class WeekViewConfig(
     var daySeparatorStrokeWidth: Int = 0
 
     // Scrolling
+    @Deprecated("No longer used")
     var xScrollingSpeed: Float = 0f
+    @Deprecated("No longer used")
     var verticalFlingEnabled: Boolean = false
+    @Deprecated("No longer used")
     var horizontalFlingEnabled: Boolean = false
     var horizontalScrollingEnabled: Boolean = false
+    @Deprecated("No longer used")
     var scrollDuration: Int = 0
 
     // Time range

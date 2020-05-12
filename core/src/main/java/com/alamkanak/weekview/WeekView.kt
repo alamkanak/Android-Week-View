@@ -1057,6 +1057,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns the scrolling speed factor in horizontal direction.
      */
     @PublicApi
+    @Deprecated("This value is no longer being taken into account.")
     var xScrollingSpeed: Float
         get() = configWrapper.xScrollingSpeed
         set(value) {
@@ -1067,6 +1068,10 @@ class WeekView<T : Any> @JvmOverloads constructor(
      * Returns whether WeekView can fling horizontally.
      */
     @PublicApi
+    @Deprecated(
+        message = "Use isHorizontalScrollingEnabled instead.",
+        replaceWith = ReplaceWith("isHorizontalScrollingEnabled")
+    )
     var isHorizontalFlingEnabled: Boolean
         get() = configWrapper.horizontalFlingEnabled
         set(value) {
@@ -1086,6 +1091,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /**
      * Returns whether WeekView can fling vertically.
      */
+    @Deprecated("This value is no longer being taken into account.")
     @PublicApi
     var isVerticalFlingEnabled: Boolean
         get() = configWrapper.verticalFlingEnabled
@@ -1094,6 +1100,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
 
     @PublicApi
+    @Deprecated("This value is no longer being taken into account.")
     var scrollDuration: Int
         get() = configWrapper.scrollDuration
         set(value) {

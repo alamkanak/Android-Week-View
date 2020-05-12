@@ -252,12 +252,14 @@ internal class WeekViewConfigWrapper(
             config.maxHour = value
         }
 
+    @Deprecated("No longer used")
     var xScrollingSpeed: Float
         get() = config.xScrollingSpeed
         set(value) {
             config.xScrollingSpeed = value
         }
 
+    @Deprecated("No longer used")
     var horizontalFlingEnabled: Boolean
         get() = config.horizontalFlingEnabled
         set(value) {
@@ -270,12 +272,14 @@ internal class WeekViewConfigWrapper(
             config.horizontalScrollingEnabled = value
         }
 
+    @Deprecated("No longer used")
     var verticalFlingEnabled: Boolean
         get() = config.verticalFlingEnabled
         set(value) {
             config.verticalFlingEnabled = value
         }
 
+    @Deprecated("No longer used")
     var scrollDuration: Int
         get() = config.scrollDuration
         set(value) {
