@@ -1418,12 +1418,27 @@ class WeekView<T : Any> @JvmOverloads constructor(
     }
 
     @PublicApi
+    @Deprecated("Use setDateFormatter() and setTimeFormatter() instead.")
     var dateTimeInterpreter: DateTimeInterpreter
-        get() = configWrapper.dateTimeInterpreter
+        get() = object : DateTimeInterpreter {
+            override fun interpretDate(date: Calendar): String = configWrapper.dateFormatter(date)
+            override fun interpretTime(hour: Int): String = configWrapper.timeFormatter(hour)
+        }
         set(value) {
-            configWrapper.dateTimeInterpreter = value
+            setDateFormatter { value.interpretDate(it) }
+            setTimeFormatter { value.interpretTime(it) }
             clearCaches()
         }
+
+    @PublicApi
+    fun setDateFormatter(formatter: (Calendar) -> String) {
+        configWrapper.dateFormatter = formatter
+    }
+
+    @PublicApi
+    fun setTimeFormatter(formatter: (Int) -> String) {
+        configWrapper.timeFormatter = formatter
+    }
 
     private fun clearCaches() {
         drawers

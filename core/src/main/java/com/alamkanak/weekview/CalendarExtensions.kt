@@ -250,18 +250,15 @@ internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
     }
 }
 
-internal fun getDefaultDateFormat(numberOfDays: Int): SimpleDateFormat {
-    return when (numberOfDays) {
-        1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // full weekday
-        in 2..6 -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // first three characters
-        else -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // first character
-    }
+internal fun defaultDateFormatter(
+    numberOfDays: Int
+): SimpleDateFormat = when (numberOfDays) {
+    1 -> SimpleDateFormat("EEEE M/dd", Locale.getDefault()) // full weekday
+    in 2..6 -> SimpleDateFormat("EEE M/dd", Locale.getDefault()) // first three characters
+    else -> SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) // first character
 }
 
-internal fun getDefaultTimeFormat(is24HourFormat: Boolean): SimpleDateFormat {
-    val format = if (is24HourFormat) "HH:mm" else "hh a"
-    return SimpleDateFormat(format, Locale.getDefault())
-}
+internal fun defaultTimeFormatter(): SimpleDateFormat = SimpleDateFormat("hh a", Locale.getDefault())
 
 internal fun Calendar.format(
     format: Int = java.text.DateFormat.MEDIUM

@@ -16,7 +16,7 @@ internal class TimeColumnDrawer(
 
     private fun cacheTimeLabels() = with(config) {
         for (hour in timeRange step timeColumnHoursInterval) {
-            timeLabelCache.put(hour, dateTimeInterpreter.interpretTime(hour))
+            timeLabelCache.put(hour, timeFormatter(hour))
         }
     }
 

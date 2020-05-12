@@ -64,7 +64,7 @@ internal class MultiLineDayLabelHeightUpdater<T>(
     }
 
     private fun provideAndCacheDayLabel(key: Int, day: Calendar): String {
-        return config.dateTimeInterpreter.interpretDate(day).also {
+        return config.dateFormatter(day).also {
             cache.dayLabelCache.put(key, it)
         }
     }

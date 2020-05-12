@@ -11,12 +11,13 @@ import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
 
+typealias DateFormatter = (Calendar) -> String
+typealias TimeFormatter = (Int) -> String
+
 internal class WeekViewConfigWrapper(
     private val view: WeekView<*>,
     private val config: WeekViewConfig
 ) {
-
-    private val context = view.context
 
     var timeTextPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.RIGHT
@@ -151,13 +152,19 @@ internal class WeekViewConfigWrapper(
     var minDate: Calendar? = null
     var maxDate: Calendar? = null
 
-    private var internalDateTimeInterpreter: DateTimeInterpreter =
-        DefaultDateTimeInterpreter(RealDateFormatProvider(context), numberOfVisibleDays)
+    var dateFormatter: DateFormatter = { date ->
+        defaultDateFormatter(numberOfDays = numberOfVisibleDays).format(date.time)
+    }
 
-    var dateTimeInterpreter: DateTimeInterpreter
-        get() = internalDateTimeInterpreter
+    private var _timeFormatter: TimeFormatter = { hour ->
+        val date = now().withTime(hour = hour, minutes = 0)
+        defaultTimeFormatter().format(date.time)
+    }
+
+    var timeFormatter: TimeFormatter
+        get() = _timeFormatter
         set(value) {
-            internalDateTimeInterpreter = value
+            _timeFormatter = value
             initTextTimeWidth()
         }
 
@@ -752,7 +759,7 @@ internal class WeekViewConfigWrapper(
      */
     private fun initTextTimeWidth() {
         timeTextWidth = (0 until hoursPerDay)
-            .map { dateTimeInterpreter.interpretTime(it) }
+            .map { _timeFormatter(it) }
             .map { timeTextPaint.measureText(it) }
             .max() ?: 0f
     }
