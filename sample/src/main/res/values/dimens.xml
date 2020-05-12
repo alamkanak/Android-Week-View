@@ -3,4 +3,5 @@
     <dimen name="default_space">16dp</dimen>
     <dimen name="border_width">1dp</dimen>
     <dimen name="no_border_width">0dp</dimen>
+    <dimen name="corner_radius">8dp</dimen>
 </resources>

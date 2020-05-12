@@ -49,6 +49,13 @@
         <attr name="todayHeaderTextColor" format="color" />
         <attr name="singleLineHeader" format="boolean" />
 
+        <!-- Week number -->
+        <attr name="showWeekNumber" format="boolean" />
+        <attr name="weekNumberTextColor" format="color" />
+        <attr name="weekNumberTextSize" format="dimension" />
+        <attr name="weekNumberBackgroundColor" format="color" />
+        <attr name="weekNumberBackgroundCornerRadius" format="dimension" />
+
         <!-- Event chips -->
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventTextSize" format="dimension" />

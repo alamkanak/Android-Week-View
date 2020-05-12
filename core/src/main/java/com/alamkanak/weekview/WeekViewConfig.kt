@@ -45,6 +45,13 @@ internal class WeekViewConfig(
     var todayHeaderTextColor: Int = 0
     var singleLineHeader: Boolean = false
 
+    // Week number
+    var showWeekNumber: Boolean = false
+    var weekNumberTextColor: Int = 0
+    var weekNumberTextSize: Int = 0
+    var weekNumberBackgroundColor: Int = 0
+    var weekNumberBackgroundCornerRadius: Int = 0
+
     // Event chips
     var eventCornerRadius: Int = 0
     var eventTextSize: Int = 0
@@ -157,6 +164,13 @@ internal class WeekViewConfig(
             headerRowPadding = getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10)
             todayHeaderTextColor = getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR)
             singleLineHeader = getBoolean(R.styleable.WeekView_singleLineHeader, true)
+
+            // Week number
+            showWeekNumber = a.getBoolean(R.styleable.WeekView_showWeekNumber, false)
+            weekNumberTextColor = a.getColor(R.styleable.WeekView_weekNumberTextColor, Color.WHITE)
+            weekNumberTextSize = a.getDimensionPixelSize(R.styleable.WeekView_weekNumberTextSize, Defaults.textSize(context))
+            weekNumberBackgroundColor = a.getColor(R.styleable.WeekView_weekNumberBackgroundColor, Color.LTGRAY)
+            weekNumberBackgroundCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_weekNumberBackgroundCornerRadius, 0)
 
             // Event chips
             eventCornerRadius = getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0)

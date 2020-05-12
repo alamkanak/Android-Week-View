@@ -3,6 +3,7 @@ package com.alamkanak.weekview
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.TextPaint
 import com.alamkanak.weekview.Constants.UNINITIALIZED
@@ -328,6 +329,60 @@ internal class WeekViewConfigWrapper(
 
     val headerRowBottomLineWidth: Float
         get() = if (showHeaderRowBottomLine) headerRowBottomLinePaint.strokeWidth else 0f
+
+    var showWeekNumber: Boolean
+        get() = config.showWeekNumber
+        set(value) {
+            config.showWeekNumber = value
+        }
+
+    var weekNumberTextColor: Int
+        get() = config.weekNumberTextColor
+        set(value) {
+            config.weekNumberTextColor = value
+        }
+    var weekNumberTextSize: Int
+        get() = config.weekNumberTextSize
+        set(value) {
+            config.weekNumberTextSize = value
+        }
+    var weekNumberBackgroundColor: Int
+        get() = config.weekNumberBackgroundColor
+        set(value) {
+            config.weekNumberBackgroundColor = value
+        }
+    var weekNumberBackgroundCornerRadius: Int
+        get() = config.weekNumberBackgroundCornerRadius
+        set(value) {
+            config.weekNumberBackgroundCornerRadius = value
+        }
+
+    private val _weekNumberBounds: RectF = RectF()
+
+    val weekNumberBounds: RectF
+        get() = _weekNumberBounds.apply {
+            left = 0f
+            top = 0f
+            right = timeColumnWidth
+            bottom = headerHeight
+        }
+
+    private val _weekNumberTextPaint: Paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+
+    val weekNumberTextPaint: Paint
+        get() = _weekNumberTextPaint.apply {
+            color = weekNumberTextColor
+            textAlign = Paint.Align.CENTER
+            textSize = weekNumberTextSize.toFloat()
+            typeface = this@WeekViewConfigWrapper.typeface
+        }
+
+    private val _weekNumberBackgroundPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    val weekNumberBackgroundPaint: Paint
+        get() = _weekNumberBackgroundPaint.apply {
+            color = weekNumberBackgroundColor
+        }
 
     val singleLineHeader: Boolean
         get() = config.singleLineHeader

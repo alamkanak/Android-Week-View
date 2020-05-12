@@ -29,7 +29,7 @@ internal class DrawingContext(
         val modifiedEnd = if (isNotScrolling) end - 1 else end
 
         dateRange.clear()
-        dateRange += getDateRange(start, modifiedEnd)
+        dateRange += config.createDateRange(start, modifiedEnd)
 
         updateStartPixels()
 

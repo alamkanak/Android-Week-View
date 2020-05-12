@@ -34,6 +34,7 @@
         app:showNowLine="true"
         app:showNowLineDot="true"
         app:showTimeColumnSeparator="true"
+        app:showWeekNumber="true"
         app:singleDayHorizontalMargin="8dp"
         app:timeColumnBackgroundColor="#ffffffff"
         app:timeColumnPadding="8dp"
@@ -41,6 +42,9 @@
         app:timeColumnSeparatorStrokeWidth="1dp"
         app:timeColumnTextColor="@color/toolbar_text"
         app:timeColumnTextSize="12sp"
-        app:todayHeaderTextColor="@color/accent" />
+        app:todayHeaderTextColor="@color/accent"
+        app:weekNumberBackgroundColor="@color/dark_gray"
+        app:weekNumberBackgroundCornerRadius="@dimen/corner_radius"
+        app:weekNumberTextColor="@android:color/white" />
 
 </LinearLayout>
