@@ -7,7 +7,7 @@ import java.util.Calendar
 internal class SingleEventsDrawer<T>(
     context: Context,
     config: WeekViewConfigWrapper,
-    private val chipCache: EventChipCache<T>
+    private val chipsCache: EventChipsCache<T>
 ) : Drawer {
 
     private val eventChipDrawer = EventChipDrawer<T>(context, config)
@@ -22,7 +22,7 @@ internal class SingleEventsDrawer<T>(
         date: Calendar,
         canvas: Canvas
     ) {
-        chipCache
+        chipsCache
             .normalEventChipsByDate(date)
             .filter { it.bounds != null }
             .forEach { eventChipDrawer.draw(it, canvas) }

@@ -15,7 +15,7 @@ internal class AllDayEventsUpdater<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
     private val cache: WeekViewCache<T>,
-    private val chipCache: EventChipCache<T>,
+    private val chipsCache: EventChipsCache<T>,
     private val emojiTextProcessor: EmojiTextProcessor = EmojiTextProcessor()
 ) : Updater {
 
@@ -28,7 +28,7 @@ internal class AllDayEventsUpdater<T : Any>(
     override fun isRequired(drawingContext: DrawingContext): Boolean {
         val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
         val dateRange = drawingContext.dateRange
-        val containsNewChips = chipCache.allDayEventChipsInDateRange(dateRange).any { it.bounds == null }
+        val containsNewChips = chipsCache.allDayEventChipsInDateRange(dateRange).any { it.bounds == null }
         return didScrollHorizontally || containsNewChips
     }
 
@@ -43,7 +43,7 @@ internal class AllDayEventsUpdater<T : Any>(
                 else -> startPixel
             }
 
-            val eventChips = chipCache.allDayEventChipsByDate(date)
+            val eventChips = chipsCache.allDayEventChipsByDate(date)
             for (eventChip in eventChips) {
                 calculateTextLayout(eventChip, modifiedStartPixel)
             }

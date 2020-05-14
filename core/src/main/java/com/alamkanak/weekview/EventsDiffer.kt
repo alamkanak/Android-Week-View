@@ -20,6 +20,7 @@ class MainExecutor : Executor {
 internal class EventsDiffer<T>(
     private val eventsCacheWrapper: EventsCacheWrapper<T>,
     private val eventChipsLoader: EventChipsLoader<T>,
+    private val eventChipsCache: EventChipsCache<T>,
     private val drawingContext: DrawingContext
 ) {
 
@@ -76,7 +77,7 @@ internal class EventsDiffer<T>(
             is PagedEventsCache -> eventsCache.update(mapEventsToPeriod(events))
         }
 
-        eventChipsLoader.createAndCacheEventChips(events)
+        eventChipsCache += eventChipsLoader.createEventChips(events)
         return dateRange.any { it.isBetween(startDate, endDate, inclusive = true) }
     }
 

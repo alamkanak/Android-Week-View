@@ -18,7 +18,7 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     private val drawingContext: DrawingContext,
     private val gestureHandler: WeekViewGestureHandler<T>,
     private val touchHandler: WeekViewTouchHandler<T>,
-    private val eventChipCache: EventChipCache<T>
+    private val eventChipsCache: EventChipsCache<T>
 ) : ExploreByTouchHelper(view) {
 
     private val context = view.context
@@ -49,7 +49,7 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
 
     override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
         val dateRange = drawingContext.dateRange
-        val visibleEventChips = eventChipCache.allEventChipsInDateRange(dateRange)
+        val visibleEventChips = eventChipsCache.allEventChipsInDateRange(dateRange)
         virtualViewIds += store.put(visibleEventChips)
         virtualViewIds += dateRange.map { store.put(it) }
     }

@@ -28,7 +28,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     }
 
     private val cache = WeekViewCache<T>()
-    private val eventChipCache = EventChipCache<T>()
+    private val eventChipCache = EventChipsCache<T>()
 
     private val viewState = WeekViewViewState(configWrapper, this)
     private val drawingContext = DrawingContext(configWrapper)
@@ -38,7 +38,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         view = this,
         config = configWrapper,
         viewState = viewState,
-        chipCache = eventChipCache,
+        eventChipsCache = eventChipCache,
         touchHandler = touchHandler,
         onInvalidation = { ViewCompat.postInvalidateOnAnimation(this) }
     )
@@ -49,16 +49,20 @@ class WeekView<T : Any> @JvmOverloads constructor(
         drawingContext = drawingContext,
         gestureHandler = gestureHandler,
         touchHandler = touchHandler,
-        eventChipCache = eventChipCache
+        eventChipsCache = eventChipCache
     )
 
-    private val eventChipsLoader = EventChipsLoader(configWrapper, eventChipCache)
-    private val eventChipsExpander = EventChipsExpander(configWrapper, eventChipCache)
+    private val eventChipsLoader = EventChipsLoader<T>(configWrapper)
 
     internal val eventsCacheWrapper = EventsCacheWrapper<T>()
     internal val eventsLoaderWrapper = EventsLoaderWrapper(eventsCacheWrapper)
 
-    private val eventsDiffer = EventsDiffer(eventsCacheWrapper, eventChipsLoader, drawingContext)
+    private val eventsDiffer = EventsDiffer(
+        eventsCacheWrapper,
+        eventChipsLoader,
+        eventChipCache,
+        drawingContext
+    )
 
     private val eventsLoader: EventsLoader<T>
         get() = eventsLoaderWrapper.get()
@@ -127,8 +131,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         eventChipCache.clear()
 
         if (events.isNotEmpty()) {
-            eventChipsLoader.createAndCacheEventChips(events)
-            eventChipsExpander.calculateEventChipPositions()
+            eventChipCache += eventChipsLoader.createEventChips(events)
         }
     }
 

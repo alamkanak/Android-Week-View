@@ -6,7 +6,7 @@ import kotlin.math.max
 
 internal class WeekViewTouchHandler<T : Any>(
     private val config: WeekViewConfigWrapper,
-    private val chipCache: EventChipCache<T>
+    private val chipsCache: EventChipsCache<T>
 ) {
 
     var onEventClickListener: OnEventClickListener<T>? = null
@@ -79,7 +79,7 @@ internal class WeekViewTouchHandler<T : Any>(
     }
 
     private fun findHitEvent(x: Float, y: Float): EventChip<T>? {
-        val candidates = chipCache.allEventChips.filter { it.isHit(x, y) }
+        val candidates = chipsCache.allEventChips.filter { it.isHit(x, y) }
         return when {
             candidates.isEmpty() -> null
             // Two events hit. This is most likely because an all-day event was clicked, but a

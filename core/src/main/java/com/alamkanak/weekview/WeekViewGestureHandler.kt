@@ -30,7 +30,7 @@ internal class WeekViewGestureHandler<T : Any>(
     private val view: WeekView<*>,
     private val config: WeekViewConfigWrapper,
     private val viewState: WeekViewViewState,
-    private val chipCache: EventChipCache<T>,
+    private val eventChipsCache: EventChipsCache<T>,
     private val touchHandler: WeekViewTouchHandler<T>,
     private val onInvalidation: () -> Unit
 ) : GestureDetector.SimpleOnGestureListener() {
@@ -193,7 +193,7 @@ internal class WeekViewGestureHandler<T : Any>(
     }
 
     internal fun findHitEvent(x: Float, y: Float): EventChip<T>? {
-        val candidates = chipCache.allEventChips.filter { it.isHit(x, y) }
+        val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) }
         return when {
             candidates.isEmpty() -> null
             // Two events hit. This is most likely because an all-day event was clicked, but a

@@ -6,7 +6,7 @@ import java.util.Calendar
 internal class SingleEventsUpdater<T : Any>(
     private val view: WeekView<T>,
     private val config: WeekViewConfigWrapper,
-    private val chipCache: EventChipCache<T>
+    private val chipsCache: EventChipsCache<T>
 ) : Updater {
 
     private val rectCalculator = EventChipRectCalculator<T>(config)
@@ -14,7 +14,7 @@ internal class SingleEventsUpdater<T : Any>(
     override fun isRequired(drawingContext: DrawingContext) = true
 
     override fun update(drawingContext: DrawingContext) {
-        chipCache.clearSingleEventsCache()
+        chipsCache.clearSingleEventsCache()
 
         drawingContext
             .dateRangeWithStartPixels
@@ -32,7 +32,7 @@ internal class SingleEventsUpdater<T : Any>(
         date: Calendar,
         startPixel: Float
     ) {
-        chipCache.normalEventChipsByDate(date)
+        chipsCache.normalEventChipsByDate(date)
             .filter { it.event.isNotAllDay && it.event.isWithin(config.minHour, config.maxHour) }
             .forEach {
                 val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
