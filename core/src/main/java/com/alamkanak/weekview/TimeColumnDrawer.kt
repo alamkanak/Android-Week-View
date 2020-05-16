@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.text.StaticLayout
 import android.util.SparseArray
 
 internal class TimeColumnDrawer(
@@ -8,15 +9,19 @@ internal class TimeColumnDrawer(
     private val config: WeekViewConfigWrapper
 ) : CachingDrawer {
 
-    private val timeLabelCache = SparseArray<String>()
+    private val timeLabelLayoutsCache = SparseArray<StaticLayout>()
+
+    private val displayedHours: IntProgression
+        get() = config.timeRange step config.timeColumnHoursInterval
 
     init {
         cacheTimeLabels()
     }
 
     private fun cacheTimeLabels() = with(config) {
-        for (hour in timeRange step timeColumnHoursInterval) {
-            timeLabelCache.put(hour, timeFormatter(hour))
+        for (hour in displayedHours) {
+            val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
+            timeLabelLayoutsCache.put(hour, textLayout)
         }
     }
 
@@ -30,9 +35,8 @@ internal class TimeColumnDrawer(
         canvas.drawRect(0f, topMargin, timeColumnWidth, bottom, timeColumnBackgroundPaint)
 
         val hourLines = FloatArray(hoursPerDay * 4)
-        val hourStep = timeColumnHoursInterval
 
-        for (hour in timeRange step hourStep) {
+        for (hour in displayedHours) {
             val heightOfHour = hourHeight * (hour - minHour)
             topMargin = headerHeight + currentOrigin.y + heightOfHour
 
@@ -42,15 +46,16 @@ internal class TimeColumnDrawer(
             }
 
             val x = timeTextWidth + timeColumnPadding
-            var y = topMargin + timeTextHeight / 2
+            var y = topMargin - timeTextHeight / 2
 
             // If the hour separator is shown in the time column, move the time label below it
             if (showTimeColumnHourSeparator) {
                 y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
-            if (hour in timeLabelCache) {
-                canvas.drawText(timeLabelCache[hour], x, y, timeTextPaint)
+            val textLayout = timeLabelLayoutsCache[hour]
+            canvas.withTranslation(x, y) {
+                textLayout.draw(this)
             }
 
             if (showTimeColumnHourSeparator && hour > 0) {
@@ -75,7 +80,7 @@ internal class TimeColumnDrawer(
     }
 
     override fun clear() {
-        timeLabelCache.clear()
+        timeLabelLayoutsCache.clear()
         cacheTimeLabels()
     }
 }

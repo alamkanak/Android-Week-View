@@ -19,6 +19,8 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 private class ViewModel(
     private val database: EventsDatabase
@@ -31,6 +33,9 @@ private class ViewModel(
 }
 
 class BasicActivity : AppCompatActivity() {
+
+    private val weekdayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
+    private val dateFormatter = SimpleDateFormat("MM/dd", Locale.getDefault())
 
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
 
@@ -46,6 +51,12 @@ class BasicActivity : AppCompatActivity() {
 
         viewModel.events.observe(this) { events ->
             weekView.submit(events)
+        }
+
+        weekView.setDateFormatter { date ->
+            val weekdayLabel = weekdayFormatter.format(date.time)
+            val dateLabel = dateFormatter.format(date.time)
+            weekdayLabel + "\n" + dateLabel
         }
 
         weekView.setOnLoadMoreListener { startDate: LocalDate, endDate: LocalDate ->

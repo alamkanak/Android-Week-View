@@ -52,7 +52,6 @@
         <attr name="headerRowPadding" format="dimension" />
         <attr name="headerRowTextSize" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
-        <attr name="singleLineHeader" format="boolean" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />

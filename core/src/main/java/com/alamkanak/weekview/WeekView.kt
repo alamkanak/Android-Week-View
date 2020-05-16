@@ -70,9 +70,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
     // Be careful when changing the order of the updaters, as the calculation of any updater might
     // depend on results of previous updaters
     private val updaters = listOf(
-        MultiLineDayLabelHeightUpdater(configWrapper, cache),
+        HeaderRowUpdater(configWrapper, cache, eventsCacheWrapper),
         AllDayEventsUpdater(this, configWrapper, cache, eventChipCache),
-        HeaderRowHeightUpdater(configWrapper, eventsCacheWrapper),
         SingleEventsUpdater(this, configWrapper, eventChipCache)
     )
 
@@ -100,10 +99,10 @@ class WeekView<T : Any> @JvmOverloads constructor(
         BackgroundGridDrawer(this, configWrapper),
         SingleEventsDrawer(context, configWrapper, eventChipCache),
         TimeColumnDrawer(this, configWrapper),
+        NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
-        DayLabelDrawer(configWrapper, cache),
-        AllDayEventsDrawer(context, configWrapper, cache),
-        NowLineDrawer(configWrapper)
+        DayLabelsDrawer(configWrapper, cache),
+        AllDayEventsDrawer(context, configWrapper, cache)
     )
 
     override fun onDraw(canvas: Canvas) {
