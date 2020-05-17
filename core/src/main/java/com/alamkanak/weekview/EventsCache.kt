@@ -40,12 +40,12 @@ internal class EventsCacheWrapper<T> {
  */
 internal abstract class EventsCache<T> {
 
-    abstract val allEvents: List<WeekViewEvent<T>>
+    abstract val allEvents: List<ResolvedWeekViewEvent<T>>
     abstract fun clear()
 
     operator fun get(
         dateRange: List<Calendar>
-    ): List<WeekViewEvent<T>> {
+    ): List<ResolvedWeekViewEvent<T>> {
         val startDate = checkNotNull(dateRange.min())
         val endDate = checkNotNull(dateRange.max())
         return allEvents.filter { it.endTime >= startDate || it.startTime <= endDate }
@@ -53,13 +53,13 @@ internal abstract class EventsCache<T> {
 
     operator fun get(
         fetchRange: FetchRange
-    ): List<WeekViewEvent<T>> {
+    ): List<ResolvedWeekViewEvent<T>> {
         val startTime = fetchRange.previous.startDate
         val endTime = fetchRange.next.endDate
         return allEvents.filter { it.endTime >= startTime && it.startTime <= endTime }
     }
 
-    open operator fun get(period: Period): List<WeekViewEvent<T>>? = null
+    open operator fun get(period: Period): List<ResolvedWeekViewEvent<T>>? = null
 }
 
 /**
@@ -68,12 +68,12 @@ internal abstract class EventsCache<T> {
  */
 internal class SimpleEventsCache<T> : EventsCache<T>() {
 
-    private var _allEvents: List<WeekViewEvent<T>>? = null
+    private var _allEvents: List<ResolvedWeekViewEvent<T>>? = null
 
-    override val allEvents: List<WeekViewEvent<T>>
+    override val allEvents: List<ResolvedWeekViewEvent<T>>
         get() = _allEvents.orEmpty()
 
-    fun update(events: List<WeekViewEvent<T>>) {
+    fun update(events: List<ResolvedWeekViewEvent<T>>) {
         _allEvents = events
     }
 
@@ -88,14 +88,14 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
  */
 internal class PagedEventsCache<T> : EventsCache<T>() {
 
-    override val allEvents: List<WeekViewEvent<T>>
+    override val allEvents: List<ResolvedWeekViewEvent<T>>
         get() = previousPeriodEvents.orEmpty() +
             currentPeriodEvents.orEmpty() +
             nextPeriodEvents.orEmpty()
 
-    private var previousPeriodEvents: List<WeekViewEvent<T>>? = null
-    private var currentPeriodEvents: List<WeekViewEvent<T>>? = null
-    private var nextPeriodEvents: List<WeekViewEvent<T>>? = null
+    private var previousPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
+    private var currentPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
+    private var nextPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
 
     @VisibleForTesting
     internal var fetchedRange: FetchRange? = null
@@ -104,7 +104,7 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
 
     operator fun contains(fetchRange: FetchRange) = fetchedRange?.isEqual(fetchRange) ?: false
 
-    override fun get(period: Period): List<WeekViewEvent<T>>? {
+    override fun get(period: Period): List<ResolvedWeekViewEvent<T>>? {
         val range = checkNotNull(fetchedRange)
         return when (period) {
             range.previous -> previousPeriodEvents
@@ -156,13 +156,13 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
         fetchedRange = fetchRange
     }
 
-    fun update(eventsByPeriod: Map<Period, List<WeekViewEvent<T>>>) {
+    fun update(eventsByPeriod: Map<Period, List<ResolvedWeekViewEvent<T>>>) {
         for ((period, events) in eventsByPeriod) {
             update(period, events)
         }
     }
 
-    private fun update(period: Period, events: List<WeekViewEvent<T>>) {
+    private fun update(period: Period, events: List<ResolvedWeekViewEvent<T>>) {
         val range = checkNotNull(fetchedRange)
         when (period) {
             range.previous -> previousPeriodEvents = events
@@ -173,7 +173,7 @@ internal class PagedEventsCache<T> : EventsCache<T>() {
 
     operator fun set(
         period: Period,
-        events: List<WeekViewEvent<T>>
+        events: List<ResolvedWeekViewEvent<T>>
     ) {
         update(period, events)
     }

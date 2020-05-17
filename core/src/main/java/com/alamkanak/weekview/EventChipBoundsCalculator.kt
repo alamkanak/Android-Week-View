@@ -2,7 +2,7 @@ package com.alamkanak.weekview
 
 import android.graphics.RectF
 
-internal class EventChipRectCalculator<T>(
+internal class EventChipBoundsCalculator<T>(
     private val config: WeekViewConfigWrapper
 ) {
 

@@ -1,6 +1,9 @@
 package com.alamkanak.weekview.sample.data
 
 import android.content.Context
+import android.text.SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+import android.text.SpannableStringBuilder
+import android.text.style.StrikethroughSpan
 import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.R
@@ -206,7 +209,23 @@ class EventsDatabase(context: Context) {
         endTime.add(Calendar.MINUTE, duration)
 
         val title = buildEventTitle(startTime)
-        return Event(id, title, startTime, endTime, "Location $id", color, isAllDay, isCanceled)
+
+        val spannableTitle = SpannableStringBuilder(title).apply {
+//            setSpan(BackgroundColorSpan(Color.RED), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+//            setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return Event(
+            id = id,
+            title = spannableTitle,
+            startTime = startTime,
+            endTime = endTime,
+            location = "Location $id",
+            color = color,
+            isAllDay = isAllDay,
+            isCanceled = isCanceled
+        )
     }
 
     private fun buildEventTitle(time: Calendar): String {

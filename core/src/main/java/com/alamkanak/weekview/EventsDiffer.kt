@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import java.util.Calendar
@@ -18,6 +19,7 @@ class MainExecutor : Executor {
  * background thread.
  */
 internal class EventsDiffer<T>(
+    private val context: Context,
     private val eventsCacheWrapper: EventsCacheWrapper<T>,
     private val eventChipsLoader: EventChipsLoader<T>,
     private val eventChipsCache: EventChipsCache<T>,
@@ -57,7 +59,7 @@ internal class EventsDiffer<T>(
         items: List<WeekViewDisplayable<T>>,
         dateRange: List<Calendar>
     ): Boolean {
-        val events = items.map { it.toWeekViewEvent() }
+        val events = items.map { it.toResolvedWeekViewEvent(context) }
         val startDate = events.map { it.startTime.atStartOfDay }.min()
         val endDate = events.map { it.endTime.atEndOfDay }.max()
 
@@ -82,6 +84,6 @@ internal class EventsDiffer<T>(
     }
 
     private fun mapEventsToPeriod(
-        events: List<WeekViewEvent<T>>
+        events: List<ResolvedWeekViewEvent<T>>
     ) = events.groupBy { Period.fromDate(it.startTime) }
 }

@@ -13,7 +13,6 @@ internal data class FetchRange(
     fun isEqual(other: FetchRange) = this == other
 
     internal companion object {
-
         fun create(firstVisibleDay: Calendar): FetchRange {
             val current = Period.fromDate(firstVisibleDay)
             return FetchRange(current.previous, current, current.next)

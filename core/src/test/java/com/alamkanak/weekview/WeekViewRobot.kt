@@ -1,38 +1,37 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import com.alamkanak.weekview.model.Event
 import com.google.common.truth.Truth.assertThat
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import java.util.Calendar
 
-fun weekViewRobot(
+internal fun weekViewRobot(
     context: Context,
     block: WeekViewRobot.() -> Unit
 ) {
     WeekViewRobot(context).apply { block() }
 }
 
-class WeekViewRobot(
+internal class WeekViewRobot(
     context: Context
 ) {
 
-    val weekView = WeekView<Event>(context)
+    val weekView = WeekView<Unit>(context)
 
     fun scrollToDate(date: Calendar) {
         weekView.goToDate(date)
         simulateRefresh(date)
     }
 
-    fun fillCache(vararg events: WeekViewEvent<Event>) {
+    fun fillCache(vararg events: ResolvedWeekViewEvent<Unit>) {
         val cache = weekView.eventsCacheWrapper.get()
         if (cache is SimpleEventsCache) {
             cache.update(events.toList())
         }
     }
 
-    fun assertDateRangeContains(date: Calendar, vararg events: WeekViewEvent<Event>) {
+    fun assertDateRangeContains(date: Calendar, vararg events: ResolvedWeekViewEvent<Unit>) {
         val loader = weekView.eventsLoaderWrapper.get()
         val dateRangeEvents = loader.refresh(date)
 
@@ -65,9 +64,9 @@ class WeekViewRobot(
 
     internal fun assertOnMonthChangeCalled(
         fetchRange: FetchRange
-    ): List<WeekViewDisplayable<Event>> {
+    ): List<WeekViewDisplayable<Unit>> {
         val listener = checkNotNull(weekView.onMonthChangeListener)
-        val results = mutableListOf<WeekViewDisplayable<Event>>()
+        val results = mutableListOf<WeekViewDisplayable<Unit>>()
         for (period in fetchRange.periods) {
             results += listener.onMonthChange(period.startDate, period.endDate)
         }

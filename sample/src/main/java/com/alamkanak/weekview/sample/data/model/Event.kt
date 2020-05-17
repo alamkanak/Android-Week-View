@@ -1,17 +1,22 @@
 package com.alamkanak.weekview.sample.data.model
 
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.SpannableStringBuilder
+import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.R
 import java.util.Calendar
 
-class Event(
+data class Event(
     val id: Long,
-    val title: String,
+    val title: CharSequence,
     private val startTime: Calendar,
     private val endTime: Calendar,
-    private val location: String,
+    private val location: CharSequence,
     private val color: Int,
     private val isAllDay: Boolean,
     private val isCanceled: Boolean
@@ -30,9 +35,14 @@ class Event(
             .setBorderColor(color)
             .build()
 
-        return WeekViewEvent.Builder<Event>(this)
+        val styledTitle = SpannableStringBuilder(title).apply {
+            setSpan(StyleSpan(Typeface.BOLD), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+
+        return WeekViewEvent.Builder(this)
             .setId(id)
-            .setTitle(title)
+            .setTitle(styledTitle)
             .setStartTime(startTime)
             .setEndTime(endTime)
             .setLocation(location)

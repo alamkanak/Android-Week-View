@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.RectF
 
 fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
     save()
@@ -20,4 +21,10 @@ fun Canvas.drawInRect(
     clipRect(left, top, right, bottom)
     block()
     restore()
+}
+
+fun RectF.insetBy(inset: Float): RectF {
+    return RectF(this).apply {
+        inset(inset, inset)
+    }
 }

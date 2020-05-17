@@ -3,29 +3,29 @@ package com.alamkanak.weekview
 import android.graphics.RectF
 
 /**
- * This class encapsulates a [WeekViewEvent] and its visual representation, a [RectF]
+ * This class encapsulates a [ResolvedWeekViewEvent] and its visual representation, a [RectF]
  * which is eventually drawn to the screen.
  *
  * There may be more than one [EventChip] for any even (think multi-day events). In that case,
- * multiple [EventChip]s will be used for a single [WeekViewEvent].
+ * multiple [EventChip]s will be used for a single [ResolvedWeekViewEvent].
  *
- * The original [WeekViewEvent] is accessible via [originalEvent]. The [WeekViewEvent] that
- * corresponds to the drawn rectangle is accessible via [event].
+ * The original [ResolvedWeekViewEvent] is accessible via [originalEvent]. The
+ * [ResolvedWeekViewEvent] that corresponds to the drawn rectangle is accessible via [event].
  */
 internal data class EventChip<T>(
     /**
-     * The [WeekViewEvent] corresponding to the drawn rectangle. It might differ from
+     * The [ResolvedWeekViewEvent] corresponding to the drawn rectangle. It might differ from
      * [originalEvent], which may be a multi-day event.
      */
-    val event: WeekViewEvent<T>,
+    val event: ResolvedWeekViewEvent<T>,
     /**
-     * The original [WeekViewEvent], which may be a multi-day event.
+     * The original [ResolvedWeekViewEvent], which may be a multi-day event.
      */
-    val originalEvent: WeekViewEvent<T>
+    val originalEvent: ResolvedWeekViewEvent<T>
 ) {
 
     /**
-     * The rectangle in which the [WeekViewEvent] will be drawn.
+     * The rectangle in which the [ResolvedWeekViewEvent] will be drawn.
      */
     var bounds: RectF? = null
 

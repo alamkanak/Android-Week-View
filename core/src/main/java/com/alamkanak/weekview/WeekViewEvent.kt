@@ -1,145 +1,75 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import android.graphics.Paint
-import android.text.TextPaint
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import java.util.Calendar
-import kotlin.math.roundToInt
 
 data class WeekViewEvent<T> internal constructor(
     val id: Long = 0L,
-    internal val titleResource: TextResource? = null,
+    internal val titleResource: TextResource,
     val startTime: Calendar = now(),
     val endTime: Calendar = now(),
     internal val locationResource: TextResource? = null,
     val isAllDay: Boolean = false,
     val style: Style = Style(),
     val data: T
-) : WeekViewDisplayable<T>, Comparable<WeekViewEvent<T>> {
-
-    internal val isNotAllDay: Boolean
-        get() = isAllDay.not()
-
-    internal val durationInMinutes: Int
-        get() = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
-
-    internal val isMultiDay: Boolean
-        get() = startTime.isSameDate(endTime).not()
-
-    internal fun isWithin(
-        minHour: Int,
-        maxHour: Int
-    ): Boolean = startTime.hour >= minHour && endTime.hour <= maxHour
-
-    internal fun getTextPaint(
-        context: Context,
-        config: WeekViewConfigWrapper
-    ): TextPaint {
-        val textPaint = if (isAllDay) {
-            config.allDayEventTextPaint
-        } else {
-            config.eventTextPaint
-        }
-
-        textPaint.color = when (val resource = style.textColorResource) {
-            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
-            is ColorResource.Value -> resource.color
-            null -> config.eventTextPaint.color
-        }
-
-        if (style.isTextStrikeThrough) {
-            textPaint.flags = textPaint.flags or Paint.STRIKE_THRU_TEXT_FLAG
-        }
-
-        return textPaint
-    }
-
-    internal fun collidesWith(other: WeekViewEvent<T>): Boolean {
-        if (isAllDay != other.isAllDay) {
-            return false
-        }
-
-        if (startTime.isEqual(other.startTime) && endTime.isEqual(other.endTime)) {
-            // Complete overlap
-            return true
-        }
-
-        // Resolve collisions by shortening the preceding event by 1 ms
-        if (endTime.isEqual(other.startTime)) {
-            endTime -= Millis(1)
-            return false
-        } else if (startTime.isEqual(other.endTime)) {
-            other.endTime -= Millis(1)
-        }
-
-        return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime)
-    }
-
-    internal fun startsOnEarlierDay(
-        originalEvent: WeekViewEvent<T>
-    ): Boolean = startTime.isNotEqual(originalEvent.startTime)
-
-    internal fun endsOnLaterDay(
-        originalEvent: WeekViewEvent<T>
-    ): Boolean = endTime.isNotEqual(originalEvent.endTime)
-
-    override fun compareTo(other: WeekViewEvent<T>): Int {
-        var comparator = startTime.compareTo(other.startTime)
-        if (comparator == 0) {
-            comparator = endTime.compareTo(other.endTime)
-        }
-        return comparator
-    }
+) : WeekViewDisplayable<T> {
 
     override fun toWeekViewEvent(): WeekViewEvent<T> = this
 
     internal sealed class ColorResource {
         data class Value(@ColorInt val color: Int) : ColorResource()
         data class Id(@ColorRes val resId: Int) : ColorResource()
+
+        fun resolve(context: Context): Int = when (this) {
+            is Id -> ContextCompat.getColor(context, resId)
+            is Value -> color
+        }
     }
 
     internal sealed class TextResource {
         data class Value(val text: CharSequence) : TextResource()
         data class Id(@StringRes val resId: Int) : TextResource()
 
-        fun resolve(context: Context): CharSequence = when (this) {
-            is Id -> context.getString(resId)
-            is Value -> text
+        fun resolve(context: Context, shouldSetBold: Boolean): CharSequence = when (this) {
+            is Id -> {
+                val text = context.getString(resId)
+                if (shouldSetBold) text.bold() else text
+            }
+            is Value -> when (text) {
+                // We don't change the existing style of SpannableStrings.
+                is SpannableString -> text
+                is SpannableStringBuilder -> text.build()
+                else -> if (shouldSetBold) text.bold() else text
+            }
         }
     }
 
     internal sealed class DimenResource {
         data class Value(val value: Int) : DimenResource()
         data class Id(@DimenRes val resId: Int) : DimenResource()
+
+        fun resolve(context: Context): Int = when (this) {
+            is Id -> context.resources.getDimensionPixelSize(resId)
+            is Value -> value
+        }
     }
 
     class Style {
 
         internal var backgroundColorResource: ColorResource? = null
         internal var textColorResource: ColorResource? = null
-        internal var isTextStrikeThrough: Boolean = false
         internal var borderWidthResource: DimenResource? = null
         internal var borderColorResource: ColorResource? = null
 
-        internal val hasBorder: Boolean
-            get() = borderWidthResource != null
-
-        internal fun getBackgroundColorOrDefault(config: WeekViewConfigWrapper): ColorResource {
-            return backgroundColorResource ?: ColorResource.Value(config.defaultEventColor)
-        }
-
-        internal fun getBorderWidth(
-            context: Context
-        ): Int = when (val resource = borderWidthResource) {
-            is DimenResource.Id -> context.resources.getDimensionPixelSize(resource.resId)
-            is DimenResource.Value -> resource.value
-            null -> throw IllegalStateException("Invalid border width resource: $resource")
-        }
+        @Deprecated("No longer used.")
+        internal var isTextStrikeThrough: Boolean = false
 
         class Builder {
 
@@ -170,6 +100,7 @@ data class WeekViewEvent<T> internal constructor(
             }
 
             @PublicApi
+            @Deprecated("Use a SpannableString for the title or location instead.")
             fun setTextStrikeThrough(strikeThrough: Boolean): Builder {
                 style.isTextStrikeThrough = strikeThrough
                 return this

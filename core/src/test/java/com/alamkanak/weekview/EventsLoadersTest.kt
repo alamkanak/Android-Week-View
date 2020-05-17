@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.test.platform.app.InstrumentationRegistry
-import com.alamkanak.weekview.model.Event
 import com.alamkanak.weekview.util.createDate
+import com.alamkanak.weekview.util.createResolvedWeekViewEvent
+import com.alamkanak.weekview.util.createWeekViewEvent
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +35,7 @@ class EventsLoadersTest {
         assertCachingEventsLoader()
 
         val date = createDate(2019, FEBRUARY, 24)
-        val event = Event(date, date + Hours(1)).toWeekViewEvent()
+        val event = createResolvedWeekViewEvent(date, date + Hours(1))
 
         fillCache(event)
         assertDateRangeContains(date, event)
@@ -61,11 +62,11 @@ class EventsLoadersTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun `LegacyEventsLoader is called correctly`() = weekViewRobot(context) {
-        val listener = mock(OnMonthChangeListener::class.java) as OnMonthChangeListener<Event>
+        val listener = mock(OnMonthChangeListener::class.java) as OnMonthChangeListener<Unit>
         weekView.onMonthChangeListener = listener
 
         val date = createDate(2019, FEBRUARY, 24)
-        val event = Event(date, date + Hours(1)).toWeekViewEvent()
+        val event = createWeekViewEvent(date, date + Hours(1))
         val fetchRange = FetchRange.create(date)
 
         fetchRange.current.run {

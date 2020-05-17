@@ -1,17 +1,19 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import java.util.Calendar
 
 /**
  * Wraps all available [EventsLoader]s to allow for dynamic switching between them.
  */
 internal class EventsLoaderWrapper<T>(
+    context: Context,
     cache: EventsCacheWrapper<T>
 ) {
 
     private val cachingEventsLoader = CachingEventsLoader(cache)
     private val pagedEventsLoader = PagedEventsLoader(cache)
-    private val legacyEventsLoader = LegacyEventsLoader(cache)
+    private val legacyEventsLoader = LegacyEventsLoader(context, cache)
 
     internal var currentEventsLoader: EventsLoader<T> = cachingEventsLoader
 
@@ -46,7 +48,7 @@ internal abstract class EventsLoader<T> {
      *
      * @param firstVisibleDate The first date that is currently visible
      */
-    abstract fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>>
+    abstract fun refresh(firstVisibleDate: Calendar): List<ResolvedWeekViewEvent<T>>
 
     /**
      * Instructs an [EventsLoader] that it should reload events when called the next time.
@@ -67,7 +69,7 @@ internal class CachingEventsLoader<T>(
     private val simpleCache: SimpleEventsCache<T>
         get() = cacheWrapper.get() as SimpleEventsCache<T>
 
-    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
+    override fun refresh(firstVisibleDate: Calendar): List<ResolvedWeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
         return simpleCache[fetchRange]
     }
@@ -87,7 +89,7 @@ internal class PagedEventsLoader<T>(
     private val pagedCache: PagedEventsCache<T>
         get() = cacheWrapper.get() as PagedEventsCache<T>
 
-    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
+    override fun refresh(firstVisibleDate: Calendar): List<ResolvedWeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
         val needsRefresh = shouldRefreshEvents || fetchRange !in pagedCache
 
@@ -127,6 +129,7 @@ internal class PagedEventsLoader<T>(
  * Unlike [PagedEventsLoader], it does return the list of [WeekViewEvent]s to the caller.
  */
 internal class LegacyEventsLoader<T>(
+    private val context: Context,
     private val cacheWrapper: EventsCacheWrapper<T>
 ) : EventsLoader<T>() {
 
@@ -135,7 +138,7 @@ internal class LegacyEventsLoader<T>(
     private val pagedCache: PagedEventsCache<T>
         get() = cacheWrapper.get() as PagedEventsCache<T>
 
-    override fun refresh(firstVisibleDate: Calendar): List<WeekViewEvent<T>> {
+    override fun refresh(firstVisibleDate: Calendar): List<ResolvedWeekViewEvent<T>> {
         val fetchRange = FetchRange.create(firstVisibleDate)
         val needsRefresh = shouldRefreshEvents || fetchRange !in pagedCache
 
@@ -162,8 +165,8 @@ internal class LegacyEventsLoader<T>(
         fetchRange: FetchRange
     ) = fetchRange.periods.filter { pagedCache[it] == null }
 
-    private fun fetchPeriods(periods: List<Period>): List<WeekViewEvent<T>> {
-        val results = mutableListOf<WeekViewEvent<T>>()
+    private fun fetchPeriods(periods: List<Period>): List<ResolvedWeekViewEvent<T>> {
+        val results = mutableListOf<ResolvedWeekViewEvent<T>>()
 
         for (period in periods) {
             val events = fetchPeriod(period)
@@ -178,5 +181,5 @@ internal class LegacyEventsLoader<T>(
         period: Period
     ) = onMonthChangeListener
         .onMonthChange(period.startDate, period.endDate)
-        .map { it.toWeekViewEvent() }
+        .map { it.toResolvedWeekViewEvent(context) }
 }

@@ -9,7 +9,7 @@ internal class SingleEventsUpdater<T : Any>(
     private val chipsCache: EventChipsCache<T>
 ) : Updater {
 
-    private val rectCalculator = EventChipRectCalculator<T>(config)
+    private val boundsCalculator = EventChipBoundsCalculator<T>(config)
 
     override fun isRequired(drawingContext: DrawingContext) = true
 
@@ -35,7 +35,7 @@ internal class SingleEventsUpdater<T : Any>(
         chipsCache.normalEventChipsByDate(date)
             .filter { it.event.isNotAllDay && it.event.isWithin(config.minHour, config.maxHour) }
             .forEach {
-                val chipRect = rectCalculator.calculateSingleEvent(it, startPixel)
+                val chipRect = boundsCalculator.calculateSingleEvent(it, startPixel)
                 if (chipRect.isValidSingleEventRect) {
                     it.bounds = chipRect
                 } else {

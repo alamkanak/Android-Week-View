@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
@@ -8,17 +7,12 @@ import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.style.StyleSpan
-import androidx.core.content.ContextCompat
-import com.alamkanak.weekview.WeekViewEvent.ColorResource
-import com.alamkanak.weekview.WeekViewEvent.TextResource
 
 internal class EventChipDrawer<T>(
-    private val context: Context,
-    private val config: WeekViewConfigWrapper,
-    private val emojiTextProcessor: EmojiTextProcessor = EmojiTextProcessor()
+    private val config: WeekViewConfigWrapper
 ) {
 
-    private val textFitter = TextFitter<T>(context, config)
+    private val textFitter = TextFitter<T>(config)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
 
     private val backgroundPaint = Paint()
@@ -34,19 +28,21 @@ internal class EventChipDrawer<T>(
         val cornerRadius = config.eventCornerRadius.toFloat()
         updateBackgroundPaint(event, backgroundPaint)
 
-        val rect = checkNotNull(eventChip.bounds)
-        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, backgroundPaint)
+        val bounds = checkNotNull(eventChip.bounds)
+        canvas.drawRoundRect(bounds, cornerRadius, cornerRadius, backgroundPaint)
 
-        if (event.style.hasBorder) {
+        if (event.style.borderWidth != null) {
             updateBorderPaint(event, borderPaint)
 
-            val borderWidth = event.style.getBorderWidth(context)
-            val adjustedRect = RectF(
-                rect.left + borderWidth / 2f,
-                rect.top + borderWidth / 2f,
-                rect.right - borderWidth / 2f,
-                rect.bottom - borderWidth / 2f)
-            canvas.drawRoundRect(adjustedRect, cornerRadius, cornerRadius, borderPaint)
+            val borderBounds = bounds.insetBy(event.style.borderWidth / 2f)
+
+//            val borderWidth = event.style.borderWidth
+//            val adjustedRect = RectF(
+//                rect.left + borderWidth / 2f,
+//                rect.top + borderWidth / 2f,
+//                rect.right - borderWidth / 2f,
+//                rect.bottom - borderWidth / 2f)
+            canvas.drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
         }
 
         if (event.isNotAllDay) {
@@ -82,7 +78,7 @@ internal class EventChipDrawer<T>(
             canvas.drawRect(bottomRect, backgroundPaint)
         }
 
-        if (event.style.hasBorder) {
+        if (event.style.borderWidth != null) {
             drawStroke(eventChip, canvas)
         }
     }
@@ -95,7 +91,7 @@ internal class EventChipDrawer<T>(
         val originalEvent = eventChip.originalEvent
         val rect = checkNotNull(eventChip.bounds)
 
-        val borderWidth = event.style.getBorderWidth(context)
+        val borderWidth = event.style.borderWidth ?: 0
         val innerWidth = rect.width() - borderWidth * 2
 
         val borderStartX = rect.left + borderWidth
@@ -142,54 +138,45 @@ internal class EventChipDrawer<T>(
         canvas: Canvas
     ) {
         val event = eventChip.event
-        val rect = checkNotNull(eventChip.bounds)
+        val bounds = checkNotNull(eventChip.bounds)
 
         val fullHorizontalPadding = config.eventPaddingHorizontal * 2
         val fullVerticalPadding = config.eventPaddingVertical * 2
 
-        val negativeWidth = rect.right - rect.left - fullHorizontalPadding < 0
-        val negativeHeight = rect.bottom - rect.top - fullVerticalPadding < 0
+        val negativeWidth = bounds.right - bounds.left - fullHorizontalPadding < 0
+        val negativeHeight = bounds.bottom - bounds.top - fullVerticalPadding < 0
         if (negativeWidth || negativeHeight) {
             return
         }
 
-        val title = when (val resource = event.titleResource) {
-            is TextResource.Id -> context.getString(resource.resId)
-            is TextResource.Value -> resource.text
-            null -> throw IllegalStateException("Invalid title resource: $resource")
-        }
-
-        val location = when (val resource = event.locationResource) {
-            is TextResource.Id -> context.getString(resource.resId)
-            is TextResource.Value -> resource.text
-            null -> null
-        }
-
-        val modifiedTitle = emojiTextProcessor.process(title)
-        val text = SpannableStringBuilder(modifiedTitle)
+        val title = event.title.emojify()
+        val text = SpannableStringBuilder(title)
         text.setSpan(StyleSpan(Typeface.BOLD))
 
-        val modifiedLocation = location?.let { emojiTextProcessor.process(it) }
-        if (modifiedLocation != null) {
-            text.appendln().append(modifiedLocation)
+        val location = event.location?.emojify()
+        if (location != null) {
+            text.appendln().append(location)
         }
 
-        val chipHeight = (rect.bottom - rect.top - fullVerticalPadding).toInt()
-        val chipWidth = (rect.right - rect.left - fullHorizontalPadding).toInt()
+        val chipHeight = (bounds.bottom - bounds.top - fullVerticalPadding).toInt()
+        val chipWidth = (bounds.right - bounds.left - fullHorizontalPadding).toInt()
 
         if (chipHeight == 0 || chipWidth == 0) {
             return
         }
 
-        val didAvailableAreaChange =
-            eventChip.didAvailableAreaChange(rect, fullHorizontalPadding, fullVerticalPadding)
-        val isCached = textLayoutCache.containsKey(event.id)
+        val didAvailableAreaChange = eventChip.didAvailableAreaChange(
+            area = bounds,
+            horizontalPadding = fullHorizontalPadding,
+            verticalPadding = fullVerticalPadding
+        )
+        val isCached = event.id in textLayoutCache
 
         if (didAvailableAreaChange || !isCached) {
             textLayoutCache[event.id] = textFitter.fit(
                 eventChip = eventChip,
-                title = modifiedTitle,
-                location = modifiedLocation,
+                title = title,
+                location = location,
                 chipHeight = chipHeight,
                 chipWidth = chipWidth
             )
@@ -203,30 +190,22 @@ internal class EventChipDrawer<T>(
     }
 
     private fun updateBackgroundPaint(
-        event: WeekViewEvent<T>,
+        event: ResolvedWeekViewEvent<T>,
         paint: Paint
     ) {
-        val resource = event.style.getBackgroundColorOrDefault(config)
-        paint.color = when (resource) {
-            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
-            is ColorResource.Value -> resource.color
-        }
+        paint.color = event.style.backgroundColor ?: config.defaultEventColor
         paint.isAntiAlias = true
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
     }
 
     private fun updateBorderPaint(
-        event: WeekViewEvent<T>,
+        event: ResolvedWeekViewEvent<T>,
         paint: Paint
     ) {
-        paint.color = when (val resource = event.style.borderColorResource) {
-            is ColorResource.Id -> ContextCompat.getColor(context, resource.resId)
-            is ColorResource.Value -> resource.color
-            null -> 0
-        }
+        paint.color = event.style.borderColor ?: config.defaultEventColor
         paint.isAntiAlias = true
-        paint.strokeWidth = event.style.getBorderWidth(context).toFloat()
+        paint.strokeWidth = event.style.borderWidth?.toFloat() ?: 0f
         paint.style = Paint.Style.STROKE
     }
 }

@@ -1,30 +1,30 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.model.Event
+import com.alamkanak.weekview.util.createResolvedWeekViewEvent
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.mockito.Mockito.`when` as whenever
 
-class WeekViewEventTest {
+class ResolvedWeekViewEventTest {
 
     private val config = Mockito.mock(WeekViewConfigWrapper::class.java)
-    private val eventSplitter = WeekViewEventSplitter<Event>(config)
+    private val eventSplitter = WeekViewEventSplitter<Unit>(config)
 
     init {
         MockitoAnnotations.initMocks(this)
-        Mockito.`when`(config.minHour).thenReturn(0)
-        Mockito.`when`(config.maxHour).thenReturn(24)
+        whenever(config.minHour).thenReturn(0)
+        whenever(config.maxHour).thenReturn(24)
     }
 
     @Test
     fun `single-day event is recognized correctly`() {
         val startTime = (today() + Days(1)).withHour(6).withMinutes(0)
         val endTime = startTime + Hours(10)
-        val event = Event(startTime, endTime)
 
-        val originalEvent = event.toWeekViewEvent()
+        val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
         val childEvents = eventSplitter.split(originalEvent)
         assertTrue(childEvents.size == 1)
 
@@ -37,9 +37,8 @@ class WeekViewEventTest {
     fun `two-day event is recognized correctly`() {
         val startTime = (today() + Days(1)).withHour(14).withMinutes(0)
         val endTime = (today() + Days(2)).withHour(14).withMinutes(0)
-        val event = Event(startTime, endTime)
 
-        val originalEvent = event.toWeekViewEvent()
+        val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
         val childEvents = eventSplitter.split(originalEvent)
         assertTrue(childEvents.size == 2)
 
@@ -57,9 +56,8 @@ class WeekViewEventTest {
     fun `multi-day event is recognized correctly`() {
         val startTime = (today() + Days(1)).withHour(14).withMinutes(0)
         val endTime = (today() + Days(3)).withHour(1).withMinutes(0)
-        val event = Event(startTime, endTime)
 
-        val originalEvent = event.toWeekViewEvent()
+        val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
         val childEvents = eventSplitter.split(originalEvent)
         assertTrue(childEvents.size == 3)
 
@@ -80,11 +78,11 @@ class WeekViewEventTest {
     fun `non-colliding events are recognized correctly`() {
         val firstStartTime = now()
         val firstEndTime = firstStartTime + Hours(1)
-        val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
+        val first = createResolvedWeekViewEvent(firstStartTime, firstEndTime)
 
         val secondStartTime = firstStartTime + Hours(2)
         val secondEndTime = secondStartTime + Hours(1)
-        val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
+        val second = createResolvedWeekViewEvent(secondStartTime, secondEndTime)
 
         assertFalse(first.collidesWith(second))
     }
@@ -93,11 +91,11 @@ class WeekViewEventTest {
     fun `overlapping events are recognized as colliding`() {
         val firstStartTime = now()
         val firstEndTime = firstStartTime + Hours(1)
-        val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
+        val first = createResolvedWeekViewEvent(firstStartTime, firstEndTime)
 
         val secondStartTime = firstStartTime - Hours(1)
         val secondEndTime = firstEndTime + Hours(1)
-        val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
+        val second = createResolvedWeekViewEvent(secondStartTime, secondEndTime)
 
         assertTrue(first.collidesWith(second))
     }
@@ -106,11 +104,11 @@ class WeekViewEventTest {
     fun `partly-overlapping events are recognized as colliding`() {
         val firstStartTime = now().withMinutes(0)
         val firstEndTime = firstStartTime + Hours(1)
-        val first = Event(firstStartTime, firstEndTime).toWeekViewEvent()
+        val first = createResolvedWeekViewEvent(firstStartTime, firstEndTime)
 
         val secondStartTime = firstStartTime.withMinutes(30)
         val secondEndTime = secondStartTime + Hours(1)
-        val second = Event(secondStartTime, secondEndTime).toWeekViewEvent()
+        val second = createResolvedWeekViewEvent(secondStartTime, secondEndTime)
 
         assertTrue(first.collidesWith(second))
     }

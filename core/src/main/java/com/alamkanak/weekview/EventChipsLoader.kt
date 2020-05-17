@@ -8,7 +8,7 @@ internal class EventChipsLoader<T>(
 
     private val eventSplitter = WeekViewEventSplitter<T>(config)
 
-    fun createEventChips(events: List<WeekViewEvent<T>>): List<EventChip<T>> {
+    fun createEventChips(events: List<ResolvedWeekViewEvent<T>>): List<EventChip<T>> {
         val eventChips = convertEventsToEventChips(events)
         val groups = eventChips.groupedByDate().values
 
@@ -20,14 +20,14 @@ internal class EventChipsLoader<T>(
     }
 
     private fun convertEventsToEventChips(
-        events: List<WeekViewEvent<T>>
+        events: List<ResolvedWeekViewEvent<T>>
     ): List<EventChip<T>> = events
         .sortedWith(compareBy({ it.startTime }, { it.endTime }))
         .map(this::convertEventToEventChips)
         .flatten()
 
     private fun convertEventToEventChips(
-        event: WeekViewEvent<T>
+        event: ResolvedWeekViewEvent<T>
     ): List<EventChip<T>> = eventSplitter.split(event).map { EventChip(it, event) }
 
     /**

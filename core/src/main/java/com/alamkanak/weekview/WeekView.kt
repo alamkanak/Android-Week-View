@@ -55,9 +55,10 @@ class WeekView<T : Any> @JvmOverloads constructor(
     private val eventChipsLoader = EventChipsLoader<T>(configWrapper)
 
     internal val eventsCacheWrapper = EventsCacheWrapper<T>()
-    internal val eventsLoaderWrapper = EventsLoaderWrapper(eventsCacheWrapper)
+    internal val eventsLoaderWrapper = EventsLoaderWrapper(context, eventsCacheWrapper)
 
     private val eventsDiffer = EventsDiffer(
+        context,
         eventsCacheWrapper,
         eventChipsLoader,
         eventChipCache,
@@ -97,12 +98,12 @@ class WeekView<T : Any> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(this, configWrapper),
         BackgroundGridDrawer(this, configWrapper),
-        SingleEventsDrawer(context, configWrapper, eventChipCache),
+        SingleEventsDrawer(configWrapper, eventChipCache),
         TimeColumnDrawer(this, configWrapper),
         NowLineDrawer(configWrapper),
         HeaderRowDrawer(this, configWrapper),
         DayLabelsDrawer(configWrapper, cache),
-        AllDayEventsDrawer(context, configWrapper, cache)
+        AllDayEventsDrawer(configWrapper, cache)
     )
 
     override fun onDraw(canvas: Canvas) {
