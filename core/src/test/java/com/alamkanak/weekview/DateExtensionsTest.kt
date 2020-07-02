@@ -1,9 +1,9 @@
 package com.alamkanak.weekview
 
+import java.util.Calendar
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
-import java.util.Calendar
 
 class DateExtensionsTest {
 

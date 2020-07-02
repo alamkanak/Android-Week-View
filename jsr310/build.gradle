@@ -22,7 +22,7 @@ dependencies {
     implementation libraries.kotlin
     implementation libraries.appCompat
 
-    testImplementation libraries.jUnit
-    testImplementation libraries.mockitoCore
-    testImplementation libraries.mockitoInline
+    testImplementation testing.jUnit
+    testImplementation testing.mockitoCore
+    testImplementation testing.mockitoInline
 }

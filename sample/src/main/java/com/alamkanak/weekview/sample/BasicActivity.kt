@@ -14,13 +14,13 @@ import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.sample.util.toCalendar
 import com.alamkanak.weekview.threetenabp.setOnEmptyViewClickListener
 import com.alamkanak.weekview.threetenabp.setOnLoadMoreListener
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 private class ViewModel(
     private val database: EventsDatabase

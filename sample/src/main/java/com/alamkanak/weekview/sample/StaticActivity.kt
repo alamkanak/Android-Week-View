@@ -10,18 +10,18 @@ import com.alamkanak.weekview.OnEventLongClickListener
 import com.alamkanak.weekview.OnMonthChangeListener
 import com.alamkanak.weekview.OnRangeChangeListener
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.data.EventsDatabase
+import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import kotlinx.android.synthetic.main.activity_static.dateRangeTextView
 import kotlinx.android.synthetic.main.activity_static.nextWeekButton
 import kotlinx.android.synthetic.main.activity_static.previousWeekButton
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
     OnMonthChangeListener<Event>, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {

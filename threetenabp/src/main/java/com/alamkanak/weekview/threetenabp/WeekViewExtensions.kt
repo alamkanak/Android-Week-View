@@ -8,9 +8,9 @@ import com.alamkanak.weekview.ScrollListener
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
+import java.util.Calendar
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import java.util.Calendar
 
 fun <T : Any> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())

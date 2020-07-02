@@ -1,10 +1,10 @@
 package com.alamkanak.weekview.jodatime
 
+import java.util.Calendar
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.junit.Assert
 import org.junit.Test
-import java.util.Calendar
 
 class DateExtensionsTest {
 

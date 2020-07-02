@@ -1,11 +1,11 @@
 package com.alamkanak.weekview.jsr310
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.util.Calendar
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class DateExtensionsTest {
 

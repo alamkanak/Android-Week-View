@@ -1,8 +1,7 @@
-apply plugin: 'com.github.dcendents.android-maven'
-
 group = 'com.github.thellmund.Android-Week-View'
-version = '4.0.0'
+version = '5.0.0'
 
+apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -12,6 +11,14 @@ android {
     defaultConfig {
         minSdkVersion buildConfig.minSdk
         targetSdkVersion buildConfig.targetSdk
+
+        // Required for core library desugaring
+        multiDexEnabled true
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     testOptions {
         unitTests.includeAndroidResources = true
@@ -26,14 +33,12 @@ dependencies {
     implementation libraries.appCompat
     implementation libraries.emoji
 
-    testImplementation libraries.jUnit
-    testImplementation libraries.mockitoCore
-    testImplementation libraries.mockitoInline
+    coreLibraryDesugaring libraries.coreLibraryDesugaring
 
-    testImplementation "org.robolectric:robolectric:4.2"
-    testImplementation "androidx.test:runner:1.2.0"
-    testImplementation "androidx.test.ext:junit:1.1.1"
-    testImplementation "androidx.test.espresso:espresso-intents:3.2.0"
-    testImplementation "androidx.test.espresso:espresso-core:3.2.0"
-    testImplementation "androidx.test.ext:truth:1.2.0"
+    testImplementation testing.androidxjUnit
+    testImplementation testing.androidxTestRunner
+    testImplementation testing.jUnit
+    testImplementation testing.mockitoCore
+    testImplementation testing.mockitoInline
+    testImplementation testing.robolectric
 }

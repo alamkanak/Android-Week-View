@@ -8,9 +8,9 @@ import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 class CustomFontActivity : AppCompatActivity() {
 

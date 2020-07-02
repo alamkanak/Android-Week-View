@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alamkanak.weekview.sample.util.EqualSpacingItemDecoration
+import kotlin.math.roundToInt
 import kotlinx.android.synthetic.main.activity_main.recyclerView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
-import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,9 +1,9 @@
 package com.alamkanak.weekview.threetenabp
 
 import com.alamkanak.weekview.WeekView
+import java.util.Calendar
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
-import java.util.Calendar
 
 class WeekViewAdapter<T : Any>(
     private val weekView: WeekView<T>

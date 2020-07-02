@@ -14,10 +14,10 @@ import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Calendar.DAY_OF_MONTH
+import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 class LimitedActivity : AppCompatActivity(), OnEventClickListener<Event>,
     OnMonthChangeListener<Event>, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {

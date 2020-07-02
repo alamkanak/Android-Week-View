@@ -1,10 +1,10 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import com.google.common.truth.Truth.assertThat
+import java.util.Calendar
+import org.junit.Assert.assertTrue
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
-import java.util.Calendar
 
 internal fun weekViewRobot(
     context: Context,
@@ -36,7 +36,7 @@ internal class WeekViewRobot(
         val dateRangeEvents = loader.refresh(date)
 
         for (event in events) {
-            assertThat(dateRangeEvents).contains(event)
+            assertTrue(event in dateRangeEvents)
         }
     }
 
@@ -75,16 +75,16 @@ internal class WeekViewRobot(
 
     internal fun assertCachingEventsLoader() {
         val loader = weekView.eventsLoaderWrapper.currentEventsLoader
-        assertThat(loader).isInstanceOf(CachingEventsLoader::class.java)
+        assertTrue(loader is CachingEventsLoader)
     }
 
     internal fun assertPagedEventsLoader() {
         val loader = weekView.eventsLoaderWrapper.currentEventsLoader
-        assertThat(loader).isInstanceOf(PagedEventsLoader::class.java)
+        assertTrue(loader is PagedEventsLoader)
     }
 
     internal fun assertLegacyEventsLoader() {
         val loader = weekView.eventsLoaderWrapper.currentEventsLoader
-        assertThat(loader).isInstanceOf(LegacyEventsLoader::class.java)
+        assertTrue(loader is LegacyEventsLoader)
     }
 }

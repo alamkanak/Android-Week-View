@@ -24,7 +24,8 @@ dependencies {
     implementation libraries.threeTenAbp
 
     testImplementation libraries.threeTen
-    testImplementation libraries.jUnit
-    testImplementation libraries.mockitoCore
-    testImplementation libraries.mockitoInline
+
+    testImplementation testing.jUnit
+    testImplementation testing.mockitoCore
+    testImplementation testing.mockitoInline
 }

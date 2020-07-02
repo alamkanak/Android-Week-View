@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import java.util.Calendar
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
-import java.util.Calendar
 
 inline fun <reified T : View> Activity.lazyView(
     @IdRes viewId: Int

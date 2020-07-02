@@ -11,8 +11,8 @@ import com.alamkanak.weekview.sample.data.model.ApiEvent
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import java.text.SimpleDateFormat
+import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 private data class AsyncViewState(
     val events: List<ApiEvent> = emptyList(),
