@@ -72,6 +72,7 @@ interface OnRangeChangeListener {
     fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar)
 }
 
+@Deprecated("Use OnLoadMoreListener instead. This interface will be removed in the future.")
 @FunctionalInterface
 interface OnMonthChangeListener<T> {
 

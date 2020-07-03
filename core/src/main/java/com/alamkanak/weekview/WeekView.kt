@@ -1276,6 +1276,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
     }
 
+    @Deprecated("Use onLoadMoreListener instead. This property will be removed in the future.")
     @PublicApi
     var onMonthChangeListener: OnMonthChangeListener<T>?
         get() = (eventsLoader as? LegacyEventsLoader)?.onMonthChangeListener
@@ -1284,6 +1285,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             eventsLoaderWrapper.onListenerChanged(value)
         }
 
+    @Deprecated("Use setOnLoadMoreListener instead. This method will be removed in the future.")
     @PublicApi
     fun setOnMonthChangeListener(
         block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>

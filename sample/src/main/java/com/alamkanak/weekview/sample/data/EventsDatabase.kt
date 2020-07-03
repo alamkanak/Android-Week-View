@@ -12,7 +12,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-class EventsDatabase(context: Context) {
+public class EventsDatabase(context: Context) {
 
     private val color1 = ContextCompat.getColor(context, R.color.event_color_01)
     private val color2 = ContextCompat.getColor(context, R.color.event_color_02)

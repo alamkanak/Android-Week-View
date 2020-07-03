@@ -7,10 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.OnEmptyViewLongClickListener
 import com.alamkanak.weekview.OnEventClickListener
 import com.alamkanak.weekview.OnEventLongClickListener
-import com.alamkanak.weekview.OnMonthChangeListener
+import com.alamkanak.weekview.OnLoadMoreListener
 import com.alamkanak.weekview.OnRangeChangeListener
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.model.Event
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
@@ -24,11 +23,11 @@ import kotlinx.android.synthetic.main.activity_static.previousWeekButton
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
-    OnMonthChangeListener<Event>, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {
+    OnLoadMoreListener, OnEventLongClickListener<Event>, OnEmptyViewLongClickListener {
 
     private val weekView: WeekView<Event> by lazyView(R.id.weekView)
+    private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
 
-    private val database: EventsDatabase by lazy { EventsDatabase(this) }
     private val dateFormatter = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +37,7 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
         toolbar.setupWithWeekView(weekView)
 
         weekView.onEventClickListener = this
-        weekView.onMonthChangeListener = this
+        weekView.onLoadMoreListener = this
         weekView.onEventLongClickListener = this
         weekView.onEmptyViewLongClickListener = this
 
@@ -62,10 +61,9 @@ class StaticActivity : AppCompatActivity(), OnEventClickListener<Event>,
         }
     }
 
-    override fun onMonthChange(
-        startDate: Calendar,
-        endDate: Calendar
-    ) = database.getEventsInRange(startDate, endDate)
+    override fun onLoadMore(startDate: Calendar, endDate: Calendar) {
+        eventsFetcher.fetch(startDate, endDate, weekView::submit)
+    }
 
     override fun onEventClick(data: Event, eventRect: RectF) {
         showToast("Clicked ${data.title}")
