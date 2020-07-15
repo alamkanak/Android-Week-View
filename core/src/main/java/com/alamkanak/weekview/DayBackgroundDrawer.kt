@@ -71,7 +71,10 @@ internal class DayBackgroundDrawer(
         canvas: Canvas
     ) {
         val now = now()
-        val beforeNow = (now.hour + now.minute / MINUTES_PER_HOUR) * config.hourHeight
+        val hour = now.hour - config.minHour
+        val hourFraction = now.minute / MINUTES_PER_HOUR
+
+        val beforeNow = (hour + hourFraction) * config.hourHeight
         canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint)
         canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint)
     }
