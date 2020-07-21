@@ -552,8 +552,9 @@ public class WeekView extends View {
         mWidthPerDay = mWidthPerDay/mNumberOfVisibleDays;
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
-
-        Calendar today = today();
+        
+        // Android Studio Rendering Problems #393 credit Rexcantor
+        Calendar today = today(); if(today == null) today = new GregorianCalendar(2000, 1, 1); 
 
         if (mAreDimensionsInvalid) {
             mEffectiveMinHourHeight= Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / 24));
