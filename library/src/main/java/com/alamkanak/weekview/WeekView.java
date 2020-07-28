@@ -143,6 +143,8 @@ public class WeekView extends View {
     private boolean mShowDistinctPastFutureColor = false;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
+    private boolean mHorizontalScrollEnabled = true;
+    private boolean mVerticalScrollEnabled = true;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
 
@@ -203,12 +205,16 @@ public class WeekView extends View {
             switch (mCurrentScrollDirection) {
                 case LEFT:
                 case RIGHT:
-                    mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    if (mHorizontalScrollEnabled) {
+                        mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    }
                     break;
                 case VERTICAL:
-                    mCurrentOrigin.y -= distanceY;
-                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    if (mVerticalScrollEnabled) {
+                        mCurrentOrigin.y -= distanceY;
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                    }
                     break;
             }
             return true;
@@ -219,6 +225,8 @@ public class WeekView extends View {
             if (mIsZooming)
                 return true;
 
+            mCurrentFlingDirection = mCurrentScrollDirection;
+
             if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) ||
                     (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) ||
                     (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
@@ -227,7 +235,6 @@ public class WeekView extends View {
 
             mScroller.forceFinished(true);
 
-            mCurrentFlingDirection = mCurrentScrollDirection;
             switch (mCurrentFlingDirection) {
                 case LEFT:
                 case RIGHT:
@@ -352,6 +359,8 @@ public class WeekView extends View {
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
+            mHorizontalScrollEnabled = a.getBoolean(R.styleable.WeekView_horizontalScrollEnabled, mHorizontalScrollEnabled);
+            mVerticalScrollEnabled = a.getBoolean(R.styleable.WeekView_verticalScrollEnabled, mVerticalScrollEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
@@ -1784,6 +1793,36 @@ public class WeekView extends View {
      */
     public void setVerticalFlingEnabled(boolean enabled) {
         mVerticalFlingEnabled = enabled;
+    }
+
+    /**
+     * Get whether the week view should scroll horizontally.
+     * @return True if the week view has horizontal scroll enabled.
+     */
+    public boolean isHorizontalScrollEnabled() {
+        return mHorizontalScrollEnabled;
+    }
+
+    /**
+     * Set whether the week view should scroll horizontally.
+     */
+    public void setHorizontalScrollEnabled(boolean enabled) {
+        mHorizontalScrollEnabled = enabled;
+    }
+
+    /**
+     * Get whether the week view should scroll vertically.
+     * @return True if the week view has vertical scroll enabled.
+     */
+    public boolean isVerticalScrollEnabled() {
+        return mVerticalScrollEnabled;
+    }
+
+    /**
+     * Set whether the week view should scroll vertically.
+     */
+    public void setVerticalScrollEnabled(boolean enabled) {
+        mVerticalScrollEnabled = enabled;
     }
 
     /**
