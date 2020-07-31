@@ -49,6 +49,9 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
         return matchedEvents;
     }
 
+
+    private static final Calendar sStartTime = Calendar.getInstance();
+    private static final Calendar sEndTime = Calendar.getInstance();
     /**
      * Checks if an event falls into a specific year and month.
      * @param event The event to check for.
@@ -57,7 +60,10 @@ public class AsynchronousActivity extends BaseActivity implements Callback<List<
      * @return True if the event matches the year and month.
      */
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
-        return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
+        sStartTime.setTimeInMillis(event.getStartTime());
+        sEndTime.setTimeInMillis(event.getEndTime());
+        return (sStartTime.get(Calendar.YEAR) == year && sStartTime.get(Calendar.MONTH) ==  month - 1)
+            || (sEndTime.get(Calendar.YEAR) == year && sEndTime.get(Calendar.MONTH) == month - 1);
     }
 
     @Override

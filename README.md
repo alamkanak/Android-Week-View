@@ -230,10 +230,15 @@ Changelog
 
 * Added support for overlapping events
 
+**Lai Kitman Fork**
+
+* remove almost all calendar instance to avoid memory leak
+* optimize performance on large amount of events 
+
 License
 ----------
 
-    Copyright 2014 Raquib-ul-Alam
+    Copyright 2017 Lai Kitman
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
