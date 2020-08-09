@@ -12,7 +12,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-public class EventsDatabase(context: Context) {
+class EventsDatabase(context: Context) {
 
     private val color1 = ContextCompat.getColor(context, R.color.event_color_01)
     private val color2 = ContextCompat.getColor(context, R.color.event_color_02)
@@ -22,6 +22,19 @@ public class EventsDatabase(context: Context) {
     fun getEventsInRange(
         startDate: Calendar,
         endDate: Calendar
+    ): List<WeekViewDisplayable<Event>> {
+        val monthStartDates = mutableListOf<Calendar>()
+        while (startDate < endDate) {
+            val monthStartDate = Calendar.getInstance()
+            monthStartDate.timeInMillis = startDate.timeInMillis
+            monthStartDates.add(monthStartDate)
+            startDate.add(Calendar.MONTH, 1)
+        }
+        return monthStartDates.flatMap(this::simulateEventsForRange)
+    }
+
+    private fun simulateEventsForRange(
+        startDate: Calendar
     ): List<WeekViewDisplayable<Event>> {
         val year = startDate.get(Calendar.YEAR)
         val month = startDate.get(Calendar.MONTH)
@@ -49,6 +62,7 @@ public class EventsDatabase(context: Context) {
             hour = 20,
             minute = 0,
             duration = 5 * 60,
+            isCanceled = true,
             color = color4
         )
 
@@ -62,17 +76,6 @@ public class EventsDatabase(context: Context) {
             duration = 60,
             color = color4,
             isCanceled = true
-        )
-
-        events += newEvent(
-            id = idOffset + 3,
-            year = year,
-            month = month,
-            dayOfMonth = 28,
-            hour = 9,
-            minute = 30,
-            duration = 60,
-            color = color2
         )
 
         events += newEvent(
@@ -211,8 +214,6 @@ public class EventsDatabase(context: Context) {
         val title = buildEventTitle(startTime)
 
         val spannableTitle = SpannableStringBuilder(title).apply {
-//            setSpan(BackgroundColorSpan(Color.RED), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
-//            setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 

@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
@@ -18,10 +17,7 @@ class LimitedActivity : AppCompatActivity() {
     private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
 
     private val adapter: LimitedActivityWeekViewAdapter by lazy {
-        LimitedActivityWeekViewAdapter(
-            context = this,
-            loadMoreHandler = this::onLoadMore
-        )
+        LimitedActivityWeekViewAdapter(loadMoreHandler = this::onLoadMore)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +48,8 @@ class LimitedActivity : AppCompatActivity() {
 }
 
 private class LimitedActivityWeekViewAdapter(
-    context: Context,
     private val loadMoreHandler: (startDate: Calendar, endDate: Calendar) -> Unit
-) : WeekView.PagingAdapter<Event>(context) {
+) : WeekView.PagingAdapter<Event>() {
 
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 

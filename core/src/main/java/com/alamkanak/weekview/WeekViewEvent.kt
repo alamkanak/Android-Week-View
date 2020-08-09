@@ -11,14 +11,14 @@ import androidx.core.content.ContextCompat
 import java.util.Calendar
 
 data class WeekViewEvent<T> internal constructor(
-    val id: Long = 0L,
+    internal val id: Long = 0L,
     internal val titleResource: TextResource,
-    val startTime: Calendar = now(),
-    val endTime: Calendar = now(),
+    internal val startTime: Calendar = now(),
+    internal val endTime: Calendar = now(),
     internal val locationResource: TextResource? = null,
-    val isAllDay: Boolean = false,
-    val style: Style = Style(),
-    val data: T
+    internal val isAllDay: Boolean = false,
+    internal val style: Style = Style(),
+    internal val data: T
 ) : WeekViewDisplayable<T> {
 
     override fun toWeekViewEvent(): WeekViewEvent<T> = this

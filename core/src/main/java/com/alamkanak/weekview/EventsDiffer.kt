@@ -61,15 +61,14 @@ internal class EventsDiffer<T>(
             return
         }
 
-        when (eventsCache) {
-            is SimpleEventsCache -> eventsCache.update(events)
-            is PagedEventsCache -> eventsCache.update(mapEventsToPeriod(events))
+        eventsCache.update(events)
+
+        if (eventsCache is SimpleEventsCache) {
+            // When using SimpleEventsCache, we completely replace all event chips that are
+            // currently cached.
+            eventChipsCache.clear()
         }
 
         eventChipsCache += eventChipsFactory.createEventChips(events, viewState)
     }
-
-    private fun mapEventsToPeriod(
-        events: List<ResolvedWeekViewEvent<T>>
-    ) = events.groupBy { Period.fromDate(it.startTime) }
 }

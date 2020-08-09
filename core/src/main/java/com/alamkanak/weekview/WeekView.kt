@@ -98,7 +98,7 @@ class WeekView @JvmOverloads constructor(
         }
 
         val pagedAdapter = adapter as? PagingAdapter ?: return
-        pagedAdapter.triggerEventsFetching(firstVisibleDate)
+        pagedAdapter.loadPeriodsIfNecessary()
     }
 
     private fun performRendering(canvas: Canvas) {
@@ -146,7 +146,6 @@ class WeekView @JvmOverloads constructor(
         if (hasFirstVisibleDayChanged) {
             val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
             adapter?.onRangeChanged(firstVisibleDate, lastVisibleDate)
-            adapter?.onFirstVisibleDateChanged(firstVisibleDate)
         }
     }
 
@@ -1109,19 +1108,8 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        adapter?.requireRefresh()
-
         val diff = adjustedDate.daysFromToday
         viewState.currentOrigin.x = diff.toFloat() * (-1f) * viewState.totalDayWidth
-        invalidate()
-    }
-
-    /**
-     * Refreshes the view and loads the events again.
-     */
-    @PublicApi
-    fun notifyDataSetChanged() {
-        adapter?.requireRefresh()
         invalidate()
     }
 
@@ -1226,12 +1214,6 @@ class WeekView @JvmOverloads constructor(
         set(value) {
             setDateFormatter { value.interpretDate(it) }
             setTimeFormatter { value.interpretTime(it) }
-            renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
-                it.onDateFormatterChanged(value::interpretDate)
-            }
-            renderers.filterIsInstance(TimeFormatterDependent::class.java).forEach {
-                it.onTimeFormatterChanged(value::interpretTime)
-            }
             invalidate()
         }
 
@@ -1258,7 +1240,15 @@ class WeekView @JvmOverloads constructor(
         return super.dispatchHoverEvent(event)
     }
 
-    abstract class Adapter<T>(protected val context: Context) {
+    /**
+     * An abstract base class for an adapter used with [WeekView].
+     *
+     * An adapter allows interaction with [WeekView]. It provides optional methods for being
+     * notified about clicks, long-clicks and scrolling events.
+     *
+     * @param T The type of elements that are displayed in the corresponding [WeekView].
+     */
+    abstract class Adapter<T> {
 
         internal abstract val eventsCache: EventsCache<T>
 
@@ -1275,11 +1265,11 @@ class WeekView @JvmOverloads constructor(
             )
         }
 
-        protected var shouldRefreshEvents: Boolean = false
+        internal var weekView: WeekView? = null
+            private set
 
-        internal fun requireRefresh() {
-            shouldRefreshEvents = true
-        }
+        val context: Context
+            get() = checkNotNull(weekView).context
 
         internal fun handleClick(x: Float, y: Float): Boolean {
             val eventChip = findHitEvent(x, y) ?: return false
@@ -1326,15 +1316,12 @@ class WeekView @JvmOverloads constructor(
             }
         }
 
-        internal fun updateObserver() {
-            weekView?.invalidate()
-        }
-
-        internal var weekView: WeekView? = null
-            private set
-
         internal fun registerObserver(weekView: WeekView) {
             this.weekView = weekView
+        }
+
+        internal fun updateObserver() {
+            weekView?.invalidate()
         }
 
         internal fun unregisterObserver() {
@@ -1353,72 +1340,182 @@ class WeekView @JvmOverloads constructor(
 
         private fun findEventData(id: Long): T? = eventsCache[id]?.data
 
-        // TODO: Comments
-
+        /**
+         * Returns the data of the [WeekViewEvent] that the user clicked on.
+         *
+         * @param data The data of the [WeekViewEvent]
+         */
         open fun onEventClick(data: T) = Unit
+
+        /**
+         * Returns the data of the [WeekViewEvent] that the user clicked on as well as the bounds
+         * of the [EventChip] in which it is displayed.
+         *
+         * @param data The data of the [WeekViewEvent]
+         * @param bounds The [RectF] representing the bounds of the event's [EventChip]
+         */
         open fun onEventClick(data: T, bounds: RectF) = Unit
+
+        /**
+         * Returns the data of the [WeekViewEvent] that the user long-clicked on.
+         *
+         * @param data The data of the [WeekViewEvent]
+         */
         open fun onEventLongClick(data: T) = Unit
+
+        /**
+         * Returns the data of the [WeekViewEvent] that the user long-clicked on as well as the
+         * bounds of the [EventChip] in which it is displayed.
+         *
+         * @param data The data of the [WeekViewEvent]
+         * @param bounds The [RectF] representing the bounds of the event's [EventChip]
+         */
         open fun onEventLongClick(data: T, bounds: RectF) = Unit
+
+        /**
+         * Returns the date and time of the location that the user clicked on.
+         *
+         * @param time A [Calendar] with the date and time
+         */
         open fun onEmptyViewClick(time: Calendar) = Unit
-        open fun onEmptyViewClick(time: Calendar, bounds: RectF) = Unit
+
+        /**
+         * Returns the date and time of the location that the user long-clicked on.
+         *
+         * @param time A [Calendar] with the date and time
+         */
         open fun onEmptyViewLongClick(time: Calendar) = Unit
-        open fun onEmptyViewLongClick(time: Calendar, bounds: RectF) = Unit
+
+        /**
+         * Called whenever the range of dates visible in [WeekView] changes. The list of dates is
+         * typically as long as [numberOfVisibleDays], though it might contain an additional date
+         * if [WeekView] is currently scrolling.
+         *
+         * @param firstVisibleDate A [Calendar] representing the first visible date
+         * @param lastVisibleDate A [Calendar] representing the last visible date
+         */
         open fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) = Unit
-        open fun onFirstVisibleDateChanged(date: Calendar) = Unit
     }
 
-    open class PagingAdapter<T>(context: Context) : Adapter<T>(context) {
-
-        override val eventsCache = PagedEventsCache<T>()
-
-        fun submit(events: List<WeekViewDisplayable<T>>) {
-            val viewState = weekView?.viewState ?: return
-            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
-        }
-
-        open fun onLoadMore(startDate: Calendar, endDate: Calendar) = Unit
-
-        internal fun triggerEventsFetching(firstVisibleDate: Calendar) {
-            val fetchRange = FetchRange.create(firstVisibleDate)
-            val needsRefresh = shouldRefreshEvents || fetchRange !in eventsCache
-
-            if (needsRefresh) {
-                val periods = eventsCache.determinePeriodsToFetch(fetchRange)
-                val needsToFetchAllPeriods = periods.size == 3
-                eventsCache.prepare(fetchRange, needsToFetchAllPeriods)
-                fetchPeriods(periods)
-            }
-
-            shouldRefreshEvents = false
-        }
-
-        private fun PagedEventsCache<T>.determinePeriodsToFetch(
-            fetchRange: FetchRange
-        ) = fetchRange.periods.filter { it !in this }
-
-        private fun PagedEventsCache<T>.prepare(fetchRange: FetchRange, needsToFetchAllPeriods: Boolean) {
-            if (shouldRefreshEvents && needsToFetchAllPeriods) {
-                clear()
-            }
-
-            shouldRefreshEvents = false
-            adjustToFetchRange(fetchRange)
-        }
-
-        private fun fetchPeriods(periods: List<Period>) {
-            for (period in periods) {
-                onLoadMore(period.startDate, period.endDate)
-            }
-        }
-    }
-
-    open class SimpleAdapter<T>(context: Context) : Adapter<T>(context) {
+    /**
+     * An implementation of [WeekView.Adapter] that allows to submit a list of new elements to
+     * [WeekView].
+     *
+     * Newly submitted events are processed on a background thread and then presented in
+     * [WeekView]. Previously submitted events are replaced completely. If you require a paginated
+     * approach, you might want to use [WeekView.PagingAdapter].
+     *
+     * @param T The type of elements that are displayed in the corresponding [WeekView].
+     */
+    open class SimpleAdapter<T> : Adapter<T>() {
 
         override val eventsCache = SimpleEventsCache<T>()
 
+        /**
+         * Submits a new list of [WeekViewDisplayable] elements to the adapter. These events are
+         * processed on a background thread and then presented in [WeekView]. Previously submitted
+         * events are replaced completely.
+         *
+         * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
+         */
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
             eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+        }
+    }
+
+    /**
+     * An implementation of [WeekView.Adapter] that allows to submit a list of new elements to
+     * [WeekView] in a paginated way.
+     *
+     * This adapter keeps a cache of [WeekViewDisplayable] elements grouped by month. Whenever the
+     * user scrolls to a different month, this adapter will check whether that month's events are
+     * present in the cache. If not, it will dispatch a callback to [onLoadMore] with the start and
+     * end dates of the months that need to be fetched.
+     *
+     * Newly submitted events are processed on a background thread and then presented in
+     * [WeekView]. To clear the cache and thus refresh all events, you can call [refresh].
+     *
+     * @param T The type of elements that are displayed in the corresponding [WeekView].
+     */
+    open class PagingAdapter<T> : Adapter<T>() {
+
+        override val eventsCache = PagedEventsCache<T>()
+
+        /**
+         * Submits a new list of [WeekViewDisplayable] elements to the adapter. These events are
+         * processed on a background thread and then presented in [WeekView]. Previously submitted
+         * events of the same month are replaced completely.
+         *
+         * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
+         */
+        fun submit(events: List<WeekViewDisplayable<T>>) {
+            val viewState = weekView?.viewState ?: return
+            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+        }
+
+        /**
+         * Called whenever [WeekView] needs to fetch [WeekViewDisplayable] elements of a given
+         * month in order to allow for a smooth scrolling experience.
+         *
+         * This adapter caches [WeekViewDisplayable] elements of the current month as well as its
+         * previous and next month. If [WeekView] scrolls to a new month, that month as well as its
+         * surrounding months need to potentially be fetched.
+         *
+         * @param startDate A [Calendar] of the first date of the month that needs to be fetched
+         * @param endDate A [Calendar] of the last date of the month that needs to be fetched
+         */
+        open fun onLoadMore(startDate: Calendar, endDate: Calendar) = Unit
+
+        /**
+         * Refreshes the [WeekViewDisplayable] elements presented by this adapter. All cached
+         * elements will be removed and a call to [onLoadMore] will be triggered.
+         */
+        fun refresh() {
+            eventsCache.clear()
+            weekView?.invalidate()
+        }
+
+        internal fun loadPeriodsIfNecessary() {
+            val firstVisibleDate = weekView?.viewState?.firstVisibleDate ?: return
+            val fetchRange = FetchRange.create(firstVisibleDate)
+            if (fetchRange in eventsCache) {
+                return
+            }
+
+            val periodsToFetch = eventsCache.determinePeriodsToFetch(fetchRange)
+            if (periodsToFetch.isNotEmpty()) {
+                fetchPeriods(periodsToFetch)
+            }
+        }
+
+        private fun fetchPeriods(periods: List<Period>) {
+            val grouped = periods.groupConsecutivePeriods()
+
+            for (period in periods) {
+                // We add an empty list for the periods to avoid multiple fetch attempts.
+                eventsCache.reserve(period)
+            }
+
+            for (group in grouped) {
+                val first = group.first()
+                val last = group.last()
+                onLoadMore(first.startDate, last.endDate)
+            }
+        }
+
+        private fun List<Period>.groupConsecutivePeriods(): List<List<Period>> {
+            val emptyList = mutableListOf<MutableList<Period>>()
+            return fold(emptyList) { accumulator, period ->
+                val lastPeriodInList = accumulator.lastOrNull()?.last()
+                val isConsecutive = lastPeriodInList?.next == period
+                if (accumulator.isEmpty() || !isConsecutive) {
+                    accumulator.add(mutableListOf(period))
+                } else {
+                    accumulator.last().add(period)
+                }
+                accumulator
+            }
         }
     }
 }

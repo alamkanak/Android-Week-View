@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -54,10 +53,8 @@ class AsyncActivity : AppCompatActivity() {
 
         toolbar.setupWithWeekView(weekView)
 
-        val adapter = AsyncActivityWeekViewAdapter(
-            context = this,
-            eventClickHandler = viewModel::remove
-        )
+        val adapter = AsyncActivityWeekViewAdapter(eventClickHandler = viewModel::remove)
+        weekView.adapter = adapter
 
         viewModel.viewState.observe(this, Observer { viewState ->
             blockingProgressIndicator.isVisible = viewState.isLoading
@@ -73,9 +70,8 @@ private var View.isVisible: Boolean
     }
 
 private class AsyncActivityWeekViewAdapter(
-    context: Context,
     private val eventClickHandler: (ApiEvent) -> Unit
-) : WeekView.SimpleAdapter<ApiEvent>(context) {
+) : WeekView.SimpleAdapter<ApiEvent>() {
 
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 

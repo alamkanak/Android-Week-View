@@ -10,7 +10,7 @@ fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
     restore()
 }
 
-fun Canvas.drawInRect(
+fun Canvas.drawInBounds(
     left: Float,
     top: Float,
     right: Float,

@@ -1,39 +1,7 @@
 package com.alamkanak.weekview
 
-import androidx.annotation.VisibleForTesting
+import androidx.collection.ArrayMap
 import java.util.Calendar
-
-// /**
-// * Wraps all available [EventsCache]s to allow for dynamic switching between them.
-// */
-// internal class EventsCacheWrapper<T> {
-//
-//    private val simpleEventsCache: EventsCache<T> = SimpleEventsCache()
-//    private val pagedEventsCache: EventsCache<T> = PagedEventsCache()
-//
-//    private var currentEventsCache = simpleEventsCache
-//
-//    /**
-//     * Returns the [EventsCache] that is currently in use.
-//     */
-//    fun get() = currentEventsCache
-//
-//    /**
-//     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
-//     * or [SimpleEventsCache] (otherwise).
-//     */
-//    fun onListenerChanged(listener: OnMonthChangeListener<T>?) {
-//        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
-//    }
-//
-//    /**
-//     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
-//     * or [SimpleEventsCache] (otherwise).
-//     */
-//    fun onListenerChanged(listener: OnLoadMoreListener?) {
-//        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
-//    }
-// }
 
 /**
  * An abstract class that provides functionality to cache [WeekViewEvent]s.
@@ -41,11 +9,10 @@ import java.util.Calendar
 internal abstract class EventsCache<T> {
 
     abstract val allEvents: List<ResolvedWeekViewEvent<T>>
+    abstract fun update(events: List<ResolvedWeekViewEvent<T>>)
     abstract fun clear()
 
-    operator fun get(id: Long): ResolvedWeekViewEvent<T>? {
-        return allEvents.firstOrNull { it.id == id }
-    }
+    operator fun get(id: Long): ResolvedWeekViewEvent<T>? = allEvents.firstOrNull { it.id == id }
 
     operator fun get(
         dateRange: List<Calendar>
@@ -62,8 +29,6 @@ internal abstract class EventsCache<T> {
         val endTime = fetchRange.next.endDate
         return allEvents.filter { it.endTime >= startTime && it.startTime <= endTime }
     }
-
-    open operator fun get(period: Period): List<ResolvedWeekViewEvent<T>>? = null
 }
 
 /**
@@ -77,7 +42,7 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
     override val allEvents: List<ResolvedWeekViewEvent<T>>
         get() = _allEvents.orEmpty()
 
-    fun update(events: List<ResolvedWeekViewEvent<T>>) {
+    override fun update(events: List<ResolvedWeekViewEvent<T>>) {
         _allEvents = events
     }
 
@@ -87,103 +52,34 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
 }
 
 /**
- * Represents an [EventsCache] that caches [WeekViewEvent]s for a particular [FetchRange].
+ * Represents an [EventsCache] that caches [ResolvedWeekViewEvent]s for their respective [Period]
+ * and allows retrieval based on that [Period].
  */
 internal class PagedEventsCache<T> : EventsCache<T>() {
 
     override val allEvents: List<ResolvedWeekViewEvent<T>>
-        get() = previousPeriodEvents.orEmpty() +
-            currentPeriodEvents.orEmpty() +
-            nextPeriodEvents.orEmpty()
+        get() = eventsByPeriod.values.flatten()
 
-    private var previousPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
-    private var currentPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
-    private var nextPeriodEvents: List<ResolvedWeekViewEvent<T>>? = null
+    private val eventsByPeriod: ArrayMap<Period, List<ResolvedWeekViewEvent<T>>> = ArrayMap()
 
-    @VisibleForTesting
-    internal var fetchedRange: FetchRange? = null
-
-    operator fun contains(period: Period) = fetchedRange?.periods?.contains(period) ?: false
-
-    operator fun contains(fetchRange: FetchRange) = fetchedRange?.isEqual(fetchRange) ?: false
-
-    override fun get(period: Period): List<ResolvedWeekViewEvent<T>>? {
-        val range = checkNotNull(fetchedRange)
-        return when (period) {
-            range.previous -> previousPeriodEvents
-            range.current -> currentPeriodEvents
-            range.next -> nextPeriodEvents
-            else -> throw IllegalStateException("Requesting events for invalid period $period")
+    override fun update(events: List<ResolvedWeekViewEvent<T>>) {
+        val groupedEvents = events.groupBy { Period.fromDate(it.startTime) }
+        for ((period, periodEvents) in groupedEvents) {
+            eventsByPeriod[period] = periodEvents
         }
     }
 
-    /**
-     * Adjusts the [WeekViewEvent]s of the fetched [Period]s to the new [FetchRange]. This means
-     * that if the user scrolled to the next month, the following would happen:
-     *  1. The events of the current month would be moved to [previousPeriodEvents].
-     *  2. The events of the next month would be moved to [currentPeriodEvents].
-     *  3. The events of the following month aren't loaded yet; [nextPeriodEvents] will be null.
-     *  4. The [fetchedRange] will be set to the provided [FetchRange].
-     *
-     * When scrolling to the previous month, the behavior would be like so:
-     *  1. The events of the current month would be moved to [nextPeriodEvents].
-     *  2. The events of the previous month would be moved to [currentPeriodEvents].
-     *  2. The events of the preceding month aren't loaded yet; [previousPeriodEvents] will be null.
-     *  4. The [fetchedRange] will be set to the provided [FetchRange].
-     */
-    fun adjustToFetchRange(fetchRange: FetchRange) {
-        val oldFetchRange = fetchedRange ?: fetchRange
-        val newCurrentPeriod = fetchRange.current
+    internal fun determinePeriodsToFetch(range: FetchRange) = range.periods.filter { it !in this }
 
-        val previousEvents = when (newCurrentPeriod) {
-            oldFetchRange.previous -> null
-            oldFetchRange.next -> currentPeriodEvents
-            else -> previousPeriodEvents
-        }
+    operator fun contains(period: Period) = eventsByPeriod.contains(period)
 
-        val currentEvents = when (newCurrentPeriod) {
-            oldFetchRange.previous -> previousPeriodEvents
-            oldFetchRange.next -> nextPeriodEvents
-            else -> currentPeriodEvents
-        }
+    operator fun contains(range: FetchRange) = eventsByPeriod.containsAll(range.periods)
 
-        val nextEvents = when (newCurrentPeriod) {
-            oldFetchRange.previous -> currentPeriodEvents
-            oldFetchRange.next -> null
-            else -> nextPeriodEvents
-        }
-
-        previousPeriodEvents = previousEvents
-        currentPeriodEvents = currentEvents
-        nextPeriodEvents = nextEvents
-        fetchedRange = fetchRange
-    }
-
-    fun update(eventsByPeriod: Map<Period, List<ResolvedWeekViewEvent<T>>>) {
-        for ((period, events) in eventsByPeriod) {
-            update(period, events)
-        }
-    }
-
-    private fun update(period: Period, events: List<ResolvedWeekViewEvent<T>>) {
-        val range = checkNotNull(fetchedRange)
-        when (period) {
-            range.previous -> previousPeriodEvents = events
-            range.current -> currentPeriodEvents = events
-            range.next -> nextPeriodEvents = events
-        }
-    }
-
-    operator fun set(
-        period: Period,
-        events: List<ResolvedWeekViewEvent<T>>
-    ) {
-        update(period, events)
+    fun reserve(period: Period) {
+        eventsByPeriod[period] = listOf()
     }
 
     override fun clear() {
-        previousPeriodEvents = null
-        currentPeriodEvents = null
-        nextPeriodEvents = null
+        eventsByPeriod.clear()
     }
 }

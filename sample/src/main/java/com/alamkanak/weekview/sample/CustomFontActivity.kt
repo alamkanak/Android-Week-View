@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
@@ -18,10 +17,7 @@ class CustomFontActivity : AppCompatActivity() {
     private val database: EventsDatabase by lazy { EventsDatabase(this) }
 
     private val adapter: CustomFontActivityWeekViewAdapter by lazy {
-        CustomFontActivityWeekViewAdapter(
-            context = this,
-            loadMoreHandler = this::onLoadMore
-        )
+        CustomFontActivityWeekViewAdapter(loadMoreHandler = this::onLoadMore)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +34,8 @@ class CustomFontActivity : AppCompatActivity() {
 }
 
 private class CustomFontActivityWeekViewAdapter(
-    context: Context,
     private val loadMoreHandler: (startDate: Calendar, endDate: Calendar) -> Unit
-) : WeekView.PagingAdapter<Event>(context) {
+) : WeekView.PagingAdapter<Event>() {
 
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 

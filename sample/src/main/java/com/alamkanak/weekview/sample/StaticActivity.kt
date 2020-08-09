@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
@@ -24,7 +23,6 @@ class StaticActivity : AppCompatActivity() {
 
     private val adapter: StaticActivityWeekViewAdapter by lazy {
         StaticActivityWeekViewAdapter(
-            context = this,
             loadMoreHandler = this::onLoadMore,
             rangeChangeHandler = this::onRangeChanged
         )
@@ -62,10 +60,9 @@ class StaticActivity : AppCompatActivity() {
 }
 
 private class StaticActivityWeekViewAdapter(
-    context: Context,
     private val rangeChangeHandler: (startDate: Calendar, endDate: Calendar) -> Unit,
     private val loadMoreHandler: (startDate: Calendar, endDate: Calendar) -> Unit
-) : WeekView.PagingAdapter<Event>(context) {
+) : WeekView.PagingAdapter<Event>() {
 
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 

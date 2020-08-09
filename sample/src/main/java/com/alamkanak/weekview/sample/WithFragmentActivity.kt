@@ -38,7 +38,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
         val start = getStartDate()
         val end = getEndDate()
 
-        val adapter = WeekView.SimpleAdapter<Event>(context = requireContext())
+        val adapter = WeekView.SimpleAdapter<Event>()
         weekView.adapter = adapter
 
         val events = database.getEventsInRange(start, end)

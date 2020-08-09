@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -34,7 +33,7 @@ public class LegacyActivity extends AppCompatActivity {
         WeekView weekView = findViewById(R.id.weekView);
         ToolbarUtils.setupWithWeekView(toolbar, weekView);
 
-        weekViewAdapter = new WeekViewAdapter(this, this::onLoadMore);
+        weekViewAdapter = new WeekViewAdapter(this::onLoadMore);
         eventsFetcher = new EventsFetcher(this);
 
         weekView.setAdapter(weekViewAdapter);
@@ -53,8 +52,8 @@ public class LegacyActivity extends AppCompatActivity {
         @NonNull
         private OnLoadMoreNotifier notifier;
 
-        public WeekViewAdapter(@NotNull Context context, @NonNull OnLoadMoreNotifier notifier) {
-            super(context);
+        public WeekViewAdapter(@NonNull OnLoadMoreNotifier notifier) {
+            super();
             this.notifier = notifier;
         }
 

@@ -234,8 +234,15 @@ private class SingleEventsDrawer(
     private val eventChipDrawer = EventChipDrawer(viewState)
 
     override fun draw(canvas: Canvas) {
-        for (date in viewState.dateRange) {
-            drawEventsForDate(date, canvas)
+        canvas.drawInBounds(
+            left = viewState.timeColumnWidth,
+            top = viewState.headerHeight,
+            right = viewState.viewWidth.toFloat(),
+            bottom = viewState.viewHeight.toFloat()
+        ) {
+            for (date in viewState.dateRange) {
+                drawEventsForDate(date, canvas)
+            }
         }
     }
 

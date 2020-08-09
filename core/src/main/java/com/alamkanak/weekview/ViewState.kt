@@ -846,6 +846,11 @@ private fun TypedArray.getInt(index: Int): Int? {
     return if (hasValue(index)) getInteger(index, 0) else null
 }
 
+private fun Float.limit(
+    minValue: Float,
+    maxValue: Float
+): Float = min(max(this, minValue), maxValue)
+
 private object Defaults {
     const val BACKGROUND_COLOR = Color.WHITE
     val PAST_BACKGROUND_COLOR = Color.rgb(227, 227, 227)

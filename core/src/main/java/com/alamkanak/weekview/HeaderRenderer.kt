@@ -140,7 +140,7 @@ private class DayLabelsDrawer(
         val right = canvas.width.toFloat()
         val bottom = viewState.getTotalHeaderHeight()
 
-        canvas.drawInRect(left, top, right, bottom) {
+        canvas.drawInBounds(left, top, right, bottom) {
             viewState.dateRangeWithStartPixels.forEach { (date, startPixel) ->
                 drawLabel(date, startPixel, this)
             }
@@ -319,7 +319,7 @@ internal class AllDayEventsDrawer(
         val right = canvas.width.toFloat()
         val bottom = viewState.getTotalHeaderHeight()
 
-        canvas.drawInRect(left, top, right, bottom) {
+        canvas.drawInBounds(left, top, right, bottom) {
             for ((eventChip, textLayout) in allDayEventLayouts) {
                 eventChipDrawer.draw(eventChip, canvas, textLayout)
             }

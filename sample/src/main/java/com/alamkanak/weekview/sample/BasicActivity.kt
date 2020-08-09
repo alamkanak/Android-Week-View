@@ -1,6 +1,5 @@
 package com.alamkanak.weekview.sample
 
-import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
@@ -29,7 +28,8 @@ private class ViewModel(
     val events = MutableLiveData<List<WeekViewDisplayable<Event>>>()
 
     fun fetchEvents(startDate: LocalDate, endDate: LocalDate) {
-        events.value = database.getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
+        val values = database.getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
+        events.value = values
     }
 }
 
@@ -48,10 +48,9 @@ class BasicActivity : AppCompatActivity() {
 
         toolbar.setupWithWeekView(weekView)
 
-        val adapter = BasicActivityWeekViewAdapter(
-            context = this,
-            loadMoreHandler = viewModel::fetchEvents
-        )
+        WeekView.SimpleAdapter<Int>()
+
+        val adapter = BasicActivityWeekViewAdapter(loadMoreHandler = viewModel::fetchEvents)
         weekView.adapter = adapter
 
         weekView.setDateFormatter { date: LocalDate ->
@@ -67,9 +66,8 @@ class BasicActivity : AppCompatActivity() {
 }
 
 private class BasicActivityWeekViewAdapter(
-    context: Context,
     private val loadMoreHandler: (startDate: LocalDate, endDate: LocalDate) -> Unit
-) : WeekView.PagingAdapter<Event>(context) {
+) : WeekView.PagingAdapter<Event>() {
 
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 

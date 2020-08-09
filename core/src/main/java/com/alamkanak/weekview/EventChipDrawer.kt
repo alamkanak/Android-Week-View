@@ -72,11 +72,11 @@ internal class EventChipDrawer(
         }
 
         if (event.style.borderWidth != null) {
-            drawStroke(eventChip, canvas)
+            drawBorderStroke(eventChip, canvas)
         }
     }
 
-    private fun drawStroke(
+    private fun drawBorderStroke(
         eventChip: EventChip,
         canvas: Canvas
     ) {
@@ -185,20 +185,20 @@ internal class EventChipDrawer(
     private fun updateBackgroundPaint(
         event: ResolvedWeekViewEvent<*>,
         paint: Paint
-    ) {
-        paint.color = event.style.backgroundColor ?: viewState.defaultEventColor
-        paint.isAntiAlias = true
-        paint.strokeWidth = 0f
-        paint.style = Paint.Style.FILL
+    ) = with(paint) {
+        color = event.style.backgroundColor ?: viewState.defaultEventColor
+        isAntiAlias = true
+        strokeWidth = 0f
+        style = Paint.Style.FILL
     }
 
     private fun updateBorderPaint(
         event: ResolvedWeekViewEvent<*>,
         paint: Paint
-    ) {
-        paint.color = event.style.borderColor ?: viewState.defaultEventColor
-        paint.isAntiAlias = true
-        paint.strokeWidth = event.style.borderWidth?.toFloat() ?: 0f
-        paint.style = Paint.Style.STROKE
+    ) = with(paint) {
+        color = event.style.borderColor ?: viewState.defaultEventColor
+        isAntiAlias = true
+        strokeWidth = event.style.borderWidth?.toFloat() ?: 0f
+        style = Paint.Style.STROKE
     }
 }
