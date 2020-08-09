@@ -36,6 +36,8 @@ public class LegacyActivity extends AppCompatActivity {
 
         weekViewAdapter = new WeekViewAdapter(this, this::onLoadMore);
         eventsFetcher = new EventsFetcher(this);
+
+        weekView.setAdapter(weekViewAdapter);
     }
 
     private void onLoadMore(@NotNull Calendar startDate, @NotNull Calendar endDate) {

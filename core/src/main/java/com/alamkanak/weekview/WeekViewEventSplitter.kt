@@ -38,7 +38,7 @@ private fun ResolvedWeekViewEvent<*>.splitEventByDates(
     results += lastEvent
 
     val diff = lastEvent.startTime.timeInMillis - firstEvent.startTime.timeInMillis
-    val daysInBetween = diff / Constants.DAY_IN_MILLIS
+    val daysInBetween = diff / DAY_IN_MILLIS
 
     if (daysInBetween > 0) {
         val start = firstEventEnd.withTimeAtStartOfPeriod(viewState.minHour) + Days(1)

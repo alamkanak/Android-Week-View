@@ -1,8 +1,8 @@
 package com.alamkanak.weekview.sample
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -13,6 +13,7 @@ import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import kotlinx.android.synthetic.main.activity_basic.blockingProgressIndicator
 import kotlinx.android.synthetic.main.activity_basic.weekView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
@@ -47,14 +48,6 @@ class AsyncActivity : AppCompatActivity() {
         AsyncViewModel(EventsApi(this))
     }
 
-    @Suppress("DEPRECATION")
-    private val progressDialog: ProgressDialog by lazy {
-        ProgressDialog(this).apply {
-            setCancelable(false)
-            setMessage("Loading events ...")
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_basic)
@@ -67,15 +60,17 @@ class AsyncActivity : AppCompatActivity() {
         )
 
         viewModel.viewState.observe(this, Observer { viewState ->
-            if (viewState.isLoading) {
-                progressDialog.show()
-            } else {
-                progressDialog.dismiss()
-            }
+            blockingProgressIndicator.isVisible = viewState.isLoading
             adapter.submit(viewState.events)
         })
     }
 }
+
+private var View.isVisible: Boolean
+    get() = visibility == View.VISIBLE
+    set(value) {
+        visibility = if (value) View.VISIBLE else View.GONE
+    }
 
 private class AsyncActivityWeekViewAdapter(
     context: Context,

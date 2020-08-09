@@ -306,7 +306,7 @@ data class ViewState(
             color = nowLineDotColor
         }
 
-    var timeColumnWidth: Float = Constants.UNINITIALIZED
+    var timeColumnWidth: Float = 0f
 
     private val _eventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
         style = Paint.Style.FILL
@@ -339,7 +339,7 @@ data class ViewState(
 
     var hasEventInHeader: Boolean = false
 
-    var newHourHeight: Float = Constants.UNINITIALIZED
+    var newHourHeight: Float = 0f
 
     var minDate: Calendar? = null
     var maxDate: Calendar? = null
@@ -419,56 +419,13 @@ data class ViewState(
             color = weekNumberBackgroundColor
         }
 
-//    var todayHeaderTextColor: Int
-//        get() = todayHeaderTextColor
-//        set(value) {
-//            todayHeaderTextPaint.color = value
-//            todayHeaderTextColor = value
-//        }
-
-//    var timeColumnTextColor: Int
-//        get() = timeColumnTextColor
-//        set(value) {
-//            timeTextPaint.color = value
-//            timeColumnTextColor = value
-//        }
-
-//    var timeColumnBackgroundColor: Int
-//        get() = timeColumnBackgroundColor
-//        set(value) {
-//            timeColumnBackgroundPaint.color = value
-//            timeColumnBackgroundColor = value
-//        }
-
-//    var headerRowBackgroundColor: Int
-//        get() = headerRowBackgroundColor
-//        set(value) {
-//            headerRowBackgroundColor = value
-//            headerBackgroundPaint.color = value
-//        }
-
-//    var headerRowTextColor: Int
-//        get() = headerRowTextColor
-//        set(value) {
-//            headerRowTextColor = value
-//            headerTextPaint.color = value
-//        }
-
-//    var headerRowTextSize: Int
-//        get() = headerRowTextSize
-//        set(value) {
-//            headerRowTextSize = value
-//            headerTextPaint.textSize = value.toFloat()
-//            todayHeaderTextPaint.textSize = value.toFloat()
-//        }
-
     val hoursPerDay: Int
         get() = maxHour - minHour
 
     val minutesPerDay: Int
-        get() = (hoursPerDay * Constants.MINUTES_PER_HOUR).toInt()
+        get() = hoursPerDay * 60
 
-    val timeRange: IntRange
+    private val timeRange: IntRange
         get() {
             val includeMidnightHour = showTimeColumnHourSeparator && showMidnightHour
             val padding = if (includeMidnightHour) 0 else timeColumnHoursInterval
@@ -479,11 +436,11 @@ data class ViewState(
     val displayedHours: IntProgression
         get() = timeRange step timeColumnHoursInterval
 
-    fun calculateTimeColumnWidth() {
+    private fun calculateTimeColumnWidth() {
         timeColumnWidth = timeTextWidth + timeColumnPadding * 2
     }
 
-    fun calculateWidthPerDay() {
+    private fun calculateWidthPerDay() {
         val viewWidth = viewWidth.toFloat()
         val availableWidth = viewWidth - timeColumnWidth - columnGap * numberOfVisibleDays
         widthPerDay = availableWidth / numberOfVisibleDays
@@ -524,13 +481,15 @@ data class ViewState(
         if (desired.hour > minHour) {
             // Add some padding above the current time (and thus: the now line)
             desired -= Hours(1)
+        } else {
+            desired -= Minutes(desired.minute)
         }
 
         val minTime = now().withTime(hour = minHour, minutes = 0)
         val maxTime = now().withTime(hour = maxHour, minutes = 0)
         desired.limitBy(minTime, maxTime)
 
-        val fraction = desired.minute.toFloat() / Constants.MINUTES_PER_HOUR
+        val fraction = desired.minute / 60f
         val verticalOffset = hourHeight * (desired.hour + fraction)
         val desiredOffset = totalDayHeight - viewHeight
 
@@ -574,12 +533,14 @@ data class ViewState(
         }
 
         val dayHeight = hourHeight * hoursPerDay
-        val isNotFillingEntireHeight = dayHeight < viewHeight
+        val isNotFillingEntireHeight = dayHeight < (viewHeight - getTotalHeaderHeight())
         val didZoom = newHourHeight > 0
 
         if (isNotFillingEntireHeight || didZoom) {
-            newHourHeight = max(newHourHeight, effectiveMinHourHeight.toFloat())
-            newHourHeight = min(newHourHeight, maxHourHeight.toFloat())
+            newHourHeight.limit(
+                minValue = effectiveMinHourHeight.toFloat(),
+                maxValue = maxHourHeight.toFloat()
+            )
 
             // Compute a minimum hour height so that users can't zoom out further
             // than the desired hours per day
@@ -588,7 +549,7 @@ data class ViewState(
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
             hourHeight = newHourHeight
-            newHourHeight = Constants.UNINITIALIZED
+            newHourHeight = 0f
         }
     }
 
@@ -602,6 +563,7 @@ data class ViewState(
     }
 
     fun getTotalHeaderHeight(): Float {
+        // TODO: Clarify difference between this and headerHeight
         return headerHeight + headerRowPadding * 2f
     }
 
@@ -704,7 +666,7 @@ data class ViewState(
         viewWidth = width
         viewHeight = height
 
-        if (timeColumnWidth == Constants.UNINITIALIZED) {
+        if (timeColumnWidth == 0f) {
             calculateTimeColumnWidth()
         }
 

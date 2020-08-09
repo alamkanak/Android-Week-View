@@ -1,13 +1,30 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.text.StaticLayout
+import android.util.SparseArray
 
-internal class TimeColumnDrawer(
-    private val viewState: ViewState,
-    private val cache: WeekViewCache
-) : Drawer {
+internal class TimeColumnRenderer(
+    private val viewState: ViewState
+) : Renderer, TimeFormatterDependent {
 
-    override fun draw(canvas: Canvas) = with(viewState) {
+    private val timeLabelLayouts = SparseArray<StaticLayout>()
+
+    init {
+        cacheTimeLabels()
+    }
+
+    override fun onSizeChanged(width: Int, height: Int) {
+        timeLabelLayouts.clear()
+        cacheTimeLabels()
+    }
+
+    override fun onTimeFormatterChanged(formatter: TimeFormatter) {
+        timeLabelLayouts.clear()
+        cacheTimeLabels()
+    }
+
+    override fun render(canvas: Canvas) = with(viewState) {
         var topMargin = headerHeight
         val bottom = viewState.viewHeight.toFloat()
 
@@ -32,9 +49,8 @@ internal class TimeColumnDrawer(
                 y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
-            val textLayout = cache.timeLabelLayouts[hour]
             canvas.withTranslation(x, y) {
-                textLayout.draw(this)
+                timeLabelLayouts[hour].draw(this)
             }
 
             if (showTimeColumnHourSeparator && hour > 0) {
@@ -55,6 +71,13 @@ internal class TimeColumnDrawer(
         // Draw the hour separator inside the time column
         if (showTimeColumnHourSeparator) {
             canvas.drawLines(hourLines, hourSeparatorPaint)
+        }
+    }
+
+    private fun cacheTimeLabels() = with(viewState) {
+        for (hour in displayedHours) {
+            val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
+            timeLabelLayouts.put(hour, textLayout)
         }
     }
 }

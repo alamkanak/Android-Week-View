@@ -1,10 +1,11 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.Constants.DAY_IN_MILLIS
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToInt
+
+internal const val DAY_IN_MILLIS = 1000L * 60L * 60L * 24L
 
 internal interface Duration {
     val inMillis: Int
@@ -18,6 +19,11 @@ internal inline class Days(val days: Int) : Duration {
 internal inline class Hours(val hours: Int) : Duration {
     override val inMillis: Int
         get() = hours * (60 * 60 * 1_000)
+}
+
+internal inline class Minutes(val minutes: Int) : Duration {
+    override val inMillis: Int
+        get() = minutes * (60 * 1_000)
 }
 
 internal inline class Millis(val millis: Int) : Duration {
@@ -76,6 +82,10 @@ internal operator fun Calendar.minusAssign(days: Days) {
     add(Calendar.DATE, days.days * (-1))
 }
 
+internal operator fun Calendar.minusAssign(minutes: Minutes) {
+    add(Calendar.MINUTE, minutes.minutes * (-1))
+}
+
 internal operator fun Calendar.plus(hours: Hours): Calendar {
     return copy().apply {
         add(Calendar.HOUR_OF_DAY, hours.hours)
@@ -119,18 +129,6 @@ internal operator fun Calendar.minusAssign(millis: Millis) {
 internal fun Calendar.isBefore(other: Calendar) = timeInMillis < other.timeInMillis
 
 internal fun Calendar.isAfter(other: Calendar) = timeInMillis > other.timeInMillis
-
-internal fun Calendar.isBetween(
-    lhs: Calendar,
-    rhs: Calendar,
-    inclusive: Boolean = false
-): Boolean {
-    return if (inclusive) {
-        timeInMillis >= lhs.timeInMillis && timeInMillis <= rhs.timeInMillis
-    } else {
-        timeInMillis > lhs.timeInMillis && timeInMillis < rhs.timeInMillis
-    }
-}
 
 internal val Calendar.isBeforeToday: Boolean
     get() = isBefore(today())

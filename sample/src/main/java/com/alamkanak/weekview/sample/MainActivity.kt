@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             Sample(R.string.title_activity_custom_font, "Custom font in WeekView", CustomFontActivity::class.java),
             Sample(R.string.title_activity_asynchronous, "Asynchronous events fetching from an API", AsyncActivity::class.java),
             Sample(R.string.title_activity_with_fragment, "Displays WeekView within a Fragment", WithFragmentActivity::class.java),
-            Sample(R.string.title_activity_legacy, "Implemented in Java\nUses synchronous events fetching", LegacyActivity::class.java)
+            Sample(R.string.title_activity_legacy, "Implemented in Java", LegacyActivity::class.java)
         )
     }
 }

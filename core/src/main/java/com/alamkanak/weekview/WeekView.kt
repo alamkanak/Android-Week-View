@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.view.ViewCompat
-import com.alamkanak.weekview.Constants.UNINITIALIZED
 import java.util.Calendar
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -26,7 +25,6 @@ class WeekView @JvmOverloads constructor(
         ViewState.make(context, attrs)
     }
 
-    private val cache = WeekViewCache()
     private val eventChipsCache = EventChipsCache()
 
     private val touchHandler = WeekViewTouchHandler(viewState)
@@ -46,10 +44,10 @@ class WeekView @JvmOverloads constructor(
         eventChipsCache = eventChipsCache
     )
 
-    private val updaters = listOf(
-        HeaderRowUpdater(viewState, cache, eventChipsCache),
-        AllDayEventsUpdater(viewState, cache, eventChipsCache),
-        SingleEventsUpdater(viewState, eventChipsCache)
+    private val renderers: List<Renderer> = listOf(
+        TimeColumnRenderer(viewState),
+        CalendarRenderer(viewState, eventChipsCache),
+        HeaderRenderer(viewState, eventChipsCache)
     )
 
     init {
@@ -65,21 +63,7 @@ class WeekView @JvmOverloads constructor(
         }
 
         setLayerType(LAYER_TYPE_SOFTWARE, null)
-        cacheTimeLabels()
     }
-
-    // Be careful when changing the order of the drawers, as that might cause
-    // views to incorrectly draw over each other
-    private val drawers = listOf(
-        DayBackgroundDrawer(viewState),
-        BackgroundGridDrawer(viewState),
-        SingleEventsDrawer(viewState, eventChipsCache),
-        TimeColumnDrawer(viewState, cache),
-        NowLineDrawer(viewState),
-        HeaderRowDrawer(viewState),
-        DayLabelsDrawer(viewState, cache),
-        AllDayEventsDrawer(viewState, cache)
-    )
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -87,8 +71,7 @@ class WeekView @JvmOverloads constructor(
         updateDataHolders()
         notifyScrollListeners()
         refreshEvents()
-        updateDimensions()
-        performDrawing(canvas)
+        performRendering(canvas)
     }
 
     private fun performPendingScrolls() {
@@ -118,20 +101,10 @@ class WeekView @JvmOverloads constructor(
         pagedAdapter.triggerEventsFetching(firstVisibleDate)
     }
 
-    private fun updateDimensions() {
-        for (updater in updaters) {
-            if (updater.isRequired()) {
-                updater.update()
-            }
+    private fun performRendering(canvas: Canvas) {
+        for (renderer in renderers) {
+            renderer.render(canvas)
         }
-    }
-
-    private fun performDrawing(canvas: Canvas) {
-        for (drawer in drawers) {
-            drawer.draw(canvas)
-        }
-
-        accessibilityTouchHelper.invalidateRoot()
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -155,15 +128,7 @@ class WeekView @JvmOverloads constructor(
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.onSizeChanged(width, height)
-
-        // viewState.areDimensionsInvalid = true
-
-        clearCaches()
-        calculateWidthPerDay()
-
-//        if (viewState.showCompleteDay) {
-//            viewState.updateHourHeight(height)
-//        }
+        renderers.forEach { it.onSizeChanged(width, height) }
     }
 
     private fun notifyScrollListeners() {
@@ -183,14 +148,6 @@ class WeekView @JvmOverloads constructor(
             adapter?.onRangeChanged(firstVisibleDate, lastVisibleDate)
             adapter?.onFirstVisibleDateChanged(firstVisibleDate)
         }
-    }
-
-    private fun calculateWidthPerDay() {
-        if (viewState.timeColumnWidth == UNINITIALIZED) {
-            viewState.calculateTimeColumnWidth()
-        }
-
-        viewState.calculateWidthPerDay()
     }
 
     override fun invalidate() {
@@ -229,7 +186,9 @@ class WeekView @JvmOverloads constructor(
         set(value) {
             viewState.updateNumberOfVisibleDays(value)
             dateTimeInterpreter.onSetNumberOfDays(value)
-            clearCaches()
+            renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
+                it.onDateFormatterChanged(viewState.dateFormatter)
+            }
             invalidate()
         }
 
@@ -1163,7 +1122,6 @@ class WeekView @JvmOverloads constructor(
     @PublicApi
     fun notifyDataSetChanged() {
         adapter?.requireRefresh()
-        // eventsLoader.requireRefresh()
         invalidate()
     }
 
@@ -1238,7 +1196,6 @@ class WeekView @JvmOverloads constructor(
 
     private var internalAdapter: Adapter<*>? = null
 
-    // TODO: Documentation
     var adapter: Adapter<*>?
         get() = internalAdapter
         set(value) {
@@ -1269,29 +1226,28 @@ class WeekView @JvmOverloads constructor(
         set(value) {
             setDateFormatter { value.interpretDate(it) }
             setTimeFormatter { value.interpretTime(it) }
-            clearCaches()
+            renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
+                it.onDateFormatterChanged(value::interpretDate)
+            }
+            renderers.filterIsInstance(TimeFormatterDependent::class.java).forEach {
+                it.onTimeFormatterChanged(value::interpretTime)
+            }
+            invalidate()
         }
 
     @PublicApi
     fun setDateFormatter(formatter: DateFormatter) {
         viewState.dateFormatter = formatter
+        renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
+            it.onDateFormatterChanged(formatter)
+        }
     }
 
     @PublicApi
     fun setTimeFormatter(formatter: TimeFormatter) {
         viewState.timeFormatter = formatter
-    }
-
-    private fun clearCaches() {
-        cache.allDayEventLayouts.clear()
-        cache.timeLabelLayouts.clear()
-        cacheTimeLabels()
-    }
-
-    private fun cacheTimeLabels() = with(viewState) {
-        for (hour in displayedHours) {
-            val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
-            cache.timeLabelLayouts.put(hour, textLayout)
+        renderers.filterIsInstance(TimeFormatterDependent::class.java).forEach {
+            it.onTimeFormatterChanged(formatter)
         }
     }
 

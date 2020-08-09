@@ -10,13 +10,12 @@ import org.mockito.MockitoAnnotations
 
 class ResolvedWeekViewEventTest {
 
-    private val config = Mockito.mock(WeekViewConfigWrapper::class.java)
-    private val eventSplitter = WeekViewEventSplitter<Unit>(config)
+    private val viewState = Mockito.mock(ViewState::class.java)
 
     init {
         MockitoAnnotations.initMocks(this)
-        whenever(config.minHour).thenReturn(0)
-        whenever(config.maxHour).thenReturn(24)
+        whenever(viewState.minHour).thenReturn(0)
+        whenever(viewState.maxHour).thenReturn(24)
     }
 
     @Test
@@ -25,7 +24,7 @@ class ResolvedWeekViewEventTest {
         val endTime = startTime + Hours(10)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = eventSplitter.split(originalEvent)
+        val childEvents = originalEvent.split(viewState)
         assertTrue(childEvents.size == 1)
 
         val child = childEvents.first()
@@ -39,7 +38,7 @@ class ResolvedWeekViewEventTest {
         val endTime = (today() + Days(2)).withHour(14).withMinutes(0)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = eventSplitter.split(originalEvent)
+        val childEvents = originalEvent.split(viewState)
         assertTrue(childEvents.size == 2)
 
         val first = childEvents.first()
@@ -58,7 +57,7 @@ class ResolvedWeekViewEventTest {
         val endTime = (today() + Days(3)).withHour(1).withMinutes(0)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = eventSplitter.split(originalEvent)
+        val childEvents = originalEvent.split(viewState)
         assertTrue(childEvents.size == 3)
 
         val first = childEvents.first()
