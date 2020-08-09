@@ -4,14 +4,14 @@ import android.graphics.Canvas
 import java.util.Calendar
 
 internal class SingleEventsDrawer<T>(
-    config: WeekViewConfigWrapper,
+    private val viewState: ViewState,
     private val chipsCache: EventChipsCache<T>
 ) : Drawer {
 
-    private val eventChipDrawer = EventChipDrawer<T>(config)
+    private val eventChipDrawer = EventChipDrawer<T>(viewState)
 
-    override fun draw(drawingContext: DrawingContext, canvas: Canvas) {
-        for (date in drawingContext.dateRange) {
+    override fun draw(canvas: Canvas) {
+        for (date in viewState.dateRange) {
             drawEventsForDate(date, canvas)
         }
     }
@@ -28,20 +28,17 @@ internal class SingleEventsDrawer<T>(
 }
 
 internal class AllDayEventsDrawer<T>(
-    private val config: WeekViewConfigWrapper,
+    private val viewState: ViewState,
     private val cache: WeekViewCache<T>
-) : CachingDrawer {
+) : Drawer {
 
-    private val eventChipDrawer = EventChipDrawer<T>(config)
+    private val eventChipDrawer = EventChipDrawer<T>(viewState)
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) {
-        val left = config.timeColumnWidth
+    override fun draw(canvas: Canvas) {
+        val left = viewState.timeColumnWidth
         val top = 0f
         val right = canvas.width.toFloat()
-        val bottom = config.getTotalHeaderHeight()
+        val bottom = viewState.getTotalHeaderHeight()
 
         canvas.drawInRect(left, top, right, bottom) {
             val eventChips = cache.allDayEventLayouts
@@ -49,9 +46,5 @@ internal class AllDayEventsDrawer<T>(
                 eventChipDrawer.draw(eventChip, canvas, textLayout)
             }
         }
-    }
-
-    override fun clear() {
-        cache.clearAllDayEventLayouts()
     }
 }

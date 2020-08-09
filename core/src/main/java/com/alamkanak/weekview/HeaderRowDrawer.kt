@@ -6,41 +6,37 @@ import android.graphics.Rect
 import android.graphics.RectF
 import kotlin.math.roundToInt
 
-internal class HeaderRowDrawer<T : Any>(
-    private val view: WeekView<T>,
-    private val config: WeekViewConfigWrapper
+internal class HeaderRowDrawer(
+    private val viewState: ViewState
 ) : Drawer {
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) {
-        val width = view.width.toFloat()
+    override fun draw(canvas: Canvas) {
+        val width = viewState.viewWidth.toFloat()
 
-        val backgroundPaint = if (config.showHeaderRowBottomShadow) {
-            config.headerBackgroundPaint.withShadow(
-                radius = config.headerRowBottomShadowRadius,
-                color = config.headerRowBottomShadowColor
+        val backgroundPaint = if (viewState.showHeaderRowBottomShadow) {
+            viewState.headerBackgroundPaint.withShadow(
+                radius = viewState.headerRowBottomShadowRadius,
+                color = viewState.headerRowBottomShadowColor
             )
-        } else config.headerBackgroundPaint
+        } else viewState.headerBackgroundPaint
 
-        canvas.drawRect(0f, 0f, width, config.headerHeight, backgroundPaint)
+        canvas.drawRect(0f, 0f, width, viewState.headerHeight, backgroundPaint)
 
-        if (config.showWeekNumber) {
-            canvas.drawWeekNumber(drawingContext)
+        if (viewState.showWeekNumber) {
+            canvas.drawWeekNumber(viewState)
         }
 
-        if (config.showHeaderRowBottomLine) {
-            val y = config.headerHeight - config.headerRowBottomLineWidth
-            canvas.drawLine(0f, y, width, y, config.headerRowBottomLinePaint)
+        if (viewState.showHeaderRowBottomLine) {
+            val y = viewState.headerHeight - viewState.headerRowBottomLineWidth
+            canvas.drawLine(0f, y, width, y, viewState.headerRowBottomLinePaint)
         }
     }
 
-    private fun Canvas.drawWeekNumber(drawingContext: DrawingContext) {
-        val weekNumber = drawingContext.dateRange.first().weekOfYear.toString()
+    private fun Canvas.drawWeekNumber(state: ViewState) {
+        val weekNumber = state.dateRange.first().weekOfYear.toString()
 
-        val bounds = config.weekNumberBounds
-        val textPaint = config.weekNumberTextPaint
+        val bounds = state.weekNumberBounds
+        val textPaint = state.weekNumberTextPaint
 
         val textHeight = textPaint.textHeight
         val textOffset = (textHeight / 2f).roundToInt() - textPaint.descent().roundToInt()
@@ -55,10 +51,10 @@ internal class HeaderRowDrawer<T : Any>(
             bounds.centerY() + height / 2f
         )
 
-        drawRect(bounds, config.headerBackgroundPaint)
+        drawRect(bounds, state.headerBackgroundPaint)
 
-        val backgroundPaint = config.weekNumberBackgroundPaint
-        val radius = config.weekNumberBackgroundCornerRadius.toFloat()
+        val backgroundPaint = state.weekNumberBackgroundPaint
+        val radius = state.weekNumberBackgroundCornerRadius.toFloat()
         drawRoundRect(backgroundRect, radius, radius, backgroundPaint)
 
         drawText(weekNumber, bounds.centerX(), bounds.centerY() + textOffset, textPaint)

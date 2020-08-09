@@ -5,7 +5,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 internal class WeekViewTouchHandler<T : Any>(
-    private val config: WeekViewConfigWrapper,
+    private val viewState: ViewState,
     private val chipsCache: EventChipsCache<T>
 ) {
 
@@ -40,16 +40,16 @@ internal class WeekViewTouchHandler<T : Any>(
         touchX: Float,
         touchY: Float
     ): Calendar? {
-        val widthPerDay = config.widthPerDay
-        val totalDayWidth = widthPerDay + config.columnGap
-        val originX = config.currentOrigin.x
-        val timeColumnWidth = config.timeColumnWidth
+        val widthPerDay = viewState.widthPerDay
+        val totalDayWidth = widthPerDay + viewState.columnGap
+        val originX = viewState.currentOrigin.x
+        val timeColumnWidth = viewState.timeColumnWidth
 
         val daysFromOrigin = (ceil((originX / totalDayWidth).toDouble()) * -1).toInt()
         var startPixel = originX + daysFromOrigin * totalDayWidth + timeColumnWidth
 
         val firstDay = daysFromOrigin + 1
-        val lastDay = firstDay + config.numberOfVisibleDays
+        val lastDay = firstDay + viewState.numberOfVisibleDays
 
         for (dayNumber in firstDay..lastDay) {
             val start = max(startPixel, timeColumnWidth)
@@ -62,14 +62,14 @@ internal class WeekViewTouchHandler<T : Any>(
             if (isVisibleHorizontally && isWithinDay) {
                 val day = now() + Days(dayNumber - 1)
 
-                val hourHeight = config.hourHeight
-                val pixelsFromMidnight = touchY - config.currentOrigin.y - config.headerHeight
+                val hourHeight = viewState.hourHeight
+                val pixelsFromMidnight = touchY - viewState.currentOrigin.y - viewState.headerHeight
                 val hour = (pixelsFromMidnight / hourHeight).toInt()
 
                 val pixelsFromFullHour = pixelsFromMidnight - hour * hourHeight
                 val minutes = ((pixelsFromFullHour / hourHeight) * 60).toInt()
 
-                return day.withTime(config.minHour + hour, minutes)
+                return day.withTime(viewState.minHour + hour, minutes)
             }
 
             startPixel += totalDayWidth
@@ -91,7 +91,7 @@ internal class WeekViewTouchHandler<T : Any>(
 
     private fun OnEventClickListener<T>.handleClick(x: Float, y: Float): Boolean {
         val eventChip = findHitEvent(x, y) ?: return false
-        val isInHeader = y <= config.headerHeight
+        val isInHeader = y <= viewState.headerHeight
 
         if (eventChip.event.isNotAllDay && isInHeader) {
             // The user tapped in the header area and a single event that is rendered below it
@@ -107,7 +107,7 @@ internal class WeekViewTouchHandler<T : Any>(
     }
 
     private fun OnEmptyViewClickListener.handleClick(x: Float, y: Float) {
-        val isInCalendarArea = x > config.timeColumnWidth && y > config.headerHeight
+        val isInCalendarArea = x > viewState.timeColumnWidth && y > viewState.headerHeight
         if (isInCalendarArea) {
             calculateTimeFromPoint(x, y)?.let { time ->
                 onEmptyViewClicked(time)
@@ -116,7 +116,7 @@ internal class WeekViewTouchHandler<T : Any>(
     }
 
     private fun OnEventLongClickListener<T>.handleLongClick(x: Float, y: Float): Boolean {
-        val isInHeader = y <= config.headerHeight
+        val isInHeader = y <= viewState.headerHeight
         val eventChip = findHitEvent(x, y) ?: return false
 
         if (eventChip.event.isNotAllDay && isInHeader) {
@@ -133,7 +133,7 @@ internal class WeekViewTouchHandler<T : Any>(
     }
 
     private fun OnEmptyViewLongClickListener.handleLongClick(x: Float, y: Float) {
-        val isInCalendarArea = x > config.timeColumnWidth && y > config.headerHeight
+        val isInCalendarArea = x > viewState.timeColumnWidth && y > viewState.headerHeight
         if (isInCalendarArea) {
             calculateTimeFromPoint(x, y)?.let { time ->
                 onEmptyViewLongClick(time)

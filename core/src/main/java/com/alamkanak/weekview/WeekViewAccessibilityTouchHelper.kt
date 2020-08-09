@@ -14,8 +14,7 @@ import kotlin.math.roundToInt
 
 internal class WeekViewAccessibilityTouchHelper<T : Any>(
     private val view: WeekView<T>,
-    private val config: WeekViewConfigWrapper,
-    private val drawingContext: DrawingContext,
+    private val viewState: ViewState,
     private val gestureHandler: WeekViewGestureHandler<T>,
     private val touchHandler: WeekViewTouchHandler<T>,
     private val eventChipsCache: EventChipsCache<T>
@@ -46,7 +45,7 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     }
 
     override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
-        val dateRange = drawingContext.dateRange
+        val dateRange = viewState.dateRange
         val visibleEventChips = eventChipsCache.allEventChipsInDateRange(dateRange)
         virtualViewIds += store.put(visibleEventChips)
         virtualViewIds += dateRange.map { store.put(it) }
@@ -152,12 +151,12 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
         node.addAction(AccessibilityActionCompat.ACTION_CLICK)
         node.addAction(AccessibilityActionCompat.ACTION_LONG_CLICK)
 
-        val dateWithStartPixel = drawingContext.dateRangeWithStartPixels
+        val dateWithStartPixel = viewState.dateRangeWithStartPixels
             .firstOrNull { it.first == date } ?: return
 
         val left = dateWithStartPixel.second.roundToInt()
-        val right = left + config.totalDayWidth.roundToInt()
-        val top = config.headerHeight.roundToInt()
+        val right = left + viewState.totalDayWidth.roundToInt()
+        val top = viewState.headerHeight.roundToInt()
         val bottom = view.height
 
         val bounds = Rect(left, top, right, bottom)

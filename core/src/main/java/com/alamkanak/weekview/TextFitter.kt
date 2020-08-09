@@ -6,7 +6,7 @@ import android.text.TextUtils
 import android.text.TextUtils.TruncateAt
 
 internal class TextFitter<T>(
-    private val config: WeekViewConfigWrapper
+    private val viewState: ViewState
 ) {
 
     private val spannableStringBuilder = SpannableStringBuilder()
@@ -19,7 +19,7 @@ internal class TextFitter<T>(
         chipWidth: Int
     ): StaticLayout {
         val text = combineTitleAndLocation(title, location, isMultiLine = true)
-        val textPaint = config.getTextPaint(eventChip.event)
+        val textPaint = viewState.getTextPaint(eventChip.event)
         val textLayout = text.toTextLayout(textPaint, chipWidth)
 
         val fitsIntoChip = chipHeight >= textLayout.height
@@ -31,7 +31,7 @@ internal class TextFitter<T>(
         val modifiedTextLayout = text.toTextLayout(textPaint, chipWidth)
 
         val fitsIntoChipNow = chipHeight >= modifiedTextLayout.height
-        val isAdaptive = config.adaptiveEventTextSize
+        val isAdaptive = viewState.adaptiveEventTextSize
 
         return when {
             fitsIntoChipNow || !isAdaptive -> {
@@ -71,10 +71,10 @@ internal class TextFitter<T>(
 
         // The text fits into the chip, so we just need to ellipsize it
         var newTextLayout = textLayout
-        val textPaint = config.getTextPaint(event)
+        val textPaint = viewState.getTextPaint(event)
 
         var availableLineCount = availableHeight / newTextLayout.lineHeight
-        val fullHorizontalPadding = config.eventPaddingHorizontal * 2f
+        val fullHorizontalPadding = viewState.eventPaddingHorizontal * 2f
         val width = (rect.right - rect.left - fullHorizontalPadding).toInt()
 
         do {
@@ -96,8 +96,8 @@ internal class TextFitter<T>(
         val event = eventChip.event
         val rect = checkNotNull(eventChip.bounds)
 
-        val textPaint = config.getTextPaint(event)
-        val fullHorizontalPadding = config.eventPaddingHorizontal * 2f
+        val textPaint = viewState.getTextPaint(event)
+        val fullHorizontalPadding = viewState.eventPaddingHorizontal * 2f
         val width = (rect.right - rect.left - fullHorizontalPadding).toInt()
 
         var textLayout: StaticLayout

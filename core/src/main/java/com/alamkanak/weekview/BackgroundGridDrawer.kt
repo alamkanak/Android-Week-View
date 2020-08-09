@@ -5,65 +5,61 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class BackgroundGridDrawer(
-    private val view: WeekView<*>,
-    private val config: WeekViewConfigWrapper
+    private val viewState: ViewState
 ) : Drawer {
 
     private lateinit var hourLines: FloatArray
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) {
-        drawingContext.startPixels.forEach { startPixel ->
-            val startX = max(startPixel, config.timeColumnWidth)
+    override fun draw(canvas: Canvas) {
+        viewState.startPixels.forEach { startPixel ->
+            val startX = max(startPixel, viewState.timeColumnWidth)
             drawGrid(startX, startPixel, canvas)
         }
     }
 
     private fun createHourLines(): FloatArray {
-        val headerHeight = config.getTotalHeaderHeight()
-        val gridHeight = view.height - headerHeight.toInt()
-        val linesPerDay = (gridHeight / config.hourHeight) + 1
-        val overallLines = linesPerDay.roundToInt() * (config.numberOfVisibleDays + 1)
+        val headerHeight = viewState.getTotalHeaderHeight()
+        val gridHeight = viewState.viewHeight - headerHeight.toInt()
+        val linesPerDay = (gridHeight / viewState.hourHeight) + 1
+        val overallLines = linesPerDay.roundToInt() * (viewState.numberOfVisibleDays + 1)
         return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
     }
 
     private fun drawGrid(startX: Float, startPixel: Float, canvas: Canvas) {
-        if (config.showHourSeparators) {
+        if (viewState.showHourSeparators) {
             hourLines = createHourLines()
             drawHourLines(startX, startPixel, canvas)
         }
 
-        if (config.showDaySeparators) {
+        if (viewState.showDaySeparators) {
             drawDaySeparators(startPixel, canvas)
         }
     }
 
     private fun drawDaySeparators(startPixel: Float, canvas: Canvas) {
-        val days = config.numberOfVisibleDays
-        val widthPerDay = config.totalDayWidth
-        val top = config.headerHeight
+        val days = viewState.numberOfVisibleDays
+        val widthPerDay = viewState.totalDayWidth
+        val top = viewState.headerHeight
 
         for (i in 0 until days) {
             val start = startPixel + widthPerDay * (i + 1)
-            canvas.drawLine(start, top, start, top + view.height, config.daySeparatorPaint)
+            canvas.drawLine(start, top, start, top + viewState.viewHeight, viewState.daySeparatorPaint)
         }
     }
 
     private fun drawHourLines(startX: Float, startPixel: Float, canvas: Canvas) {
-        val hourStep = config.timeColumnHoursInterval
+        val hourStep = viewState.timeColumnHoursInterval
         var lineIndex = 0
 
-        for (hour in hourStep until config.hoursPerDay step hourStep) {
-            val heightOfHour = (config.hourHeight * hour)
-            val top = config.headerHeight + config.currentOrigin.y + heightOfHour
+        for (hour in hourStep until viewState.hoursPerDay step hourStep) {
+            val heightOfHour = (viewState.hourHeight * hour)
+            val top = viewState.headerHeight + viewState.currentOrigin.y + heightOfHour
 
-            val widthPerDay = config.totalDayWidth
-            val separatorWidth = config.hourSeparatorPaint.strokeWidth
+            val widthPerDay = viewState.totalDayWidth
+            val separatorWidth = viewState.hourSeparatorPaint.strokeWidth
 
-            val isNotHiddenByHeader = top > config.headerHeight - separatorWidth
-            val isWithinVisibleRange = top < view.height
+            val isNotHiddenByHeader = top > viewState.headerHeight - separatorWidth
+            val isWithinVisibleRange = top < viewState.viewHeight
             val isVisibleHorizontally = startPixel + widthPerDay - startX > 0
 
             if (isNotHiddenByHeader && isWithinVisibleRange && isVisibleHorizontally) {
@@ -75,6 +71,6 @@ internal class BackgroundGridDrawer(
             }
         }
 
-        canvas.drawLines(hourLines, config.hourSeparatorPaint)
+        canvas.drawLines(hourLines, viewState.hourSeparatorPaint)
     }
 }

@@ -5,7 +5,7 @@ import android.util.SparseArray
 import java.util.Calendar
 
 internal class HeaderRowUpdater<T>(
-    private val config: WeekViewConfigWrapper,
+    private val viewState: ViewState,
     private val cache: WeekViewCache<T>,
     private val eventsCacheWrapper: EventsCacheWrapper<T>
 ) : Updater {
@@ -16,11 +16,11 @@ internal class HeaderRowUpdater<T>(
     private val eventsCache: EventsCache<T>
         get() = eventsCacheWrapper.get()
 
-    override fun isRequired(drawingContext: DrawingContext): Boolean {
-        val didScrollHorizontally = previousHorizontalOrigin != config.currentOrigin.x
-        val currentTimeColumnWidth = config.timeTextWidth + config.timeColumnPadding * 2
-        val didTimeColumnChange = currentTimeColumnWidth != config.timeColumnWidth
-        val allDayEvents = eventsCache[drawingContext.dateRange]
+    override fun isRequired(): Boolean {
+        val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
+        val currentTimeColumnWidth = viewState.timeTextWidth + viewState.timeColumnPadding * 2
+        val didTimeColumnChange = currentTimeColumnWidth != viewState.timeColumnWidth
+        val allDayEvents = eventsCache[viewState.dateRange]
             .filter { it.isAllDay }
             .map { it.id }
             .toSet()
@@ -31,13 +31,13 @@ internal class HeaderRowUpdater<T>(
         }
     }
 
-    override fun update(drawingContext: DrawingContext) {
-        val dateLabels = updateDateLabels(drawingContext)
-        updateHeaderHeight(drawingContext, dateLabels)
+    override fun update() {
+        val dateLabels = updateDateLabels(viewState)
+        updateHeaderHeight(viewState, dateLabels)
     }
 
-    private fun updateDateLabels(drawingContext: DrawingContext): List<StaticLayout> {
-        val textLayouts = drawingContext.dateRange.map { date ->
+    private fun updateDateLabels(state: ViewState): List<StaticLayout> {
+        val textLayouts = state.dateRange.map { date ->
             date.toEpochDays() to calculateStaticLayoutForDate(date)
         }.toMap()
 
@@ -48,25 +48,25 @@ internal class HeaderRowUpdater<T>(
     }
 
     private fun updateHeaderHeight(
-        drawingContext: DrawingContext,
+        state: ViewState,
         dateLabels: List<StaticLayout>
     ) {
         val maximumLayoutHeight = dateLabels.map { it.height.toFloat() }.max() ?: 0f
-        config.headerTextHeight = maximumLayoutHeight
-        drawingContext.refreshHeaderHeight()
+        state.headerTextHeight = maximumLayoutHeight
+        refreshHeaderHeight()
     }
 
-    private fun DrawingContext.refreshHeaderHeight() {
-        val visibleEvents = eventsCache[dateRange].filter { it.isAllDay }
-        config.hasEventInHeader = visibleEvents.isNotEmpty()
-        config.refreshHeaderHeight()
+    private fun refreshHeaderHeight() {
+        val visibleEvents = eventsCache[viewState.dateRange].filter { it.isAllDay }
+        viewState.hasEventInHeader = visibleEvents.isNotEmpty()
+        viewState.refreshHeaderHeight()
     }
 
     private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
-        val dayLabel = config.dateFormatter(date)
+        val dayLabel = viewState.dateFormatter(date)
         return dayLabel.toTextLayout(
-            textPaint = if (date.isToday) config.todayHeaderTextPaint else config.headerTextPaint,
-            width = config.totalDayWidth.toInt()
+            textPaint = if (date.isToday) viewState.todayHeaderTextPaint else viewState.headerTextPaint,
+            width = viewState.totalDayWidth.toInt()
         )
     }
 

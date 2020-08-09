@@ -20,10 +20,10 @@ class MainExecutor : Executor {
  */
 internal class EventsDiffer<T>(
     private val context: Context,
+    private val viewState: ViewState,
     private val eventsCacheWrapper: EventsCacheWrapper<T>,
     private val eventChipsLoader: EventChipsLoader<T>,
-    private val eventChipsCache: EventChipsCache<T>,
-    private val drawingContext: DrawingContext
+    private val eventChipsCache: EventChipsCache<T>
 ) {
 
     private val backgroundExecutor = Executors.newSingleThreadExecutor()
@@ -40,7 +40,7 @@ internal class EventsDiffer<T>(
         onFinished: (Boolean) -> Unit
     ) {
         backgroundExecutor.execute {
-            val dateRange = drawingContext.dateRange
+            val dateRange = viewState.dateRange
             // It's possible that weekView.submit() is called before the date range has been
             // initialized. Therefor, waiting until the date range is actually set may be required.
             while (dateRange.isEmpty()) {

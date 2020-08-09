@@ -7,15 +7,11 @@ import java.util.Calendar
 import kotlin.math.max
 
 internal class DayBackgroundDrawer(
-    private val view: WeekView<*>,
-    private val config: WeekViewConfigWrapper
+    private val viewState: ViewState
 ) : Drawer {
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) {
-        drawingContext.dateRangeWithStartPixels.forEach { (date, startPixel) ->
+    override fun draw(canvas: Canvas) {
+        viewState.dateRangeWithStartPixels.forEach { (date, startPixel) ->
             drawDayBackground(date, startPixel, canvas)
         }
     }
@@ -32,22 +28,22 @@ internal class DayBackgroundDrawer(
         startPixel: Float,
         canvas: Canvas
     ) {
-        val endPixel = startPixel + config.widthPerDay
-        val isCompletelyHiddenByTimeColumn = endPixel <= config.timeColumnWidth
+        val endPixel = startPixel + viewState.widthPerDay
+        val isCompletelyHiddenByTimeColumn = endPixel <= viewState.timeColumnWidth
         if (isCompletelyHiddenByTimeColumn) {
             return
         }
 
-        val actualStartPixel = max(startPixel, config.timeColumnWidth)
-        val height = view.height.toFloat()
+        val actualStartPixel = max(startPixel, viewState.timeColumnWidth)
+        val height = viewState.viewHeight.toFloat()
 
-        if (config.showDistinctPastFutureColor) {
-            val useWeekendColor = day.isWeekend && config.showDistinctWeekendColor
-            val pastPaint = config.getPastBackgroundPaint(useWeekendColor)
-            val futurePaint = config.getFutureBackgroundPaint(useWeekendColor)
+        if (viewState.showDistinctPastFutureColor) {
+            val useWeekendColor = day.isWeekend && viewState.showDistinctWeekendColor
+            val pastPaint = viewState.getPastBackgroundPaint(useWeekendColor)
+            val futurePaint = viewState.getFutureBackgroundPaint(useWeekendColor)
 
-            val startY = config.headerHeight + config.currentOrigin.y
-            val endX = startPixel + config.widthPerDay
+            val startY = viewState.headerHeight + viewState.currentOrigin.y
+            val endX = startPixel + viewState.widthPerDay
 
             when {
                 day.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
@@ -55,9 +51,9 @@ internal class DayBackgroundDrawer(
                 else -> canvas.drawRect(actualStartPixel, startY, endX, height, futurePaint)
             }
         } else {
-            val todayPaint = config.getDayBackgroundPaint(day.isToday)
-            val right = startPixel + config.widthPerDay
-            canvas.drawRect(actualStartPixel, config.headerHeight, right, height, todayPaint)
+            val todayPaint = viewState.getDayBackgroundPaint(day.isToday)
+            val right = startPixel + viewState.widthPerDay
+            canvas.drawRect(actualStartPixel, viewState.headerHeight, right, height, todayPaint)
         }
     }
 
@@ -71,10 +67,10 @@ internal class DayBackgroundDrawer(
         canvas: Canvas
     ) {
         val now = now()
-        val hour = now.hour - config.minHour
+        val hour = now.hour - viewState.minHour
         val hourFraction = now.minute / MINUTES_PER_HOUR
 
-        val beforeNow = (hour + hourFraction) * config.hourHeight
+        val beforeNow = (hour + hourFraction) * viewState.hourHeight
         canvas.drawRect(startX, startY, endX, startY + beforeNow, pastPaint)
         canvas.drawRect(startX, startY + beforeNow, endX, height, futurePaint)
     }

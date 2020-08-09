@@ -6,7 +6,7 @@ import android.view.ScaleGestureDetector as AndroidScaleGestureDetector
 
 internal class ScaleGestureDetector(
     context: Context,
-    private val config: WeekViewConfigWrapper,
+    private val state: ViewState,
     private val valueAnimator: ValueAnimator,
     private val onInvalidation: () -> Unit
 ) {
@@ -18,8 +18,8 @@ internal class ScaleGestureDetector(
         ): Boolean = !valueAnimator.isRunning
 
         override fun onScale(detector: AndroidScaleGestureDetector): Boolean {
-            val hourHeight = config.hourHeight
-            config.newHourHeight = hourHeight * detector.scaleFactor
+            val hourHeight = state.hourHeight
+            state.newHourHeight = hourHeight * detector.scaleFactor
             onInvalidation()
             return true
         }

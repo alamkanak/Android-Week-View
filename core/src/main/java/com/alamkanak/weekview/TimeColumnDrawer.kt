@@ -1,36 +1,28 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.text.StaticLayout
 import android.util.SparseArray
 
-internal class TimeColumnDrawer(
-    private val view: WeekView<*>,
-    private val config: WeekViewConfigWrapper
-) : CachingDrawer {
-
-    private val timeLabelLayoutsCache = SparseArray<StaticLayout>()
-
-    private val displayedHours: IntProgression
-        get() = config.timeRange step config.timeColumnHoursInterval
+internal class TimeColumnDrawer<T>(
+    private val viewState: ViewState,
+    private val cache: WeekViewCache<T>
+) : Drawer {
 
     init {
         cacheTimeLabels()
     }
 
-    private fun cacheTimeLabels() = with(config) {
+    // TODO Duplication
+    private fun cacheTimeLabels() = with(viewState) {
         for (hour in displayedHours) {
             val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
-            timeLabelLayoutsCache.put(hour, textLayout)
+            cache.timeLabelLayouts.put(hour, textLayout)
         }
     }
 
-    override fun draw(
-        drawingContext: DrawingContext,
-        canvas: Canvas
-    ) = with(config) {
+    override fun draw(canvas: Canvas) = with(viewState) {
         var topMargin = headerHeight
-        val bottom = view.height.toFloat()
+        val bottom = viewState.viewHeight.toFloat()
 
         canvas.drawRect(0f, topMargin, timeColumnWidth, bottom, timeColumnBackgroundPaint)
 
@@ -53,7 +45,7 @@ internal class TimeColumnDrawer(
                 y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
-            val textLayout = timeLabelLayoutsCache[hour]
+            val textLayout = cache.timeLabelLayouts[hour]
             canvas.withTranslation(x, y) {
                 textLayout.draw(this)
             }
@@ -77,11 +69,6 @@ internal class TimeColumnDrawer(
         if (showTimeColumnHourSeparator) {
             canvas.drawLines(hourLines, hourSeparatorPaint)
         }
-    }
-
-    override fun clear() {
-        timeLabelLayoutsCache.clear()
-        cacheTimeLabels()
     }
 }
 

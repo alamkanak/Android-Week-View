@@ -4,24 +4,23 @@ import android.graphics.RectF
 import java.util.Calendar
 
 internal class SingleEventsUpdater<T : Any>(
-    private val view: WeekView<T>,
-    private val config: WeekViewConfigWrapper,
+    private val viewState: ViewState,
     private val chipsCache: EventChipsCache<T>
 ) : Updater {
 
-    private val boundsCalculator = EventChipBoundsCalculator<T>(config)
+    private val boundsCalculator = EventChipBoundsCalculator<T>(viewState)
 
-    override fun isRequired(drawingContext: DrawingContext) = true
+    override fun isRequired() = true
 
-    override fun update(drawingContext: DrawingContext) {
+    override fun update() {
         chipsCache.clearSingleEventsCache()
 
-        drawingContext
+        viewState
             .dateRangeWithStartPixels
             .forEach { (date, startPixel) ->
                 // If we use a horizontal margin in the day view, we need to offset the start pixel.
                 val modifiedStartPixel = when {
-                    config.isSingleDay -> startPixel + config.eventMarginHorizontal.toFloat()
+                    viewState.isSingleDay -> startPixel + viewState.eventMarginHorizontal.toFloat()
                     else -> startPixel
                 }
                 calculateRectsForEventsOnDate(date, modifiedStartPixel)
@@ -33,7 +32,7 @@ internal class SingleEventsUpdater<T : Any>(
         startPixel: Float
     ) {
         chipsCache.normalEventChipsByDate(date)
-            .filter { it.event.isNotAllDay && it.event.isWithin(config.minHour, config.maxHour) }
+            .filter { it.event.isNotAllDay && it.event.isWithin(viewState.minHour, viewState.maxHour) }
             .forEach {
                 val chipRect = boundsCalculator.calculateSingleEvent(it, startPixel)
                 if (chipRect.isValidSingleEventRect) {
@@ -46,9 +45,9 @@ internal class SingleEventsUpdater<T : Any>(
 
     private val RectF.isValidSingleEventRect: Boolean
         get() {
-            val hasCorrectWidth = left < right && left < view.width
-            val hasCorrectHeight = top < view.height
-            val isNotHiddenByChrome = right > config.timeColumnWidth && bottom > config.headerHeight
+            val hasCorrectWidth = left < right && left < viewState.viewWidth
+            val hasCorrectHeight = top < viewState.viewHeight
+            val isNotHiddenByChrome = right > viewState.timeColumnWidth && bottom > viewState.headerHeight
             return hasCorrectWidth && hasCorrectHeight && isNotHiddenByChrome
         }
 }

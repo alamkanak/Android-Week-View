@@ -9,10 +9,10 @@ import android.text.StaticLayout
 import android.text.style.StyleSpan
 
 internal class EventChipDrawer<T>(
-    private val config: WeekViewConfigWrapper
+    private val viewState: ViewState
 ) {
 
-    private val textFitter = TextFitter<T>(config)
+    private val textFitter = TextFitter<T>(viewState)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
 
     private val backgroundPaint = Paint()
@@ -25,7 +25,7 @@ internal class EventChipDrawer<T>(
     ) {
         val event = eventChip.event
 
-        val cornerRadius = config.eventCornerRadius.toFloat()
+        val cornerRadius = viewState.eventCornerRadius.toFloat()
         updateBackgroundPaint(event, backgroundPaint)
 
         val bounds = checkNotNull(eventChip.bounds)
@@ -35,13 +35,6 @@ internal class EventChipDrawer<T>(
             updateBorderPaint(event, borderPaint)
 
             val borderBounds = bounds.insetBy(event.style.borderWidth / 2f)
-
-//            val borderWidth = event.style.borderWidth
-//            val adjustedRect = RectF(
-//                rect.left + borderWidth / 2f,
-//                rect.top + borderWidth / 2f,
-//                rect.right - borderWidth / 2f,
-//                rect.bottom - borderWidth / 2f)
             canvas.drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
         }
 
@@ -125,8 +118,8 @@ internal class EventChipDrawer<T>(
         canvas.apply {
             save()
             translate(
-                rect.left + config.eventPaddingHorizontal,
-                rect.top + config.eventPaddingVertical
+                rect.left + viewState.eventPaddingHorizontal,
+                rect.top + viewState.eventPaddingVertical
             )
             textLayout.draw(this)
             restore()
@@ -140,8 +133,8 @@ internal class EventChipDrawer<T>(
         val event = eventChip.event
         val bounds = checkNotNull(eventChip.bounds)
 
-        val fullHorizontalPadding = config.eventPaddingHorizontal * 2
-        val fullVerticalPadding = config.eventPaddingVertical * 2
+        val fullHorizontalPadding = viewState.eventPaddingHorizontal * 2
+        val fullVerticalPadding = viewState.eventPaddingVertical * 2
 
         val negativeWidth = bounds.right - bounds.left - fullHorizontalPadding < 0
         val negativeHeight = bounds.bottom - bounds.top - fullVerticalPadding < 0
@@ -193,7 +186,7 @@ internal class EventChipDrawer<T>(
         event: ResolvedWeekViewEvent<T>,
         paint: Paint
     ) {
-        paint.color = event.style.backgroundColor ?: config.defaultEventColor
+        paint.color = event.style.backgroundColor ?: viewState.defaultEventColor
         paint.isAntiAlias = true
         paint.strokeWidth = 0f
         paint.style = Paint.Style.FILL
@@ -203,7 +196,7 @@ internal class EventChipDrawer<T>(
         event: ResolvedWeekViewEvent<T>,
         paint: Paint
     ) {
-        paint.color = event.style.borderColor ?: config.defaultEventColor
+        paint.color = event.style.borderColor ?: viewState.defaultEventColor
         paint.isAntiAlias = true
         paint.strokeWidth = event.style.borderWidth?.toFloat() ?: 0f
         paint.style = Paint.Style.STROKE
