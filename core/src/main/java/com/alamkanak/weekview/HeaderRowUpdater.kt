@@ -4,25 +4,21 @@ import android.text.StaticLayout
 import android.util.SparseArray
 import java.util.Calendar
 
-internal class HeaderRowUpdater<T>(
+internal class HeaderRowUpdater(
     private val viewState: ViewState,
-    private val cache: WeekViewCache<T>,
-    private val eventsCacheWrapper: EventsCacheWrapper<T>
+    private val cache: WeekViewCache,
+    private val eventChipsCache: EventChipsCache
 ) : Updater {
 
     private var previousHorizontalOrigin: Float? = null
     private val previousAllDayEventIds = mutableSetOf<Long>()
 
-    private val eventsCache: EventsCache<T>
-        get() = eventsCacheWrapper.get()
-
     override fun isRequired(): Boolean {
         val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
         val currentTimeColumnWidth = viewState.timeTextWidth + viewState.timeColumnPadding * 2
         val didTimeColumnChange = currentTimeColumnWidth != viewState.timeColumnWidth
-        val allDayEvents = eventsCache[viewState.dateRange]
-            .filter { it.isAllDay }
-            .map { it.id }
+        val allDayEvents = eventChipsCache.allDayEventChipsInDateRange(viewState.dateRange)
+            .map { it.eventId }
             .toSet()
         val didEventsChange = allDayEvents.hashCode() != previousAllDayEventIds.hashCode()
         return (didScrollHorizontally || didTimeColumnChange || didEventsChange).also {
@@ -57,7 +53,7 @@ internal class HeaderRowUpdater<T>(
     }
 
     private fun refreshHeaderHeight() {
-        val visibleEvents = eventsCache[viewState.dateRange].filter { it.isAllDay }
+        val visibleEvents = eventChipsCache.allDayEventChipsInDateRange(viewState.dateRange)
         viewState.hasEventInHeader = visibleEvents.isNotEmpty()
         viewState.refreshHeaderHeight()
     }

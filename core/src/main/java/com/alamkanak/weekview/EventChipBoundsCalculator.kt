@@ -2,12 +2,12 @@ package com.alamkanak.weekview
 
 import android.graphics.RectF
 
-internal class EventChipBoundsCalculator<T>(
+internal class EventChipBoundsCalculator(
     private val viewState: ViewState
 ) {
 
     fun calculateSingleEvent(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         startPixel: Float
     ): RectF {
         val widthPerDay = viewState.widthPerDay
@@ -47,7 +47,7 @@ internal class EventChipBoundsCalculator<T>(
     }
 
     fun calculateAllDayEvent(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         startPixel: Float
     ): RectF {
         val top = viewState.headerTextHeight + viewState.headerRowPadding * 1.5f

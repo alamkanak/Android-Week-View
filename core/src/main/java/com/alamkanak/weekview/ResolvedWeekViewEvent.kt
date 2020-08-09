@@ -64,7 +64,7 @@ internal data class ResolvedWeekViewEvent<T>(
         maxHour: Int
     ): Boolean = startTime.hour >= minHour && endTime.hour <= maxHour
 
-    internal fun collidesWith(other: ResolvedWeekViewEvent<T>): Boolean {
+    internal fun collidesWith(other: ResolvedWeekViewEvent<*>): Boolean {
         if (isAllDay != other.isAllDay) {
             return false
         }
@@ -86,10 +86,10 @@ internal data class ResolvedWeekViewEvent<T>(
     }
 
     internal fun startsOnEarlierDay(
-        originalEvent: ResolvedWeekViewEvent<T>
+        originalEvent: ResolvedWeekViewEvent<*>
     ): Boolean = startTime.isNotEqual(originalEvent.startTime)
 
     internal fun endsOnLaterDay(
-        originalEvent: ResolvedWeekViewEvent<T>
+        originalEvent: ResolvedWeekViewEvent<*>
     ): Boolean = endTime.isNotEqual(originalEvent.endTime)
 }

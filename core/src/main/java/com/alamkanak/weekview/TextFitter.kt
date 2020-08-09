@@ -5,14 +5,14 @@ import android.text.StaticLayout
 import android.text.TextUtils
 import android.text.TextUtils.TruncateAt
 
-internal class TextFitter<T>(
+internal class TextFitter(
     private val viewState: ViewState
 ) {
 
     private val spannableStringBuilder = SpannableStringBuilder()
 
     fun fit(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         title: CharSequence,
         location: CharSequence?,
         chipHeight: Int,
@@ -60,7 +60,7 @@ internal class TextFitter<T>(
     }
 
     private fun ellipsize(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         textLayout: StaticLayout,
         text: CharSequence,
         availableHeight: Int,
@@ -89,7 +89,7 @@ internal class TextFitter<T>(
     }
 
     private fun scaleToFit(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         text: CharSequence,
         availableHeight: Int
     ): StaticLayout {

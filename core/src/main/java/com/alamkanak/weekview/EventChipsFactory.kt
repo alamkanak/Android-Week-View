@@ -2,33 +2,29 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
-internal class EventChipsLoader<T>(
-    private val viewState: ViewState
-) {
+internal class EventChipsFactory {
 
-    private val eventSplitter = WeekViewEventSplitter<T>(viewState)
-
-    fun createEventChips(events: List<ResolvedWeekViewEvent<T>>): List<EventChip<T>> {
-        val eventChips = convertEventsToEventChips(events)
+    fun createEventChips(
+        events: List<ResolvedWeekViewEvent<*>>,
+        viewState: ViewState
+    ): List<EventChip> {
+        val eventChips = convertEventsToEventChips(events, viewState)
         val groups = eventChips.groupedByDate().values
 
         for (group in groups) {
-            computePositionOfEvents(group)
+            computePositionOfEvents(group, viewState)
         }
 
         return eventChips
     }
 
     private fun convertEventsToEventChips(
-        events: List<ResolvedWeekViewEvent<T>>
-    ): List<EventChip<T>> = events
+        events: List<ResolvedWeekViewEvent<*>>,
+        viewState: ViewState
+    ): List<EventChip> = events
         .sortedWith(compareBy({ it.startTime }, { it.endTime }))
-        .map(this::convertEventToEventChips)
+        .map { event -> event.split(viewState).map { EventChip(it, event) } }
         .flatten()
-
-    private fun convertEventToEventChips(
-        event: ResolvedWeekViewEvent<T>
-    ): List<EventChip<T>> = eventSplitter.split(event).map { EventChip(it, event) }
 
     /**
      * Forms [CollisionGroup]s for all event chips and uses them to expand the [EventChip]s to their
@@ -36,8 +32,8 @@ internal class EventChipsLoader<T>(
      *
      * @param eventChips A list of [EventChip]s
      */
-    private fun computePositionOfEvents(eventChips: List<EventChip<T>>) {
-        val collisionGroups = mutableListOf<CollisionGroup<T>>()
+    private fun computePositionOfEvents(eventChips: List<EventChip>, viewState: ViewState) {
+        val collisionGroups = mutableListOf<CollisionGroup>()
 
         for (eventChip in eventChips) {
             val collidingGroup = collisionGroups.firstOrNull { it.collidesWith(eventChip) }
@@ -50,15 +46,15 @@ internal class EventChipsLoader<T>(
         }
 
         for (collisionGroup in collisionGroups) {
-            expandEventsToMaxWidth(collisionGroup)
+            expandEventsToMaxWidth(collisionGroup, viewState)
         }
     }
 
     /**
      * Expands all [EventChip]s in a [CollisionGroup] to their maximum width.
      */
-    private fun expandEventsToMaxWidth(collisionGroup: CollisionGroup<T>) {
-        val columns = mutableListOf<Column<T>>()
+    private fun expandEventsToMaxWidth(collisionGroup: CollisionGroup, viewState: ViewState) {
+        val columns = mutableListOf<Column>()
         columns += Column(index = 0)
 
         for (eventChip in collisionGroup.eventChips) {
@@ -101,11 +97,11 @@ internal class EventChipsLoader<T>(
         }
 
         for (eventChip in collisionGroup.eventChips) {
-            calculateMinutesFromStart(eventChip)
+            calculateMinutesFromStart(eventChip, viewState)
         }
     }
 
-    private fun calculateMinutesFromStart(eventChip: EventChip<T>) {
+    private fun calculateMinutesFromStart(eventChip: EventChip, viewState: ViewState) {
         val event = eventChip.event
         if (event.isAllDay) {
             return
@@ -116,8 +112,8 @@ internal class EventChipsLoader<T>(
     }
 
     private fun expandColumnEventToMaxWidth(
-        current: Column<T>,
-        previous: Column<T>?,
+        current: Column,
+        previous: Column?,
         row: Int,
         columnWidth: Float,
         columns: Int
@@ -146,11 +142,11 @@ internal class EventChipsLoader<T>(
      * they overlap from a time perspective.
      *
      */
-    private class CollisionGroup<T>(
-        val eventChips: MutableList<EventChip<T>>
+    private class CollisionGroup(
+        val eventChips: MutableList<EventChip>
     ) {
 
-        constructor(eventChip: EventChip<T>) : this(mutableListOf(eventChip))
+        constructor(eventChip: EventChip) : this(mutableListOf(eventChip))
 
         /**
          * Returns whether an [EventChip] collides with any [EventChip] already in the
@@ -159,11 +155,11 @@ internal class EventChipsLoader<T>(
          * @param eventChip An [EventChip]
          * @return Whether a collision exists
          */
-        fun collidesWith(eventChip: EventChip<T>): Boolean {
+        fun collidesWith(eventChip: EventChip): Boolean {
             return eventChips.any { it.event.collidesWith(eventChip.event) }
         }
 
-        fun add(eventChip: EventChip<T>) {
+        fun add(eventChip: EventChip) {
             eventChips.add(eventChip)
         }
     }
@@ -171,12 +167,12 @@ internal class EventChipsLoader<T>(
     /**
      * This class encapsulates [EventChip]s that are displayed in the same column.
      */
-    private class Column<T>(
+    private class Column(
         val index: Int,
-        val eventChips: MutableList<EventChip<T>> = mutableListOf()
+        val eventChips: MutableList<EventChip> = mutableListOf()
     ) {
 
-        constructor(index: Int, eventChip: EventChip<T>) : this(index, mutableListOf(eventChip))
+        constructor(index: Int, eventChip: EventChip) : this(index, mutableListOf(eventChip))
 
         val isEmpty: Boolean
             get() = eventChips.isEmpty()
@@ -184,15 +180,15 @@ internal class EventChipsLoader<T>(
         val size: Int
             get() = eventChips.size
 
-        fun add(eventChip: EventChip<T>) {
+        fun add(eventChip: EventChip) {
             eventChips.add(eventChip)
         }
 
-        fun findDuplicate(eventChip: EventChip<T>) = eventChips.firstOrNull { it == eventChip }
+        fun findDuplicate(eventChip: EventChip) = eventChips.firstOrNull { it == eventChip }
 
-        operator fun get(index: Int): EventChip<T> = eventChips[index]
+        operator fun get(index: Int): EventChip = eventChips[index]
 
-        fun fits(eventChip: EventChip<T>): Boolean {
+        fun fits(eventChip: EventChip): Boolean {
             return isEmpty || !eventChips.last().event.collidesWith(eventChip.event)
         }
     }
@@ -213,7 +209,7 @@ internal class EventChipsLoader<T>(
         return results
     }
 
-    private fun List<EventChip<T>>.groupedByDate(): Map<Calendar, List<EventChip<T>>> {
+    private fun List<EventChip>.groupedByDate(): Map<Calendar, List<EventChip>> {
         return groupBy { it.event.startTime.atStartOfDay }
     }
 }

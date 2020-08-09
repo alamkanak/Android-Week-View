@@ -1,59 +1,54 @@
 package com.alamkanak.weekview
 
-internal class WeekViewEventSplitter<T>(
-    private val viewState: ViewState
-) {
+internal fun ResolvedWeekViewEvent<*>.split(viewState: ViewState): List<ResolvedWeekViewEvent<*>> {
+    if (startTime >= endTime) {
+        return emptyList()
+    }
 
-    fun split(event: ResolvedWeekViewEvent<T>): List<ResolvedWeekViewEvent<T>> {
-        if (event.startTime >= event.endTime) {
-            return emptyList()
-        }
+    // Check whether the end date of the event is exactly 12 AM. If so, the event will be
+    // shortened by a millisecond.
+    val endsOnStartOfNextDay = endTime.isAtStartOfNextDay(startTime)
+    val isAtStartOfNextPeriod = viewState.minHour == 0 && endsOnStartOfNextDay
 
-        // Check whether the end date of the event is exactly 12 AM. If so, the event will be
-        // shortened by a millisecond.
-        val endsOnStartOfNextDay = event.endTime.isAtStartOfNextDay(event.startTime)
-        val isAtStartOfNextPeriod = viewState.minHour == 0 && endsOnStartOfNextDay
+    return when {
+        isAtStartOfNextPeriod -> listOf(shortenTooLongAllDayEvent(viewState))
+        isMultiDay -> splitEventByDates(viewState)
+        else -> listOf(this)
+    }
+}
 
-        return when {
-            isAtStartOfNextPeriod -> listOf(shortenTooLongAllDayEvent(event))
-            event.isMultiDay -> splitEventByDates(event)
-            else -> listOf(event)
+private fun ResolvedWeekViewEvent<*>.shortenTooLongAllDayEvent(
+    viewState: ViewState
+): ResolvedWeekViewEvent<*> {
+    val newEndTime = endTime.withTimeAtEndOfPeriod(viewState.maxHour)
+    return copy(endTime = newEndTime)
+}
+
+private fun ResolvedWeekViewEvent<*>.splitEventByDates(
+    viewState: ViewState
+): List<ResolvedWeekViewEvent<*>> {
+    val results = mutableListOf<ResolvedWeekViewEvent<*>>()
+
+    val firstEventEnd = startTime.withTimeAtEndOfPeriod(viewState.maxHour)
+    val firstEvent = copy(endTime = firstEventEnd)
+    results += firstEvent
+
+    val lastEventStart = endTime.withTimeAtStartOfPeriod(viewState.minHour)
+    val lastEvent = copy(startTime = lastEventStart)
+    results += lastEvent
+
+    val diff = lastEvent.startTime.timeInMillis - firstEvent.startTime.timeInMillis
+    val daysInBetween = diff / Constants.DAY_IN_MILLIS
+
+    if (daysInBetween > 0) {
+        val start = firstEventEnd.withTimeAtStartOfPeriod(viewState.minHour) + Days(1)
+        while (start.isSameDate(lastEventStart).not()) {
+            val intermediateStart = start.withTimeAtStartOfPeriod(viewState.minHour)
+            val intermediateEnd = start.withTimeAtEndOfPeriod(viewState.maxHour)
+            results += copy(startTime = intermediateStart, endTime = intermediateEnd)
+            start += Days(1)
         }
     }
 
-    private fun shortenTooLongAllDayEvent(
-        event: ResolvedWeekViewEvent<T>
-    ): ResolvedWeekViewEvent<T> {
-        val newEndTime = event.endTime.withTimeAtEndOfPeriod(viewState.maxHour)
-        return event.copy(endTime = newEndTime)
-    }
-
-    private fun splitEventByDates(
-        event: ResolvedWeekViewEvent<T>
-    ): List<ResolvedWeekViewEvent<T>> {
-        val results = mutableListOf<ResolvedWeekViewEvent<T>>()
-
-        val firstEventEnd = event.startTime.withTimeAtEndOfPeriod(viewState.maxHour)
-        val firstEvent = event.copy(endTime = firstEventEnd)
-        results += firstEvent
-
-        val lastEventStart = event.endTime.withTimeAtStartOfPeriod(viewState.minHour)
-        val lastEvent = event.copy(startTime = lastEventStart)
-        results += lastEvent
-
-        val diff = lastEvent.startTime.timeInMillis - firstEvent.startTime.timeInMillis
-        val daysInBetween = diff / Constants.DAY_IN_MILLIS
-
-        if (daysInBetween > 0) {
-            val start = firstEventEnd.withTimeAtStartOfPeriod(viewState.minHour) + Days(1)
-            while (start.isSameDate(lastEventStart).not()) {
-                val intermediateStart = start.withTimeAtStartOfPeriod(viewState.minHour)
-                val intermediateEnd = start.withTimeAtEndOfPeriod(viewState.maxHour)
-                results += event.copy(startTime = intermediateStart, endTime = intermediateEnd)
-                start += Days(1)
-            }
-        }
-
-        return results.sortedWith(compareBy({ it.startTime }, { it.endTime }))
-    }
+    return results.sortedWith(compareBy({ it.startTime }, { it.endTime }))
 }

@@ -1,24 +1,11 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.util.SparseArray
 
-internal class TimeColumnDrawer<T>(
+internal class TimeColumnDrawer(
     private val viewState: ViewState,
-    private val cache: WeekViewCache<T>
+    private val cache: WeekViewCache
 ) : Drawer {
-
-    init {
-        cacheTimeLabels()
-    }
-
-    // TODO Duplication
-    private fun cacheTimeLabels() = with(viewState) {
-        for (hour in displayedHours) {
-            val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
-            cache.timeLabelLayouts.put(hour, textLayout)
-        }
-    }
 
     override fun draw(canvas: Canvas) = with(viewState) {
         var topMargin = headerHeight
@@ -71,5 +58,3 @@ internal class TimeColumnDrawer<T>(
         }
     }
 }
-
-private operator fun <E> SparseArray<E>.contains(key: Int): Boolean = indexOfKey(key) >= 0

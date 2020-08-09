@@ -3,12 +3,12 @@ package com.alamkanak.weekview
 import android.graphics.RectF
 import java.util.Calendar
 
-internal class SingleEventsUpdater<T : Any>(
+internal class SingleEventsUpdater(
     private val viewState: ViewState,
-    private val chipsCache: EventChipsCache<T>
+    private val chipsCache: EventChipsCache
 ) : Updater {
 
-    private val boundsCalculator = EventChipBoundsCalculator<T>(viewState)
+    private val boundsCalculator = EventChipBoundsCalculator(viewState)
 
     override fun isRequired() = true
 

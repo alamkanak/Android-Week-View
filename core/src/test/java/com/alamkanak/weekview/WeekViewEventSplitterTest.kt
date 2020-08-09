@@ -10,13 +10,12 @@ import org.mockito.MockitoAnnotations
 
 class WeekViewEventSplitterTest {
 
-    private val config = mock(WeekViewConfigWrapper::class.java)
-    private val underTest = WeekViewEventSplitter<Unit>(config)
+    private val viewState = mock(ViewState::class.java)
 
     init {
         MockitoAnnotations.initMocks(this)
-        whenever(config.minHour).thenReturn(0)
-        whenever(config.maxHour).thenReturn(24)
+        whenever(viewState.minHour).thenReturn(0)
+        whenever(viewState.maxHour).thenReturn(24)
     }
 
     @Test
@@ -25,7 +24,7 @@ class WeekViewEventSplitterTest {
         val endTime = startTime + Hours(2)
         val event = createResolvedWeekViewEvent(startTime, endTime)
 
-        val results = underTest.split(event)
+        val results = event.split(viewState)
         val expected = listOf(event)
 
         assertEquals(expected, results)
@@ -37,7 +36,7 @@ class WeekViewEventSplitterTest {
         val endTime = (startTime + Days(1)).withHour(2)
 
         val event = createResolvedWeekViewEvent(startTime, endTime)
-        val results = underTest.split(event)
+        val results = event.split(viewState)
 
         val expected = listOf(
             Event(startTime, startTime.atEndOfDay),
@@ -56,7 +55,7 @@ class WeekViewEventSplitterTest {
         val endTime = (startTime + Days(2)).withHour(2)
 
         val event = createResolvedWeekViewEvent(startTime, endTime)
-        val results = underTest.split(event)
+        val results = event.split(viewState)
 
         val intermediateDate = startTime + Days(1)
         val expected = listOf(

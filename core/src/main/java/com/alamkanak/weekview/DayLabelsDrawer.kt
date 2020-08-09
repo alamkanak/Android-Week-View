@@ -3,9 +3,9 @@ package com.alamkanak.weekview
 import android.graphics.Canvas
 import java.util.Calendar
 
-internal class DayLabelsDrawer<T>(
+internal class DayLabelsDrawer(
     private val viewState: ViewState,
-    private val cache: WeekViewCache<T>
+    private val cache: WeekViewCache
 ) : Drawer {
 
     override fun draw(canvas: Canvas) {

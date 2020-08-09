@@ -16,7 +16,7 @@ import java.util.Calendar
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class WeekView<T : Any> @JvmOverloads constructor(
+class WeekView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -26,14 +26,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
         ViewState.make(context, attrs)
     }
 
-    private val cache = WeekViewCache<T>()
-    private val eventChipCache = EventChipsCache<T>()
+    private val cache = WeekViewCache()
+    private val eventChipsCache = EventChipsCache()
 
-    private val touchHandler = WeekViewTouchHandler(viewState, eventChipCache)
+    private val touchHandler = WeekViewTouchHandler(viewState)
     private val gestureHandler = WeekViewGestureHandler(
         context = context,
         viewState = viewState,
-        eventChipsCache = eventChipCache,
+        eventChipsCache = eventChipsCache,
         touchHandler = touchHandler,
         onInvalidation = { ViewCompat.postInvalidateOnAnimation(this) }
     )
@@ -43,34 +43,14 @@ class WeekView<T : Any> @JvmOverloads constructor(
         viewState = viewState,
         gestureHandler = gestureHandler,
         touchHandler = touchHandler,
-        eventChipsCache = eventChipCache
+        eventChipsCache = eventChipsCache
     )
 
-    private val eventChipsLoader = EventChipsLoader<T>(viewState)
-
-    internal val eventsCacheWrapper = EventsCacheWrapper<T>()
-    internal val eventsLoaderWrapper = EventsLoaderWrapper(context, eventsCacheWrapper)
-
-    private val eventsDiffer = EventsDiffer(
-        context,
-        viewState,
-        eventsCacheWrapper,
-        eventChipsLoader,
-        eventChipCache
-    )
-
-    private val eventsLoader: EventsLoader<T>
-        get() = eventsLoaderWrapper.get()
-
-    // Be careful when changing the order of the updaters, as the calculation of any updater might
-    // depend on results of previous updaters
     private val updaters = listOf(
-        HeaderRowUpdater(viewState, cache, eventsCacheWrapper),
-        AllDayEventsUpdater(viewState, cache, eventChipCache),
-        SingleEventsUpdater(viewState, eventChipCache)
+        HeaderRowUpdater(viewState, cache, eventChipsCache),
+        AllDayEventsUpdater(viewState, cache, eventChipsCache),
+        SingleEventsUpdater(viewState, eventChipsCache)
     )
-
-    private var isAccessibilityHelperActive = false
 
     init {
         val accessibilityManager =
@@ -79,12 +59,13 @@ class WeekView<T : Any> @JvmOverloads constructor(
         val isAccessibilityEnabled = accessibilityManager.isEnabled
         val isExploreByTouchEnabled = accessibilityManager.isTouchExplorationEnabled
 
-        isAccessibilityHelperActive = isAccessibilityEnabled && isExploreByTouchEnabled
+        val isAccessibilityHelperActive = isAccessibilityEnabled && isExploreByTouchEnabled
         if (isAccessibilityHelperActive) {
             ViewCompat.setAccessibilityDelegate(this, accessibilityTouchHelper)
         }
 
         setLayerType(LAYER_TYPE_SOFTWARE, null)
+        cacheTimeLabels()
     }
 
     // Be careful when changing the order of the drawers, as that might cause
@@ -92,7 +73,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     private val drawers = listOf(
         DayBackgroundDrawer(viewState),
         BackgroundGridDrawer(viewState),
-        SingleEventsDrawer(viewState, eventChipCache),
+        SingleEventsDrawer(viewState, eventChipsCache),
         TimeColumnDrawer(viewState, cache),
         NowLineDrawer(viewState),
         HeaderRowDrawer(viewState),
@@ -125,10 +106,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
     }
 
     private fun updateDataHolders() {
-        // TODO
-        viewState.updateViewState()
         viewState.update()
-        viewState.updateDrawingContext()
     }
 
     private fun refreshEvents() {
@@ -136,13 +114,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
             return
         }
 
-        // These can either be newly loaded events or previously cached events
-        val events = eventsLoader.refresh(firstVisibleDate = viewState.firstVisibleDate)
-        eventChipCache.clear()
-
-        if (events.isNotEmpty()) {
-            eventChipCache += eventChipsLoader.createEventChips(events)
-        }
+        val pagedAdapter = adapter as? PagingAdapter ?: return
+        pagedAdapter.triggerEventsFetching(firstVisibleDate)
     }
 
     private fun updateDimensions() {
@@ -158,9 +131,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             drawer.draw(canvas)
         }
 
-        if (isAccessibilityHelperActive) {
-            accessibilityTouchHelper.invalidateRoot()
-        }
+        accessibilityTouchHelper.invalidateRoot()
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -190,9 +161,9 @@ class WeekView<T : Any> @JvmOverloads constructor(
         clearCaches()
         calculateWidthPerDay()
 
-        if (viewState.showCompleteDay) {
-            viewState.updateHourHeight(height)
-        }
+//        if (viewState.showCompleteDay) {
+//            viewState.updateHourHeight(height)
+//        }
     }
 
     private fun notifyScrollListeners() {
@@ -208,10 +179,9 @@ class WeekView<T : Any> @JvmOverloads constructor(
 
         val hasFirstVisibleDayChanged = oldFirstVisibleDay.toEpochDays() != firstVisibleDate.toEpochDays()
         if (hasFirstVisibleDayChanged) {
-            scrollListener?.onFirstVisibleDateChanged(firstVisibleDate)
-
             val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
-            onRangeChangeListener?.onRangeChanged(firstVisibleDate, lastVisibleDate)
+            adapter?.onRangeChanged(firstVisibleDate, lastVisibleDate)
+            adapter?.onFirstVisibleDateChanged(firstVisibleDate)
         }
     }
 
@@ -224,9 +194,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
     }
 
     override fun invalidate() {
+        viewState.invalidate()
         super.invalidate()
-        // TODO
-        // viewState.invalidate()
     }
 
     /*
@@ -258,15 +227,9 @@ class WeekView<T : Any> @JvmOverloads constructor(
     var numberOfVisibleDays: Int
         get() = viewState.numberOfVisibleDays
         set(value) {
-            viewState.numberOfVisibleDays = value
+            viewState.updateNumberOfVisibleDays(value)
             dateTimeInterpreter.onSetNumberOfDays(value)
             clearCaches()
-
-            // Scroll to first visible day after changing the number of visible days
-            // TODO
-            // viewState.scrollToDate = viewState.firstVisibleDate
-
-            calculateWidthPerDay()
             invalidate()
         }
 
@@ -1187,7 +1150,7 @@ class WeekView<T : Any> @JvmOverloads constructor(
             return
         }
 
-        eventsLoader.requireRefresh()
+        adapter?.requireRefresh()
 
         val diff = adjustedDate.daysFromToday
         viewState.currentOrigin.x = diff.toFloat() * (-1f) * viewState.totalDayWidth
@@ -1199,7 +1162,8 @@ class WeekView<T : Any> @JvmOverloads constructor(
      */
     @PublicApi
     fun notifyDataSetChanged() {
-        eventsLoader.requireRefresh()
+        adapter?.requireRefresh()
+        // eventsLoader.requireRefresh()
         invalidate()
     }
 
@@ -1267,173 +1231,32 @@ class WeekView<T : Any> @JvmOverloads constructor(
     /*
      ***********************************************************************************************
      *
-     *   Listeners
+     *   Adapter
      *
      ***********************************************************************************************
      */
 
-    @PublicApi
-    var onEventClickListener: OnEventClickListener<T>?
-        get() = touchHandler.onEventClickListener
+    private var internalAdapter: Adapter<*>? = null
+
+    // TODO: Documentation
+    var adapter: Adapter<*>?
+        get() = internalAdapter
         set(value) {
-            touchHandler.onEventClickListener = value
+            setAdapterInternal(value)
         }
 
-    @PublicApi
-    fun setOnEventClickListener(
-        block: (data: T, rect: RectF) -> Unit
-    ) {
-        onEventClickListener = object : OnEventClickListener<T> {
-            override fun onEventClick(data: T, eventRect: RectF) {
-                block(data, eventRect)
-            }
-        }
-    }
-
-    @Deprecated("Use onLoadMoreListener instead. This property will be removed in the future.")
-    @PublicApi
-    var onMonthChangeListener: OnMonthChangeListener<T>?
-        get() = (eventsLoader as? LegacyEventsLoader)?.onMonthChangeListener
-        set(value) {
-            eventsCacheWrapper.onListenerChanged(value)
-            eventsLoaderWrapper.onListenerChanged(value)
+    private fun setAdapterInternal(adapter: Adapter<*>?) {
+        if (adapter == null) {
+            internalAdapter?.unregisterObserver()
+            touchHandler.adapter = null
+            return
         }
 
-    @Deprecated("Use setOnLoadMoreListener instead. This method will be removed in the future.")
-    @PublicApi
-    fun setOnMonthChangeListener(
-        block: (startDate: Calendar, endDate: Calendar) -> List<WeekViewDisplayable<T>>
-    ) {
-        onMonthChangeListener = object : OnMonthChangeListener<T> {
-            override fun onMonthChange(
-                startDate: Calendar,
-                endDate: Calendar
-            ): List<WeekViewDisplayable<T>> {
-                return block(startDate, endDate)
-            }
-        }
-    }
+        adapter.eventChipsCache = eventChipsCache
+        internalAdapter = adapter
+        touchHandler.adapter = adapter
 
-    /**
-     * Submits a list of [WeekViewDisplayable]s to [WeekView]. If the new events fall into the
-     * currently displayed date range, this method will also redraw [WeekView].
-     */
-    @PublicApi
-    fun submit(items: List<WeekViewDisplayable<T>>) {
-        eventsDiffer.submit(items) { shouldInvalidate ->
-            if (shouldInvalidate) {
-                invalidate()
-            }
-        }
-    }
-
-    @PublicApi
-    var onLoadMoreListener: OnLoadMoreListener?
-        get() = (eventsLoader as? PagedEventsLoader)?.onLoadMoreListener
-        set(value) {
-            eventsCacheWrapper.onListenerChanged(value)
-            eventsLoaderWrapper.onListenerChanged(value)
-        }
-
-    /**
-     * Registers a block that is called whenever [WeekView] needs to load more events. This is
-     * similar to an [OnMonthChangeListener], but does not require anything to be returned.
-     */
-    @PublicApi
-    fun setOnLoadMoreListener(
-        block: (startDate: Calendar, endDate: Calendar) -> Unit
-    ) {
-        onLoadMoreListener = object : OnLoadMoreListener {
-            override fun onLoadMore(startDate: Calendar, endDate: Calendar) {
-                block(startDate, endDate)
-            }
-        }
-    }
-
-    @PublicApi
-    var onEventLongClickListener: OnEventLongClickListener<T>?
-        get() = touchHandler.onEventLongClickListener
-        set(value) {
-            touchHandler.onEventLongClickListener = value
-        }
-
-    @PublicApi
-    fun setOnEventLongClickListener(
-        block: (data: T, rect: RectF) -> Unit
-    ) {
-        onEventLongClickListener = object : OnEventLongClickListener<T> {
-            override fun onEventLongClick(data: T, eventRect: RectF) {
-                block(data, eventRect)
-            }
-        }
-    }
-
-    @PublicApi
-    var onEmptyViewClickListener: OnEmptyViewClickListener?
-        get() = touchHandler.onEmptyViewClickListener
-        set(value) {
-            touchHandler.onEmptyViewClickListener = value
-        }
-
-    @PublicApi
-    fun setOnEmptyViewClickListener(
-        block: (time: Calendar) -> Unit
-    ) {
-        onEmptyViewClickListener = object : OnEmptyViewClickListener {
-            override fun onEmptyViewClicked(time: Calendar) {
-                block(time)
-            }
-        }
-    }
-
-    @PublicApi
-    var onEmptyViewLongClickListener: OnEmptyViewLongClickListener?
-        get() = touchHandler.onEmptyViewLongClickListener
-        set(value) {
-            touchHandler.onEmptyViewLongClickListener = value
-        }
-
-    @PublicApi
-    fun setOnEmptyViewLongClickListener(
-        block: (time: Calendar) -> Unit
-    ) {
-        onEmptyViewLongClickListener = object : OnEmptyViewLongClickListener {
-            override fun onEmptyViewLongClick(time: Calendar) {
-                block(time)
-            }
-        }
-    }
-
-    @PublicApi
-    var scrollListener: ScrollListener?
-        get() = gestureHandler.scrollListener
-        set(value) {
-            gestureHandler.scrollListener = value
-        }
-
-    @PublicApi
-    fun setScrollListener(
-        block: (date: Calendar) -> Unit
-    ) {
-        scrollListener = object : ScrollListener {
-            override fun onFirstVisibleDateChanged(date: Calendar) {
-                block(firstVisibleDate)
-            }
-        }
-    }
-
-    @PublicApi
-    var onRangeChangeListener: OnRangeChangeListener? = null
-
-    @PublicApi
-    fun setOnRangeChangeListener(
-        block: (firstVisibleDate: Calendar, lastVisibleDate: Calendar) -> Unit
-    ) {
-        onRangeChangeListener = object : OnRangeChangeListener {
-            override fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
-                block(firstVisibleDate, lastVisibleDate)
-            }
-        }
+        internalAdapter?.registerObserver(this)
     }
 
     @PublicApi
@@ -1450,12 +1273,12 @@ class WeekView<T : Any> @JvmOverloads constructor(
         }
 
     @PublicApi
-    fun setDateFormatter(formatter: (Calendar) -> String) {
+    fun setDateFormatter(formatter: DateFormatter) {
         viewState.dateFormatter = formatter
     }
 
     @PublicApi
-    fun setTimeFormatter(formatter: (Int) -> String) {
+    fun setTimeFormatter(formatter: TimeFormatter) {
         viewState.timeFormatter = formatter
     }
 
@@ -1477,5 +1300,169 @@ class WeekView<T : Any> @JvmOverloads constructor(
             return true
         }
         return super.dispatchHoverEvent(event)
+    }
+
+    abstract class Adapter<T>(protected val context: Context) {
+
+        internal abstract val eventsCache: EventsCache<T>
+
+        private val eventChipsFactory = EventChipsFactory()
+
+        internal lateinit var eventChipsCache: EventChipsCache
+
+        internal val eventsDiffer: EventsDiffer<T> by lazy {
+            EventsDiffer(
+                context = context,
+                eventsCache = eventsCache,
+                eventChipsCache = eventChipsCache,
+                eventChipsFactory = eventChipsFactory
+            )
+        }
+
+        protected var shouldRefreshEvents: Boolean = false
+
+        internal fun requireRefresh() {
+            shouldRefreshEvents = true
+        }
+
+        internal fun handleClick(x: Float, y: Float): Boolean {
+            val eventChip = findHitEvent(x, y) ?: return false
+            val data = findEventData(id = eventChip.eventId) ?: return false
+
+            onEventClick(data)
+
+            eventChip.bounds?.let { bounds ->
+                onEventClick(data, bounds)
+            }
+
+            return true
+        }
+
+        internal fun handleEmptyViewClick(time: Calendar) {
+            onEmptyViewClick(time)
+        }
+
+        internal fun handleLongClick(x: Float, y: Float): Boolean {
+            val eventChip = findHitEvent(x, y) ?: return false
+            val data = findEventData(id = eventChip.eventId) ?: return false
+
+            onEventLongClick(data)
+
+            eventChip.bounds?.let { bounds ->
+                onEventLongClick(data, bounds)
+            }
+
+            return true
+        }
+
+        internal fun handleEmptyViewLongClick(time: Calendar) {
+            onEmptyViewLongClick(time)
+        }
+
+        private fun findHitEvent(x: Float, y: Float): EventChip? {
+            val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) }
+            return when {
+                candidates.isEmpty() -> null
+                // Two events hit. This is most likely because an all-day event was clicked, but a
+                // single event is rendered underneath it. We return the all-day event.
+                candidates.size == 2 -> candidates.first { it.event.isAllDay }
+                else -> candidates.first()
+            }
+        }
+
+        internal fun updateObserver() {
+            weekView?.invalidate()
+        }
+
+        internal var weekView: WeekView? = null
+            private set
+
+        internal fun registerObserver(weekView: WeekView) {
+            this.weekView = weekView
+        }
+
+        internal fun unregisterObserver() {
+            weekView = null
+        }
+
+        internal fun onEventClick(id: Long) {
+            val event = eventsCache[id] ?: return
+            onEventClick(data = event.data)
+        }
+
+        internal fun onEventLongClick(id: Long) {
+            val event = eventsCache[id] ?: return
+            onEventLongClick(data = event.data)
+        }
+
+        private fun findEventData(id: Long): T? = eventsCache[id]?.data
+
+        // TODO: Comments
+
+        open fun onEventClick(data: T) = Unit
+        open fun onEventClick(data: T, bounds: RectF) = Unit
+        open fun onEventLongClick(data: T) = Unit
+        open fun onEventLongClick(data: T, bounds: RectF) = Unit
+        open fun onEmptyViewClick(time: Calendar) = Unit
+        open fun onEmptyViewClick(time: Calendar, bounds: RectF) = Unit
+        open fun onEmptyViewLongClick(time: Calendar) = Unit
+        open fun onEmptyViewLongClick(time: Calendar, bounds: RectF) = Unit
+        open fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) = Unit
+        open fun onFirstVisibleDateChanged(date: Calendar) = Unit
+    }
+
+    open class PagingAdapter<T>(context: Context) : Adapter<T>(context) {
+
+        override val eventsCache = PagedEventsCache<T>()
+
+        fun submit(events: List<WeekViewDisplayable<T>>) {
+            val viewState = weekView?.viewState ?: return
+            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+        }
+
+        open fun onLoadMore(startDate: Calendar, endDate: Calendar) = Unit
+
+        internal fun triggerEventsFetching(firstVisibleDate: Calendar) {
+            val fetchRange = FetchRange.create(firstVisibleDate)
+            val needsRefresh = shouldRefreshEvents || fetchRange !in eventsCache
+
+            if (needsRefresh) {
+                val periods = eventsCache.determinePeriodsToFetch(fetchRange)
+                val needsToFetchAllPeriods = periods.size == 3
+                eventsCache.prepare(fetchRange, needsToFetchAllPeriods)
+                fetchPeriods(periods)
+            }
+
+            shouldRefreshEvents = false
+        }
+
+        private fun PagedEventsCache<T>.determinePeriodsToFetch(
+            fetchRange: FetchRange
+        ) = fetchRange.periods.filter { it !in this }
+
+        private fun PagedEventsCache<T>.prepare(fetchRange: FetchRange, needsToFetchAllPeriods: Boolean) {
+            if (shouldRefreshEvents && needsToFetchAllPeriods) {
+                clear()
+            }
+
+            shouldRefreshEvents = false
+            adjustToFetchRange(fetchRange)
+        }
+
+        private fun fetchPeriods(periods: List<Period>) {
+            for (period in periods) {
+                onLoadMore(period.startDate, period.endDate)
+            }
+        }
+    }
+
+    open class SimpleAdapter<T>(context: Context) : Adapter<T>(context) {
+
+        override val eventsCache = SimpleEventsCache<T>()
+
+        fun submit(events: List<WeekViewDisplayable<T>>) {
+            val viewState = weekView?.viewState ?: return
+            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+        }
     }
 }

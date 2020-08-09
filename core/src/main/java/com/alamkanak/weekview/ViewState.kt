@@ -479,11 +479,6 @@ data class ViewState(
     val displayedHours: IntProgression
         get() = timeRange step timeColumnHoursInterval
 
-    fun update() {
-        refreshAfterZooming()
-        updateVerticalOrigin()
-    }
-
     fun calculateTimeColumnWidth() {
         timeColumnWidth = timeTextWidth + timeColumnPadding * 2
     }
@@ -622,7 +617,7 @@ data class ViewState(
         return if (isToday) todayBackgroundPaint else dayBackgroundPaint
     }
 
-    fun updateHourHeight(viewHeight: Int) {
+    private fun updateHourHeight(viewHeight: Int) {
         hourHeight = (viewHeight - headerHeight) / hoursPerDay
         newHourHeight = hourHeight
     }
@@ -653,14 +648,25 @@ data class ViewState(
         timeTextHeight = textLayouts.map { it.height.toFloat() }.max() ?: 0f
     }
 
-    fun updateViewState() {
+    fun update() {
+        updateViewState()
+        updateScrollState()
+        updateDateRange()
+    }
+
+    private fun updateScrollState() {
+        refreshAfterZooming()
+        updateVerticalOrigin()
+    }
+
+    private fun updateViewState() {
         val totalHeaderHeight = getTotalHeaderHeight().toInt()
         val dynamicHourHeight = (viewHeight - totalHeaderHeight) / hoursPerDay
 
         if (areDimensionsInvalid) {
             effectiveMinHourHeight = max(minHourHeight, dynamicHourHeight)
-            scrollToDate = null
-            scrollToHour = null
+//            scrollToDate = null
+//            scrollToHour = null
             areDimensionsInvalid = false
         }
 
@@ -670,12 +676,7 @@ data class ViewState(
         }
     }
 
-    fun onSizeChanged(width: Int, height: Int) {
-        viewWidth = width
-        viewHeight = height
-    }
-
-    fun updateDrawingContext() {
+    private fun updateDateRange() {
         val originX = currentOrigin.x
 
         val daysFromOrigin = ceil(originX / totalDayWidth).toInt() * (-1)
@@ -692,17 +693,37 @@ data class ViewState(
         dateRange.clear()
         dateRange += createDateRange(start, modifiedEnd)
 
-        updateStartPixels()
+        startPixels.clear()
+        startPixels += dateRange.indices.map { startPixel + it * totalDayWidth }
 
         dateRangeWithStartPixels.clear()
         dateRangeWithStartPixels += dateRange.zip(startPixels)
     }
 
-    private fun updateStartPixels() {
-        startPixels.clear()
-        startPixels += dateRange.indices.map {
-            index -> startPixel + index * totalDayWidth
+    fun onSizeChanged(width: Int, height: Int) {
+        viewWidth = width
+        viewHeight = height
+
+        if (timeColumnWidth == Constants.UNINITIALIZED) {
+            calculateTimeColumnWidth()
         }
+
+        calculateWidthPerDay()
+
+        if (showCompleteDay) {
+            updateHourHeight(height)
+        }
+    }
+
+    fun updateNumberOfVisibleDays(days: Int) {
+        numberOfVisibleDays = days
+        // Scroll to first visible day after changing the number of visible days
+        scrollToDate = firstVisibleDate
+        calculateWidthPerDay()
+    }
+
+    fun invalidate() {
+        areDimensionsInvalid = true
     }
 
     companion object {

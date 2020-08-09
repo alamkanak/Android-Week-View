@@ -19,7 +19,7 @@ private enum class WeekViewType(val value: Int) {
     }
 }
 
-fun Toolbar.setupWithWeekView(weekView: WeekView<*>) {
+fun Toolbar.setupWithWeekView(weekView: WeekView) {
     val activity = context as Activity
     title = activity.label
 

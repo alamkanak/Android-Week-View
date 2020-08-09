@@ -3,37 +3,37 @@ package com.alamkanak.weekview
 import androidx.annotation.VisibleForTesting
 import java.util.Calendar
 
-/**
- * Wraps all available [EventsCache]s to allow for dynamic switching between them.
- */
-internal class EventsCacheWrapper<T> {
-
-    private val simpleEventsCache: EventsCache<T> = SimpleEventsCache()
-    private val pagedEventsCache: EventsCache<T> = PagedEventsCache()
-
-    private var currentEventsCache = simpleEventsCache
-
-    /**
-     * Returns the [EventsCache] that is currently in use.
-     */
-    fun get() = currentEventsCache
-
-    /**
-     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
-     * or [SimpleEventsCache] (otherwise).
-     */
-    fun onListenerChanged(listener: OnMonthChangeListener<T>?) {
-        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
-    }
-
-    /**
-     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
-     * or [SimpleEventsCache] (otherwise).
-     */
-    fun onListenerChanged(listener: OnLoadMoreListener?) {
-        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
-    }
-}
+// /**
+// * Wraps all available [EventsCache]s to allow for dynamic switching between them.
+// */
+// internal class EventsCacheWrapper<T> {
+//
+//    private val simpleEventsCache: EventsCache<T> = SimpleEventsCache()
+//    private val pagedEventsCache: EventsCache<T> = PagedEventsCache()
+//
+//    private var currentEventsCache = simpleEventsCache
+//
+//    /**
+//     * Returns the [EventsCache] that is currently in use.
+//     */
+//    fun get() = currentEventsCache
+//
+//    /**
+//     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
+//     * or [SimpleEventsCache] (otherwise).
+//     */
+//    fun onListenerChanged(listener: OnMonthChangeListener<T>?) {
+//        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
+//    }
+//
+//    /**
+//     * Switches the currently used [EventsCache] to a [PagedEventsCache] (if [listener] is not null)
+//     * or [SimpleEventsCache] (otherwise).
+//     */
+//    fun onListenerChanged(listener: OnLoadMoreListener?) {
+//        currentEventsCache = if (listener != null) pagedEventsCache else simpleEventsCache
+//    }
+// }
 
 /**
  * An abstract class that provides functionality to cache [WeekViewEvent]s.
@@ -42,6 +42,10 @@ internal abstract class EventsCache<T> {
 
     abstract val allEvents: List<ResolvedWeekViewEvent<T>>
     abstract fun clear()
+
+    operator fun get(id: Long): ResolvedWeekViewEvent<T>? {
+        return allEvents.firstOrNull { it.id == id }
+    }
 
     operator fun get(
         dateRange: List<Calendar>
@@ -83,8 +87,7 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
 }
 
 /**
- * Represents an [EventsCache] that caches [WeekViewEvent]s for a particular [FetchRange]. It is
- * used in combination with [PagedEventsLoader] or [LegacyEventsLoader].
+ * Represents an [EventsCache] that caches [WeekViewEvent]s for a particular [FetchRange].
  */
 internal class PagedEventsCache<T> : EventsCache<T>() {
 

@@ -4,28 +4,29 @@ import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.max
 
-internal class WeekViewTouchHandler<T : Any>(
-    private val viewState: ViewState,
-    private val chipsCache: EventChipsCache<T>
+internal class WeekViewTouchHandler(
+    private val viewState: ViewState
 ) {
 
-    var onEventClickListener: OnEventClickListener<T>? = null
-    var onEventLongClickListener: OnEventLongClickListener<T>? = null
-
-    var onEmptyViewClickListener: OnEmptyViewClickListener? = null
-    var onEmptyViewLongClickListener: OnEmptyViewLongClickListener? = null
+    var adapter: WeekView.Adapter<*>? = null
 
     fun handleClick(x: Float, y: Float) {
-        val handled = onEventClickListener?.handleClick(x, y) ?: false
+        val inCalendarArea = x > viewState.timeColumnWidth
+        if (!inCalendarArea) {
+            return
+        }
+
+        val handled = adapter?.handleClick(x, y) ?: false
         if (!handled) {
-            onEmptyViewClickListener?.handleClick(x, y)
+            val time = calculateTimeFromPoint(x, y) ?: return
+            adapter?.handleEmptyViewClick(time)
         }
     }
 
     fun handleLongClick(x: Float, y: Float) {
-        val handled = onEventLongClickListener?.handleLongClick(x, y) ?: false
+        val handled = adapter?.handleLongClick(x, y) ?: false
         if (!handled) {
-            onEmptyViewLongClickListener?.handleLongClick(x, y)
+            adapter?.handleLongClick(x, y)
         }
     }
 
@@ -36,7 +37,7 @@ internal class WeekViewTouchHandler<T : Any>(
      * @param touchY The y coordinate of the touch event.
      * @return The [Calendar] of the clicked position, or null if none was found.
      */
-    fun calculateTimeFromPoint(
+    internal fun calculateTimeFromPoint(
         touchX: Float,
         touchY: Float
     ): Calendar? {
@@ -76,68 +77,5 @@ internal class WeekViewTouchHandler<T : Any>(
         }
 
         return null
-    }
-
-    private fun findHitEvent(x: Float, y: Float): EventChip<T>? {
-        val candidates = chipsCache.allEventChips.filter { it.isHit(x, y) }
-        return when {
-            candidates.isEmpty() -> null
-            // Two events hit. This is most likely because an all-day event was clicked, but a
-            // single event is rendered underneath it. We return the all-day event.
-            candidates.size == 2 -> candidates.first { it.event.isAllDay }
-            else -> candidates.first()
-        }
-    }
-
-    private fun OnEventClickListener<T>.handleClick(x: Float, y: Float): Boolean {
-        val eventChip = findHitEvent(x, y) ?: return false
-        val isInHeader = y <= viewState.headerHeight
-
-        if (eventChip.event.isNotAllDay && isInHeader) {
-            // The user tapped in the header area and a single event that is rendered below it
-            // has recognized the tap. We ignore this.
-            return false
-        }
-
-        val data = eventChip.originalEvent.data
-        val rect = checkNotNull(eventChip.bounds)
-        onEventClick(data, rect)
-
-        return true
-    }
-
-    private fun OnEmptyViewClickListener.handleClick(x: Float, y: Float) {
-        val isInCalendarArea = x > viewState.timeColumnWidth && y > viewState.headerHeight
-        if (isInCalendarArea) {
-            calculateTimeFromPoint(x, y)?.let { time ->
-                onEmptyViewClicked(time)
-            }
-        }
-    }
-
-    private fun OnEventLongClickListener<T>.handleLongClick(x: Float, y: Float): Boolean {
-        val isInHeader = y <= viewState.headerHeight
-        val eventChip = findHitEvent(x, y) ?: return false
-
-        if (eventChip.event.isNotAllDay && isInHeader) {
-            // The user tapped in the header area and a single event that is rendered below it
-            // has recognized the tap. We ignore this.
-            return false
-        }
-
-        val data = eventChip.originalEvent.data
-        val rect = checkNotNull(eventChip.bounds)
-        onEventLongClick(data, rect)
-
-        return true
-    }
-
-    private fun OnEmptyViewLongClickListener.handleLongClick(x: Float, y: Float) {
-        val isInCalendarArea = x > viewState.timeColumnWidth && y > viewState.headerHeight
-        if (isInCalendarArea) {
-            calculateTimeFromPoint(x, y)?.let { time ->
-                onEmptyViewLongClick(time)
-            }
-        }
     }
 }

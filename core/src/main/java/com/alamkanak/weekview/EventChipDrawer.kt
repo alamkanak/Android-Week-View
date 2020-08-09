@@ -8,18 +8,18 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.style.StyleSpan
 
-internal class EventChipDrawer<T>(
+internal class EventChipDrawer(
     private val viewState: ViewState
 ) {
 
-    private val textFitter = TextFitter<T>(viewState)
+    private val textFitter = TextFitter(viewState)
     private val textLayoutCache = mutableMapOf<Long, StaticLayout>()
 
     private val backgroundPaint = Paint()
     private val borderPaint = Paint()
 
     internal fun draw(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         canvas: Canvas,
         textLayout: StaticLayout? = null
     ) {
@@ -51,7 +51,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun drawCornersForMultiDayEvents(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         cornerRadius: Float,
         canvas: Canvas
     ) {
@@ -77,7 +77,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun drawStroke(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         canvas: Canvas
     ) {
         val event = eventChip.event
@@ -110,7 +110,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun drawEventTitle(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         textLayout: StaticLayout,
         canvas: Canvas
     ) {
@@ -127,7 +127,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun calculateTextHeightAndDrawTitle(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         canvas: Canvas
     ) {
         val event = eventChip.event
@@ -183,7 +183,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun updateBackgroundPaint(
-        event: ResolvedWeekViewEvent<T>,
+        event: ResolvedWeekViewEvent<*>,
         paint: Paint
     ) {
         paint.color = event.style.backgroundColor ?: viewState.defaultEventColor
@@ -193,7 +193,7 @@ internal class EventChipDrawer<T>(
     }
 
     private fun updateBorderPaint(
-        event: ResolvedWeekViewEvent<T>,
+        event: ResolvedWeekViewEvent<*>,
         paint: Paint
     ) {
         paint.color = event.style.borderColor ?: viewState.defaultEventColor

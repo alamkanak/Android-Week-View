@@ -12,18 +12,18 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-internal class WeekViewAccessibilityTouchHelper<T : Any>(
-    private val view: WeekView<T>,
+internal class WeekViewAccessibilityTouchHelper(
+    private val view: WeekView,
     private val viewState: ViewState,
-    private val gestureHandler: WeekViewGestureHandler<T>,
-    private val touchHandler: WeekViewTouchHandler<T>,
-    private val eventChipsCache: EventChipsCache<T>
+    private val gestureHandler: WeekViewGestureHandler,
+    private val touchHandler: WeekViewTouchHandler,
+    private val eventChipsCache: EventChipsCache
 ) : ExploreByTouchHelper(view) {
 
     private val dateFormatter = SimpleDateFormat.getDateInstance(LONG)
     private val dateTimeFormatter = SimpleDateFormat.getDateTimeInstance(LONG, SHORT)
 
-    private val store = VirtualViewIdStore<T>()
+    private val store = VirtualViewIdStore()
 
     override fun getVirtualViewAt(x: Float, y: Float): Int {
         // First, we check if an event chip was hit
@@ -68,45 +68,38 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
 
     private fun onPerformActionForEventChip(
         virtualViewId: Int,
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         action: Int
-    ): Boolean {
-        val data = checkNotNull(eventChip.originalEvent.data)
-        val rect = checkNotNull(eventChip.bounds)
-
-        return when (action) {
-            AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                touchHandler.onEventClickListener?.onEventClick(data, rect)
-                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
-                true
-            }
-            AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-                touchHandler.onEventLongClickListener?.onEventLongClick(data, rect)
-                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
-                true
-            }
-            else -> false
+    ): Boolean = when (action) {
+        AccessibilityNodeInfoCompat.ACTION_CLICK -> {
+            touchHandler.adapter?.onEventClick(id = eventChip.eventId)
+            sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+            true
         }
+        AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
+            touchHandler.adapter?.onEventLongClick(id = eventChip.eventId)
+            sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
+            true
+        }
+        else -> false
     }
 
     private fun onPerformActionForDate(
         virtualViewId: Int,
         date: Calendar,
         action: Int
-    ): Boolean {
-        return when (action) {
-            AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-                touchHandler.onEmptyViewClickListener?.onEmptyViewClicked(date)
-                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
-                true
-            }
-            AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-                touchHandler.onEmptyViewLongClickListener?.onEmptyViewLongClick(date)
-                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
-                true
-            }
-            else -> false
+    ): Boolean = when (action) {
+        AccessibilityNodeInfoCompat.ACTION_CLICK -> {
+            touchHandler.adapter?.onEmptyViewClick(date)
+            sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+            true
         }
+        AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
+            touchHandler.adapter?.onEmptyViewLongClick(date)
+            sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
+            true
+        }
+        else -> false
     }
 
     override fun onPopulateNodeForVirtualView(
@@ -129,11 +122,10 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     }
 
     private fun populateNodeWithEventInfo(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         node: AccessibilityNodeInfoCompat
     ) {
         node.contentDescription = createDescriptionForVirtualView(eventChip.originalEvent)
-
         node.addAction(AccessibilityActionCompat.ACTION_CLICK)
         node.addAction(AccessibilityActionCompat.ACTION_LONG_CLICK)
 
@@ -163,7 +155,7 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
         node.setBoundsInParent(bounds)
     }
 
-    private fun createDescriptionForVirtualView(event: ResolvedWeekViewEvent<T>): String {
+    private fun createDescriptionForVirtualView(event: ResolvedWeekViewEvent<*>): String {
         val date = dateTimeFormatter.format(event.startTime.time)
         return "$date: ${event.title}, ${event.location}"
     }
@@ -173,9 +165,9 @@ internal class WeekViewAccessibilityTouchHelper<T : Any>(
     }
 }
 
-private class VirtualViewIdStore<T> {
+private class VirtualViewIdStore {
 
-    private val eventChips = mutableListOf<EventChip<T>>()
+    private val eventChips = mutableListOf<EventChip>()
     private val dates = mutableListOf<Calendar>()
 
     private val eventChipVirtualViewIds = mutableListOf<Int>()
@@ -183,7 +175,7 @@ private class VirtualViewIdStore<T> {
 
     private var maximumId = 0
 
-    operator fun get(eventChip: EventChip<T>): Int? {
+    operator fun get(eventChip: EventChip): Int? {
         val index = eventChips.indexOf(eventChip)
         return eventChipVirtualViewIds[index]
     }
@@ -195,7 +187,7 @@ private class VirtualViewIdStore<T> {
 
     fun findEventChip(
         virtualViewId: Int
-    ): EventChip<T>? {
+    ): EventChip? {
         val index = eventChipVirtualViewIds.indexOfFirst { it == virtualViewId }
         return if (index != -1) eventChips[index] else null
     }
@@ -220,7 +212,7 @@ private class VirtualViewIdStore<T> {
         }
     }
 
-    fun put(newEventChips: List<EventChip<T>>): List<Int> {
+    fun put(newEventChips: List<EventChip>): List<Int> {
         val virtualViewIds = mutableListOf<Int>()
 
         for (eventChip in newEventChips) {

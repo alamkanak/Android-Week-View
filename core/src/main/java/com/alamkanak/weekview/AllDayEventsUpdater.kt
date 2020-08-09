@@ -5,13 +5,13 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import kotlin.math.roundToInt
 
-internal class AllDayEventsUpdater<T : Any>(
+internal class AllDayEventsUpdater(
     private val viewState: ViewState,
-    private val cache: WeekViewCache<T>,
-    private val chipsCache: EventChipsCache<T>
+    private val cache: WeekViewCache,
+    private val chipsCache: EventChipsCache
 ) : Updater {
 
-    private val boundsCalculator = EventChipBoundsCalculator<T>(viewState)
+    private val boundsCalculator = EventChipBoundsCalculator(viewState)
     private val spannableStringBuilder = SpannableStringBuilder()
 
     private var previousHorizontalOrigin: Float? = null
@@ -25,7 +25,7 @@ internal class AllDayEventsUpdater<T : Any>(
     }
 
     override fun update() {
-        cache.clearAllDayEventLayouts()
+        cache.allDayEventLayouts.clear()
 
         val datesWithStartPixels = viewState.dateRangeWithStartPixels
         for ((date, startPixel) in datesWithStartPixels) {
@@ -50,7 +50,7 @@ internal class AllDayEventsUpdater<T : Any>(
     }
 
     private fun calculateTextLayout(
-        eventChip: EventChip<T>,
+        eventChip: EventChip,
         startPixel: Float
     ) {
         val chipRect = boundsCalculator.calculateAllDayEvent(eventChip, startPixel)
@@ -64,9 +64,7 @@ internal class AllDayEventsUpdater<T : Any>(
         }
     }
 
-    private fun calculateChipTextLayout(
-        eventChip: EventChip<T>
-    ): StaticLayout? {
+    private fun calculateChipTextLayout(eventChip: EventChip): StaticLayout? {
         val event = eventChip.event
         val bounds = checkNotNull(eventChip.bounds)
 
@@ -120,7 +118,7 @@ internal class AllDayEventsUpdater<T : Any>(
      * Creates a dummy text layout that is only used to determine the height of all-day events.
      */
     private fun createDummyTextLayout(
-        event: ResolvedWeekViewEvent<T>
+        event: ResolvedWeekViewEvent<*>
     ): StaticLayout {
         if (dummyTextLayout == null) {
             val textPaint = viewState.getTextPaint(event)
@@ -129,7 +127,7 @@ internal class AllDayEventsUpdater<T : Any>(
         return checkNotNull(dummyTextLayout)
     }
 
-    private fun EventChip<T>.ellipsizeText(
+    private fun EventChip.ellipsizeText(
         text: CharSequence,
         availableWidth: Int,
         existingTextLayout: StaticLayout

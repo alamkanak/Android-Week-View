@@ -26,11 +26,11 @@ private enum class Direction {
         get() = this == Vertical
 }
 
-internal class WeekViewGestureHandler<T : Any>(
+internal class WeekViewGestureHandler(
     context: Context,
     private val viewState: ViewState,
-    private val eventChipsCache: EventChipsCache<T>,
-    private val touchHandler: WeekViewTouchHandler<T>,
+    private val eventChipsCache: EventChipsCache,
+    private val touchHandler: WeekViewTouchHandler,
     private val onInvalidation: () -> Unit
 ) : GestureDetector.SimpleOnGestureListener() {
 
@@ -43,8 +43,6 @@ internal class WeekViewGestureHandler<T : Any>(
     private val gestureDetector = GestureDetector(context, this)
 
     private val scaledTouchSlop = context.scaledTouchSlop
-
-    var scrollListener: ScrollListener? = null
 
     override fun onDown(
         e: MotionEvent
@@ -191,7 +189,7 @@ internal class WeekViewGestureHandler<T : Any>(
         touchHandler.handleLongClick(e.x, e.y)
     }
 
-    internal fun findHitEvent(x: Float, y: Float): EventChip<T>? {
+    internal fun findHitEvent(x: Float, y: Float): EventChip? {
         val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) }
         return when {
             candidates.isEmpty() -> null
