@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.RectF
 
 fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
@@ -8,6 +9,15 @@ fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
     translate(x, y)
     block()
     restore()
+}
+
+fun Canvas.drawVerticalLine(
+    horizontalOffset: Float,
+    startY: Float,
+    endY: Float,
+    paint: Paint
+) {
+    drawLine(horizontalOffset, startY, horizontalOffset, endY, paint)
 }
 
 fun Canvas.drawInBounds(

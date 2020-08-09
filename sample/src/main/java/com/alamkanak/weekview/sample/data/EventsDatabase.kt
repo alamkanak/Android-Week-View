@@ -62,7 +62,6 @@ class EventsDatabase(context: Context) {
             hour = 20,
             minute = 0,
             duration = 5 * 60,
-            isCanceled = true,
             color = color4
         )
 

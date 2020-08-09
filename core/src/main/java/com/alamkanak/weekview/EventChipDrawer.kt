@@ -33,7 +33,6 @@ internal class EventChipDrawer(
 
         if (event.style.borderWidth != null) {
             updateBorderPaint(event, borderPaint)
-
             val borderBounds = bounds.insetBy(event.style.borderWidth / 2f)
             canvas.drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
         }
@@ -72,12 +71,13 @@ internal class EventChipDrawer(
         }
 
         if (event.style.borderWidth != null) {
-            drawBorderStroke(eventChip, canvas)
+            drawMultiDayBorderStroke(eventChip, cornerRadius, canvas)
         }
     }
 
-    private fun drawBorderStroke(
+    private fun drawMultiDayBorderStroke(
         eventChip: EventChip,
+        cornerRadius: Float,
         canvas: Canvas
     ) {
         val event = eventChip.event
@@ -85,27 +85,58 @@ internal class EventChipDrawer(
         val rect = checkNotNull(eventChip.bounds)
 
         val borderWidth = event.style.borderWidth ?: 0
-        val innerWidth = rect.width() - borderWidth * 2
+        val borderStart = rect.left + borderWidth / 2
+        val borderEnd = rect.right - borderWidth / 2
 
-        val borderStartX = rect.left + borderWidth
-        val borderEndX = borderStartX + innerWidth
+        // val innerWidth = rect.width() - borderWidth * 2
+
+//        val borderStartX = rect.left + borderWidth
+//        val borderEndX = borderStartX + innerWidth
 
         updateBorderPaint(event, backgroundPaint)
 
         if (event.startsOnEarlierDay(originalEvent)) {
             // Remove top rounded corners by drawing a rectangle
-            val borderStartY = rect.top
-            val borderEndY = borderStartY + borderWidth
-            val newRect = RectF(borderStartX, borderStartY, borderEndX, borderEndY)
-            canvas.drawRect(newRect, backgroundPaint)
+//            val borderStartY = rect.top
+//            val borderEndY = borderStartY + borderWidth
+//            val newRect = RectF(borderStartX, borderStartY, borderEndX, borderEndY)
+//            canvas.drawRect(newRect, backgroundPaint)
+
+            canvas.drawVerticalLine(
+                horizontalOffset = borderStart,
+                startY = rect.top,
+                endY = rect.top + cornerRadius,
+                paint = backgroundPaint
+            )
+
+            canvas.drawVerticalLine(
+                horizontalOffset = borderEnd,
+                startY = rect.top,
+                endY = rect.top + cornerRadius,
+                paint = backgroundPaint
+            )
         }
 
         if (event.endsOnLaterDay(originalEvent)) {
             // Remove bottom rounded corners by drawing a rectangle
-            val borderEndY = rect.bottom
-            val borderStartY = borderEndY - borderWidth
-            val newRect = RectF(borderStartX, borderStartY, borderEndX, borderEndY)
-            canvas.drawRect(newRect, backgroundPaint)
+//            val borderEndY = rect.bottom
+//            val borderStartY = borderEndY - borderWidth
+//            val newRect = RectF(borderStartX, borderStartY, borderEndX, borderEndY)
+//            canvas.drawRect(newRect, backgroundPaint)
+
+            canvas.drawVerticalLine(
+                horizontalOffset = borderStart,
+                startY = rect.bottom - cornerRadius,
+                endY = rect.bottom,
+                paint = backgroundPaint
+            )
+
+            canvas.drawVerticalLine(
+                horizontalOffset = borderEnd,
+                startY = rect.bottom - cornerRadius,
+                endY = rect.bottom,
+                paint = backgroundPaint
+            )
         }
     }
 

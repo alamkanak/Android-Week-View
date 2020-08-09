@@ -48,8 +48,6 @@ class BasicActivity : AppCompatActivity() {
 
         toolbar.setupWithWeekView(weekView)
 
-        WeekView.SimpleAdapter<Int>()
-
         val adapter = BasicActivityWeekViewAdapter(loadMoreHandler = viewModel::fetchEvents)
         weekView.adapter = adapter
 

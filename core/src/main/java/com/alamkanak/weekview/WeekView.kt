@@ -1418,6 +1418,7 @@ class WeekView @JvmOverloads constructor(
          *
          * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
          */
+        @PublicApi
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
             eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
@@ -1449,6 +1450,7 @@ class WeekView @JvmOverloads constructor(
          *
          * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
          */
+        @PublicApi
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
             eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
@@ -1465,12 +1467,14 @@ class WeekView @JvmOverloads constructor(
          * @param startDate A [Calendar] of the first date of the month that needs to be fetched
          * @param endDate A [Calendar] of the last date of the month that needs to be fetched
          */
+        @PublicApi
         open fun onLoadMore(startDate: Calendar, endDate: Calendar) = Unit
 
         /**
          * Refreshes the [WeekViewDisplayable] elements presented by this adapter. All cached
          * elements will be removed and a call to [onLoadMore] will be triggered.
          */
+        @PublicApi
         fun refresh() {
             eventsCache.clear()
             weekView?.invalidate()
