@@ -1,6 +1,5 @@
 package com.alamkanak.weekview
 
-import android.animation.Animator
 import android.animation.ValueAnimator as AndroidValueAnimator
 import android.view.animation.DecelerateInterpolator
 
@@ -15,8 +14,7 @@ internal class ValueAnimator {
         fromValue: Float,
         toValue: Float,
         duration: Long = 300,
-        onUpdate: (Float) -> Unit,
-        onEnd: () -> Unit = {}
+        onUpdate: (Float) -> Unit
     ) {
         valueAnimator?.cancel()
 
@@ -29,8 +27,6 @@ internal class ValueAnimator {
                 onUpdate(value)
             }
 
-            addEndListener { onEnd() }
-
             start()
         }
     }
@@ -38,16 +34,4 @@ internal class ValueAnimator {
     fun stop() {
         valueAnimator?.cancel()
     }
-}
-
-private fun AndroidValueAnimator.addEndListener(listener: (AndroidValueAnimator) -> Unit) {
-    addListener(object : Animator.AnimatorListener {
-        override fun onAnimationStart(animator: Animator) {
-            listener(animator as AndroidValueAnimator)
-        }
-
-        override fun onAnimationEnd(animator: Animator) = Unit
-        override fun onAnimationCancel(animator: Animator) = Unit
-        override fun onAnimationRepeat(animator: Animator) = Unit
-    })
 }

@@ -18,7 +18,7 @@ import kotlin.math.min
 typealias DateFormatter = (Calendar) -> String
 typealias TimeFormatter = (Int) -> String
 
-data class ViewState(
+internal data class ViewState(
     // View
     var viewWidth: Int = 0,
     var viewHeight: Int = 0,
@@ -804,11 +804,6 @@ data class ViewState(
 private fun TypedArray.getInt(index: Int): Int? {
     return if (hasValue(index)) getInteger(index, 0) else null
 }
-
-private fun Float.limit(
-    minValue: Float,
-    maxValue: Float
-): Float = min(max(this, minValue), maxValue)
 
 private object Defaults {
     const val BACKGROUND_COLOR = Color.WHITE

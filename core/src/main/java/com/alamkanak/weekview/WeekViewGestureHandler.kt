@@ -247,6 +247,6 @@ internal class WeekViewGestureHandler(
 
     private val Context.scaledTouchSlop: Int
         get() = ViewConfiguration.get(this).scaledTouchSlop
-
-    private fun Float.limit(minValue: Float, maxValue: Float): Float = min(max(this, minValue), maxValue)
 }
+
+internal fun Float.limit(minValue: Float, maxValue: Float): Float = min(max(this, minValue), maxValue)

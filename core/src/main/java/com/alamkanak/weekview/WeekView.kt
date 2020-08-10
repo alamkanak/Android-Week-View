@@ -44,6 +44,8 @@ class WeekView @JvmOverloads constructor(
         eventChipsCache = eventChipsCache
     )
 
+    private val scroller = ValueAnimator()
+
     private val renderers: List<Renderer> = listOf(
         TimeColumnRenderer(viewState),
         CalendarRenderer(viewState, eventChipsCache),
@@ -1110,9 +1112,24 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        val diff = adjustedDate.daysFromToday
-        viewState.currentOrigin.x = diff.toFloat() * (-1f) * viewState.totalDayWidth
-        invalidate()
+        val destinationOffset = viewState.getXOriginForDate(date)
+        val adjustedDestinationOffset = destinationOffset.limit(
+            minValue = viewState.minX,
+            maxValue = viewState.maxX
+        )
+
+        scroller.animate(
+            fromValue = viewState.currentOrigin.x,
+            toValue = adjustedDestinationOffset,
+            onUpdate = {
+                viewState.currentOrigin.x = it
+                invalidate()
+            }
+        )
+
+//        val diff = adjustedDate.daysFromToday
+//        viewState.currentOrigin.x = diff.toFloat() * (-1f) * viewState.totalDayWidth
+//        invalidate()
     }
 
     /**
@@ -1144,10 +1161,16 @@ class WeekView @JvmOverloads constructor(
         // height minus the height of WeekView, which would result in scrolling all the way to the
         // bottom.
         val maxOffset = viewState.totalDayHeight - height
-        val finalOffset = min(maxOffset, desiredOffset)
+        val finalOffset = min(maxOffset, desiredOffset) * (-1)
 
-        viewState.currentOrigin.y = finalOffset * (-1)
-        invalidate()
+        scroller.animate(
+            fromValue = viewState.currentOrigin.y,
+            toValue = finalOffset,
+            onUpdate = {
+                viewState.currentOrigin.y = it
+                invalidate()
+            }
+        )
     }
 
     /**
