@@ -160,7 +160,7 @@ internal class WeekViewGestureHandler(
         val dayHeight = viewState.hourHeight * viewState.hoursPerDay
         val viewHeight = viewState.viewHeight
 
-        val minY = (dayHeight + viewState.getTotalHeaderHeight() - viewHeight) * -1
+        val minY = (dayHeight + viewState.headerHeight - viewHeight) * -1
         val maxY = 0f
 
         val currentOffset = viewState.currentOrigin.y

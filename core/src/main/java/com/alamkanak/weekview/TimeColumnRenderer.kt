@@ -11,17 +11,15 @@ internal class TimeColumnRenderer(
     private val timeLabelLayouts = SparseArray<StaticLayout>()
 
     init {
-        cacheTimeLabels()
+        updateTimeLabels()
     }
 
     override fun onSizeChanged(width: Int, height: Int) {
-        timeLabelLayouts.clear()
-        cacheTimeLabels()
+        updateTimeLabels()
     }
 
     override fun onTimeFormatterChanged(formatter: TimeFormatter) {
-        timeLabelLayouts.clear()
-        cacheTimeLabels()
+        updateTimeLabels()
     }
 
     override fun render(canvas: Canvas) = with(viewState) {
@@ -41,7 +39,6 @@ internal class TimeColumnRenderer(
                 continue
             }
 
-            val x = timeTextWidth + timeColumnPadding
             var y = topMargin - timeTextHeight / 2
 
             // If the hour separator is shown in the time column, move the time label below it
@@ -49,8 +46,11 @@ internal class TimeColumnRenderer(
                 y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
+            val label = timeLabelLayouts[hour]
+            val x = timeColumnWidth - timeColumnPadding
+
             canvas.withTranslation(x, y) {
-                timeLabelLayouts[hour].draw(this)
+                label.draw(this)
             }
 
             if (showTimeColumnHourSeparator && hour > 0) {
@@ -74,10 +74,21 @@ internal class TimeColumnRenderer(
         }
     }
 
-    private fun cacheTimeLabels() = with(viewState) {
+    private fun updateTimeLabels() = with(viewState) {
+        var maxLineLength = 0f
+        var maxLineHeight = 0
+
+        timeLabelLayouts.clear()
         for (hour in displayedHours) {
             val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
+            maxLineLength = textLayout.maxLineLength
+            maxLineHeight = textLayout.height
             timeLabelLayouts.put(hour, textLayout)
         }
+
+        updateTimeColumnBounds(
+            lineLength = maxLineLength,
+            lineHeight = maxLineHeight.toFloat()
+        )
     }
 }

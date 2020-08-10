@@ -129,6 +129,8 @@ class WeekView @JvmOverloads constructor(
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.onSizeChanged(width, height)
         renderers.forEach { it.onSizeChanged(width, height) }
+
+        // TODO: Fix broken scrolling after orientation change
     }
 
     private fun notifyScrollListeners() {
@@ -1223,6 +1225,7 @@ class WeekView @JvmOverloads constructor(
         renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
             it.onDateFormatterChanged(formatter)
         }
+        invalidate()
     }
 
     @PublicApi
@@ -1231,6 +1234,7 @@ class WeekView @JvmOverloads constructor(
         renderers.filterIsInstance(TimeFormatterDependent::class.java).forEach {
             it.onTimeFormatterChanged(formatter)
         }
+        invalidate()
     }
 
     override fun dispatchHoverEvent(event: MotionEvent): Boolean {

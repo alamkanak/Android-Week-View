@@ -36,7 +36,6 @@ data class ViewState(
     val startPixels: MutableList<Float> = mutableListOf(),
     val dateRange: MutableList<Calendar> = mutableListOf(),
     val dateRangeWithStartPixels: MutableList<Pair<Calendar, Float>> = mutableListOf(),
-    // TODO Update this
 
     // Calendar configuration
     var firstDayOfWeek: Int = now().firstDayOfWeek,
@@ -169,9 +168,7 @@ data class ViewState(
             typeface = typeface
         }
 
-    var timeTextWidth: Float = 0.toFloat()
-
-    var timeTextHeight: Float = 0.toFloat()
+    var timeTextHeight: Float = 0f
 
     private val _headerTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -192,9 +189,9 @@ data class ViewState(
             strokeWidth = headerRowBottomLineWidth.toFloat()
         }
 
-    var headerTextHeight: Float = headerTextPaint.descent() - headerTextPaint.ascent()
+    var dateLabelHeight: Float = headerTextPaint.descent() - headerTextPaint.ascent()
 
-    var headerHeight: Float = 0.toFloat()
+    var headerHeight: Float = 0f
 
     private val _todayHeaderTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -207,7 +204,7 @@ data class ViewState(
             color = todayHeaderTextColor
         }
 
-    private var currentAllDayEventHeight: Int = 0
+    var currentAllDayEventHeight: Int = 0
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
@@ -337,8 +334,6 @@ data class ViewState(
             color = timeColumnBackgroundColor
         }
 
-    var hasEventInHeader: Boolean = false
-
     var newHourHeight: Float = 0f
 
     var minDate: Calendar? = null
@@ -348,21 +343,9 @@ data class ViewState(
         defaultDateFormatter(numberOfDays = numberOfVisibleDays).format(date.time)
     }
 
-    private var _timeFormatter: TimeFormatter = { hour ->
+    var timeFormatter: TimeFormatter = { hour ->
         val date = now().withTime(hour = hour, minutes = 0)
         defaultTimeFormatter().format(date.time)
-    }
-
-    var timeFormatter: TimeFormatter
-        get() = _timeFormatter
-        set(value) {
-            _timeFormatter = value
-            initTimeColumnTextBounds()
-        }
-
-    init {
-        initTimeColumnTextBounds()
-        refreshHeaderHeight()
     }
 
     val minX: Float
@@ -387,9 +370,6 @@ data class ViewState(
 
     val totalDayWidth: Float
         get() = widthPerDay + columnGap
-
-//    val headerRowBottomLineWidth: Float
-//        get() = if (showHeaderRowBottomLine) headerRowBottomLinePaint.strokeWidth else 0f
 
     private val _weekNumberBounds: RectF = RectF()
 
@@ -436,10 +416,6 @@ data class ViewState(
     val displayedHours: IntProgression
         get() = timeRange step timeColumnHoursInterval
 
-    private fun calculateTimeColumnWidth() {
-        timeColumnWidth = timeTextWidth + timeColumnPadding * 2
-    }
-
     private fun calculateWidthPerDay() {
         val viewWidth = viewWidth.toFloat()
         val availableWidth = viewWidth - timeColumnWidth - columnGap * numberOfVisibleDays
@@ -448,11 +424,6 @@ data class ViewState(
 
     fun getXOriginForDate(date: Calendar): Float {
         return date.daysFromToday * totalDayWidth * -1f
-    }
-
-    fun updateAllDayEventHeight(height: Int) {
-        currentAllDayEventHeight = height
-        refreshHeaderHeight()
     }
 
     private fun moveCurrentOriginIfFirstDraw() {
@@ -533,7 +504,7 @@ data class ViewState(
         }
 
         val dayHeight = hourHeight * hoursPerDay
-        val isNotFillingEntireHeight = dayHeight < (viewHeight - getTotalHeaderHeight())
+        val isNotFillingEntireHeight = dayHeight < (viewHeight - headerHeight)
         val didZoom = newHourHeight > 0
 
         if (isNotFillingEntireHeight || didZoom) {
@@ -562,11 +533,6 @@ data class ViewState(
         currentOrigin.y = min(currentOrigin.y, 0f)
     }
 
-    fun getTotalHeaderHeight(): Float {
-        // TODO: Clarify difference between this and headerHeight
-        return headerHeight + headerRowPadding * 2f
-    }
-
     fun getPastBackgroundPaint(useWeekendColor: Boolean): Paint {
         return if (useWeekendColor) pastWeekendBackgroundPaint else pastBackgroundPaint
     }
@@ -585,14 +551,17 @@ data class ViewState(
     }
 
     fun refreshHeaderHeight() {
-        headerHeight = headerRowPadding * 2 + headerTextHeight
+        headerHeight = headerRowPadding + dateLabelHeight
+
+        if (currentAllDayEventHeight > 0) {
+            headerHeight += headerRowPadding / 2
+            headerHeight += currentAllDayEventHeight.toFloat()
+        }
+
+        headerHeight += headerRowPadding
 
         if (showHeaderRowBottomLine) {
             headerHeight += headerRowBottomLinePaint.strokeWidth
-        }
-
-        if (hasEventInHeader) {
-            headerHeight += currentAllDayEventHeight.toFloat()
         }
 
         if (showCompleteDay) {
@@ -601,13 +570,10 @@ data class ViewState(
         }
     }
 
-    private fun initTimeColumnTextBounds() {
-        val textLayouts = timeRange
-            .map { _timeFormatter(it) }
-            .map { it.toTextLayout(timeTextPaint, width = Int.MAX_VALUE) }
-
-        timeTextWidth = textLayouts.map { it.maxLineLength }.max() ?: 0f
-        timeTextHeight = textLayouts.map { it.height.toFloat() }.max() ?: 0f
+    fun updateTimeColumnBounds(lineLength: Float, lineHeight: Float) {
+        timeTextHeight = lineHeight
+        timeColumnWidth = lineLength + timeColumnPadding * 2
+        calculateWidthPerDay()
     }
 
     fun update() {
@@ -622,13 +588,10 @@ data class ViewState(
     }
 
     private fun updateViewState() {
-        val totalHeaderHeight = getTotalHeaderHeight().toInt()
-        val dynamicHourHeight = (viewHeight - totalHeaderHeight) / hoursPerDay
+        val dynamicHourHeight = (viewHeight - headerHeight.toInt()) / hoursPerDay
 
         if (areDimensionsInvalid) {
             effectiveMinHourHeight = max(minHourHeight, dynamicHourHeight)
-//            scrollToDate = null
-//            scrollToHour = null
             areDimensionsInvalid = false
         }
 
@@ -665,10 +628,6 @@ data class ViewState(
     fun onSizeChanged(width: Int, height: Int) {
         viewWidth = width
         viewHeight = height
-
-        if (timeColumnWidth == 0f) {
-            calculateTimeColumnWidth()
-        }
 
         calculateWidthPerDay()
 

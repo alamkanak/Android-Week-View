@@ -7,6 +7,7 @@ import android.text.StaticLayout
 import android.util.SparseArray
 import androidx.collection.ArrayMap
 import java.util.Calendar
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class HeaderRenderer(
@@ -19,8 +20,7 @@ internal class HeaderRenderer(
 
     private val headerRowUpdater = HeaderRowUpdater(
         viewState = viewState,
-        labelLayouts = dateLabelLayouts,
-        eventChipsCache = eventChipsCache
+        labelLayouts = dateLabelLayouts
     )
 
     private val dateLabelDrawer = DayLabelsDrawer(
@@ -50,69 +50,39 @@ internal class HeaderRenderer(
     }
 
     override fun render(canvas: Canvas) {
-        if (headerRowUpdater.isRequired()) {
-            headerRowUpdater.update()
-        }
-        dateLabelDrawer.draw(canvas)
-
         if (eventsUpdater.isRequired()) {
             eventsUpdater.update()
         }
         eventsDrawer.draw(canvas)
+
+        headerRowUpdater.update()
+        dateLabelDrawer.draw(canvas)
     }
 }
 
 private class HeaderRowUpdater(
     private val viewState: ViewState,
-    private val labelLayouts: SparseArray<StaticLayout>,
-    private val eventChipsCache: EventChipsCache
+    private val labelLayouts: SparseArray<StaticLayout>
 ) : Updater {
 
-    private var previousHorizontalOrigin: Float? = null
-    private val previousAllDayEventIds = mutableSetOf<Long>()
-
-    override fun isRequired(): Boolean {
-        val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
-        val currentTimeColumnWidth = viewState.timeTextWidth + viewState.timeColumnPadding * 2
-        val didTimeColumnChange = currentTimeColumnWidth != viewState.timeColumnWidth
-        val allDayEvents = eventChipsCache.allDayEventChipsInDateRange(viewState.dateRange)
-            .map { it.eventId }
-            .toSet()
-        val didEventsChange = allDayEvents.hashCode() != previousAllDayEventIds.hashCode()
-        return (didScrollHorizontally || didTimeColumnChange || didEventsChange).also {
-            previousAllDayEventIds.clear()
-            previousAllDayEventIds += allDayEvents
-        }
-    }
-
     override fun update() {
-        val dateLabels = updateDateLabels(viewState)
-        updateHeaderHeight(viewState, dateLabels)
+        val missingDates = viewState.dateRange.filterNot { labelLayouts.contains(it.toEpochDays()) }
+        for (date in missingDates) {
+            val key = date.toEpochDays()
+            labelLayouts.put(key, calculateStaticLayoutForDate(date))
+        }
+
+        val dateLabels = viewState.dateRange.map { labelLayouts[it.toEpochDays()] }
+        updateHeaderHeight(dateLabels)
     }
 
-    private fun updateDateLabels(state: ViewState): List<StaticLayout> {
-        val textLayouts = state.dateRange.map { date ->
-            date.toEpochDays() to calculateStaticLayoutForDate(date)
-        }.toMap()
-
-        labelLayouts.clear()
-        labelLayouts += textLayouts
-
-        return textLayouts.values.toList()
-    }
+    private fun <E> SparseArray<E>.contains(key: Int): Boolean = indexOfKey(key) >= 0
 
     private fun updateHeaderHeight(
-        state: ViewState,
         dateLabels: List<StaticLayout>
     ) {
         val maximumLayoutHeight = dateLabels.map { it.height.toFloat() }.max() ?: 0f
-        state.headerTextHeight = maximumLayoutHeight
-        refreshHeaderHeight()
-    }
-
-    private fun refreshHeaderHeight() {
-        val visibleEvents = eventChipsCache.allDayEventChipsInDateRange(viewState.dateRange)
-        viewState.hasEventInHeader = visibleEvents.isNotEmpty()
+        viewState.dateLabelHeight = maximumLayoutHeight
         viewState.refreshHeaderHeight()
     }
 
@@ -135,23 +105,23 @@ private class DayLabelsDrawer(
 ) : Drawer {
 
     override fun draw(canvas: Canvas) {
-        val left = viewState.timeColumnWidth
-        val top = 0f
-        val right = canvas.width.toFloat()
-        val bottom = viewState.getTotalHeaderHeight()
-
-        canvas.drawInBounds(left, top, right, bottom) {
+        canvas.drawInBounds(
+            left = viewState.timeColumnWidth,
+            top = 0f,
+            right = canvas.width.toFloat(),
+            bottom = viewState.headerHeight
+        ) {
             viewState.dateRangeWithStartPixels.forEach { (date, startPixel) ->
-                drawLabel(date, startPixel, this)
+                drawLabel(date, startPixel)
             }
         }
     }
 
-    private fun drawLabel(day: Calendar, startPixel: Float, canvas: Canvas) {
+    private fun Canvas.drawLabel(day: Calendar, startPixel: Float) {
         val key = day.toEpochDays()
         val textLayout = dateLabelLayouts[key]
 
-        canvas.withTranslation(
+        withTranslation(
             x = startPixel + viewState.widthPerDay / 2,
             y = viewState.headerRowPadding.toFloat()
         ) {
@@ -192,7 +162,10 @@ private class AllDayEventsUpdater(
 
             val eventChips = eventChipsCache.allDayEventChipsByDate(date)
             for (eventChip in eventChips) {
-                calculateTextLayout(eventChip, modifiedStartPixel)
+                val bounds = eventChip.calculateBounds(modifiedStartPixel)
+                if (bounds != null) {
+                    eventsLabelLayouts[eventChip] = eventChip.calculateTextLayout()
+                }
             }
         }
 
@@ -201,27 +174,18 @@ private class AllDayEventsUpdater(
             .map { it.height().roundToInt() }
             .max() ?: 0
 
-        viewState.updateAllDayEventHeight(maximumChipHeight)
+        viewState.currentAllDayEventHeight = maximumChipHeight
     }
 
-    private fun calculateTextLayout(
-        eventChip: EventChip,
-        startPixel: Float
-    ) {
-        val chipRect = boundsCalculator.calculateAllDayEvent(eventChip, startPixel)
-        eventChip.bounds = if (chipRect.isValidEventBounds) chipRect else null
-
-        if (chipRect.isValidEventBounds) {
-            val textLayout = calculateChipTextLayout(eventChip)
-            if (textLayout != null) {
-                eventsLabelLayouts[eventChip] = textLayout
-            }
-        }
+    private fun EventChip.calculateBounds(startPixel: Float): RectF? {
+        val chipRect = boundsCalculator.calculateAllDayEvent(this, startPixel)
+        bounds = chipRect
+        return chipRect.takeIf { it.isValidEventBounds }
     }
 
-    private fun calculateChipTextLayout(eventChip: EventChip): StaticLayout? {
-        val event = eventChip.event
-        val bounds = checkNotNull(eventChip.bounds)
+    private fun EventChip.calculateTextLayout(): StaticLayout? {
+        val event = event
+        val bounds = checkNotNull(bounds)
 
         val fullHorizontalPadding = viewState.eventPaddingHorizontal * 2
         val fullVerticalPadding = viewState.eventPaddingVertical * 2
@@ -262,7 +226,7 @@ private class AllDayEventsUpdater(
         val chipHeight = lineHeight + fullVerticalPadding
         bounds.bottom = bounds.top + chipHeight
 
-        return eventChip.ellipsizeText(text, availableWidth, existingTextLayout = textLayout)
+        return ellipsizeText(text, availableWidth, existingTextLayout = textLayout)
     }
 
     /**
@@ -314,12 +278,12 @@ internal class AllDayEventsDrawer(
     private val eventChipDrawer = EventChipDrawer(viewState)
 
     override fun draw(canvas: Canvas) {
-        val left = viewState.timeColumnWidth
-        val top = 0f
-        val right = canvas.width.toFloat()
-        val bottom = viewState.getTotalHeaderHeight()
-
-        canvas.drawInBounds(left, top, right, bottom) {
+        canvas.drawInBounds(
+            left = viewState.timeColumnWidth,
+            top = 0f,
+            right = canvas.width.toFloat(),
+            bottom = viewState.headerHeight
+        ) {
             for ((eventChip, textLayout) in allDayEventLayouts) {
                 eventChipDrawer.draw(eventChip, canvas, textLayout)
             }

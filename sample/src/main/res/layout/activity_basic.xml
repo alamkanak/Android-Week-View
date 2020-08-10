@@ -26,7 +26,7 @@
             app:eventTextColor="@android:color/white"
             app:headerRowBottomShadowColor="@color/light_gray"
             app:headerRowBottomShadowRadius="4dp"
-            app:headerRowPadding="12dp"
+            app:headerRowPadding="8dp"
             app:hourHeight="60dp"
             app:nowLineColor="@color/accent"
             app:nowLineDotColor="@color/accent"

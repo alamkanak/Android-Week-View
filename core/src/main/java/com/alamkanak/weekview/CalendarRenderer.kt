@@ -169,8 +169,7 @@ private class BackgroundGridDrawer(
     }
 
     private fun createHourLines(): FloatArray {
-        val headerHeight = viewState.getTotalHeaderHeight()
-        val gridHeight = viewState.viewHeight - headerHeight.toInt()
+        val gridHeight = viewState.viewHeight - viewState.headerHeight
         val linesPerDay = (gridHeight / viewState.hourHeight) + 1
         val overallLines = linesPerDay.roundToInt() * (viewState.numberOfVisibleDays + 1)
         return FloatArray(overallLines * 4) // 4 lines make a cube in the grid
