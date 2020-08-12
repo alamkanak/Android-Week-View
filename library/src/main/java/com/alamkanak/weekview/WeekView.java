@@ -24,6 +24,7 @@ import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -145,6 +146,7 @@ public class WeekView extends View {
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
+    private boolean mShowOnlyRelevantHours = false;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -354,6 +356,7 @@ public class WeekView extends View {
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
+            mShowOnlyRelevantHours = a.getBoolean(R.styleable.WeekView_showOnlyRelevantHours, mShowOnlyRelevantHours);
         } finally {
             a.recycle();
         }
@@ -368,6 +371,7 @@ public class WeekView extends View {
 
         mMinimumFlingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
         mScaledTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
+
 
         // Measure settings for time column.
         mTimeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -527,21 +531,49 @@ public class WeekView extends View {
         }
     }
 
+
+    private boolean isEventDuringHour(int hour) {
+        for(WeekViewEvent event : mCurrentPeriodEvents) {
+            int eventYear = event.getStartTime().get(Calendar.YEAR);
+            int eventMonth = event.getStartTime().get(Calendar.MONTH);
+            int eventDay = event.getStartTime().get(Calendar.DAY_OF_MONTH);
+            Calendar today = Calendar.getInstance();
+            if(today.get(Calendar.YEAR) == eventYear && today.get(Calendar.MONTH) == eventMonth &&
+                    today.get(Calendar.DAY_OF_MONTH) == eventDay) {
+                int startHour = event.getStartTime().get(Calendar.HOUR_OF_DAY);
+                int endHour = event.getEndTime().get(Calendar.HOUR_OF_DAY);
+                if (!event.isAllDay() && startHour <= hour && endHour >= hour) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
         canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
-
+        
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
             String time = getDateTimeInterpreter().interpretTime(i);
-            if (time == null)
-                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+            if(mShowOnlyRelevantHours) {
+                if (time == null)
+                    throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+                if (isEventDuringHour(i)) {
+                    if (top < getHeight())
+                        canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+                }
+            } else {
+                if (time == null)
+                    throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+                if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+            }
         }
     }
 
