@@ -4,8 +4,8 @@ ext {
     buildConfig = [
             minSdk      : 15,
             minSdkJsr310: 26,
-            compileSdk  : 29,
-            targetSdk   : 29,
+            compileSdk  : 30,
+            targetSdk   : 30,
     ]
     versions = [
             androidxjUnit        : '1.1.1',
