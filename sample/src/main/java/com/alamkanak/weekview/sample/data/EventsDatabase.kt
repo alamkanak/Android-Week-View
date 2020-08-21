@@ -213,7 +213,9 @@ class EventsDatabase(context: Context) {
         val title = buildEventTitle(startTime)
 
         val spannableTitle = SpannableStringBuilder(title).apply {
-            setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (isCanceled) {
+                setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
 
         return Event(

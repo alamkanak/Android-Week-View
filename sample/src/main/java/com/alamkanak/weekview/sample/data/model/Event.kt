@@ -30,14 +30,15 @@ data class Event(
         val style = WeekViewEvent.Style.Builder()
             .setTextColor(textColor)
             .setBackgroundColor(backgroundColor)
-            .setTextStrikeThrough(isCanceled)
             .setBorderWidthResource(borderWidthResId)
             .setBorderColor(color)
             .build()
 
         val styledTitle = SpannableStringBuilder(title).apply {
             setSpan(StyleSpan(Typeface.BOLD), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (isCanceled) {
+                setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
 
         return WeekViewEvent.Builder(this)

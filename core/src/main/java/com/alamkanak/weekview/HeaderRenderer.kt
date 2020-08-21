@@ -9,7 +9,6 @@ import android.text.StaticLayout
 import android.util.SparseArray
 import androidx.collection.ArrayMap
 import java.util.Calendar
-import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class HeaderRenderer(
@@ -73,7 +72,7 @@ private class HeaderRowUpdater(
 ) : Updater {
 
     override fun update() {
-        val missingDates = viewState.dateRange.filterNot { labelLayouts.contains(it.toEpochDays()) }
+        val missingDates = viewState.dateRange.filterNot { labelLayouts.hasKey(it.toEpochDays()) }
         for (date in missingDates) {
             val key = date.toEpochDays()
             labelLayouts.put(key, calculateStaticLayoutForDate(date))
@@ -83,7 +82,7 @@ private class HeaderRowUpdater(
         updateHeaderHeight(dateLabels)
     }
 
-    private fun <E> SparseArray<E>.contains(key: Int): Boolean = indexOfKey(key) >= 0
+    private fun <E> SparseArray<E>.hasKey(key: Int): Boolean = indexOfKey(key) >= 0
 
     private fun updateHeaderHeight(
         dateLabels: List<StaticLayout>
