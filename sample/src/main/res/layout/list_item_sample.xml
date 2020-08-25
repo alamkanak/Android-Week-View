@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/toolbar"
+    app:cardBackgroundColor="@color/gray_200"
     app:cardCornerRadius="8dp"
     app:contentPadding="@dimen/default_space">
 

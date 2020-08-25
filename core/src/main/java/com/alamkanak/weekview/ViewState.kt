@@ -10,10 +10,14 @@ import android.graphics.Typeface
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.util.TypedValue.COMPLEX_UNIT_SP
+import androidx.annotation.AttrRes
+import androidx.core.graphics.ColorUtils
 import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 typealias DateFormatter = (Calendar) -> String
 typealias TimeFormatter = (Int) -> String
@@ -29,7 +33,6 @@ internal data class ViewState(
     var scrollToHour: Int? = null,
 
     private var isFirstDraw: Boolean = true,
-    var areDimensionsInvalid: Boolean = true,
 
     // Drawing context
     private var startPixel: Float = 0f,
@@ -87,10 +90,8 @@ internal data class ViewState(
     var eventTextSize: Int = 0,
     var adaptiveEventTextSize: Boolean = false,
     var eventTextColor: Int = 0,
-
     var eventPaddingHorizontal: Int = 0,
     var eventPaddingVertical: Int = 0,
-
     var defaultEventColor: Int = 0,
     var allDayEventTextSize: Int = 0,
 
@@ -165,7 +166,7 @@ internal data class ViewState(
             textAlign = Paint.Align.RIGHT
             textSize = timeColumnTextSize.toFloat()
             color = timeColumnTextColor
-            typeface = typeface
+            typeface = this@ViewState.typeface
         }
 
     var timeTextHeight: Float = 0f
@@ -178,7 +179,10 @@ internal data class ViewState(
         get() = _headerTextPaint.apply {
             color = headerRowTextColor
             textSize = headerRowTextSize.toFloat()
-            typeface = Typeface.create(typeface, Typeface.BOLD)
+            typeface = when (this@ViewState.typeface) {
+                Typeface.DEFAULT -> Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                else -> Typeface.create(this@ViewState.typeface, Typeface.BOLD)
+            }
         }
 
     private val _headerRowBottomLinePaint: Paint = Paint()
@@ -199,9 +203,13 @@ internal data class ViewState(
 
     val todayHeaderTextPaint: TextPaint
         get() = _todayHeaderTextPaint.apply {
-            textSize = headerRowTextSize.toFloat()
-            typeface = Typeface.create(typeface, Typeface.BOLD)
             color = todayHeaderTextColor
+            textSize = headerRowTextSize.toFloat()
+            // typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            typeface = when (this@ViewState.typeface) {
+                Typeface.DEFAULT -> Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                else -> Typeface.create(this@ViewState.typeface, Typeface.BOLD)
+            }
         }
 
     var currentAllDayEventHeight: Int = 0
@@ -313,7 +321,7 @@ internal data class ViewState(
         get() = _eventTextPaint.apply {
             color = eventTextColor
             textSize = eventTextSize.toFloat()
-            typeface = typeface
+            typeface = this@ViewState.typeface
         }
 
     private val _allDayEventTextPaint: TextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
@@ -324,7 +332,7 @@ internal data class ViewState(
         get() = _allDayEventTextPaint.apply {
             color = eventTextColor
             textSize = allDayEventTextSize.toFloat()
-            typeface = typeface
+            typeface = this@ViewState.typeface
         }
 
     private val _timeColumnBackgroundPaint: Paint = Paint()
@@ -371,6 +379,26 @@ internal data class ViewState(
     val totalDayWidth: Float
         get() = widthPerDay + columnGap
 
+    private val _headerBounds: RectF = RectF()
+
+    val headerBounds: RectF
+        get() = _headerBounds.apply {
+            left = timeColumnWidth
+            top = 0f
+            right = viewWidth.toFloat()
+            bottom = headerHeight
+        }
+
+    private val _calendarGridBounds: RectF = RectF()
+
+    val calendarGridBounds: RectF
+        get() = _calendarGridBounds.apply {
+            left = timeColumnWidth
+            top = headerHeight
+            right = viewWidth.toFloat()
+            bottom = viewHeight.toFloat()
+        }
+
     private val _weekNumberBounds: RectF = RectF()
 
     val weekNumberBounds: RectF
@@ -389,7 +417,7 @@ internal data class ViewState(
         get() = _weekNumberTextPaint.apply {
             color = weekNumberTextColor
             textSize = weekNumberTextSize.toFloat()
-            typeface = this.typeface
+            typeface = this@ViewState.typeface
         }
 
     private val _weekNumberBackgroundPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -426,25 +454,18 @@ internal data class ViewState(
         return date.daysFromToday * totalDayWidth * -1f
     }
 
-    private fun moveCurrentOriginIfFirstDraw() {
-        // If the week view is being drawn for the first time, then consider the first day of the
-        // week.
+    private fun scrollToFirstDayOfWeek() {
+        // If the week view is being drawn for the first time, consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
         val currentDayIsNotToday = today.dayOfWeek != firstDayOfWeek
 
-        if (isWeekView && currentDayIsNotToday && showFirstDayOfWeekFirst) {
+        if (isWeekView && currentDayIsNotToday) {
             val difference = today.computeDifferenceWithFirstDayOfWeek()
             currentOrigin.x += (widthPerDay + columnGap) * difference
         }
 
-        if (showCurrentTimeFirst) {
-            scrollToCurrentTime()
-        }
-
-        // Overwrites the origin when today is out of date range
-        currentOrigin.x = min(currentOrigin.x, maxX)
-        currentOrigin.x = max(currentOrigin.x, minX)
+        currentOrigin.x = currentOrigin.x.limit(minValue = minX, maxValue = maxX)
     }
 
     private fun scrollToCurrentTime() {
@@ -508,15 +529,17 @@ internal data class ViewState(
         val didZoom = newHourHeight > 0
 
         if (isNotFillingEntireHeight || didZoom) {
-            newHourHeight.limit(
-                minValue = effectiveMinHourHeight.toFloat(),
+            // Compute a minimum hour height so that users can't zoom out further
+            // than the desired hours per day
+            val newMinHourHeight = (viewHeight - headerHeight) / hoursPerDay
+            val effectiveMinHourHeight = max(minHourHeight.toFloat(), newMinHourHeight)
+
+            newHourHeight = newHourHeight.limit(
+                minValue = effectiveMinHourHeight,
                 maxValue = maxHourHeight.toFloat()
             )
 
-            // Compute a minimum hour height so that users can't zoom out further
-            // than the desired hours per day
-            val minHourHeight = (viewHeight - headerHeight) / hoursPerDay
-            newHourHeight = max(newHourHeight, minHourHeight)
+            // newHourHeight = max(newHourHeight, minHourHeight)
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
             hourHeight = newHourHeight
@@ -554,8 +577,7 @@ internal data class ViewState(
         headerHeight = headerRowPadding + dateLabelHeight
 
         if (currentAllDayEventHeight > 0) {
-            headerHeight += headerRowPadding / 2
-            headerHeight += currentAllDayEventHeight.toFloat()
+            headerHeight += headerRowPadding + currentAllDayEventHeight.toFloat()
         }
 
         headerHeight += headerRowPadding
@@ -588,17 +610,19 @@ internal data class ViewState(
     }
 
     private fun updateViewState() {
-        val dynamicHourHeight = (viewHeight - headerHeight.toInt()) / hoursPerDay
-
-        if (areDimensionsInvalid) {
-            effectiveMinHourHeight = max(minHourHeight, dynamicHourHeight)
-            areDimensionsInvalid = false
+        if (!isFirstDraw) {
+            return
         }
 
-        if (isFirstDraw) {
-            moveCurrentOriginIfFirstDraw()
-            isFirstDraw = false
+        if (showFirstDayOfWeekFirst) {
+            scrollToFirstDayOfWeek()
         }
+
+        if (showCurrentTimeFirst) {
+            scrollToCurrentTime()
+        }
+
+        isFirstDraw = false
     }
 
     private fun updateDateRange() {
@@ -643,10 +667,6 @@ internal data class ViewState(
         calculateWidthPerDay()
     }
 
-    fun invalidate() {
-        areDimensionsInvalid = true
-    }
-
     companion object {
         fun make(context: Context, attrs: AttributeSet?): ViewState {
             val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
@@ -661,26 +681,26 @@ internal data class ViewState(
 
                 // Header bottom line
                 showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false),
-                headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, Defaults.GRID_COLOR),
+                headerRowBottomLineColor = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, context.lineColor),
                 headerRowBottomLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomLineWidth, 1),
 
                 // Header bottom shadow
                 showHeaderRowBottomShadow = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomShadow, false),
-                headerRowBottomShadowColor = a.getColor(R.styleable.WeekView_headerRowBottomShadowColor, Color.LTGRAY),
-                headerRowBottomShadowRadius = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomShadowRadius, 2),
+                headerRowBottomShadowColor = a.getColor(R.styleable.WeekView_headerRowBottomShadowColor, context.shadowColor),
+                headerRowBottomShadowRadius = a.getDimensionPixelSize(R.styleable.WeekView_headerRowBottomShadowRadius, 4),
 
                 // Time column
-                timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, Color.BLACK),
-                timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, Color.WHITE),
+                timeColumnTextColor = a.getColor(R.styleable.WeekView_timeColumnTextColor, context.textColorPrimary),
+                timeColumnBackgroundColor = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, context.windowBackground),
                 timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10),
-                timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, Defaults.textSize(context)),
+                timeColumnTextSize = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnTextSize, context.defaultTextSize),
                 showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, false),
                 showTimeColumnHourSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false),
                 timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1),
 
                 // Time column separator
                 showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false),
-                timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, Defaults.GRID_COLOR),
+                timeColumnSeparatorColor = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, context.lineColor),
                 timeColumnSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1),
 
                 // Time range
@@ -688,25 +708,25 @@ internal data class ViewState(
                 maxHour = a.getInt(R.styleable.WeekView_maxHour, 24),
 
                 // Header row
-                headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, Color.BLACK),
-                headerRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, Color.WHITE),
-                headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, Defaults.textSize(context)),
+                headerRowTextColor = a.getColor(R.styleable.WeekView_headerRowTextColor, context.textColorPrimary),
+                headerRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, context.windowBackground),
+                headerRowTextSize = a.getDimensionPixelSize(R.styleable.WeekView_headerRowTextSize, context.defaultTextSize),
                 headerRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, 10),
-                todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, Defaults.HIGHLIGHT_COLOR),
+                todayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, context.colorAccent),
 
                 // Week number
                 showWeekNumber = a.getBoolean(R.styleable.WeekView_showWeekNumber, false),
                 weekNumberTextColor = a.getColor(R.styleable.WeekView_weekNumberTextColor, Color.WHITE),
-                weekNumberTextSize = a.getDimensionPixelSize(R.styleable.WeekView_weekNumberTextSize, Defaults.textSize(context)),
+                weekNumberTextSize = a.getDimensionPixelSize(R.styleable.WeekView_weekNumberTextSize, context.defaultTextSize),
                 weekNumberBackgroundColor = a.getColor(R.styleable.WeekView_weekNumberBackgroundColor, Color.LTGRAY),
                 weekNumberBackgroundCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_weekNumberBackgroundCornerRadius, 0),
 
                 // Event chips
                 eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0),
-                eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, Defaults.textSize(context)),
+                eventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, context.defaultTextSize),
                 adaptiveEventTextSize = a.getBoolean(R.styleable.WeekView_adaptiveEventTextSize, false),
-                eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.BLACK),
-                defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, Defaults.EVENT_COLOR),
+                eventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, Color.WHITE),
+                defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, context.colorAccent),
 
                 // Event padding
                 eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, 8),
@@ -719,12 +739,12 @@ internal data class ViewState(
                 eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0),
 
                 // Colors
-                dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, Defaults.BACKGROUND_COLOR),
-                todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, Defaults.BACKGROUND_COLOR),
+                dayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.windowBackground),
+                todayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, context.windowBackground),
                 showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false),
                 showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, false),
-                pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, Defaults.PAST_BACKGROUND_COLOR),
-                futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, Defaults.FUTURE_BACKGROUND_COLOR),
+                pastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, context.windowBackground),
+                futureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, context.windowBackground),
 
                 // Hour height
                 hourHeight = a.getDimension(R.styleable.WeekView_hourHeight, 50f),
@@ -734,22 +754,22 @@ internal data class ViewState(
 
                 // Now line
                 showNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, false),
-                nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, Defaults.NOW_COLOR),
+                nowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, context.colorAccent),
                 nowLineStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_nowLineStrokeWidth, 5),
 
                 // Now line dot
                 showNowLineDot = a.getBoolean(R.styleable.WeekView_showNowLineDot, false),
-                nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, Defaults.NOW_COLOR),
+                nowLineDotColor = a.getColor(R.styleable.WeekView_nowLineDotColor, context.colorAccent),
                 nowLineDotRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowLineDotRadius, 16),
 
                 // Hour separators
                 showHourSeparators = a.getBoolean(R.styleable.WeekView_showHourSeparator, true),
-                hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, Defaults.SEPARATOR_COLOR),
+                hourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, context.lineColor),
                 hourSeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorStrokeWidth, 2),
 
                 // Day separators
                 showDaySeparators = a.getBoolean(R.styleable.WeekView_showDaySeparator, true),
-                daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, Defaults.SEPARATOR_COLOR),
+                daySeparatorColor = a.getColor(R.styleable.WeekView_daySeparatorColor, context.lineColor),
                 daySeparatorStrokeWidth = a.getDimensionPixelSize(R.styleable.WeekView_daySeparatorStrokeWidth, 2),
 
                 // Scrolling
@@ -761,14 +781,13 @@ internal data class ViewState(
             ).apply {
                 pastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, pastBackgroundColor)
                 futureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, futureBackgroundColor)
-                effectiveMinHourHeight = minHourHeight
-
                 allDayEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventTextSize, eventTextSize)
+                effectiveMinHourHeight = minHourHeight
 
                 // Font
                 val fontFamily = a.getString(R.styleable.WeekView_fontFamily)
-                val typefaceIndex = a.getInteger(R.styleable.WeekView_typeface, 0)
-                val textStyle = a.getInteger(R.styleable.WeekView_textStyle, 0)
+                val typefaceIndex = a.getInteger(R.styleable.WeekView_typeface, Typeface.NORMAL)
+                val textStyle = a.getInteger(R.styleable.WeekView_textStyle, Typeface.NORMAL)
                 typeface = getTypefaceFromAttrs(fontFamily, typefaceIndex, textStyle)
             }.also {
                 a.recycle()
@@ -805,20 +824,28 @@ private fun TypedArray.getInt(index: Int): Int? {
     return if (hasValue(index)) getInteger(index, 0) else null
 }
 
-private object Defaults {
-    const val BACKGROUND_COLOR = Color.WHITE
-    val PAST_BACKGROUND_COLOR = Color.rgb(227, 227, 227)
-    val FUTURE_BACKGROUND_COLOR = Color.rgb(245, 245, 245)
-
-    val EVENT_COLOR = Color.rgb(159, 198, 231)
-
-    val GRID_COLOR = Color.rgb(102, 102, 102)
-    const val NOW_COLOR = Color.BLACK
-    val SEPARATOR_COLOR = Color.rgb(230, 230, 230)
-    val HIGHLIGHT_COLOR = Color.rgb(39, 137, 228)
-
-    fun textSize(context: Context): Int {
-        val displayMetrics = context.resources.displayMetrics
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, displayMetrics).toInt()
-    }
+private fun Context.resolveColor(@AttrRes resourceId: Int, alpha: Double = 1.0): Int {
+    val typedValue = TypedValue()
+    val typedArray = obtainStyledAttributes(typedValue.data, intArrayOf(resourceId))
+    val color = ColorUtils.setAlphaComponent(typedArray.getColor(0, 0), (alpha * 255).roundToInt())
+    typedArray.recycle()
+    return color
 }
+
+private val Context.colorAccent: Int
+    get() = resolveColor(R.attr.colorAccent)
+
+private val Context.lineColor: Int
+    get() = resolveColor(android.R.attr.textColorTertiary, alpha = 0.1)
+
+private val Context.shadowColor: Int
+    get() = resolveColor(android.R.attr.textColorTertiary, alpha = 0.4)
+
+private val Context.textColorPrimary: Int
+    get() = resolveColor(android.R.attr.textColorPrimary)
+
+private val Context.windowBackground: Int
+    get() = resolveColor(android.R.attr.windowBackground)
+
+private val Context.defaultTextSize: Int
+    get() = TypedValue.applyDimension(COMPLEX_UNIT_SP, 12f, resources.displayMetrics).toInt()

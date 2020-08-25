@@ -13,10 +13,10 @@ internal fun <T> WeekViewEvent<T>.resolve(
 ): ResolvedWeekViewEvent<T> {
     return ResolvedWeekViewEvent(
         id = id,
-        title = titleResource.resolve(context, shouldSetBold = true),
+        title = titleResource.resolve(context, semibold = true),
         startTime = startTime,
         endTime = endTime,
-        location = locationResource?.resolve(context, shouldSetBold = false),
+        location = locationResource?.resolve(context, semibold = false),
         isAllDay = isAllDay,
         style = style.resolve(context),
         data = data

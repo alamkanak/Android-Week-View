@@ -41,12 +41,12 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
         val adapter = WeekView.SimpleAdapter<Event>()
         weekView.adapter = adapter
 
-        val events = database.getEventsInRange(start, end)
-        adapter.submit(events)
-
         // Limit WeekView to the current month
         weekView.minDate = start
         weekView.maxDate = end
+
+        val events = database.getEventsInRange(start, end)
+        adapter.submit(events)
     }
 
     private fun getStartDate(): Calendar = Calendar.getInstance().apply {

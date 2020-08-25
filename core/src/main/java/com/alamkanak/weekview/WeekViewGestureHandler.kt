@@ -229,8 +229,10 @@ internal class WeekViewGestureHandler(
         scaleDetector.onTouchEvent(event)
         val handled = gestureDetector.onTouchEvent(event)
 
-        if (event.action == ACTION_UP && currentScrollDirection != None && currentFlingDirection == None) {
-            goToNearestOrigin()
+        if (event.action == ACTION_UP && currentFlingDirection == None) {
+            if (currentScrollDirection.isHorizontal) {
+                goToNearestOrigin()
+            }
             currentScrollDirection = None
         } else if (event.action == ACTION_DOWN) {
             preFlingFirstVisibleDate = viewState.firstVisibleDate.copy()

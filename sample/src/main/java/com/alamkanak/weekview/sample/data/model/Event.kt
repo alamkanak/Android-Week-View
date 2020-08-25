@@ -1,11 +1,10 @@
 package com.alamkanak.weekview.sample.data.model
 
 import android.graphics.Color
-import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.style.StrikethroughSpan
-import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.WeekViewEvent
 import com.alamkanak.weekview.sample.R
@@ -35,7 +34,14 @@ data class Event(
             .build()
 
         val styledTitle = SpannableStringBuilder(title).apply {
-            setSpan(StyleSpan(Typeface.BOLD), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            val titleSpan = TypefaceSpan("sans-serif-medium")
+            setSpan(titleSpan, 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (isCanceled) {
+                setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+
+        val styledLocation = SpannableStringBuilder(location).apply {
             if (isCanceled) {
                 setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             }
@@ -46,7 +52,7 @@ data class Event(
             .setTitle(styledTitle)
             .setStartTime(startTime)
             .setEndTime(endTime)
-            .setLocation(location)
+            .setLocation(styledLocation)
             .setAllDay(isAllDay)
             .setStyle(style)
             .build()

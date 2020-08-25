@@ -25,6 +25,12 @@ internal data class EventChip(
 ) {
 
     /**
+     * A unique ID of this [EventChip].
+     */
+    val id: String
+        get() = "$eventId-${this.event.startTime.timeInMillis}"
+
+    /**
      * The ID of the [ResolvedWeekViewEvent] that this [EventChip] represents.
      */
     val eventId: Long
@@ -33,7 +39,7 @@ internal data class EventChip(
     /**
      * The rectangle in which the [ResolvedWeekViewEvent] will be drawn.
      */
-    var bounds: RectF? = null
+    var bounds: RectF = RectF()
 
     /**
      * The relative start position of the [EventChip].
@@ -64,8 +70,8 @@ internal data class EventChip(
         horizontalPadding: Int,
         verticalPadding: Int
     ): Boolean {
-        val availableWidth = (area.right - area.left - horizontalPadding).toInt()
-        val availableHeight = (area.bottom - area.top - verticalPadding).toInt()
+        val availableWidth = (area.width() - horizontalPadding).toInt()
+        val availableHeight = (area.height() - verticalPadding).toInt()
         return availableWidth != availableWidthCache || availableHeight != availableHeightCache
     }
 
@@ -75,14 +81,12 @@ internal data class EventChip(
     }
 
     fun clearCache() {
-        bounds = null
+        bounds.setEmpty()
         availableWidthCache = 0
         availableHeightCache = 0
     }
 
     fun isHit(x: Float, y: Float): Boolean {
-        return bounds?.let {
-            x > it.left && x < it.right && y > it.top && y < it.bottom
-        } ?: false
+        return x > bounds.left && x < bounds.right && y > bounds.top && y < bounds.bottom
     }
 }

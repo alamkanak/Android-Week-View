@@ -11,13 +11,12 @@ internal class EventChipBoundsCalculator(
         startPixel: Float
     ): RectF {
         val widthPerDay = viewState.widthPerDay
-        val singleVerticalMargin = viewState.eventMarginVertical / 2
 
         val minutesFromStart = eventChip.minutesFromStartHour
-        val top = calculateDistanceFromTop(minutesFromStart) + singleVerticalMargin
+        val top = calculateDistanceFromTop(minutesFromStart)
 
         val bottomMinutesFromStart = minutesFromStart + eventChip.event.durationInMinutes
-        val bottom = calculateDistanceFromTop(bottomMinutesFromStart) - singleVerticalMargin
+        val bottom = calculateDistanceFromTop(bottomMinutesFromStart) - viewState.eventMarginVertical
 
         var left = startPixel + eventChip.relativeStart * widthPerDay
         var right = left + eventChip.relativeWidth * widthPerDay
@@ -52,7 +51,7 @@ internal class EventChipBoundsCalculator(
     ): RectF {
         val padding = viewState.headerRowPadding
 
-        val top = padding + viewState.dateLabelHeight + padding / 2
+        val top = padding + viewState.dateLabelHeight + padding
         val height = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2
         val bottom = top + height
 

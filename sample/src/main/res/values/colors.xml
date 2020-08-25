@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="event_color_01">#59dbe0</color>
-    <color name="event_color_02">#f57f68</color>
-    <color name="event_color_03">#87d288</color>
-    <color name="event_color_04">#f8b552</color>
-    <color name="toolbar">#efefef</color>
-    <color name="header_bottom_line">#E0E0E0</color>
-    <color name="toolbar_text">#8f000000</color>
+    <color name="event_color_01">#59DBE0</color>
+    <color name="event_color_02">#F57F68</color>
+    <color name="event_color_03">#87D288</color>
+    <color name="event_color_04">#F8B552</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="white_alpha50">#80FFFFFF</color>
+
+    <color name="gray_200">#EFEFEF</color>
+    <color name="gray_300">#E0E0E0</color>
+    <color name="gray_600">#757575</color>
+
     <color name="accent">#2789e4</color>
-    <color name="divider">#E2E2E2</color>
-    <color name="dark_gray">#aeaeae</color>
-    <color name="light_gray">#CCCCCC</color>
 </resources>

@@ -3,15 +3,20 @@ package com.alamkanak.weekview
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.text.StaticLayout
 
-fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
+internal fun Canvas.withTranslation(x: Float, y: Float, block: Canvas.() -> Unit) {
     save()
     translate(x, y)
     block()
     restore()
 }
 
-fun Canvas.drawVerticalLine(
+internal fun Canvas.draw(staticLayout: StaticLayout) {
+    staticLayout.draw(this)
+}
+
+internal fun Canvas.drawVerticalLine(
     horizontalOffset: Float,
     startY: Float,
     endY: Float,
@@ -20,21 +25,30 @@ fun Canvas.drawVerticalLine(
     drawLine(horizontalOffset, startY, horizontalOffset, endY, paint)
 }
 
-fun Canvas.drawInBounds(
-    left: Float,
-    top: Float,
-    right: Float,
-    bottom: Float,
+internal fun Canvas.drawHorizontalLine(
+    verticalOffset: Float,
+    startX: Float,
+    endX: Float,
+    paint: Paint
+) {
+    drawLine(startX, verticalOffset, endX, verticalOffset, paint)
+}
+
+internal fun Canvas.drawInBounds(
+    bounds: RectF,
     block: Canvas.() -> Unit
 ) {
     save()
-    clipRect(left, top, right, bottom)
+    clipRect(bounds)
     block()
     restore()
 }
 
-fun RectF.insetBy(inset: Float): RectF {
+internal fun RectF.insetBy(inset: Float): RectF {
     return RectF(this).apply {
         inset(inset, inset)
     }
 }
+
+internal val RectF.isNotEmpty: Boolean
+    get() = !isEmpty

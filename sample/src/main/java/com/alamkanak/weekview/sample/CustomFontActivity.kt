@@ -40,7 +40,7 @@ private class CustomFontActivityWeekViewAdapter(
     private val formatter = SimpleDateFormat.getDateTimeInstance()
 
     override fun onEventClick(data: Event) {
-        context.showToast("Removed ${data.title}")
+        context.showToast("Clicked ${data.title}")
     }
 
     override fun onEmptyViewClick(time: Calendar) {

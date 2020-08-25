@@ -37,16 +37,16 @@ data class WeekViewEvent<T> internal constructor(
         data class Value(val text: CharSequence) : TextResource()
         data class Id(@StringRes val resId: Int) : TextResource()
 
-        fun resolve(context: Context, shouldSetBold: Boolean): CharSequence = when (this) {
+        fun resolve(context: Context, semibold: Boolean): CharSequence = when (this) {
             is Id -> {
                 val text = context.getString(resId)
-                if (shouldSetBold) text.bold() else text
+                if (semibold) text.semibold() else SpannableString(text)
             }
             is Value -> when (text) {
                 // We don't change the existing style of SpannableStrings.
                 is SpannableString -> text
                 is SpannableStringBuilder -> text.build()
-                else -> if (shouldSetBold) text.bold() else text
+                else -> if (semibold) text.semibold() else SpannableString(text)
             }
         }
     }

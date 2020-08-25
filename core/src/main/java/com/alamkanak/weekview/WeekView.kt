@@ -120,8 +120,8 @@ class WeekView @JvmOverloads constructor(
         val savedState = state as SavedState
         super.onRestoreInstanceState(savedState.superState)
 
-        if (this.viewState.restoreNumberOfVisibleDays) {
-            this.viewState.numberOfVisibleDays = savedState.numberOfVisibleDays
+        if (viewState.restoreNumberOfVisibleDays) {
+            viewState.numberOfVisibleDays = savedState.numberOfVisibleDays
         }
 
         goToDate(savedState.firstVisibleDate)
@@ -131,16 +131,11 @@ class WeekView @JvmOverloads constructor(
         super.onSizeChanged(width, height, oldWidth, oldHeight)
         viewState.onSizeChanged(width, height)
         renderers.forEach { it.onSizeChanged(width, height) }
-
-        // TODO: Fix broken scrolling after orientation change
     }
 
     private fun notifyScrollListeners() {
         val oldFirstVisibleDay = viewState.firstVisibleDate
-        val totalDayWidth = viewState.totalDayWidth
-        val visibleDays = viewState.numberOfVisibleDays
-
-        val daysScrolled = viewState.currentOrigin.x / totalDayWidth
+        val daysScrolled = viewState.currentOrigin.x / viewState.totalDayWidth
         val delta = daysScrolled.roundToInt() * (-1)
 
         val firstVisibleDate = today() + Days(delta)
@@ -148,14 +143,10 @@ class WeekView @JvmOverloads constructor(
 
         val hasFirstVisibleDayChanged = oldFirstVisibleDay.toEpochDays() != firstVisibleDate.toEpochDays()
         if (hasFirstVisibleDayChanged) {
+            val visibleDays = viewState.numberOfVisibleDays
             val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
             adapter?.onRangeChanged(firstVisibleDate, lastVisibleDate)
         }
-    }
-
-    override fun invalidate() {
-        viewState.invalidate()
-        super.invalidate()
     }
 
     /*
@@ -1105,7 +1096,7 @@ class WeekView @JvmOverloads constructor(
         gestureHandler.forceScrollFinished()
 
         val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
-        if (viewState.areDimensionsInvalid || isWaitingToBeLaidOut) {
+        if (isWaitingToBeLaidOut) {
             // If the view's dimensions have just changed or if it hasn't been laid out yet, we
             // postpone the action until onDraw() is called the next time.
             viewState.scrollToDate = adjustedDate
@@ -1126,10 +1117,6 @@ class WeekView @JvmOverloads constructor(
                 invalidate()
             }
         )
-
-//        val diff = adjustedDate.daysFromToday
-//        viewState.currentOrigin.x = diff.toFloat() * (-1f) * viewState.totalDayWidth
-//        invalidate()
     }
 
     /**
@@ -1142,7 +1129,8 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     fun goToHour(hour: Int) {
-        if (viewState.areDimensionsInvalid) {
+        val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
+        if (isWaitingToBeLaidOut) {
             viewState.scrollToHour = hour
             return
         }
@@ -1303,10 +1291,7 @@ class WeekView @JvmOverloads constructor(
             val data = findEventData(id = eventChip.eventId) ?: return false
 
             onEventClick(data)
-
-            eventChip.bounds?.let { bounds ->
-                onEventClick(data, bounds)
-            }
+            onEventClick(data, eventChip.bounds)
 
             return true
         }
@@ -1320,10 +1305,7 @@ class WeekView @JvmOverloads constructor(
             val data = findEventData(id = eventChip.eventId) ?: return false
 
             onEventLongClick(data)
-
-            eventChip.bounds?.let { bounds ->
-                onEventLongClick(data, bounds)
-            }
+            onEventLongClick(data, eventChip.bounds)
 
             return true
         }

@@ -17,15 +17,20 @@ internal class WeekViewTouchHandler(
         }
 
         val handled = adapter?.handleClick(x, y) ?: false
-        if (!handled) {
+        if (!handled && y > viewState.headerHeight) {
             val time = calculateTimeFromPoint(x, y) ?: return
             adapter?.handleEmptyViewClick(time)
         }
     }
 
     fun handleLongClick(x: Float, y: Float) {
+        val inCalendarArea = x > viewState.timeColumnWidth
+        if (!inCalendarArea) {
+            return
+        }
+
         val handled = adapter?.handleLongClick(x, y) ?: false
-        if (!handled) {
+        if (!handled && y > viewState.headerHeight) {
             adapter?.handleLongClick(x, y)
         }
     }
