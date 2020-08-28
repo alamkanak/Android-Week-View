@@ -13,8 +13,23 @@ fun <T : Any> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekV
     return setEndTime(endTime.toCalendar())
 }
 
-val WeekView.threeTenAbpAdapter: WeekViewThreeTenAbpAdapter
-    get() = WeekViewThreeTenAbpAdapter(this)
+var WeekView.minDateAsLocalDate: LocalDate?
+    get() = minDate?.toLocalDate()
+    set(value) {
+        minDate = value?.toCalendar()
+    }
+
+var WeekView.maxDateAsLocalDate: LocalDate?
+    get() = maxDate?.toLocalDate()
+    set(value) {
+        maxDate = value?.toCalendar()
+    }
+
+val WeekView.firstVisibleDateAsLocalDate: LocalDate
+    get() = firstVisibleDate.toLocalDate()
+
+val WeekView.lastVisibleDateAsLocalDate: LocalDate
+    get() = lastVisibleDate.toLocalDate()
 
 fun WeekView.goToDate(date: LocalDate) {
     goToDate(date.toCalendar())

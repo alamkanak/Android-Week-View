@@ -4,15 +4,6 @@
     <declare-styleable name="WeekView">
 
         <!-- Calendar configuration -->
-        <attr name="firstDayOfWeek" format="enum">
-            <enum name="sunday" value="1" />
-            <enum name="monday" value="2" />
-            <enum name="tuesday" value="3" />
-            <enum name="wednesday" value="4" />
-            <enum name="thursday" value="5" />
-            <enum name="friday" value="6" />
-            <enum name="saturday" value="7" />
-        </attr>
         <attr name="numberOfVisibleDays" format="integer" />
         <attr name="restoreNumberOfVisibleDays" format="boolean" />
         <attr name="showFirstDayOfWeekFirst" format="boolean" />

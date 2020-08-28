@@ -158,20 +158,6 @@ class WeekView @JvmOverloads constructor(
      */
 
     /**
-     * Returns the first day of the week. Possible values are [java.util.Calendar.SUNDAY],
-     * [java.util.Calendar.MONDAY], [java.util.Calendar.TUESDAY],
-     * [java.util.Calendar.WEDNESDAY], [java.util.Calendar.THURSDAY],
-     * [java.util.Calendar.FRIDAY], [java.util.Calendar.SATURDAY].
-     */
-    @PublicApi
-    var firstDayOfWeek: Int
-        get() = viewState.firstDayOfWeek
-        set(value) {
-            viewState.firstDayOfWeek = value
-            invalidate()
-        }
-
-    /**
      * Returns the number of visible days.
      */
     @PublicApi

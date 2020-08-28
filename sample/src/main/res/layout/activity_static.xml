@@ -20,7 +20,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_chevron_left_black_24dp" />
+            android:src="@drawable/ic_chevron_left_black_24dp" />
 
         <TextView
             android:id="@+id/dateRangeTextView"
@@ -41,7 +41,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_chevron_right_black_24dp" />
+            android:src="@drawable/ic_chevron_right_black_24dp" />
 
     </LinearLayout>
 
@@ -52,7 +52,6 @@
         app:columnGap="1dp"
         app:eventCornerRadius="4dp"
         app:eventTextColor="@color/white"
-        app:firstDayOfWeek="monday"
         app:headerRowBottomLineColor="@color/gray_300"
         app:headerRowBottomLineWidth="1dp"
         app:headerRowPadding="12dp"

@@ -192,9 +192,8 @@ internal fun firstDayOfYear(): Calendar {
     }
 }
 
-internal fun ViewState.createDateRange(start: Int, end: Int): List<Calendar> {
+internal fun createDateRange(start: Int, end: Int): List<Calendar> {
     val firstDate = today()
-    firstDate.firstDayOfWeek = firstDayOfWeek
     return (start..end).map { firstDate + Days(it - 1) }
 }
 

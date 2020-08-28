@@ -41,7 +41,6 @@ internal data class ViewState(
     val dateRangeWithStartPixels: MutableList<Pair<Calendar, Float>> = mutableListOf(),
 
     // Calendar configuration
-    var firstDayOfWeek: Int = now().firstDayOfWeek,
     var numberOfVisibleDays: Int = 0,
     var restoreNumberOfVisibleDays: Boolean = true,
     var showFirstDayOfWeekFirst: Boolean = false,
@@ -458,7 +457,7 @@ internal data class ViewState(
         // If the week view is being drawn for the first time, consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
-        val currentDayIsNotToday = today.dayOfWeek != firstDayOfWeek
+        val currentDayIsNotToday = today.dayOfWeek != today.firstDayOfWeek
 
         if (isWeekView && currentDayIsNotToday) {
             val difference = today.computeDifferenceWithFirstDayOfWeek()
@@ -672,8 +671,6 @@ internal data class ViewState(
             val a = context.theme.obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0)
             return ViewState(
                 // Calendar configuration
-                firstDayOfWeek = a.getInt(R.styleable.WeekView_firstDayOfWeek)
-                    ?: now().firstDayOfWeek,
                 numberOfVisibleDays = a.getInt(R.styleable.WeekView_numberOfVisibleDays, 3),
                 restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true),
                 showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false),
