@@ -39,11 +39,11 @@ internal class TimeColumnRenderer(
                 continue
             }
 
-            var y = topMargin - timeTextHeight / 2
+            var y = topMargin - timeColumnTextHeight / 2
 
             // If the hour separator is shown in the time column, move the time label below it
-            if (showTimeColumnHourSeparator) {
-                y += timeTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
+            if (showTimeColumnHourSeparators) {
+                y += timeColumnTextHeight / 2 + hourSeparatorPaint.strokeWidth + timeColumnPadding
             }
 
             val label = timeLabelLayouts[hour]
@@ -53,7 +53,7 @@ internal class TimeColumnRenderer(
                 label.draw(this)
             }
 
-            if (showTimeColumnHourSeparator && hour > 0) {
+            if (showTimeColumnHourSeparators && hour > 0) {
                 val j = hour - 1
                 hourLines[j * 4] = 0f
                 hourLines[j * 4 + 1] = topMargin
@@ -64,12 +64,12 @@ internal class TimeColumnRenderer(
 
         // Draw the vertical time column separator
         if (showTimeColumnSeparator) {
-            val lineX = timeColumnWidth - timeColumnSeparatorStrokeWidth
+            val lineX = timeColumnWidth - timeColumnSeparatorPaint.strokeWidth
             canvas.drawLine(lineX, headerHeight, lineX, bottom, timeColumnSeparatorPaint)
         }
 
         // Draw the hour separator inside the time column
-        if (showTimeColumnHourSeparator) {
+        if (showTimeColumnHourSeparators) {
             canvas.drawLines(hourLines, hourSeparatorPaint)
         }
     }
@@ -80,7 +80,7 @@ internal class TimeColumnRenderer(
 
         timeLabelLayouts.clear()
         for (hour in displayedHours) {
-            val textLayout = timeFormatter(hour).toTextLayout(timeTextPaint, width = Int.MAX_VALUE)
+            val textLayout = timeFormatter(hour).toTextLayout(timeColumnTextPaint, width = Int.MAX_VALUE)
             maxLineLength = textLayout.maxLineLength
             maxLineHeight = textLayout.height
             timeLabelLayouts.put(hour, textLayout)

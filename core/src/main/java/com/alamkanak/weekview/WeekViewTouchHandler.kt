@@ -46,8 +46,7 @@ internal class WeekViewTouchHandler(
         touchX: Float,
         touchY: Float
     ): Calendar? {
-        val widthPerDay = viewState.widthPerDay
-        val totalDayWidth = widthPerDay + viewState.columnGap
+        val totalDayWidth = viewState.dayWidth
         val originX = viewState.currentOrigin.x
         val timeColumnWidth = viewState.timeColumnWidth
 

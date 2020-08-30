@@ -83,23 +83,22 @@ private class SingleEventsUpdater(
             val horizontalPadding = viewState.eventPaddingHorizontal * 2
             val verticalPadding = viewState.eventPaddingVertical * 2
 
-            val chipHeight = (bounds.height() - verticalPadding).toInt()
-            val chipWidth = (bounds.width() - horizontalPadding).toInt()
-            if (chipHeight <= 0 || chipWidth <= 0) {
-                eventChip.bounds.setEmpty()
+            val availableWidth = bounds.width() - horizontalPadding
+            val availableHeight = bounds.height() - verticalPadding
+            if (availableHeight <= 0 || availableWidth <= 0) {
+                eventChip.setEmpty()
                 continue
             }
 
+            val isNotCached = eventChip.id !in eventLabels
             val didAvailableAreaChange = eventChip.didAvailableAreaChange(
-                area = bounds,
-                horizontalPadding = horizontalPadding,
-                verticalPadding = verticalPadding
+                availableWidth = availableWidth,
+                availableHeight = availableHeight
             )
-            val isCached = eventChip.id in eventLabels
 
-            if (didAvailableAreaChange || !isCached) {
-                eventChip.updateAvailableArea(chipWidth, chipHeight)
+            if (isNotCached || didAvailableAreaChange) {
                 eventLabels[eventChip.id] = textFitter.fit(eventChip = eventChip)
+                eventChip.updateAvailableArea(availableWidth, availableHeight)
             }
         }
     }
@@ -137,7 +136,7 @@ private class DayBackgroundDrawer(
         startPixel: Float,
         canvas: Canvas
     ) {
-        val endPixel = startPixel + viewState.widthPerDay
+        val endPixel = startPixel + viewState.dayWidth
         val isCompletelyHiddenByTimeColumn = endPixel <= viewState.timeColumnWidth
         if (isCompletelyHiddenByTimeColumn) {
             return
@@ -152,7 +151,7 @@ private class DayBackgroundDrawer(
             val futurePaint = viewState.getFutureBackgroundPaint(useWeekendColor)
 
             val startY = viewState.headerHeight + viewState.currentOrigin.y
-            val endX = startPixel + viewState.widthPerDay
+            val endX = startPixel + viewState.dayWidth
 
             when {
                 day.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
@@ -161,7 +160,7 @@ private class DayBackgroundDrawer(
             }
         } else {
             val todayPaint = viewState.getDayBackgroundPaint(day.isToday)
-            val right = startPixel + viewState.widthPerDay
+            val right = startPixel + viewState.dayWidth
             canvas.drawRect(actualStartPixel, viewState.headerHeight, right, height, todayPaint)
         }
     }
@@ -218,20 +217,18 @@ private class BackgroundGridDrawer(
 
     private fun Canvas.drawHourLines() {
         for (hour in viewState.displayedHours) {
-            for (startPixel in viewState.startPixels) {
-                drawHourLine(hour, startPixel)
-            }
+            drawHourLine(hour)
         }
     }
 
-    private fun Canvas.drawHourLine(hour: Int, startPixel: Float) {
-        val heightOfHour = (viewState.hourHeight * hour)
+    private fun Canvas.drawHourLine(hour: Int) {
+        val heightOfHour = (viewState.hourHeight * (hour - viewState.minHour))
         val verticalOffset = viewState.headerHeight + viewState.currentOrigin.y + heightOfHour
 
         drawHorizontalLine(
             verticalOffset = verticalOffset,
-            startX = startPixel,
-            endX = startPixel + viewState.totalDayWidth,
+            startX = viewState.timeColumnWidth,
+            endX = viewState.viewWidth.toFloat(),
             paint = viewState.hourSeparatorPaint
         )
     }
@@ -289,7 +286,7 @@ private class NowLineDrawer(
         val verticalOffset = top + portionOfDayInPixels
 
         val startX = max(startPixel, viewState.timeColumnWidth)
-        val endX = startPixel + viewState.totalDayWidth
+        val endX = startPixel + viewState.dayWidth
         drawLine(startX, verticalOffset, endX, verticalOffset, viewState.nowLinePaint)
 
         if (viewState.showNowLineDot) {
@@ -301,7 +298,7 @@ private class NowLineDrawer(
         val dotRadius = viewState.nowDotPaint.strokeWidth
         val actualStartPixel = max(startPixel, viewState.timeColumnWidth)
 
-        val fullLineWidth = viewState.totalDayWidth
+        val fullLineWidth = viewState.dayWidth
         val actualEndPixel = startPixel + fullLineWidth
 
         val currentlyDisplayedWidth = actualEndPixel - actualStartPixel

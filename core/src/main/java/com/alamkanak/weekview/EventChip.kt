@@ -28,13 +28,7 @@ internal data class EventChip(
      * A unique ID of this [EventChip].
      */
     val id: String
-        get() = "$eventId-${this.event.startTime.timeInMillis}"
-
-    /**
-     * The ID of the [ResolvedWeekViewEvent] that this [EventChip] represents.
-     */
-    val eventId: Long
-        get() = originalEvent.id
+        get() = "${event.id}-${this.event.startTime.timeInMillis}"
 
     /**
      * The rectangle in which the [ResolvedWeekViewEvent] will be drawn.
@@ -62,31 +56,26 @@ internal data class EventChip(
 
     var minutesFromStartHour: Int = 0
 
-    private var availableWidthCache: Int = 0
-    private var availableHeightCache: Int = 0
-
-    fun didAvailableAreaChange(
-        area: RectF,
-        horizontalPadding: Int,
-        verticalPadding: Int
-    ): Boolean {
-        val availableWidth = (area.width() - horizontalPadding).toInt()
-        val availableHeight = (area.height() - verticalPadding).toInt()
-        return availableWidth != availableWidthCache || availableHeight != availableHeightCache
-    }
-
-    fun updateAvailableArea(width: Int, height: Int) {
-        availableWidthCache = width
-        availableHeightCache = height
-    }
-
-    fun clearCache() {
+    fun setEmpty() {
         bounds.setEmpty()
-        availableWidthCache = 0
-        availableHeightCache = 0
+        widthCache = 0f
+        heightCache = 0f
     }
 
     fun isHit(x: Float, y: Float): Boolean {
         return x > bounds.left && x < bounds.right && y > bounds.top && y < bounds.bottom
+    }
+
+    private var widthCache: Float = 0f
+    private var heightCache: Float = 0f
+
+    fun didAvailableAreaChange(
+        availableWidth: Float,
+        availableHeight: Float
+    ): Boolean = availableWidth != widthCache || availableHeight != heightCache
+
+    fun updateAvailableArea(width: Float, height: Float) {
+        widthCache = width
+        heightCache = height
     }
 }

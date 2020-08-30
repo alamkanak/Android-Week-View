@@ -94,8 +94,8 @@ private class HeaderRowUpdater(
     private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
         val dayLabel = viewState.dateFormatter(date)
         return dayLabel.toTextLayout(
-            textPaint = if (date.isToday) viewState.todayHeaderTextPaint else viewState.headerTextPaint,
-            width = viewState.totalDayWidth.toInt()
+            textPaint = if (date.isToday) viewState.todayHeaderTextPaint else viewState.headerRowTextPaint,
+            width = viewState.dayWidth.toInt()
         )
     }
 
@@ -122,8 +122,8 @@ private class DateLabelsDrawer(
         val textLayout = dateLabelLayouts[key]
 
         withTranslation(
-            x = startPixel + viewState.widthPerDay / 2,
-            y = viewState.headerRowPadding.toFloat()
+            x = startPixel + viewState.dayWidth / 2f,
+            y = viewState.headerRowPadding
         ) {
             draw(textLayout)
         }
@@ -214,11 +214,10 @@ private class HeaderRowDrawer(
         val width = viewState.viewWidth.toFloat()
 
         val backgroundPaint = if (viewState.showHeaderRowBottomShadow) {
-            viewState.headerBackgroundPaint.withShadow(
-                radius = viewState.headerRowBottomShadowRadius,
-                color = viewState.headerRowBottomShadowColor
-            )
-        } else viewState.headerBackgroundPaint
+            viewState.headerRowBackgroundWithShadowPaint
+        } else {
+            viewState.headerRowBackgroundPaint
+        }
 
         canvas.drawRect(0f, 0f, width, viewState.headerHeight, backgroundPaint)
 
@@ -227,7 +226,7 @@ private class HeaderRowDrawer(
         }
 
         if (viewState.showHeaderRowBottomLine) {
-            val y = viewState.headerHeight - viewState.headerRowBottomLineWidth
+            val y = viewState.headerHeight - viewState.headerRowBottomLinePaint.strokeWidth
             canvas.drawLine(0f, y, width, y, viewState.headerRowBottomLinePaint)
         }
     }
@@ -251,7 +250,7 @@ private class HeaderRowDrawer(
             bounds.centerY() + height / 2f
         )
 
-        drawRect(bounds, state.headerBackgroundPaint)
+        drawRect(bounds, state.headerRowBackgroundPaint)
 
         val backgroundPaint = state.weekNumberBackgroundPaint
         val radius = state.weekNumberBackgroundCornerRadius.toFloat()
@@ -268,10 +267,4 @@ private fun Paint.getTextBounds(text: String): Rect {
     val rect = Rect()
     getTextBounds(text, 0, text.length, rect)
     return rect
-}
-
-private fun Paint.withShadow(radius: Int, color: Int): Paint {
-    return Paint(this).apply {
-        setShadowLayer(radius.toFloat(), 0f, 0f, color)
-    }
 }

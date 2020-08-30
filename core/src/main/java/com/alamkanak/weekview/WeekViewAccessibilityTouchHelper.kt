@@ -15,7 +15,6 @@ import kotlin.math.roundToInt
 internal class WeekViewAccessibilityTouchHelper(
     private val view: WeekView,
     private val viewState: ViewState,
-    private val gestureHandler: WeekViewGestureHandler,
     private val touchHandler: WeekViewTouchHandler,
     private val eventChipsCache: EventChipsCache
 ) : ExploreByTouchHelper(view) {
@@ -27,7 +26,7 @@ internal class WeekViewAccessibilityTouchHelper(
 
     override fun getVirtualViewAt(x: Float, y: Float): Int {
         // First, we check if an event chip was hit
-        val eventChip = gestureHandler.findHitEvent(x, y)
+        val eventChip = eventChipsCache.findHitEvent(x, y)
         val eventChipVirtualViewId = eventChip?.let { store[it] }
         if (eventChipVirtualViewId != null) {
             return eventChipVirtualViewId
@@ -72,12 +71,12 @@ internal class WeekViewAccessibilityTouchHelper(
         action: Int
     ): Boolean = when (action) {
         AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-            touchHandler.adapter?.onEventClick(id = eventChip.eventId)
+            touchHandler.adapter?.onEventClick(id = eventChip.originalEvent.id)
             sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
             true
         }
         AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> {
-            touchHandler.adapter?.onEventLongClick(id = eventChip.eventId)
+            touchHandler.adapter?.onEventLongClick(id = eventChip.originalEvent.id)
             sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED)
             true
         }
@@ -147,7 +146,7 @@ internal class WeekViewAccessibilityTouchHelper(
             .firstOrNull { it.first == date } ?: return
 
         val left = dateWithStartPixel.second.roundToInt()
-        val right = left + viewState.totalDayWidth.roundToInt()
+        val right = left + viewState.dayWidth.roundToInt()
         val top = viewState.headerHeight.roundToInt()
         val bottom = view.height
 

@@ -135,7 +135,7 @@ data class WeekViewEvent<T> internal constructor(
         }
     }
 
-    class Builder<T : Any> @JvmOverloads constructor(
+    class Builder<T> @JvmOverloads constructor(
         private var data: T? = null
     ) {
 

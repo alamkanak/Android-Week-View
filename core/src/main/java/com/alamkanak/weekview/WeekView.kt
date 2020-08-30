@@ -22,7 +22,7 @@ class WeekView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val viewState: ViewState by lazy {
-        ViewState.make(context, attrs)
+        ViewStateFactory.create(context, attrs)
     }
 
     private val eventChipsCache = EventChipsCache()
@@ -31,7 +31,6 @@ class WeekView @JvmOverloads constructor(
     private val gestureHandler = WeekViewGestureHandler(
         context = context,
         viewState = viewState,
-        eventChipsCache = eventChipsCache,
         touchHandler = touchHandler,
         onInvalidation = { ViewCompat.postInvalidateOnAnimation(this) }
     )
@@ -39,7 +38,6 @@ class WeekView @JvmOverloads constructor(
     private var accessibilityTouchHelper = WeekViewAccessibilityTouchHelper(
         view = this,
         viewState = viewState,
-        gestureHandler = gestureHandler,
         touchHandler = touchHandler,
         eventChipsCache = eventChipsCache
     )
@@ -135,16 +133,19 @@ class WeekView @JvmOverloads constructor(
 
     private fun notifyScrollListeners() {
         val oldFirstVisibleDay = viewState.firstVisibleDate
-        val daysScrolled = viewState.currentOrigin.x / viewState.totalDayWidth
+        val daysScrolled = viewState.currentOrigin.x / viewState.dayWidth
         val delta = daysScrolled.roundToInt() * (-1)
 
         val firstVisibleDate = today() + Days(delta)
-        viewState.firstVisibleDate = firstVisibleDate
+        val visibleDays = viewState.numberOfVisibleDays
+
+        val dateRange = firstVisibleDate.rangeWithDays(visibleDays)
+        val adjustedDateRange = dateRange.limitTo(viewState.minDate, viewState.maxDate)
+        viewState.firstVisibleDate = adjustedDateRange.first()
 
         val hasFirstVisibleDayChanged = oldFirstVisibleDay.toEpochDays() != firstVisibleDate.toEpochDays()
-        if (hasFirstVisibleDayChanged) {
-            val visibleDays = viewState.numberOfVisibleDays
-            val lastVisibleDate = firstVisibleDate + Days(visibleDays - 1)
+        if (hasFirstVisibleDayChanged && !scroller.isRunning) {
+            val lastVisibleDate = adjustedDateRange.last()
             adapter?.onRangeChanged(firstVisibleDate, lastVisibleDate)
         }
     }
@@ -164,7 +165,7 @@ class WeekView @JvmOverloads constructor(
     var numberOfVisibleDays: Int
         get() = viewState.numberOfVisibleDays
         set(value) {
-            viewState.updateNumberOfVisibleDays(value)
+            viewState.numberOfVisibleDays = value
             dateTimeInterpreter.onSetNumberOfDays(value)
             renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
                 it.onDateFormatterChanged(viewState.dateFormatter)
@@ -191,45 +192,34 @@ class WeekView @JvmOverloads constructor(
      ***********************************************************************************************
      */
 
+    /**
+     * Returns whether a horizontal line should be displayed at the bottom of the header row.
+     */
     @PublicApi
     var isShowHeaderRowBottomLine: Boolean
-        /**
-         * Returns whether a horizontal line should be displayed at the bottom of the header row.
-         */
         get() = viewState.showHeaderRowBottomLine
-        /**
-         * Sets whether a horizontal line should be displayed at the bottom of the header row.
-         */
         set(value) {
             viewState.showHeaderRowBottomLine = value
             invalidate()
         }
 
+    /**
+     * Returns the color of the horizontal line at the bottom of the header row.
+     */
     @PublicApi
     var headerRowBottomLineColor: Int
-        /**
-         * Returns the color of the horizontal line at the bottom of the header row.
-         */
         get() = viewState.headerRowBottomLinePaint.color
-        /**
-         * Sets the color of the horizontal line at the bottom of the header row. Whether the line
-         * is displayed, is determined by [isShowHeaderRowBottomLine]
-         */
         set(value) {
             viewState.headerRowBottomLinePaint.color = value
             invalidate()
         }
 
+    /**
+     * Returns the stroke width of the horizontal line at the bottom of the header row.
+     */
     @PublicApi
     var headerRowBottomLineWidth: Int
-        /**
-         * Returns the stroke width of the horizontal line at the bottom of the header row.
-         */
         get() = viewState.headerRowBottomLinePaint.strokeWidth.toInt()
-        /**
-         * Sets the stroke width of the horizontal line at the bottom of the header row. Whether the
-         * line is displayed, is determined by [isShowHeaderRowBottomLine]
-         */
         set(value) {
             viewState.headerRowBottomLinePaint.strokeWidth = value.toFloat()
             invalidate()
@@ -259,9 +249,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var timeColumnTextColor: Int
-        get() = viewState.timeColumnTextColor
+        get() = viewState.timeColumnTextPaint.color
         set(value) {
-            viewState.timeColumnTextColor = value
+            viewState.timeColumnTextPaint.color = value
             invalidate()
         }
 
@@ -270,9 +260,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var timeColumnBackgroundColor: Int
-        get() = viewState.timeColumnBackgroundColor
+        get() = viewState.timeColumnBackgroundPaint.color
         set(value) {
-            viewState.timeColumnBackgroundColor = value
+            viewState.timeColumnBackgroundPaint.color = value
             invalidate()
         }
 
@@ -280,16 +270,16 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of the labels in the time column.
      */
     @PublicApi
-    var timeColumnTextSize: Int
-        get() = viewState.timeColumnTextSize
+    var timeColumnTextSize: Float
+        get() = viewState.timeColumnTextPaint.textSize
         set(value) {
-            viewState.timeColumnTextSize = value
+            viewState.timeColumnTextPaint.textSize = value
             invalidate()
         }
 
     /**
      * Returns whether the label for the midnight hour is displayed in the time column. This setting
-     * is only considered if [isShowTimeColumnHourSeparator] is set to true.
+     * is only considered if [showTimeColumnHourSeparators] is set to true.
      */
     @PublicApi
     var isShowMidnightHour: Boolean
@@ -303,10 +293,10 @@ class WeekView @JvmOverloads constructor(
      * Returns whether a horizontal line is displayed for each hour in the time column.
      */
     @PublicApi
-    var isShowTimeColumnHourSeparator: Boolean
-        get() = viewState.showTimeColumnHourSeparator
+    var showTimeColumnHourSeparators: Boolean
+        get() = viewState.showTimeColumnHourSeparators
         set(value) {
-            viewState.showTimeColumnHourSeparator = value
+            viewState.showTimeColumnHourSeparators = value
             invalidate()
         }
 
@@ -345,9 +335,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var timeColumnSeparatorColor: Int
-        get() = viewState.timeColumnSeparatorColor
+        get() = viewState.timeColumnSeparatorPaint.color
         set(value) {
-            viewState.timeColumnSeparatorColor = value
+            viewState.timeColumnSeparatorPaint.color = value
             invalidate()
         }
 
@@ -355,10 +345,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke width of the time column separator.
      */
     @PublicApi
-    var timeColumnSeparatorWidth: Int
-        get() = viewState.timeColumnSeparatorStrokeWidth
+    var timeColumnSeparatorWidth: Float
+        get() = viewState.timeColumnSeparatorPaint.strokeWidth
         set(value) {
-            viewState.timeColumnSeparatorStrokeWidth = value
+            viewState.timeColumnSeparatorPaint.strokeWidth = value
             invalidate()
         }
 
@@ -374,7 +364,7 @@ class WeekView @JvmOverloads constructor(
      * Returns the header row padding, which is applied above and below the all-day event chips.
      */
     @PublicApi
-    var headerRowPadding: Int
+    var headerRowPadding: Float
         get() = viewState.headerRowPadding
         set(value) {
             viewState.headerRowPadding = value
@@ -386,9 +376,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var headerRowBackgroundColor: Int
-        get() = viewState.headerRowBackgroundColor
+        get() = viewState.headerRowBackgroundPaint.color
         set(value) {
-            viewState.headerRowBackgroundColor = value
+            viewState.headerRowBackgroundPaint.color = value
             invalidate()
         }
 
@@ -397,9 +387,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var headerRowTextColor: Int
-        get() = viewState.headerRowTextColor
+        get() = viewState.headerRowTextPaint.color
         set(value) {
-            viewState.headerRowTextColor = value
+            viewState.headerRowTextPaint.color = value
             invalidate()
         }
 
@@ -408,9 +398,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     var todayHeaderTextColor: Int
-        get() = viewState.todayHeaderTextColor
+        get() = viewState.todayHeaderTextPaint.color
         set(value) {
-            viewState.todayHeaderTextColor = value
+            viewState.todayHeaderTextPaint.color = value
             invalidate()
         }
 
@@ -418,10 +408,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of all date labels.
      */
     @PublicApi
-    var headerRowTextSize: Int
-        get() = viewState.headerRowTextSize
+    var headerRowTextSize: Float
+        get() = viewState.headerRowTextPaint.textSize
         set(value) {
-            viewState.headerRowTextSize = value
+            viewState.headerRowTextPaint.textSize = value
             invalidate()
         }
 
@@ -448,10 +438,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of a single-event [EventChip].
      */
     @PublicApi
-    var eventTextSize: Int
-        get() = viewState.eventTextPaint.textSize.toInt()
+    var eventTextSize: Float
+        get() = viewState.eventTextPaint.textSize
         set(value) {
-            viewState.eventTextPaint.textSize = value.toFloat()
+            viewState.eventTextPaint.textSize = value
             invalidate()
         }
 
@@ -470,10 +460,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of an all-day [EventChip].
      */
     @PublicApi
-    var allDayEventTextSize: Int
-        get() = viewState.allDayEventTextPaint.textSize.toInt()
+    var allDayEventTextSize: Float
+        get() = viewState.allDayEventTextPaint.textSize
         set(value) {
-            viewState.allDayEventTextPaint.textSize = value.toFloat()
+            viewState.allDayEventTextPaint.textSize = value
             invalidate()
         }
 
@@ -704,7 +694,7 @@ class WeekView @JvmOverloads constructor(
      * Returns the minimum height of an hour.
      */
     @PublicApi
-    var minHourHeight: Int
+    var minHourHeight: Float
         get() = viewState.minHourHeight
         set(value) {
             viewState.minHourHeight = value
@@ -715,7 +705,7 @@ class WeekView @JvmOverloads constructor(
      * Returns the maximum height of an hour.
      */
     @PublicApi
-    var maxHourHeight: Int
+    var maxHourHeight: Float
         get() = viewState.maxHourHeight
         set(value) {
             viewState.maxHourHeight = value
@@ -768,10 +758,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke width of the horizontal "now" line.
      */
     @PublicApi
-    var nowLineStrokeWidth: Int
-        get() = viewState.nowLinePaint.strokeWidth.toInt()
+    var nowLineStrokeWidth: Float
+        get() = viewState.nowLinePaint.strokeWidth
         set(value) {
-            viewState.nowLinePaint.strokeWidth = value.toFloat()
+            viewState.nowLinePaint.strokeWidth = value
             invalidate()
         }
 
@@ -802,10 +792,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the radius of the dot at the start of the "now" line.
      */
     @PublicApi
-    var nowLineDotRadius: Int
-        get() = viewState.nowDotPaint.strokeWidth.toInt()
+    var nowLineDotRadius: Float
+        get() = viewState.nowDotPaint.strokeWidth
         set(value) {
-            viewState.nowDotPaint.strokeWidth = value.toFloat()
+            viewState.nowDotPaint.strokeWidth = value
             invalidate()
         }
 
@@ -834,10 +824,10 @@ class WeekView @JvmOverloads constructor(
         }
 
     @PublicApi
-    var hourSeparatorStrokeWidth: Int
-        get() = viewState.hourSeparatorPaint.strokeWidth.toInt()
+    var hourSeparatorStrokeWidth: Float
+        get() = viewState.hourSeparatorPaint.strokeWidth
         set(value) {
-            viewState.hourSeparatorPaint.strokeWidth = value.toFloat()
+            viewState.hourSeparatorPaint.strokeWidth = value
             invalidate()
         }
 
@@ -875,10 +865,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke color of the separators between dates.
      */
     @PublicApi
-    var daySeparatorStrokeWidth: Int
-        get() = viewState.daySeparatorPaint.strokeWidth.toInt()
+    var daySeparatorStrokeWidth: Float
+        get() = viewState.daySeparatorPaint.strokeWidth
         set(value) {
-            viewState.daySeparatorPaint.strokeWidth = value.toFloat()
+            viewState.daySeparatorPaint.strokeWidth = value
             invalidate()
         }
 
@@ -1079,6 +1069,10 @@ class WeekView @JvmOverloads constructor(
     @PublicApi
     fun goToDate(date: Calendar) {
         val adjustedDate = viewState.getDateWithinDateRange(date)
+        if (adjustedDate.toEpochDays() == viewState.firstVisibleDate.toEpochDays()) {
+            return
+        }
+
         gestureHandler.forceScrollFinished()
 
         val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
@@ -1101,6 +1095,13 @@ class WeekView @JvmOverloads constructor(
             onUpdate = {
                 viewState.currentOrigin.x = it
                 invalidate()
+            },
+            onEnd = {
+                val lastVisibleDate = adjustedDate + Days(numberOfVisibleDays - 1)
+                adapter?.onRangeChanged(
+                    firstVisibleDate = adjustedDate,
+                    lastVisibleDate = lastVisibleDate
+                )
             }
         )
     }
@@ -1134,7 +1135,7 @@ class WeekView @JvmOverloads constructor(
         // We make sure that WeekView doesn't "over-scroll" by limiting the offset to the total day
         // height minus the height of WeekView, which would result in scrolling all the way to the
         // bottom.
-        val maxOffset = viewState.totalDayHeight - height
+        val maxOffset = viewState.dayHeight - height
         val finalOffset = min(maxOffset, desiredOffset) * (-1)
 
         scroller.animate(
@@ -1274,7 +1275,7 @@ class WeekView @JvmOverloads constructor(
 
         internal fun handleClick(x: Float, y: Float): Boolean {
             val eventChip = findHitEvent(x, y) ?: return false
-            val data = findEventData(id = eventChip.eventId) ?: return false
+            val data = findEventData(id = eventChip.originalEvent.id) ?: return false
 
             onEventClick(data)
             onEventClick(data, eventChip.bounds)
@@ -1288,7 +1289,7 @@ class WeekView @JvmOverloads constructor(
 
         internal fun handleLongClick(x: Float, y: Float): Boolean {
             val eventChip = findHitEvent(x, y) ?: return false
-            val data = findEventData(id = eventChip.eventId) ?: return false
+            val data = findEventData(id = eventChip.originalEvent.id) ?: return false
 
             onEventLongClick(data)
             onEventLongClick(data, eventChip.bounds)

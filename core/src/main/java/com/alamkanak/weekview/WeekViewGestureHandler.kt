@@ -29,7 +29,6 @@ private enum class Direction {
 internal class WeekViewGestureHandler(
     context: Context,
     private val viewState: ViewState,
-    private val eventChipsCache: EventChipsCache,
     private val touchHandler: WeekViewTouchHandler,
     private val onInvalidation: () -> Unit
 ) : GestureDetector.SimpleOnGestureListener() {
@@ -189,19 +188,8 @@ internal class WeekViewGestureHandler(
         touchHandler.handleLongClick(e.x, e.y)
     }
 
-    internal fun findHitEvent(x: Float, y: Float): EventChip? {
-        val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) }
-        return when {
-            candidates.isEmpty() -> null
-            // Two events hit. This is most likely because an all-day event was clicked, but a
-            // single event is rendered underneath it. We return the all-day event.
-            candidates.size == 2 -> candidates.first { it.event.isAllDay }
-            else -> candidates.first()
-        }
-    }
-
     private fun goToNearestOrigin() {
-        val dayWidth = viewState.totalDayWidth
+        val dayWidth = viewState.dayWidth
         val daysFromOrigin = viewState.currentOrigin.x / dayWidth.toDouble()
         val adjustedDaysFromOrigin = daysFromOrigin.roundToInt()
 

@@ -35,6 +35,11 @@ class StaticActivity : AppCompatActivity() {
         toolbar.setupWithWeekView(weekView)
         weekView.adapter = adapter
 
+        dateRangeTextView.text = buildDateRangeText(
+            startDate = weekView.firstVisibleDate,
+            endDate = weekView.lastVisibleDate
+        )
+
         previousWeekButton.setOnClickListener {
             val cal = weekView.firstVisibleDate
             cal.add(Calendar.DATE, -7)
@@ -53,9 +58,13 @@ class StaticActivity : AppCompatActivity() {
     }
 
     private fun onRangeChanged(startDate: Calendar, endDate: Calendar) {
+        dateRangeTextView.text = buildDateRangeText(startDate, endDate)
+    }
+
+    private fun buildDateRangeText(startDate: Calendar, endDate: Calendar): String {
         val formattedFirstDay = dateFormatter.format(startDate.time)
         val formattedLastDay = dateFormatter.format(endDate.time)
-        dateRangeTextView.text = getString(R.string.date_infos, formattedFirstDay, formattedLastDay)
+        return getString(R.string.date_infos, formattedFirstDay, formattedLastDay)
     }
 }
 

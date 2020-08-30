@@ -192,10 +192,41 @@ internal fun firstDayOfYear(): Calendar {
     }
 }
 
-internal fun createDateRange(start: Int, end: Int): List<Calendar> {
-    val firstDate = today()
-    return (start..end).map { firstDate + Days(it - 1) }
+internal typealias DateRange = List<Calendar>
+
+internal fun DateRange.limitTo(minDate: Calendar?, maxDate: Calendar?): List<Calendar> {
+    if (minDate == null && maxDate == null) {
+        return this
+    }
+
+    val firstDate = firstOrNull() ?: return this
+    val lastDate = lastOrNull() ?: return this
+    val numberOfDays = size
+
+    val mustAdjustStart = minDate != null && firstDate < minDate
+    val mustAdjustEnd = maxDate != null && lastDate > maxDate
+
+    if (mustAdjustStart && mustAdjustEnd) {
+        // The date range is longer than the range from min date to max date.
+        throw IllegalStateException("Can't render $numberOfDays days " +
+            "between the provided minDate and maxDate.")
+    }
+
+    return when {
+        mustAdjustStart -> {
+            minDate!!.rangeWithDays(numberOfDays)
+        }
+        mustAdjustEnd -> {
+            val start = maxDate!! - Days(numberOfDays - 1)
+            start.rangeWithDays(numberOfDays)
+        }
+        else -> {
+            this
+        }
+    }
 }
+
+internal fun Calendar.rangeWithDays(days: Int) = (0 until days).map { this + Days(it) }
 
 internal val Calendar.isWeekend: Boolean
     get() = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
@@ -262,14 +293,4 @@ internal fun Calendar.format(
 ): String {
     val sdf = SimpleDateFormat.getDateInstance(format)
     return sdf.format(time)
-}
-
-internal fun Calendar.limitBy(minTime: Calendar, maxTime: Calendar) {
-    if (this < minTime) {
-        hour = minTime.hour
-        minute = 0
-    } else if (this > maxTime) {
-        hour = maxTime.hour
-        minute = 0
-    }
 }
