@@ -1,5 +1,16 @@
 package com.alamkanak.weekview;
 
+import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
+import static com.alamkanak.weekview.WeekViewUtil.today;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -34,15 +45,13 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-
-import static com.alamkanak.weekview.WeekViewUtil.*;
+import com.alamkanak.weekview.interfaces.DateTimeInterpreter;
+import com.alamkanak.weekview.interfaces.EmptyViewClickListener;
+import com.alamkanak.weekview.interfaces.EmptyViewLongPressListener;
+import com.alamkanak.weekview.interfaces.EventClickListener;
+import com.alamkanak.weekview.interfaces.EventLongPressListener;
+import com.alamkanak.weekview.interfaces.ScrollListener;
+import com.alamkanak.weekview.interfaces.WeekViewLoader;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -460,6 +469,31 @@ public class WeekView extends View {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
                 mNewHourHeight = Math.round(mHourHeight * detector.getScaleFactor());
+
+                int minHourHeight = (int) (getHeight() - (mHeaderTextHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom)) / 24 + 1;
+                int maxHourHeight = 200;
+                float maxHeight = -(mHourHeight * 24 - (getHeight() - (mHeaderTextHeight + mHeaderRowPadding * 2 +mHeaderMarginBottom)));
+                if (detector.getScaleFactor() > 1 && mHourHeight < maxHourHeight) {
+                    mHourHeight=(mHourHeight + 4 * (int) detector.getScaleFactor());
+                    if (mHourHeight > maxHourHeight)
+                        mHourHeight=(maxHourHeight);
+                    // Zoom
+
+                }
+                else if (detector.getScaleFactor() < 1 && mHourHeight > minHourHeight) {
+                    mHourHeight=(mHourHeight - 4 * (int) (detector.getScaleFactor() + 1));
+                    if (mHourHeight < minHourHeight)
+                        mHourHeight=(minHourHeight);
+                    // deZoom
+                }
+                double focusedHour =12;
+                int verticalOffset = (int) (mHourHeight * focusedHour);
+                mCurrentOrigin.y = -verticalOffset + getHeight() / 2;
+                if (mCurrentOrigin.y > 0)
+                    mCurrentOrigin.y = 0;
+                if (mCurrentOrigin.y < maxHeight)
+                    mCurrentOrigin.y = maxHeight;
+
                 invalidate();
                 return true;
             }
@@ -1988,58 +2022,5 @@ public class WeekView extends View {
      */
     public double getFirstVisibleHour(){
         return -mCurrentOrigin.y / mHourHeight;
-    }
-
-
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Interfaces.
-    //
-    /////////////////////////////////////////////////////////////////
-
-    public interface EventClickListener {
-        /**
-         * Triggered when clicked on one existing event
-         * @param event: event clicked.
-         * @param eventRect: view containing the clicked event.
-         */
-        void onEventClick(WeekViewEvent event, RectF eventRect);
-    }
-
-    public interface EventLongPressListener {
-        /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
-         * @param event: event clicked.
-         * @param eventRect: view containing the clicked event.
-         */
-        void onEventLongPress(WeekViewEvent event, RectF eventRect);
-    }
-
-    public interface EmptyViewClickListener {
-        /**
-         * Triggered when the users clicks on a empty space of the calendar.
-         * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
-         */
-        void onEmptyViewClicked(Calendar time);
-    }
-
-    public interface EmptyViewLongPressListener {
-        /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
-         * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
-         */
-        void onEmptyViewLongPress(Calendar time);
-    }
-
-    public interface ScrollListener {
-        /**
-         * Called when the first visible day has changed.
-         *
-         * (this will also be called during the first draw of the weekview)
-         * @param newFirstVisibleDay The new first visible day
-         * @param oldFirstVisibleDay The old first visible day (is null on the first call).
-         */
-        void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
 }

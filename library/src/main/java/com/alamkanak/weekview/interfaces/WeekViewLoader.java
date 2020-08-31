@@ -1,4 +1,6 @@
-package com.alamkanak.weekview;
+package com.alamkanak.weekview.interfaces;
+
+import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.Calendar;
 import java.util.List;

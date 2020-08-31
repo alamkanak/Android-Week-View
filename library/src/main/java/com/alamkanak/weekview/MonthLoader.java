@@ -1,5 +1,7 @@
 package com.alamkanak.weekview;
 
+import com.alamkanak.weekview.interfaces.WeekViewLoader;
+
 import java.util.Calendar;
 import java.util.List;
 
