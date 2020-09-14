@@ -1,5 +1,13 @@
 package com.alamkanak.weekview;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -34,13 +42,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import com.alamkanak.weekview.interfaces.DateTimeInterpreter;
+import com.alamkanak.weekview.interfaces.WeekViewLoader;
 
 import static com.alamkanak.weekview.WeekViewUtil.*;
 
@@ -147,13 +150,13 @@ public class WeekView extends View {
     private int mScrollDuration = 250;
 
     // Listeners.
-    private EventClickListener mEventClickListener;
-    private EventLongPressListener mEventLongPressListener;
-    private WeekViewLoader mWeekViewLoader;
-    private EmptyViewClickListener mEmptyViewClickListener;
-    private EmptyViewLongPressListener mEmptyViewLongPressListener;
-    private DateTimeInterpreter mDateTimeInterpreter;
-    private ScrollListener mScrollListener;
+    private com.alamkanak.weekview.interfaces.EventClickListener mEventClickListener;
+    private com.alamkanak.weekview.interfaces.EventLongPressListener mEventLongPressListener;
+    private com.alamkanak.weekview.interfaces.WeekViewLoader mWeekViewLoader;
+    private com.alamkanak.weekview.interfaces.EmptyViewClickListener mEmptyViewClickListener;
+    private com.alamkanak.weekview.interfaces.EmptyViewLongPressListener mEmptyViewLongPressListener;
+    private com.alamkanak.weekview.interfaces.DateTimeInterpreter mDateTimeInterpreter;
+    private com.alamkanak.weekview.interfaces.ScrollListener mScrollListener;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -1223,21 +1226,21 @@ public class WeekView extends View {
     //
     /////////////////////////////////////////////////////////////////
 
-    public void setOnEventClickListener (EventClickListener listener) {
+    public void setOnEventClickListener (com.alamkanak.weekview.interfaces.EventClickListener listener) {
         this.mEventClickListener = listener;
     }
 
-    public EventClickListener getEventClickListener() {
+    public com.alamkanak.weekview.interfaces.EventClickListener getEventClickListener() {
         return mEventClickListener;
     }
 
-    public @Nullable MonthLoader.MonthChangeListener getMonthChangeListener() {
+    public @Nullable com.alamkanak.weekview.interfaces.MonthChangeListener getMonthChangeListener() {
         if (mWeekViewLoader instanceof MonthLoader)
             return ((MonthLoader) mWeekViewLoader).getOnMonthChangeListener();
         return null;
     }
 
-    public void setMonthChangeListener(MonthLoader.MonthChangeListener monthChangeListener) {
+    public void setMonthChangeListener(com.alamkanak.weekview.interfaces.MonthChangeListener monthChangeListener) {
         this.mWeekViewLoader = new MonthLoader(monthChangeListener);
     }
 
@@ -1261,35 +1264,35 @@ public class WeekView extends View {
         this.mWeekViewLoader = loader;
     }
 
-    public EventLongPressListener getEventLongPressListener() {
+    public com.alamkanak.weekview.interfaces.EventLongPressListener getEventLongPressListener() {
         return mEventLongPressListener;
     }
 
-    public void setEventLongPressListener(EventLongPressListener eventLongPressListener) {
+    public void setEventLongPressListener(com.alamkanak.weekview.interfaces.EventLongPressListener eventLongPressListener) {
         this.mEventLongPressListener = eventLongPressListener;
     }
 
-    public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener){
+    public void setEmptyViewClickListener(com.alamkanak.weekview.interfaces.EmptyViewClickListener emptyViewClickListener){
         this.mEmptyViewClickListener = emptyViewClickListener;
     }
 
-    public EmptyViewClickListener getEmptyViewClickListener(){
+    public com.alamkanak.weekview.interfaces.EmptyViewClickListener getEmptyViewClickListener(){
         return mEmptyViewClickListener;
     }
 
-    public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener){
+    public void setEmptyViewLongPressListener(com.alamkanak.weekview.interfaces.EmptyViewLongPressListener emptyViewLongPressListener){
         this.mEmptyViewLongPressListener = emptyViewLongPressListener;
     }
 
-    public EmptyViewLongPressListener getEmptyViewLongPressListener(){
+    public com.alamkanak.weekview.interfaces.EmptyViewLongPressListener getEmptyViewLongPressListener(){
         return mEmptyViewLongPressListener;
     }
 
-    public void setScrollListener(ScrollListener scrolledListener){
+    public void setScrollListener(com.alamkanak.weekview.interfaces.ScrollListener scrolledListener){
         this.mScrollListener = scrolledListener;
     }
 
-    public ScrollListener getScrollListener(){
+    public com.alamkanak.weekview.interfaces.ScrollListener getScrollListener(){
         return mScrollListener;
     }
 
@@ -1992,54 +1995,51 @@ public class WeekView extends View {
 
 
 
+
     /////////////////////////////////////////////////////////////////
     //
     //      Interfaces.
     //
     /////////////////////////////////////////////////////////////////
-
-    public interface EventClickListener {
-        /**
-         * Triggered when clicked on one existing event
-         * @param event: event clicked.
-         * @param eventRect: view containing the clicked event.
-         */
-        void onEventClick(WeekViewEvent event, RectF eventRect);
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.EventClickListener}  instead.
+     */
+    @Deprecated
+    public interface EventClickListener extends com.alamkanak.weekview.interfaces.EventClickListener{
     }
-
-    public interface EventLongPressListener {
-        /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
-         * @param event: event clicked.
-         * @param eventRect: view containing the clicked event.
-         */
-        void onEventLongPress(WeekViewEvent event, RectF eventRect);
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.EventLongPressListener}  instead.
+     */
+    @Deprecated
+    public interface EventLongPressListener extends com.alamkanak.weekview.interfaces.EventLongPressListener{
     }
-
-    public interface EmptyViewClickListener {
-        /**
-         * Triggered when the users clicks on a empty space of the calendar.
-         * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
-         */
-        void onEmptyViewClicked(Calendar time);
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.EmptyViewClickListener}  instead.
+     */
+    @Deprecated
+    public interface EmptyViewClickListener extends com.alamkanak.weekview.interfaces.EmptyViewClickListener{
     }
-
-    public interface EmptyViewLongPressListener {
-        /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
-         * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
-         */
-        void onEmptyViewLongPress(Calendar time);
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.EmptyViewLongPressListener}  instead.
+     */
+    @Deprecated
+    public interface EmptyViewLongPressListener extends com.alamkanak.weekview.interfaces.EmptyViewLongPressListener{
     }
+    /**
+     * @deprecated  code refractoring
+     *              {will be removed in next version} </br>
+     *              use {@link com.alamkanak.weekview.interfaces.ScrollListener}  instead.
+     */
+    @Deprecated
+    public interface ScrollListener extends com.alamkanak.weekview.interfaces.ScrollListener{
 
-    public interface ScrollListener {
-        /**
-         * Called when the first visible day has changed.
-         *
-         * (this will also be called during the first draw of the weekview)
-         * @param newFirstVisibleDay The new first visible day
-         * @param oldFirstVisibleDay The old first visible day (is null on the first call).
-         */
-        void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
 }
