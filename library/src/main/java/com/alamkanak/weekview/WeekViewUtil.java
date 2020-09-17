@@ -36,4 +36,19 @@ public class WeekViewUtil {
         today.set(Calendar.MILLISECOND, 0);
         return today;
     }
+
+    /**
+     * Checks if two times are on the same day and hour.
+     *
+     * @param dayOne The first day.
+     * @param dayTwo The second day.
+     * @return Whether the times are on the same day and hour.
+     */
+    public static boolean isSameDayAndHour(Calendar dayOne, Calendar dayTwo) {
+
+        if (dayTwo != null) {
+            return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR) && dayOne.get(Calendar.HOUR_OF_DAY) == dayTwo.get(Calendar.HOUR_OF_DAY);
+        }
+        return false;
+    }
 }
