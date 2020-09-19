@@ -52,8 +52,8 @@ internal class TextFitter(
         while (textLayout.height > availableHeight && textLayout.lineCount > 1) {
             // Remove the last lines until there's only a single line left. If it doesn't fit
             // by that point, we need to reduce the text size.
-            val lineStart = textLayout.getLineStart(textLayout.lineCount)
-            text = text.subSequence(0, lineStart).trim()
+            val startOfLastLine = textLayout.getLineStart(textLayout.lineCount)
+            text = text.substring(startIndex = 0, endIndex = startOfLastLine - 1).trim()
             textLayout = text.toTextLayout(textPaint, width = availableWidth)
         }
 
