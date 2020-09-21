@@ -14,10 +14,10 @@ class MainExecutor : Executor {
 }
 
 /**
- * A helper class that caches the submitted [WeekViewEvent]s and creates [EventChip]s on a
+ * A helper class that processes the submitted [WeekViewEvent]s and creates [EventChip]s on a
  * background thread.
  */
-internal class EventsDiffer<T>(
+internal class EventsProcessor<T>(
     private val context: Context,
     private val eventsCache: EventsCache<T>,
     private val eventChipsFactory: EventChipsFactory,
@@ -31,6 +31,7 @@ internal class EventsDiffer<T>(
      * Updates the [EventsCache] with the provided [WeekViewDisplayable]s and creates [EventChip]s.
      *
      * @param items The list of new [WeekViewDisplayable]s
+     * @param viewState The current [ViewState] of [WeekView]
      * @param onFinished Callback to inform the caller whether [WeekView] should invalidate.
      */
     fun submit(
@@ -38,7 +39,8 @@ internal class EventsDiffer<T>(
         viewState: ViewState,
         onFinished: () -> Unit
     ) {
-        backgroundExecutor.execute { submitItems(items, viewState)
+        backgroundExecutor.execute {
+            submitItems(items, viewState)
             mainThreadExecutor.execute {
                 onFinished()
             }
@@ -50,11 +52,10 @@ internal class EventsDiffer<T>(
         viewState: ViewState
     ) {
         val events = items.map { it.toResolvedWeekViewEvent(context) }
-        val startDate = events.map { it.startTime.atStartOfDay }.min()
-        val endDate = events.map { it.endTime.atEndOfDay }.max()
+        val startDate = events.map { it.startTime.atStartOfDay }.minOrNull()
+        val endDate = events.map { it.endTime.atEndOfDay }.maxOrNull()
 
         if (startDate == null || endDate == null) {
-            // If these are null, this would indicate that the submitted list of events is empty.
             // The new items are empty, but it's possible that WeekView is currently displaying
             // events.
             eventsCache.clear()

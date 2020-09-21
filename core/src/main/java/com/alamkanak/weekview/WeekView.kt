@@ -1191,16 +1191,9 @@ class WeekView @JvmOverloads constructor(
         }
 
     private fun setAdapterInternal(adapter: Adapter<*>?) {
-        if (adapter == null) {
-            internalAdapter?.unregisterObserver()
-            touchHandler.adapter = null
-            return
-        }
-
-        adapter.eventChipsCache = eventChipsCache
+        adapter?.eventChipsCache = eventChipsCache
         internalAdapter = adapter
         touchHandler.adapter = adapter
-
         internalAdapter?.registerObserver(this)
     }
 
@@ -1258,8 +1251,8 @@ class WeekView @JvmOverloads constructor(
 
         internal lateinit var eventChipsCache: EventChipsCache
 
-        internal val eventsDiffer: EventsDiffer<T> by lazy {
-            EventsDiffer(
+        internal val eventsProcessor: EventsProcessor<T> by lazy {
+            EventsProcessor(
                 context = context,
                 eventsCache = eventsCache,
                 eventChipsCache = eventChipsCache,
@@ -1318,10 +1311,6 @@ class WeekView @JvmOverloads constructor(
 
         internal fun updateObserver() {
             weekView?.invalidate()
-        }
-
-        internal fun unregisterObserver() {
-            weekView = null
         }
 
         internal fun onEventClick(id: Long) {
@@ -1417,7 +1406,7 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
-            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+            eventsProcessor.submit(events, viewState, onFinished = this::updateObserver)
         }
     }
 
@@ -1449,7 +1438,7 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
-            eventsDiffer.submit(events, viewState, onFinished = this::updateObserver)
+            eventsProcessor.submit(events, viewState, onFinished = this::updateObserver)
         }
 
         /**

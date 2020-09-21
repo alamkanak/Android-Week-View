@@ -41,7 +41,7 @@ internal class EventChipsCache {
         return results
     }
 
-    private fun put(newChips: List<EventChip>) {
+    operator fun plusAssign(newChips: List<EventChip>) {
         for (eventChip in newChips) {
             val key = eventChip.event.startTime.atStartOfDay.timeInMillis
             if (eventChip.event.isAllDay) {
@@ -51,8 +51,6 @@ internal class EventChipsCache {
             }
         }
     }
-
-    operator fun plusAssign(newChips: List<EventChip>) = put(newChips)
 
     fun findHitEvent(x: Float, y: Float): EventChip? {
         val candidates = allEventChips.filter { it.isHit(x, y) }
