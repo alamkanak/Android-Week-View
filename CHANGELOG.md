@@ -1,6 +1,25 @@
 Changelog
 =========
 
+## Version 5.0.0-beta01
+*(2020-09-29)*
+
+This beta release contains new functionality and includes breaking changes. To get started, take a look at the [wiki](https://github.com/thellmund/Android-Week-View/wiki/Getting-started-(v5-beta)).
+- New: You can now use `SpannableString` for event titles and locations to provide custom styling.
+- New: You can now choose to show the current week number in the header.
+- New: You can now elevate the header by providing a header row bottom shadow.
+- Changed: WeekView now relies on `WeekView.Adapter<T>` for submitting events and providing callbacks. As a consequence, all listeners used for click and scroll callbacks have been removed.
+- Changed: WeekView now uses `DateFormatter` and `TimeFormatter` to format date and time labels. `DateTimeInterpreter` has been deprecated and will be removed soon.
+- Changed: WeekView now scrolls more naturally. In the process, multiple scrolling-related attributes have been deprecated.
+- Changed: WeekView now automatically handles newline characters in date labels. As a consequence, the `singleLineHeader` attributes has been removed.
+- Changed: WeekView no longer uses a generic. As a consequence, you no longer need to use `findViewById<WeekView<T>>`.
+- Changed: WeekView no longer replaces events of months that have already been cached when using a paginated approach. To force-refresh the cache, call `refresh()` on an implementation of `WeekView.PagingAdapter`.
+- Fixed: WeekView no longer crashes with a `ConcurrentModificationException` when submitting new events in quick succession.
+- Fixed: WeekView no longer renders borders of multi-day events incorrectly.
+- Fixed: WeekView no longer draws the day background incorrectly when `minHour` is set.
+
+Thanks for contributing, [FeFelten](https://github.com/FeFelten)!
+
 ## Version 4.1.6
 *(2020-05-10)*
 - Fixed: WeekView would crash if restoring the state before `firstVisibleDate` was initialized.
