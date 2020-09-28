@@ -145,8 +145,6 @@ private class DayBackgroundDrawer(
         val actualStartPixel = max(startPixel, viewState.timeColumnWidth)
         val height = viewState.viewHeight.toFloat()
 
-        // TODO
-
         // If not specified, this will use the normal day background.
         val pastPaint = viewState.getPastBackgroundPaint(isWeekend = day.isWeekend)
         val futurePaint = viewState.getFutureBackgroundPaint(isWeekend = day.isWeekend)
@@ -159,24 +157,6 @@ private class DayBackgroundDrawer(
             day.isBeforeToday -> canvas.drawRect(actualStartPixel, startY, endX, height, pastPaint)
             else -> canvas.drawRect(actualStartPixel, startY, endX, height, futurePaint)
         }
-
-//        if (false /*viewState.showDistinctPastFutureColor*/) {
-//            val pastPaint = viewState.getPastBackgroundPaint(isWeekend = day.isWeekend)
-//            val futurePaint = viewState.getFutureBackgroundPaint(isWeekend = day.isWeekend)
-//
-//            val startY = viewState.headerHeight + viewState.currentOrigin.y
-//            val endX = startPixel + viewState.dayWidth
-//
-//            when {
-//                day.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
-//                day.isBeforeToday -> canvas.drawRect(actualStartPixel, startY, endX, height, pastPaint)
-//                else -> canvas.drawRect(actualStartPixel, startY, endX, height, futurePaint)
-//            }
-//        } else {
-//            val todayPaint = viewState.getDayBackgroundPaint(day.isToday)
-//            val right = startPixel + viewState.dayWidth
-//            canvas.drawRect(actualStartPixel, viewState.headerHeight, right, height, todayPaint)
-//        }
     }
 
     private fun drawPastAndFutureRect(
