@@ -155,7 +155,7 @@ private class AllDayEventsUpdater(
         for ((date, startPixel) in datesWithStartPixels) {
             // If we use a horizontal margin in the day view, we need to offset the start pixel.
             val modifiedStartPixel = when {
-                viewState.isSingleDay -> startPixel + viewState.eventMarginHorizontal.toFloat()
+                viewState.isSingleDay -> startPixel + viewState.singleDayHorizontalPadding.toFloat()
                 else -> startPixel
             }
 
@@ -253,7 +253,7 @@ private class HeaderRowDrawer(
         drawRect(bounds, state.headerRowBackgroundPaint)
 
         val backgroundPaint = state.weekNumberBackgroundPaint
-        val radius = state.weekNumberBackgroundCornerRadius.toFloat()
+        val radius = state.weekNumberBackgroundCornerRadius
         drawRoundRect(backgroundRect, radius, radius, backgroundPaint)
 
         drawText(weekNumber, bounds.centerX(), bounds.centerY() + textOffset, textPaint)

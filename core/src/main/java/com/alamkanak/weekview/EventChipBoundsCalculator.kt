@@ -31,7 +31,7 @@ internal class EventChipBoundsCalculator(
 
         val hasNoOverlaps = (right == startPixel + drawableWidth)
         if (viewState.isSingleDay && hasNoOverlaps) {
-            right -= viewState.eventMarginHorizontal * 2
+            right -= viewState.singleDayHorizontalPadding * 2
         }
 
         return RectF(left, top, right, bottom)
@@ -70,7 +70,7 @@ internal class EventChipBoundsCalculator(
 
         val hasNoOverlaps = (right == startPixel + chipWidth)
         if (viewState.isSingleDay && hasNoOverlaps) {
-            right -= viewState.eventMarginHorizontal * 2
+            right -= viewState.singleDayHorizontalPadding * 2
         }
 
         return RectF(left, top, right, bottom)

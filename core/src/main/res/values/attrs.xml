@@ -65,13 +65,11 @@
         <attr name="columnGap" format="dimension" />
         <attr name="overlappingEventGap" format="dimension" />
         <attr name="eventMarginVertical" format="dimension" />
-        <attr name="singleDayHorizontalMargin" format="dimension" />
+        <attr name="singleDayHorizontalPadding" format="dimension" />
 
         <!-- Colors -->
         <attr name="dayBackgroundColor" format="color" />
         <attr name="todayBackgroundColor" format="color" />
-        <attr name="showDistinctWeekendColor" format="boolean" />
-        <attr name="showDistinctPastFutureColor" format="boolean" />
         <attr name="pastBackgroundColor" format="color" />
         <attr name="futureBackgroundColor" format="color" />
         <attr name="pastWeekendBackgroundColor" format="color" />
@@ -104,10 +102,11 @@
         <attr name="daySeparatorStrokeWidth" format="dimension" />
 
         <!-- Scrolling -->
+        <attr name="horizontalScrollingEnabled" format="boolean" />
+
         <attr name="xScrollingSpeed" format="float" />
         <attr name="verticalFlingEnabled" format="boolean" />
         <attr name="horizontalFlingEnabled" format="boolean" />
-        <attr name="horizontalScrollingEnabled" format="boolean" />
         <attr name="scrollDuration" format="integer" />
 
         <!-- Font -->

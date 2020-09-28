@@ -57,10 +57,6 @@ internal object ViewStateFactory {
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
-        viewState.dayBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.windowBackground)
-        }
-
         viewState.hourSeparatorPaint.apply {
             color = a.getColor(R.styleable.WeekView_hourSeparatorColor, context.lineColor)
             strokeWidth = a.getDimension(R.styleable.WeekView_hourSeparatorStrokeWidth, 2f)
@@ -71,16 +67,20 @@ internal object ViewStateFactory {
             strokeWidth = a.getDimension(R.styleable.WeekView_daySeparatorStrokeWidth, 2f)
         }
 
+        viewState.dayBackgroundPaint.apply {
+            color = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.windowBackground)
+        }
+
         viewState.todayBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_todayBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_todayBackgroundColor, viewState.dayBackgroundPaint.color)
         }
 
         viewState.pastBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_pastBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_pastBackgroundColor, viewState.dayBackgroundPaint.color)
         }
 
         viewState.futureBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_futureBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_futureBackgroundColor, viewState.dayBackgroundPaint.color)
         }
 
         viewState.pastWeekendBackgroundPaint.apply {
@@ -146,7 +146,6 @@ internal object ViewStateFactory {
 
         viewState.apply {
             timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10)
-            showMidnightHour = a.getBoolean(R.styleable.WeekView_showMidnightHour, false)
             showTimeColumnHourSeparators = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false)
             timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1)
         }
@@ -181,12 +180,7 @@ internal object ViewStateFactory {
             columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)
             overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0)
             eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 2)
-            eventMarginHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalMargin, 0)
-        }
-
-        viewState.apply {
-            showDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, false)
-            showDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, false)
+            singleDayHorizontalPadding = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalPadding, 0)
         }
 
         viewState.apply {

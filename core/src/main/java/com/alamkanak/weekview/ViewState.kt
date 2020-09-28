@@ -56,7 +56,7 @@ internal class ViewState {
     var columnGap: Int = 0
     var overlappingEventGap: Int = 0
     var eventMarginVertical: Int = 0
-    var eventMarginHorizontal: Int = 0
+    var singleDayHorizontalPadding: Int = 0
 
     var hourHeight: Float = 0f
     var minHourHeight: Float = 0f
@@ -70,11 +70,8 @@ internal class ViewState {
     var showDaySeparators: Boolean = false
     var showTimeColumnSeparator: Boolean = false
     var showTimeColumnHourSeparators: Boolean = false
-    var showMidnightHour: Boolean = false
     var showHeaderRowBottomLine: Boolean = false
     var showHeaderRowBottomShadow: Boolean = false
-    var showDistinctWeekendColor: Boolean = false
-    var showDistinctPastFutureColor: Boolean = false
 
     var horizontalScrollingEnabled: Boolean = false
 
@@ -241,7 +238,7 @@ internal class ViewState {
 
     private val timeRange: IntRange
         get() {
-            val includeMidnightHour = showTimeColumnHourSeparators && showMidnightHour
+            val includeMidnightHour = showTimeColumnHourSeparators // && showMidnightHour
             val padding = if (includeMidnightHour) 0 else timeColumnHoursInterval
             val startHour = minHour + padding
             return startHour until maxHour
@@ -353,16 +350,12 @@ internal class ViewState {
         currentOrigin.y = min(currentOrigin.y, 0f)
     }
 
-    fun getPastBackgroundPaint(useWeekendColor: Boolean): Paint {
-        return if (useWeekendColor) pastWeekendBackgroundPaint else pastBackgroundPaint
+    fun getPastBackgroundPaint(isWeekend: Boolean): Paint {
+        return if (isWeekend) pastWeekendBackgroundPaint else pastBackgroundPaint
     }
 
-    fun getFutureBackgroundPaint(useWeekendColor: Boolean): Paint {
-        return if (useWeekendColor) futureWeekendBackgroundPaint else futureBackgroundPaint
-    }
-
-    fun getDayBackgroundPaint(isToday: Boolean): Paint {
-        return if (isToday) todayBackgroundPaint else dayBackgroundPaint
+    fun getFutureBackgroundPaint(isWeekend: Boolean): Paint {
+        return if (isWeekend) futureWeekendBackgroundPaint else futureBackgroundPaint
     }
 
     private fun updateHourHeight(viewHeight: Int) {

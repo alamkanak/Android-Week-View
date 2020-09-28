@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityManager
+import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
 import kotlin.math.min
@@ -174,11 +175,11 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
-     * Returns whether the first day of the week should be displayed at the left-most position
-     * when WeekView is displayed for the first time.
+     * Returns whether the first day of the week should be displayed at the start position
+     * when WeekView is rendered for the first time.
      */
     @PublicApi
-    var isShowFirstDayOfWeekFirst: Boolean
+    var showFirstDayOfWeekFirst: Boolean
         get() = viewState.showFirstDayOfWeekFirst
         set(value) {
             viewState.showFirstDayOfWeekFirst = value
@@ -196,7 +197,7 @@ class WeekView @JvmOverloads constructor(
      * Returns whether a horizontal line should be displayed at the bottom of the header row.
      */
     @PublicApi
-    var isShowHeaderRowBottomLine: Boolean
+    var showHeaderRowBottomLine: Boolean
         get() = viewState.showHeaderRowBottomLine
         set(value) {
             viewState.showHeaderRowBottomLine = value
@@ -222,6 +223,51 @@ class WeekView @JvmOverloads constructor(
         get() = viewState.headerRowBottomLinePaint.strokeWidth.toInt()
         set(value) {
             viewState.headerRowBottomLinePaint.strokeWidth = value.toFloat()
+            invalidate()
+        }
+
+    /*
+     ***********************************************************************************************
+     *
+     *   Header bottom shadow
+     *
+     ***********************************************************************************************
+     */
+
+    /**
+     * Returns whether a shadow should be displayed at the bottom of the header row.
+     */
+    @PublicApi
+    var showHeaderRowBottomShadow: Boolean
+        get() = viewState.showHeaderRowBottomShadow
+        set(value) {
+            viewState.showHeaderRowBottomShadow = value
+            invalidate()
+        }
+
+    /**
+     * Returns the color of the shadow at the bottom of the header row.
+     */
+    @PublicApi
+    var headerRowBottomShadowColor: Int
+        @RequiresApi(api = 29)
+        get() = viewState.headerRowBackgroundWithShadowPaint.shadowLayerColor
+        set(value) {
+            val paint = viewState.headerRowBackgroundWithShadowPaint
+            paint.setShadowLayer(headerRowBottomShadowRadius.toFloat(), 0f, 0f, value)
+            invalidate()
+        }
+
+    /**
+     * Returns the radius of the shadow at the bottom of the header row.
+     */
+    @PublicApi
+    var headerRowBottomShadowRadius: Int
+        @RequiresApi(api = 29)
+        get() = viewState.headerRowBackgroundWithShadowPaint.shadowLayerRadius.roundToInt()
+        set(value) {
+            val paint = viewState.headerRowBackgroundWithShadowPaint
+            paint.setShadowLayer(value.toFloat(), 0f, 0f, headerRowBottomShadowColor)
             invalidate()
         }
 
@@ -270,22 +316,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of the labels in the time column.
      */
     @PublicApi
-    var timeColumnTextSize: Float
-        get() = viewState.timeColumnTextPaint.textSize
+    var timeColumnTextSize: Int
+        get() = viewState.timeColumnTextPaint.textSize.roundToInt()
         set(value) {
-            viewState.timeColumnTextPaint.textSize = value
-            invalidate()
-        }
-
-    /**
-     * Returns whether the label for the midnight hour is displayed in the time column. This setting
-     * is only considered if [showTimeColumnHourSeparators] is set to true.
-     */
-    @PublicApi
-    var isShowMidnightHour: Boolean
-        get() = viewState.showMidnightHour
-        set(value) {
-            viewState.showMidnightHour = value
+            viewState.timeColumnTextPaint.textSize = value.toFloat()
             invalidate()
         }
 
@@ -320,10 +354,10 @@ class WeekView @JvmOverloads constructor(
      */
 
     /**
-     * Returns whether a vertical line is displayed at the end of the time column.
+     * Returns whether a vertical line is displayed between the time column and the calendar grid.
      */
     @PublicApi
-    var isShowTimeColumnSeparator: Boolean
+    var showTimeColumnSeparator: Boolean
         get() = viewState.showTimeColumnSeparator
         set(value) {
             viewState.showTimeColumnSeparator = value
@@ -345,10 +379,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke width of the time column separator.
      */
     @PublicApi
-    var timeColumnSeparatorWidth: Float
-        get() = viewState.timeColumnSeparatorPaint.strokeWidth
+    var timeColumnSeparatorWidth: Int
+        get() = viewState.timeColumnSeparatorPaint.strokeWidth.roundToInt()
         set(value) {
-            viewState.timeColumnSeparatorPaint.strokeWidth = value
+            viewState.timeColumnSeparatorPaint.strokeWidth = value.toFloat()
             invalidate()
         }
 
@@ -364,10 +398,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the header row padding, which is applied above and below the all-day event chips.
      */
     @PublicApi
-    var headerRowPadding: Float
-        get() = viewState.headerRowPadding
+    var headerRowPadding: Int
+        get() = viewState.headerRowPadding.roundToInt()
         set(value) {
-            viewState.headerRowPadding = value
+            viewState.headerRowPadding = value.toFloat()
             invalidate()
         }
 
@@ -408,10 +442,73 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of all date labels.
      */
     @PublicApi
-    var headerRowTextSize: Float
-        get() = viewState.headerRowTextPaint.textSize
+    var headerRowTextSize: Int
+        get() = viewState.headerRowTextPaint.textSize.roundToInt()
         set(value) {
-            viewState.headerRowTextPaint.textSize = value
+            viewState.headerRowTextPaint.textSize = value.toFloat()
+            invalidate()
+        }
+
+    /*
+     ***********************************************************************************************
+     *
+     *   Week number
+     *
+     ***********************************************************************************************
+     */
+
+    /**
+     * Returns whether the current week number is displayed in the header.
+     */
+    @PublicApi
+    var showWeekNumber: Boolean
+        get() = viewState.showWeekNumber
+        set(value) {
+            viewState.showWeekNumber = value
+            invalidate()
+        }
+
+    /**
+     * Returns the text color of the week number.
+     */
+    @PublicApi
+    var weekNumberTextColor: Int
+        get() = viewState.weekNumberTextPaint.color
+        set(value) {
+            viewState.weekNumberTextPaint.color = value
+            invalidate()
+        }
+
+    /**
+     * Returns the text size of the week number.
+     */
+    @PublicApi
+    var weekNumberTextSize: Int
+        get() = viewState.weekNumberTextPaint.textSize.toInt()
+        set(value) {
+            viewState.weekNumberTextPaint.textSize = value.toFloat()
+            invalidate()
+        }
+
+    /**
+     * Returns the color of the week number's background.
+     */
+    @PublicApi
+    var weekNumberBackgroundColor: Int
+        get() = viewState.weekNumberBackgroundPaint.color
+        set(value) {
+            viewState.weekNumberTextPaint.color = value
+            invalidate()
+        }
+
+    /**
+     * Returns the corner radius of the week number's background.
+     */
+    @PublicApi
+    var weekNumberBackgroundCornerRadius: Int
+        get() = viewState.weekNumberBackgroundCornerRadius.roundToInt()
+        set(value) {
+            viewState.weekNumberBackgroundCornerRadius = value.toFloat()
             invalidate()
         }
 
@@ -438,10 +535,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of a single-event [EventChip].
      */
     @PublicApi
-    var eventTextSize: Float
-        get() = viewState.eventTextPaint.textSize
+    var eventTextSize: Int
+        get() = viewState.eventTextPaint.textSize.roundToInt()
         set(value) {
-            viewState.eventTextPaint.textSize = value
+            viewState.eventTextPaint.textSize = value.toFloat()
             invalidate()
         }
 
@@ -460,10 +557,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text size of an all-day [EventChip].
      */
     @PublicApi
-    var allDayEventTextSize: Float
-        get() = viewState.allDayEventTextPaint.textSize
+    var allDayEventTextSize: Int
+        get() = viewState.allDayEventTextPaint.textSize.roundToInt()
         set(value) {
-            viewState.allDayEventTextPaint.textSize = value
+            viewState.allDayEventTextPaint.textSize = value.toFloat()
             invalidate()
         }
 
@@ -501,7 +598,7 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
-     * Returns the default text color of an [EventChip].
+     * Returns the default background color of an [EventChip].
      */
     @PublicApi
     var defaultEventColor: Int
@@ -553,14 +650,13 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
-     * Returns the horizontal margin of an [EventChip]. This margin is only applied in single-day
-     * view and if there are no overlapping events.
+     * Returns the horizontal padding used in single-day view.
      */
     @PublicApi
-    var eventMarginHorizontal: Int
-        get() = viewState.eventMarginHorizontal
+    var singleDayHorizontalPadding: Int
+        get() = viewState.singleDayHorizontalPadding
         set(value) {
-            viewState.eventMarginHorizontal = value
+            viewState.singleDayHorizontalPadding = value
             invalidate()
         }
 
@@ -591,35 +687,6 @@ class WeekView @JvmOverloads constructor(
         get() = viewState.todayBackgroundPaint.color
         set(value) {
             viewState.todayBackgroundPaint.color = value
-            invalidate()
-        }
-
-    /**
-     * Returns whether weekends should have a background color different from [dayBackgroundColor].
-     *
-     * The weekend background colors can be defined by [pastWeekendBackgroundColor] and
-     * [futureWeekendBackgroundColor].
-     */
-    @PublicApi
-    var isShowDistinctWeekendColor: Boolean
-        get() = viewState.showDistinctWeekendColor
-        set(value) {
-            viewState.showDistinctWeekendColor = value
-            invalidate()
-        }
-
-    /**
-     * Returns whether past and future days should have background colors different from
-     * [dayBackgroundColor].
-     *
-     * The past and future day colors can be defined by [pastBackgroundColor] and
-     * [futureBackgroundColor].
-     */
-    @PublicApi
-    var isShowDistinctPastFutureColor: Boolean
-        get() = viewState.showDistinctPastFutureColor
-        set(value) {
-            viewState.showDistinctPastFutureColor = value
             invalidate()
         }
 
@@ -683,10 +750,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the current height of an hour.
      */
     @PublicApi
-    var hourHeight: Float
-        get() = viewState.hourHeight
+    var hourHeight: Int
+        get() = viewState.hourHeight.roundToInt()
         set(value) {
-            viewState.newHourHeight = value
+            viewState.newHourHeight = value.toFloat()
             invalidate()
         }
 
@@ -694,10 +761,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the minimum height of an hour.
      */
     @PublicApi
-    var minHourHeight: Float
-        get() = viewState.minHourHeight
+    var minHourHeight: Int
+        get() = viewState.minHourHeight.roundToInt()
         set(value) {
-            viewState.minHourHeight = value
+            viewState.minHourHeight = value.toFloat()
             invalidate()
         }
 
@@ -705,10 +772,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the maximum height of an hour.
      */
     @PublicApi
-    var maxHourHeight: Float
-        get() = viewState.maxHourHeight
+    var maxHourHeight: Int
+        get() = viewState.maxHourHeight.roundToInt()
         set(value) {
-            viewState.maxHourHeight = value
+            viewState.maxHourHeight = value.toFloat()
             invalidate()
         }
 
@@ -717,7 +784,7 @@ class WeekView @JvmOverloads constructor(
      * adjusts to accommodate all hours between [minHour] and [maxHour].
      */
     @PublicApi
-    var isShowCompleteDay: Boolean
+    var showCompleteDay: Boolean
         get() = viewState.showCompleteDay
         set(value) {
             viewState.showCompleteDay = value
@@ -736,7 +803,7 @@ class WeekView @JvmOverloads constructor(
      * Returns whether a horizontal line should be displayed at the current time.
      */
     @PublicApi
-    var isShowNowLine: Boolean
+    var showNowLine: Boolean
         get() = viewState.showNowLine
         set(value) {
             viewState.showNowLine = value
@@ -758,19 +825,19 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke width of the horizontal "now" line.
      */
     @PublicApi
-    var nowLineStrokeWidth: Float
-        get() = viewState.nowLinePaint.strokeWidth
+    var nowLineStrokeWidth: Int
+        get() = viewState.nowLinePaint.strokeWidth.roundToInt()
         set(value) {
-            viewState.nowLinePaint.strokeWidth = value
+            viewState.nowLinePaint.strokeWidth = value.toFloat()
             invalidate()
         }
 
     /**
      * Returns whether a dot at the start of the "now" line is displayed. The dot is only displayed
-     * if [isShowNowLine] is set to true.
+     * if [showNowLine] is set to true.
      */
     @PublicApi
-    var isShowNowLineDot: Boolean
+    var showNowLineDot: Boolean
         get() = viewState.showNowLineDot
         set(value) {
             viewState.showNowLineDot = value
@@ -792,10 +859,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the radius of the dot at the start of the "now" line.
      */
     @PublicApi
-    var nowLineDotRadius: Float
-        get() = viewState.nowDotPaint.strokeWidth
+    var nowLineDotRadius: Int
+        get() = viewState.nowDotPaint.strokeWidth.roundToInt()
         set(value) {
-            viewState.nowDotPaint.strokeWidth = value
+            viewState.nowDotPaint.strokeWidth = value.toFloat()
             invalidate()
         }
 
@@ -808,7 +875,7 @@ class WeekView @JvmOverloads constructor(
      */
 
     @PublicApi
-    var isShowHourSeparators: Boolean
+    var showHourSeparators: Boolean
         get() = viewState.showHourSeparators
         set(value) {
             viewState.showHourSeparators = value
@@ -824,10 +891,10 @@ class WeekView @JvmOverloads constructor(
         }
 
     @PublicApi
-    var hourSeparatorStrokeWidth: Float
-        get() = viewState.hourSeparatorPaint.strokeWidth
+    var hourSeparatorStrokeWidth: Int
+        get() = viewState.hourSeparatorPaint.strokeWidth.roundToInt()
         set(value) {
-            viewState.hourSeparatorPaint.strokeWidth = value
+            viewState.hourSeparatorPaint.strokeWidth = value.toFloat()
             invalidate()
         }
 
@@ -843,7 +910,7 @@ class WeekView @JvmOverloads constructor(
      * Returns whether vertical lines are displayed as separators between dates.
      */
     @PublicApi
-    var isShowDaySeparators: Boolean
+    var showDaySeparators: Boolean
         get() = viewState.showDaySeparators
         set(value) {
             viewState.showDaySeparators = value
@@ -865,10 +932,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke color of the separators between dates.
      */
     @PublicApi
-    var daySeparatorStrokeWidth: Float
-        get() = viewState.daySeparatorPaint.strokeWidth
+    var daySeparatorStrokeWidth: Int
+        get() = viewState.daySeparatorPaint.strokeWidth.roundToInt()
         set(value) {
-            viewState.daySeparatorPaint.strokeWidth = value
+            viewState.daySeparatorPaint.strokeWidth = value.toFloat()
             invalidate()
         }
 

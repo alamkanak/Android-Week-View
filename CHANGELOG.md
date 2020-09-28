@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 4.1.6
+*(2020-05-10)*
+- Fixed: WeekView would crash if restoring the state before `firstVisibleDate` was initialized.
+
+Thanks for fixing this, [shuirna](https://github.com/shuirna)!
 
 ## Version 4.1.5
 *(2020-02-09)*
