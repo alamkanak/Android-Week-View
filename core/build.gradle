@@ -11,12 +11,8 @@ android {
     defaultConfig {
         minSdkVersion buildConfig.minSdk
         targetSdkVersion buildConfig.targetSdk
-
-        // Required for core library desugaring
-        multiDexEnabled true
     }
     compileOptions {
-        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -32,8 +28,6 @@ dependencies {
     implementation libraries.kotlin
     implementation libraries.appCompat
     implementation libraries.emoji
-
-    coreLibraryDesugaring libraries.coreLibraryDesugaring
 
     testImplementation testing.androidxjUnit
     testImplementation testing.androidxTestRunner

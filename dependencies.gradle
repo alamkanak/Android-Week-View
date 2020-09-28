@@ -11,7 +11,6 @@ ext {
             androidxjUnit        : '1.1.1',
             androidxTestRunner   : '1.2.0',
             appCompat            : '1.1.0',
-            coreLibraryDesugaring: '1.0.5',
             emoji                : '1.1.0',
             jodaTime             : '2.10.6',
             jodaTimeAndroid      : '2.10.6',
@@ -24,7 +23,6 @@ ext {
     ]
     libraries = [
             appCompat            : "androidx.appcompat:appcompat:${versions.appCompat}",
-            coreLibraryDesugaring: "com.android.tools:desugar_jdk_libs:${versions.coreLibraryDesugaring}",
             emoji                : "androidx.emoji:emoji-bundled:${versions.emoji}",
             jodaTime             : "joda-time:joda-time:${versions.jodaTime}",
             jodaTimeAndroid      : "net.danlew:android.joda:${versions.jodaTimeAndroid}",
