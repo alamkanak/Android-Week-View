@@ -8,6 +8,9 @@ import android.os.Looper;
 import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.sample.data.EventsDatabase;
 import com.alamkanak.weekview.sample.data.model.Event;
+import com.alamkanak.weekview.sample.util.ExtensionsKt;
+
+import org.threeten.bp.LocalDate;
 
 import java.util.Calendar;
 import java.util.List;
@@ -18,6 +21,10 @@ class EventsFetcher {
 
     public EventsFetcher(Context context) {
         database = new EventsDatabase(context);
+    }
+
+    void fetch(LocalDate startDate, LocalDate endDate, Listener listener) {
+        fetch(ExtensionsKt.toCalendar(startDate), ExtensionsKt.toCalendar(endDate), listener);
     }
 
     void fetch(Calendar startDate, Calendar endDate, Listener listener) {

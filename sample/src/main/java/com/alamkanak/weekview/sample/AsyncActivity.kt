@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.sample.data.EventsApi
 import com.alamkanak.weekview.sample.data.model.ApiEvent
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import com.alamkanak.weekview.threetenabp.WeekViewSimpleAdapterThreeTenAbp
 import kotlinx.android.synthetic.main.activity_basic.blockingProgressIndicator
 import kotlinx.android.synthetic.main.activity_basic.weekView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
 
 private data class AsyncViewState(
     val events: List<ApiEvent> = emptyList(),
@@ -56,10 +56,10 @@ class AsyncActivity : AppCompatActivity() {
         val adapter = AsyncActivityWeekViewAdapter(eventClickHandler = viewModel::remove)
         weekView.adapter = adapter
 
-        viewModel.viewState.observe(this, Observer { viewState ->
+        viewModel.viewState.observe(this) { viewState ->
             blockingProgressIndicator.isVisible = viewState.isLoading
             adapter.submit(viewState.events)
-        })
+        }
     }
 }
 
@@ -71,24 +71,24 @@ private var View.isVisible: Boolean
 
 private class AsyncActivityWeekViewAdapter(
     private val eventClickHandler: (ApiEvent) -> Unit
-) : WeekView.SimpleAdapter<ApiEvent>() {
+) : WeekViewSimpleAdapterThreeTenAbp<ApiEvent>() {
 
-    private val formatter = SimpleDateFormat.getDateTimeInstance()
+    private val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
 
     override fun onEventClick(data: ApiEvent) {
         eventClickHandler(data)
         context.showToast("Removed ${data.title}")
     }
 
-    override fun onEmptyViewClick(time: Calendar) {
-        context.showToast("Empty view clicked at ${formatter.format(time.time)}")
+    override fun onEmptyViewClick(time: LocalDateTime) {
+        context.showToast("Empty view clicked at ${formatter.format(time)}")
     }
 
     override fun onEventLongClick(data: ApiEvent) {
         context.showToast("Long-clicked ${data.title}")
     }
 
-    override fun onEmptyViewLongClick(time: Calendar) {
-        context.showToast("Empty view long-clicked at ${formatter.format(time.time)}")
+    override fun onEmptyViewLongClick(time: LocalDateTime) {
+        context.showToast("Empty view long-clicked at ${formatter.format(time)}")
     }
 }

@@ -6,9 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import java.util.Calendar
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
@@ -27,10 +24,6 @@ fun LocalDate.toCalendar(): Calendar {
     val calendar = Calendar.getInstance()
     calendar.time = DateTimeUtils.toDate(instant)
     return calendar
-}
-
-fun <T> LiveData<T>.observe(owner: LifecycleOwner, observe: (T) -> Unit) {
-    observe(owner, Observer { observe(it) })
 }
 
 fun Context.showToast(text: String) {

@@ -5,7 +5,9 @@ import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.R
 import com.alamkanak.weekview.sample.data.model.Event
+import com.alamkanak.weekview.sample.util.toCalendar
 import java.util.Calendar
+import org.threeten.bp.LocalDate
 
 class EventsDatabase(context: Context) {
 
@@ -13,6 +15,13 @@ class EventsDatabase(context: Context) {
     private val color2 = ContextCompat.getColor(context, R.color.event_color_02)
     private val color3 = ContextCompat.getColor(context, R.color.event_color_03)
     private val color4 = ContextCompat.getColor(context, R.color.event_color_04)
+
+    fun getEventsInRange(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<WeekViewDisplayable<Event>> {
+        return getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
+    }
 
     fun getEventsInRange(
         startDate: Calendar,
