@@ -3,7 +3,6 @@ package com.alamkanak.weekview
 import android.graphics.Canvas
 
 internal interface Updater {
-    fun isRequired(): Boolean = true
     fun update()
 }
 

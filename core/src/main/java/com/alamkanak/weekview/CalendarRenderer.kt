@@ -26,9 +26,7 @@ internal class CalendarRenderer(
     )
 
     override fun render(canvas: Canvas) {
-        if (eventsUpdater.isRequired()) {
-            eventsUpdater.update()
-        }
+        eventsUpdater.update()
 
         for (drawer in drawers) {
             drawer.draw(canvas)
@@ -44,8 +42,6 @@ private class SingleEventsUpdater(
 
     private val boundsCalculator = EventChipBoundsCalculator(viewState)
     private val textFitter = TextFitter(viewState)
-
-    override fun isRequired() = true
 
     override fun update() {
         chipsCache.clearSingleEventsCache()

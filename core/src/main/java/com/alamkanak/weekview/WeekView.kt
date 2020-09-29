@@ -48,7 +48,7 @@ class WeekView @JvmOverloads constructor(
     private val renderers: List<Renderer> = listOf(
         TimeColumnRenderer(viewState),
         CalendarRenderer(viewState, eventChipsCache),
-        HeaderRenderer(viewState, eventChipsCache)
+        HeaderRenderer(viewState, eventChipsCache, onHeaderHeightChanged = this::invalidate)
     )
 
     init {

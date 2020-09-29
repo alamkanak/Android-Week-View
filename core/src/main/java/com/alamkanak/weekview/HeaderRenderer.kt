@@ -12,7 +12,8 @@ import kotlin.math.roundToInt
 
 internal class HeaderRenderer(
     viewState: ViewState,
-    eventChipsCache: EventChipsCache
+    eventChipsCache: EventChipsCache,
+    onHeaderHeightChanged: () -> Unit
 ) : Renderer, DateFormatterDependent {
 
     private val allDayEventLabels = ArrayMap<EventChip, StaticLayout>()
@@ -20,7 +21,8 @@ internal class HeaderRenderer(
 
     private val headerRowUpdater = HeaderRowUpdater(
         viewState = viewState,
-        labelLayouts = dateLabelLayouts
+        labelLayouts = dateLabelLayouts,
+        onHeaderHeightChanged = onHeaderHeightChanged
     )
 
     private val eventsUpdater = AllDayEventsUpdater(
@@ -54,9 +56,7 @@ internal class HeaderRenderer(
     }
 
     override fun render(canvas: Canvas) {
-        if (eventsUpdater.isRequired()) {
-            eventsUpdater.update()
-        }
+        eventsUpdater.update()
         headerRowUpdater.update()
 
         headerRowDrawer.draw(canvas)
@@ -67,7 +67,8 @@ internal class HeaderRenderer(
 
 private class HeaderRowUpdater(
     private val viewState: ViewState,
-    private val labelLayouts: SparseArray<StaticLayout>
+    private val labelLayouts: SparseArray<StaticLayout>,
+    private val onHeaderHeightChanged: () -> Unit
 ) : Updater {
 
     override fun update() {
@@ -88,7 +89,14 @@ private class HeaderRowUpdater(
     ) {
         val maximumLayoutHeight = dateLabels.map { it.height.toFloat() }.maxOrNull() ?: 0f
         viewState.dateLabelHeight = maximumLayoutHeight
+
+        val currentHeaderHeight = viewState.headerHeight
         viewState.refreshHeaderHeight()
+        val newHeaderHeight = viewState.headerHeight
+
+        if (currentHeaderHeight != newHeaderHeight) {
+            onHeaderHeightChanged()
+        }
     }
 
     private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
@@ -141,14 +149,19 @@ private class AllDayEventsUpdater(
 
     private var previousHorizontalOrigin: Float? = null
 
-    override fun isRequired(): Boolean {
-        val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
-        val dateRange = viewState.dateRange
-        val containsNewChips = eventChipsCache.allDayEventChipsInDateRange(dateRange).any { it.bounds.isEmpty }
-        return didScrollHorizontally || containsNewChips
-    }
+    private val isRequired: Boolean
+        get() {
+            val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
+            val dateRange = viewState.dateRange
+            val containsNewChips = eventChipsCache.allDayEventChipsInDateRange(dateRange).any { it.bounds.isEmpty }
+            return didScrollHorizontally || containsNewChips
+        }
 
     override fun update() {
+        if (!isRequired) {
+            return
+        }
+
         eventsLabelLayouts.clear()
 
         val datesWithStartPixels = viewState.dateRangeWithStartPixels
