@@ -10,7 +10,6 @@ import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.threetenabp.WeekViewPagingAdapterThreeTenAbp
 import com.alamkanak.weekview.threetenabp.setDateFormatter
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.android.synthetic.main.activity_basic.weekView
@@ -20,6 +19,8 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle.MEDIUM
+import org.threeten.bp.format.FormatStyle.SHORT
 
 private class ViewModel(
     private val database: EventsDatabase
@@ -66,7 +67,7 @@ private class BasicActivityWeekViewAdapter(
     private val loadMoreHandler: (startDate: LocalDate, endDate: LocalDate) -> Unit
 ) : WeekViewPagingAdapterThreeTenAbp<Event>() {
 
-    private val formatter = SimpleDateFormat.getDateTimeInstance()
+    private val formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM, SHORT)
 
     override fun onEventClick(data: Event) {
         context.showToast("Clicked ${data.title}")
