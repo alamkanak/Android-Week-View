@@ -1,9 +1,14 @@
 Changelog
 =========
 
+## Version 5.0.0-beta02
+*(2020-09-30)*
+- New: You can now set the text color for weekend date labels via `weekendTextColor`.
+- Fixed: WeekView no longer keeps outdated events around if an empty list of events was submitted through `WeekView.SimpleAdapter`.
+- Fixed: WeekView no longer uses incorrect dates for `minDate` and `maxDate`.
+
 ## Version 5.0.0-beta01
 *(2020-09-29)*
-
 This beta release contains new functionality and includes breaking changes. To get started, take a look at the [wiki](https://github.com/thellmund/Android-Week-View/wiki/Getting-started-(v5-beta)).
 - New: You can now use `SpannableString` for event titles and locations to provide custom styling.
 - New: You can now choose to show the current week number in the header.
