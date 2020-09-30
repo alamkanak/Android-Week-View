@@ -29,31 +29,37 @@ internal object ViewStateFactory {
             Typeface.create(it, Typeface.NORMAL)
         } ?: Typeface.create("sans-serif-medium", Typeface.NORMAL)
 
-        viewState.headerRowTextPaint.apply {
-            color = a.getColor(R.styleable.WeekView_headerRowTextColor, context.textColorPrimary)
-            textSize = a.getDimension(R.styleable.WeekView_headerRowTextSize, context.defaultTextSize)
+        viewState.headerTextPaint.apply {
+            color = a.getColor(R.styleable.WeekView_headerTextColor, context.textColorPrimary)
+            textSize = a.getDimension(R.styleable.WeekView_headerTextSize, context.defaultTextSize)
             typeface = headerTextTypeface
         }
 
-        viewState.headerRowBottomLinePaint.apply {
-            color = a.getColor(R.styleable.WeekView_headerRowBottomLineColor, context.lineColor)
-            strokeWidth = a.getDimension(R.styleable.WeekView_headerRowBottomLineWidth, 1f)
+        viewState.headerBottomLinePaint.apply {
+            color = a.getColor(R.styleable.WeekView_headerBottomLineColor, context.lineColor)
+            strokeWidth = a.getDimension(R.styleable.WeekView_headerBottomLineWidth, 1f)
         }
 
         viewState.todayHeaderTextPaint.apply {
             color = a.getColor(R.styleable.WeekView_todayHeaderTextColor, context.colorAccent)
-            textSize = a.getDimension(R.styleable.WeekView_headerRowTextSize, context.defaultTextSize)
+            textSize = a.getDimension(R.styleable.WeekView_headerTextSize, context.defaultTextSize)
             typeface = headerTextTypeface
         }
 
-        viewState.headerRowBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, context.windowBackground)
+        viewState.weekendHeaderTextPaint.apply {
+            color = a.getColor(R.styleable.WeekView_weekendHeaderTextColor, viewState.headerTextPaint.color)
+            textSize = a.getDimension(R.styleable.WeekView_headerTextSize, context.defaultTextSize)
+            typeface = headerTextTypeface
         }
 
-        viewState.headerRowBackgroundWithShadowPaint.apply {
-            color = viewState.headerRowBackgroundPaint.color
-            val shadowColor = a.getColor(R.styleable.WeekView_headerRowBottomShadowColor, context.shadowColor)
-            val shadowRadius = a.getDimension(R.styleable.WeekView_headerRowBottomShadowRadius, 4f)
+        viewState.headerBackgroundPaint.apply {
+            color = a.getColor(R.styleable.WeekView_headerBackgroundColor, context.windowBackground)
+        }
+
+        viewState.headerBackgroundWithShadowPaint.apply {
+            color = viewState.headerBackgroundPaint.color
+            val shadowColor = a.getColor(R.styleable.WeekView_headerBottomShadowColor, context.shadowColor)
+            val shadowRadius = a.getDimension(R.styleable.WeekView_headerBottomShadowRadius, 4f)
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
@@ -140,8 +146,8 @@ internal object ViewStateFactory {
         }
 
         viewState.apply {
-            showHeaderRowBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomLine, false)
-            showHeaderRowBottomShadow = a.getBoolean(R.styleable.WeekView_showHeaderRowBottomShadow, false)
+            showHeaderBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderBottomLine, false)
+            showHeaderBottomShadow = a.getBoolean(R.styleable.WeekView_showHeaderBottomShadow, false)
         }
 
         viewState.apply {
@@ -160,7 +166,7 @@ internal object ViewStateFactory {
         }
 
         viewState.apply {
-            headerRowPadding = a.getDimension(R.styleable.WeekView_headerRowPadding, 10f)
+            headerPadding = a.getDimension(R.styleable.WeekView_headerPadding, 10f)
         }
 
         viewState.apply {

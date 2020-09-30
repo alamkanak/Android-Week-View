@@ -197,10 +197,10 @@ class WeekView @JvmOverloads constructor(
      * Returns whether a horizontal line should be displayed at the bottom of the header row.
      */
     @PublicApi
-    var showHeaderRowBottomLine: Boolean
-        get() = viewState.showHeaderRowBottomLine
+    var showHeaderBottomLine: Boolean
+        get() = viewState.showHeaderBottomLine
         set(value) {
-            viewState.showHeaderRowBottomLine = value
+            viewState.showHeaderBottomLine = value
             invalidate()
         }
 
@@ -208,10 +208,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the color of the horizontal line at the bottom of the header row.
      */
     @PublicApi
-    var headerRowBottomLineColor: Int
-        get() = viewState.headerRowBottomLinePaint.color
+    var headerBottomLineColor: Int
+        get() = viewState.headerBottomLinePaint.color
         set(value) {
-            viewState.headerRowBottomLinePaint.color = value
+            viewState.headerBottomLinePaint.color = value
             invalidate()
         }
 
@@ -219,10 +219,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the stroke width of the horizontal line at the bottom of the header row.
      */
     @PublicApi
-    var headerRowBottomLineWidth: Int
-        get() = viewState.headerRowBottomLinePaint.strokeWidth.toInt()
+    var headerBottomLineWidth: Int
+        get() = viewState.headerBottomLinePaint.strokeWidth.toInt()
         set(value) {
-            viewState.headerRowBottomLinePaint.strokeWidth = value.toFloat()
+            viewState.headerBottomLinePaint.strokeWidth = value.toFloat()
             invalidate()
         }
 
@@ -238,10 +238,10 @@ class WeekView @JvmOverloads constructor(
      * Returns whether a shadow should be displayed at the bottom of the header row.
      */
     @PublicApi
-    var showHeaderRowBottomShadow: Boolean
-        get() = viewState.showHeaderRowBottomShadow
+    var showHeaderBottomShadow: Boolean
+        get() = viewState.showHeaderBottomShadow
         set(value) {
-            viewState.showHeaderRowBottomShadow = value
+            viewState.showHeaderBottomShadow = value
             invalidate()
         }
 
@@ -249,12 +249,12 @@ class WeekView @JvmOverloads constructor(
      * Returns the color of the shadow at the bottom of the header row.
      */
     @PublicApi
-    var headerRowBottomShadowColor: Int
+    var headerBottomShadowColor: Int
         @RequiresApi(api = 29)
-        get() = viewState.headerRowBackgroundWithShadowPaint.shadowLayerColor
+        get() = viewState.headerBackgroundWithShadowPaint.shadowLayerColor
         set(value) {
-            val paint = viewState.headerRowBackgroundWithShadowPaint
-            paint.setShadowLayer(headerRowBottomShadowRadius.toFloat(), 0f, 0f, value)
+            val paint = viewState.headerBackgroundWithShadowPaint
+            paint.setShadowLayer(headerBottomShadowRadius.toFloat(), 0f, 0f, value)
             invalidate()
         }
 
@@ -262,12 +262,12 @@ class WeekView @JvmOverloads constructor(
      * Returns the radius of the shadow at the bottom of the header row.
      */
     @PublicApi
-    var headerRowBottomShadowRadius: Int
+    var headerBottomShadowRadius: Int
         @RequiresApi(api = 29)
-        get() = viewState.headerRowBackgroundWithShadowPaint.shadowLayerRadius.roundToInt()
+        get() = viewState.headerBackgroundWithShadowPaint.shadowLayerRadius.roundToInt()
         set(value) {
-            val paint = viewState.headerRowBackgroundWithShadowPaint
-            paint.setShadowLayer(value.toFloat(), 0f, 0f, headerRowBottomShadowColor)
+            val paint = viewState.headerBackgroundWithShadowPaint
+            paint.setShadowLayer(value.toFloat(), 0f, 0f, headerBottomShadowColor)
             invalidate()
         }
 
@@ -398,10 +398,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the header row padding, which is applied above and below the all-day event chips.
      */
     @PublicApi
-    var headerRowPadding: Int
-        get() = viewState.headerRowPadding.roundToInt()
+    var headerPadding: Int
+        get() = viewState.headerPadding.roundToInt()
         set(value) {
-            viewState.headerRowPadding = value.toFloat()
+            viewState.headerPadding = value.toFloat()
             invalidate()
         }
 
@@ -409,10 +409,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the header row background color.
      */
     @PublicApi
-    var headerRowBackgroundColor: Int
-        get() = viewState.headerRowBackgroundPaint.color
+    var headerBackgroundColor: Int
+        get() = viewState.headerBackgroundPaint.color
         set(value) {
-            viewState.headerRowBackgroundPaint.color = value
+            viewState.headerBackgroundPaint.color = value
             invalidate()
         }
 
@@ -420,10 +420,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the text color used for all date labels except today.
      */
     @PublicApi
-    var headerRowTextColor: Int
-        get() = viewState.headerRowTextPaint.color
+    var headerTextColor: Int
+        get() = viewState.headerTextPaint.color
         set(value) {
-            viewState.headerRowTextPaint.color = value
+            viewState.headerTextPaint.color = value
             invalidate()
         }
 
@@ -439,13 +439,26 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
+     * Returns the text color used for weekend date labels.
+     */
+    @PublicApi
+    var weekendHeaderTextColor: Int
+        get() = viewState.weekendHeaderTextPaint.color
+        set(value) {
+            viewState.weekendHeaderTextPaint.color = value
+            invalidate()
+        }
+
+    /**
      * Returns the text size of all date labels.
      */
     @PublicApi
-    var headerRowTextSize: Int
-        get() = viewState.headerRowTextPaint.textSize.roundToInt()
+    var headerTextSize: Int
+        get() = viewState.headerTextPaint.textSize.roundToInt()
         set(value) {
-            viewState.headerRowTextPaint.textSize = value.toFloat()
+            viewState.headerTextPaint.textSize = value.toFloat()
+            viewState.todayHeaderTextPaint.textSize = value.toFloat()
+            viewState.weekendHeaderTextPaint.textSize = value.toFloat()
             invalidate()
         }
 

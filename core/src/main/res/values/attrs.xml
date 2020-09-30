@@ -10,14 +10,14 @@
         <attr name="showCurrentTimeFirst" format="boolean" />
 
         <!-- Header bottom line -->
-        <attr name="showHeaderRowBottomLine" format="boolean" />
-        <attr name="headerRowBottomLineColor" format="color" />
-        <attr name="headerRowBottomLineWidth" format="dimension" />
+        <attr name="showHeaderBottomLine" format="boolean" />
+        <attr name="headerBottomLineColor" format="color" />
+        <attr name="headerBottomLineWidth" format="dimension" />
 
         <!-- Header bottom shadow -->
-        <attr name="showHeaderRowBottomShadow" format="boolean" />
-        <attr name="headerRowBottomShadowColor" format="color" />
-        <attr name="headerRowBottomShadowRadius" format="dimension" />
+        <attr name="showHeaderBottomShadow" format="boolean" />
+        <attr name="headerBottomShadowColor" format="color" />
+        <attr name="headerBottomShadowRadius" format="dimension" />
 
         <!-- Time column -->
         <attr name="timeColumnTextColor" format="color" />
@@ -38,11 +38,12 @@
         <attr name="maxHour" format="integer" />
 
         <!-- Header row -->
-        <attr name="headerRowTextColor" format="color" />
-        <attr name="headerRowBackgroundColor" format="color" />
-        <attr name="headerRowPadding" format="dimension" />
-        <attr name="headerRowTextSize" format="dimension" />
+        <attr name="headerBackgroundColor" format="color" />
+        <attr name="headerPadding" format="dimension" />
+        <attr name="headerTextSize" format="dimension" />
+        <attr name="headerTextColor" format="color" />
         <attr name="todayHeaderTextColor" format="color" />
+        <attr name="weekendHeaderTextColor" format="color" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />

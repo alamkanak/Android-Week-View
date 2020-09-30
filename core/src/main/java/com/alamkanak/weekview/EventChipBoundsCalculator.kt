@@ -49,7 +49,7 @@ internal class EventChipBoundsCalculator(
         eventChip: EventChip,
         startPixel: Float
     ): RectF {
-        val padding = viewState.headerRowPadding
+        val padding = viewState.headerPadding
 
         val top = padding + viewState.dateLabelHeight + padding
         val height = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2

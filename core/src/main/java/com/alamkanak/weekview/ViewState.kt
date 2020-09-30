@@ -42,7 +42,7 @@ internal class ViewState {
     var timeColumnPadding: Int = 0
     var timeColumnHoursInterval: Int = 0
 
-    var headerRowPadding: Float = 0f
+    var headerPadding: Float = 0f
 
     var showWeekNumber: Boolean = false
     var weekNumberBackgroundCornerRadius: Float = 0f
@@ -70,8 +70,8 @@ internal class ViewState {
     var showDaySeparators: Boolean = false
     var showTimeColumnSeparator: Boolean = false
     var showTimeColumnHourSeparators: Boolean = false
-    var showHeaderRowBottomLine: Boolean = false
-    var showHeaderRowBottomShadow: Boolean = false
+    var showHeaderBottomLine: Boolean = false
+    var showHeaderBottomShadow: Boolean = false
 
     var horizontalScrollingEnabled: Boolean = false
 
@@ -96,28 +96,32 @@ internal class ViewState {
         textAlign = Paint.Align.RIGHT
     }
 
-    val headerRowTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+    val headerTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
     }
-
-    val headerRowBottomLinePaint = Paint()
-
-    var dateLabelHeight: Float = 0f
-
-    var headerHeight: Float = 0f
 
     val todayHeaderTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
     }
+
+    val weekendHeaderTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+    }
+
+    val headerBottomLinePaint = Paint()
+
+    var dateLabelHeight: Float = 0f
+
+    var headerHeight: Float = 0f
 
     var currentAllDayEventHeight: Int = 0
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
 
-    val headerRowBackgroundPaint = Paint()
+    val headerBackgroundPaint = Paint()
 
-    val headerRowBackgroundWithShadowPaint = Paint()
+    val headerBackgroundWithShadowPaint = Paint()
 
     val dayWidth: Float
         get() = (viewWidth - timeColumnWidth) / numberOfVisibleDays
@@ -364,16 +368,16 @@ internal class ViewState {
     }
 
     fun refreshHeaderHeight() {
-        headerHeight = headerRowPadding + dateLabelHeight
+        headerHeight = headerPadding + dateLabelHeight
 
         if (currentAllDayEventHeight > 0) {
-            headerHeight += headerRowPadding + currentAllDayEventHeight.toFloat()
+            headerHeight += headerPadding + currentAllDayEventHeight.toFloat()
         }
 
-        headerHeight += headerRowPadding
+        headerHeight += headerPadding
 
-        if (showHeaderRowBottomLine) {
-            headerHeight += headerRowBottomLinePaint.strokeWidth
+        if (showHeaderBottomLine) {
+            headerHeight += headerBottomLinePaint.strokeWidth
         }
 
         if (showCompleteDay) {

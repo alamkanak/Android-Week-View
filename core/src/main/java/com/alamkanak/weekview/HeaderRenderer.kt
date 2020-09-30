@@ -19,7 +19,7 @@ internal class HeaderRenderer(
     private val allDayEventLabels = ArrayMap<EventChip, StaticLayout>()
     private val dateLabelLayouts = SparseArray<StaticLayout>()
 
-    private val headerRowUpdater = HeaderRowUpdater(
+    private val headerUpdater = HeaderUpdater(
         viewState = viewState,
         labelLayouts = dateLabelLayouts,
         onHeaderHeightChanged = onHeaderHeightChanged
@@ -41,7 +41,7 @@ internal class HeaderRenderer(
         allDayEventLayouts = allDayEventLabels
     )
 
-    private val headerRowDrawer = HeaderRowDrawer(
+    private val headerDrawer = HeaderDrawer(
         viewState = viewState
     )
 
@@ -57,15 +57,15 @@ internal class HeaderRenderer(
 
     override fun render(canvas: Canvas) {
         eventsUpdater.update()
-        headerRowUpdater.update()
+        headerUpdater.update()
 
-        headerRowDrawer.draw(canvas)
+        headerDrawer.draw(canvas)
         dateLabelDrawer.draw(canvas)
         eventsDrawer.draw(canvas)
     }
 }
 
-private class HeaderRowUpdater(
+private class HeaderUpdater(
     private val viewState: ViewState,
     private val labelLayouts: SparseArray<StaticLayout>,
     private val onHeaderHeightChanged: () -> Unit
@@ -101,10 +101,12 @@ private class HeaderRowUpdater(
 
     private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
         val dayLabel = viewState.dateFormatter(date)
-        return dayLabel.toTextLayout(
-            textPaint = if (date.isToday) viewState.todayHeaderTextPaint else viewState.headerRowTextPaint,
-            width = viewState.dayWidth.toInt()
-        )
+        val textPaint = when {
+            date.isToday -> viewState.todayHeaderTextPaint
+            date.isWeekend -> viewState.weekendHeaderTextPaint
+            else -> viewState.headerTextPaint
+        }
+        return dayLabel.toTextLayout(textPaint = textPaint, width = viewState.dayWidth.toInt())
     }
 
     private operator fun <E> SparseArray<E>.plusAssign(elements: Map<Int, E>) {
@@ -131,7 +133,7 @@ private class DateLabelsDrawer(
 
         withTranslation(
             x = startPixel + viewState.dayWidth / 2f,
-            y = viewState.headerRowPadding
+            y = viewState.headerPadding
         ) {
             draw(textLayout)
         }
@@ -219,17 +221,17 @@ internal class AllDayEventsDrawer(
     }
 }
 
-private class HeaderRowDrawer(
+private class HeaderDrawer(
     private val viewState: ViewState
 ) : Drawer {
 
     override fun draw(canvas: Canvas) {
         val width = viewState.viewWidth.toFloat()
 
-        val backgroundPaint = if (viewState.showHeaderRowBottomShadow) {
-            viewState.headerRowBackgroundWithShadowPaint
+        val backgroundPaint = if (viewState.showHeaderBottomShadow) {
+            viewState.headerBackgroundWithShadowPaint
         } else {
-            viewState.headerRowBackgroundPaint
+            viewState.headerBackgroundPaint
         }
 
         canvas.drawRect(0f, 0f, width, viewState.headerHeight, backgroundPaint)
@@ -238,9 +240,9 @@ private class HeaderRowDrawer(
             canvas.drawWeekNumber(viewState)
         }
 
-        if (viewState.showHeaderRowBottomLine) {
-            val y = viewState.headerHeight - viewState.headerRowBottomLinePaint.strokeWidth
-            canvas.drawLine(0f, y, width, y, viewState.headerRowBottomLinePaint)
+        if (viewState.showHeaderBottomLine) {
+            val y = viewState.headerHeight - viewState.headerBottomLinePaint.strokeWidth
+            canvas.drawLine(0f, y, width, y, viewState.headerBottomLinePaint)
         }
     }
 
@@ -263,7 +265,7 @@ private class HeaderRowDrawer(
             bounds.centerY() + height / 2f
         )
 
-        drawRect(bounds, state.headerRowBackgroundPaint)
+        drawRect(bounds, state.headerBackgroundPaint)
 
         val backgroundPaint = state.weekNumberBackgroundPaint
         val radius = state.weekNumberBackgroundCornerRadius
