@@ -960,7 +960,7 @@ class WeekView @JvmOverloads constructor(
                 throw IllegalArgumentException("Can't set a minDate that's after maxDate")
             }
 
-            viewState.minDate = value
+            viewState.minDate = value?.copy()
             invalidate()
         }
 
@@ -977,7 +977,7 @@ class WeekView @JvmOverloads constructor(
                 throw IllegalArgumentException("Can't set a maxDate that's before minDate")
             }
 
-            viewState.maxDate = value
+            viewState.maxDate = value?.copy()
             invalidate()
         }
 
