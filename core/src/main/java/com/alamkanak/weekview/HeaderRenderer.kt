@@ -71,6 +71,8 @@ private class HeaderUpdater(
     private val onHeaderHeightChanged: () -> Unit
 ) : Updater {
 
+    private val animator = ValueAnimator()
+
     override fun update() {
         val missingDates = viewState.dateRange.filterNot { labelLayouts.hasKey(it.toEpochDays()) }
         for (date in missingDates) {
@@ -82,8 +84,6 @@ private class HeaderUpdater(
         updateHeaderHeight(dateLabels)
     }
 
-    private fun <E> SparseArray<E>.hasKey(key: Int): Boolean = indexOfKey(key) >= 0
-
     private fun updateHeaderHeight(
         dateLabels: List<StaticLayout>
     ) {
@@ -91,12 +91,27 @@ private class HeaderUpdater(
         viewState.dateLabelHeight = maximumLayoutHeight
 
         val currentHeaderHeight = viewState.headerHeight
-        viewState.refreshHeaderHeight()
-        val newHeaderHeight = viewState.headerHeight
+        val newHeaderHeight = viewState.calculateHeaderHeight()
 
-        if (currentHeaderHeight != newHeaderHeight) {
-            onHeaderHeightChanged()
+        if (currentHeaderHeight == 0f || currentHeaderHeight == newHeaderHeight) {
+            // The height hasn't been set yet or didn't change; simply update without an animation
+            viewState.updateHeaderHeight(newHeaderHeight)
+            return
         }
+
+        if (animator.isRunning) {
+            // We're already running the animation to change the header height
+            return
+        }
+
+        animator.animate(
+            fromValue = currentHeaderHeight,
+            toValue = newHeaderHeight,
+            onUpdate = { height ->
+                viewState.updateHeaderHeight(height)
+                onHeaderHeightChanged()
+            }
+        )
     }
 
     private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
@@ -109,9 +124,7 @@ private class HeaderUpdater(
         return dayLabel.toTextLayout(textPaint = textPaint, width = viewState.dayWidth.toInt())
     }
 
-    private operator fun <E> SparseArray<E>.plusAssign(elements: Map<Int, E>) {
-        elements.entries.forEach { put(it.key, it.value) }
-    }
+    private fun <E> SparseArray<E>.hasKey(key: Int): Boolean = indexOfKey(key) >= 0
 }
 
 private class DateLabelsDrawer(

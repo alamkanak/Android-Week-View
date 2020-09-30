@@ -367,20 +367,25 @@ internal class ViewState {
         newHourHeight = hourHeight
     }
 
-    fun refreshHeaderHeight() {
-        headerHeight = headerPadding + dateLabelHeight
+    fun calculateHeaderHeight(): Float {
+        var newHeight = headerPadding + dateLabelHeight + headerPadding
 
         if (currentAllDayEventHeight > 0) {
-            headerHeight += headerPadding + currentAllDayEventHeight.toFloat()
+            newHeight += currentAllDayEventHeight.toFloat() + headerPadding
         }
-
-        headerHeight += headerPadding
 
         if (showHeaderBottomLine) {
-            headerHeight += headerBottomLinePaint.strokeWidth
+            newHeight += headerBottomLinePaint.strokeWidth
         }
 
+        return newHeight
+    }
+
+    fun updateHeaderHeight(height: Float) {
+        headerHeight = height
+
         if (showCompleteDay) {
+            // Update the hour height to make sure the day's hours fill the full height of the view
             hourHeight = (viewHeight - headerHeight) / hoursPerDay
             newHourHeight = hourHeight
         }
