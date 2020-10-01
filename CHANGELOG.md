@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 5.0.0-beta03
+*(2020-10-01)*
+- New: Changes of the header height are now animated.
+- New: All-day events are now arranged vertically by default. To arrange them horizontally, set `arrangeAllDayEventsVertically` to `false`.
+
 ## Version 5.0.0-beta02
 *(2020-09-30)*
 - New: You can now set the text color for weekend date labels via `weekendTextColor`.
