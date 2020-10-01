@@ -21,6 +21,7 @@
             app:allDayEventTextSize="13sp"
             app:columnGap="6dp"
             app:eventCornerRadius="4dp"
+            app:eventMarginVertical="2dp"
             app:eventPaddingHorizontal="4dp"
             app:eventPaddingVertical="5dp"
             app:eventTextSize="13sp"

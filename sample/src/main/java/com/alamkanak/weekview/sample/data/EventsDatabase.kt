@@ -174,9 +174,22 @@ class EventsDatabase(context: Context) {
             color = color2
         )
 
-        // All-day event until 00:00 next day
+        // All-day event
         events += newEvent(
             id = idOffset + 12,
+            year = year,
+            month = month,
+            dayOfMonth = 28,
+            hour = 0,
+            minute = 0,
+            duration = 24 * 60,
+            isAllDay = true,
+            color = color2
+        )
+
+        // All-day event until 00:00 next day
+        events += newEvent(
+            id = idOffset + 13,
             year = year,
             month = month,
             dayOfMonth = 14,

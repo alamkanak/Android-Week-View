@@ -48,7 +48,7 @@ class WeekView @JvmOverloads constructor(
     private val renderers: List<Renderer> = listOf(
         TimeColumnRenderer(viewState),
         CalendarRenderer(viewState, eventChipsCache),
-        HeaderRenderer(viewState, eventChipsCache, onHeaderHeightChanged = this::invalidate)
+        HeaderRenderer(context, viewState, eventChipsCache, onHeaderHeightChanged = this::invalidate)
     )
 
     init {
@@ -183,6 +183,18 @@ class WeekView @JvmOverloads constructor(
         get() = viewState.showFirstDayOfWeekFirst
         set(value) {
             viewState.showFirstDayOfWeekFirst = value
+        }
+
+    /**
+     * Returns whether all-day events are arranged vertically. If false, all-day events are shown
+     * in a horizontal arrangement, occupying only a single row.
+     */
+    @PublicApi
+    var arrangeAllDayEventsVertically: Boolean
+        get() = viewState.arrangeAllDayEventsVertically
+        set(value) {
+            viewState.arrangeAllDayEventsVertically = value
+            invalidate()
         }
 
     /*
@@ -1380,8 +1392,8 @@ class WeekView @JvmOverloads constructor(
                 candidates.isEmpty() -> null
                 // Two events hit. This is most likely because an all-day event was clicked, but a
                 // single event is rendered underneath it. We return the all-day event.
-                candidates.size == 2 -> candidates.first { it.event.isAllDay }
-                else -> candidates.first()
+                candidates.size == 2 -> candidates.first { it.event.isAllDay }.takeUnless { it.isHidden }
+                else -> candidates.first().takeUnless { it.isHidden }
             }
         }
 

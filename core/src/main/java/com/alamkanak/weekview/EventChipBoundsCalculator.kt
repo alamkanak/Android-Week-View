@@ -46,30 +46,49 @@ internal class EventChipBoundsCalculator(
     }
 
     fun calculateAllDayEvent(
+        index: Int,
         eventChip: EventChip,
         startPixel: Float
     ): RectF {
         val padding = viewState.headerPadding
+        val dayWidth = viewState.drawableDayWidth
 
-        val top = padding + viewState.dateLabelHeight + padding
-        val height = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2
-        val bottom = top + height
+        val dateLabelHeight = padding + viewState.dateLabelHeight + padding
+        val chipHeight = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2
 
-        val chipWidth = viewState.drawableDayWidth
+        val top = if (viewState.arrangeAllDayEventsVertically) {
+            val previousChipsHeight = index * (eventChip.bounds.height() + viewState.eventMarginVertical)
+            dateLabelHeight + previousChipsHeight
+        } else {
+            dateLabelHeight
+        }
 
-        var left = startPixel + eventChip.relativeStart * chipWidth
-        var right = left + eventChip.relativeWidth * chipWidth
+        var left = if (viewState.arrangeAllDayEventsVertically) {
+            startPixel
+        } else {
+            startPixel + eventChip.relativeStart * dayWidth
+        }
 
-        if (left > startPixel) {
+        var right = if (viewState.arrangeAllDayEventsVertically) {
+            left + dayWidth
+        } else {
+            left + eventChip.relativeWidth * dayWidth
+        }
+
+        val isLeftMostColumn = left == startPixel
+        val isRightMostColumn = right == startPixel + dayWidth
+
+        if (!isLeftMostColumn) {
             left += viewState.overlappingEventGap / 2f
         }
 
-        if (right < startPixel + chipWidth) {
+        if (!isRightMostColumn) {
             right -= viewState.overlappingEventGap / 2f
         }
 
-        val hasNoOverlaps = (right == startPixel + chipWidth)
-        if (viewState.isSingleDay && hasNoOverlaps) {
+        val bottom = top + chipHeight
+
+        if (viewState.isSingleDay && isRightMostColumn) {
             right -= viewState.singleDayHorizontalPadding * 2
         }
 

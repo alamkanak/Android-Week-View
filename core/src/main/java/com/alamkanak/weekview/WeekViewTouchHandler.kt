@@ -12,6 +12,14 @@ internal class WeekViewTouchHandler(
 
     fun handleClick(x: Float, y: Float) {
         val inCalendarArea = x > viewState.timeColumnWidth
+        val inAllDayEventsToggleArea = viewState.toggleAllDayEventsAreaBounds.contains(x, y)
+
+        if (inAllDayEventsToggleArea && viewState.showAllDayEventsToggleArrow) {
+            viewState.allDayEventsExpanded = !viewState.allDayEventsExpanded
+            adapter?.updateObserver()
+            return
+        }
+
         if (!inCalendarArea) {
             return
         }

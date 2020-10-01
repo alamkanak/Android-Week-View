@@ -176,11 +176,9 @@ internal class WeekViewGestureHandler(
         )
     }
 
-    override fun onSingleTapConfirmed(
-        e: MotionEvent
-    ): Boolean {
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
         touchHandler.handleClick(e.x, e.y)
-        return super.onSingleTapConfirmed(e)
+        return super.onSingleTapUp(e)
     }
 
     override fun onLongPress(e: MotionEvent) {

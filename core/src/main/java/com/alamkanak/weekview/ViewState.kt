@@ -37,6 +37,7 @@ internal class ViewState {
     var restoreNumberOfVisibleDays: Boolean = true
     var showFirstDayOfWeekFirst: Boolean = false
     var showCurrentTimeFirst: Boolean = false
+    var arrangeAllDayEventsVertically: Boolean = true
 
     // Time column
     var timeColumnPadding: Int = 0
@@ -115,6 +116,13 @@ internal class ViewState {
     var headerHeight: Float = 0f
 
     var currentAllDayEventHeight: Int = 0
+
+    var maxNumberOfAllDayEvents: Int = 0
+
+    var allDayEventsExpanded: Boolean = false
+
+    val showAllDayEventsToggleArrow: Boolean
+        get() = arrangeAllDayEventsVertically && maxNumberOfAllDayEvents > 2
 
     // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
     var currentOrigin = PointF(0f, 0f)
@@ -224,6 +232,16 @@ internal class ViewState {
         get() = _weekNumberBounds.apply {
             left = 0f
             top = 0f
+            right = timeColumnWidth
+            bottom = headerPadding + dateLabelHeight + headerPadding
+        }
+
+    private val _toggleAllDayEventsAreaBounds: RectF = RectF()
+
+    val toggleAllDayEventsAreaBounds: RectF
+        get() = _toggleAllDayEventsAreaBounds.apply {
+            left = 0f
+            top = weekNumberBounds.bottom
             right = timeColumnWidth
             bottom = headerHeight
         }
@@ -370,8 +388,21 @@ internal class ViewState {
     fun calculateHeaderHeight(): Float {
         var newHeight = headerPadding + dateLabelHeight + headerPadding
 
-        if (currentAllDayEventHeight > 0) {
-            newHeight += currentAllDayEventHeight.toFloat() + headerPadding
+        if (maxNumberOfAllDayEvents > 0) {
+            val numberOfRows = if (arrangeAllDayEventsVertically && allDayEventsExpanded) {
+                maxNumberOfAllDayEvents
+            } else if (arrangeAllDayEventsVertically) {
+                min(maxNumberOfAllDayEvents, 2)
+            } else {
+                1
+            }
+
+            val heightOfChips = numberOfRows * currentAllDayEventHeight
+            val heightOfSpacing = (numberOfRows - 1) * eventMarginVertical
+            newHeight += heightOfChips + heightOfSpacing
+
+            // Add padding below the event chips
+            newHeight += headerPadding
         }
 
         if (showHeaderBottomLine) {

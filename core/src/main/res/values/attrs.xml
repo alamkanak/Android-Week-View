@@ -8,6 +8,7 @@
         <attr name="restoreNumberOfVisibleDays" format="boolean" />
         <attr name="showFirstDayOfWeekFirst" format="boolean" />
         <attr name="showCurrentTimeFirst" format="boolean" />
+        <attr name="arrangeAllDayEventsVertically" format="boolean" />
 
         <!-- Header bottom line -->
         <attr name="showHeaderBottomLine" format="boolean" />

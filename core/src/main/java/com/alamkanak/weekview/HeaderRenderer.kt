@@ -1,16 +1,21 @@
 package com.alamkanak.weekview
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.text.StaticLayout
+import android.text.TextPaint
 import android.util.SparseArray
 import androidx.collection.ArrayMap
+import androidx.core.content.ContextCompat
 import java.util.Calendar
 import kotlin.math.roundToInt
 
 internal class HeaderRenderer(
+    context: Context,
     viewState: ViewState,
     eventChipsCache: EventChipsCache,
     onHeaderHeightChanged: () -> Unit
@@ -42,6 +47,7 @@ internal class HeaderRenderer(
     )
 
     private val headerDrawer = HeaderDrawer(
+        context = context,
         viewState = viewState
     )
 
@@ -188,8 +194,9 @@ private class AllDayEventsUpdater(
             }
 
             val eventChips = eventChipsCache.allDayEventChipsByDate(date)
-            for (eventChip in eventChips) {
-                eventChip.updateBounds(startPixel = modifiedStartPixel)
+
+            eventChips.forEachIndexed { index, eventChip ->
+                eventChip.updateBounds(index = index, startPixel = modifiedStartPixel)
                 if (eventChip.bounds.isNotEmpty) {
                     eventsLabelLayouts[eventChip] = textFitter.fit(eventChip)
                 } else {
@@ -203,10 +210,17 @@ private class AllDayEventsUpdater(
             .maxOrNull() ?: 0
 
         viewState.currentAllDayEventHeight = maximumChipHeight
+
+        val maximumChipsPerDay = eventsLabelLayouts.keys
+            .groupBy { it.event.startTime.toEpochDays() }
+            .values
+            .maxByOrNull { it.size }?.size ?: 0
+
+        viewState.maxNumberOfAllDayEvents = maximumChipsPerDay
     }
 
-    private fun EventChip.updateBounds(startPixel: Float) {
-        val candidate = boundsCalculator.calculateAllDayEvent(this, startPixel)
+    private fun EventChip.updateBounds(index: Int, startPixel: Float) {
+        val candidate = boundsCalculator.calculateAllDayEvent(index, eventChip = this, startPixel)
         bounds = if (candidate.isValid) candidate else RectF()
     }
 
@@ -225,18 +239,84 @@ internal class AllDayEventsDrawer(
 
     private val eventChipDrawer = EventChipDrawer(viewState)
 
-    override fun draw(canvas: Canvas) {
-        canvas.drawInBounds(viewState.headerBounds) {
-            for ((eventChip, textLayout) in allDayEventLayouts) {
-                eventChipDrawer.draw(eventChip, canvas, textLayout)
+    private val expandInfoTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+
+    override fun draw(canvas: Canvas) = canvas.drawInBounds(viewState.headerBounds) {
+        for (date in viewState.dateRange) {
+            val events = allDayEventLayouts
+                .filter { it.key.event.startTime.isSameDate(date) }
+                .toList()
+
+            if (viewState.arrangeAllDayEventsVertically) {
+                renderEventsVertically(events.sortedBy { it.first.bounds.top })
+            } else {
+                renderEventsHorizontally(events)
             }
         }
+    }
+
+    private fun Canvas.renderEventsHorizontally(events: List<Pair<EventChip, StaticLayout>>) {
+        for ((eventChip, textLayout) in events) {
+            eventChipDrawer.draw(eventChip, canvas = this, textLayout)
+        }
+    }
+
+    private fun Canvas.renderEventsVertically(events: List<Pair<EventChip, StaticLayout>>) {
+        // Un-hide all events. To prevent any click handler from mapping a click to a hidden event,
+        // we set isHidden to true for all events that aren't shown in the collapsed state.
+        events.forEach { it.first.isHidden = false }
+
+        if (viewState.allDayEventsExpanded || events.size <= 2) {
+            // Draw them all!
+            for ((eventChip, textLayout) in events) {
+                eventChipDrawer.draw(eventChip, canvas = this, textLayout)
+            }
+        } else {
+            val (firstEventChip, firstTextLayout) = events[0]
+            eventChipDrawer.draw(firstEventChip, canvas = this, firstTextLayout)
+
+            val needsExpandInfo = events.size >= 2
+            if (needsExpandInfo) {
+                drawExpandInfo(eventsCount = events.size - 1, priorEventChip = firstEventChip)
+                events.drop(1).forEach { it.first.isHidden = true }
+            } else {
+                val (secondEventChip, secondTextLayout) = events[1]
+                eventChipDrawer.draw(secondEventChip, canvas = this, secondTextLayout)
+                events.drop(2).forEach { it.first.isHidden = true }
+            }
+        }
+    }
+
+    private fun Canvas.drawExpandInfo(eventsCount: Int, priorEventChip: EventChip) {
+        // Draw +X text
+        val text = "+$eventsCount"
+        val textPaint = expandInfoTextPaint.apply {
+            textSize = viewState.allDayEventTextPaint.textSize
+            color = viewState.headerTextPaint.color
+        }
+
+        val x = priorEventChip.bounds.left + viewState.eventPaddingHorizontal.toFloat()
+        val y = priorEventChip.bounds.bottom +
+            viewState.eventMarginVertical +
+            viewState.eventPaddingVertical +
+            textPaint.textSize
+
+        drawText(text, x, y, textPaint)
     }
 }
 
 private class HeaderDrawer(
+    context: Context,
     private val viewState: ViewState
 ) : Drawer {
+
+    private val upArrow: Drawable by lazy {
+        checkNotNull(ContextCompat.getDrawable(context, R.drawable.ic_arrow_up))
+    }
+
+    private val downArrow: Drawable by lazy {
+        checkNotNull(ContextCompat.getDrawable(context, R.drawable.ic_arrow_down))
+    }
 
     override fun draw(canvas: Canvas) {
         val width = viewState.viewWidth.toFloat()
@@ -250,7 +330,11 @@ private class HeaderDrawer(
         canvas.drawRect(0f, 0f, width, viewState.headerHeight, backgroundPaint)
 
         if (viewState.showWeekNumber) {
-            canvas.drawWeekNumber(viewState)
+            canvas.drawWeekNumber()
+        }
+
+        if (viewState.showAllDayEventsToggleArrow) {
+            canvas.drawAllDayEventsToggleArrow()
         }
 
         if (viewState.showHeaderBottomLine) {
@@ -259,11 +343,11 @@ private class HeaderDrawer(
         }
     }
 
-    private fun Canvas.drawWeekNumber(state: ViewState) {
-        val weekNumber = state.dateRange.first().weekOfYear.toString()
+    private fun Canvas.drawWeekNumber() {
+        val weekNumber = viewState.dateRange.first().weekOfYear.toString()
 
-        val bounds = state.weekNumberBounds
-        val textPaint = state.weekNumberTextPaint
+        val bounds = viewState.weekNumberBounds
+        val textPaint = viewState.weekNumberTextPaint
 
         val textHeight = textPaint.textHeight
         val textOffset = (textHeight / 2f).roundToInt() - textPaint.descent().roundToInt()
@@ -278,13 +362,32 @@ private class HeaderDrawer(
             bounds.centerY() + height / 2f
         )
 
-        drawRect(bounds, state.headerBackgroundPaint)
+        drawRect(bounds, viewState.headerBackgroundPaint)
 
-        val backgroundPaint = state.weekNumberBackgroundPaint
-        val radius = state.weekNumberBackgroundCornerRadius
+        val backgroundPaint = viewState.weekNumberBackgroundPaint
+        val radius = viewState.weekNumberBackgroundCornerRadius
         drawRoundRect(backgroundRect, radius, radius, backgroundPaint)
 
         drawText(weekNumber, bounds.centerX(), bounds.centerY() + textOffset, textPaint)
+    }
+
+    private fun Canvas.drawAllDayEventsToggleArrow() = with(viewState) {
+        val bottom = (headerHeight - headerPadding).roundToInt()
+        val top = bottom - currentAllDayEventHeight
+
+        val width = weekNumberBounds.width().roundToInt()
+        val height = bottom - top
+
+        val left = (width - height) / 2
+        val right = (left + height)
+
+        if (allDayEventsExpanded) {
+            upArrow.setBounds(left, top, right, bottom)
+            upArrow.draw(this@drawAllDayEventsToggleArrow)
+        } else {
+            downArrow.setBounds(left, top, right, bottom)
+            downArrow.draw(this@drawAllDayEventsToggleArrow)
+        }
     }
 }
 

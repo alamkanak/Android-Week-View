@@ -33,9 +33,33 @@ internal class EventChipsFactory {
      * @param eventChips A list of [EventChip]s
      */
     private fun computePositionOfEvents(eventChips: List<EventChip>, viewState: ViewState) {
+        val singleEventChips = eventChips.filter { it.event.isNotAllDay }
+        val allDayEventChips = eventChips.filter { it.event.isAllDay }
+
+        val singleEventGroups = singleEventChips.toMultiColumnCollisionGroups()
+        val allDayGroups = if (viewState.arrangeAllDayEventsVertically) {
+            allDayEventChips.toSingleColumnCollisionGroups()
+        } else {
+            allDayEventChips.toMultiColumnCollisionGroups()
+        }
+
+        for (collisionGroup in singleEventGroups) {
+            expandEventsToMaxWidth(collisionGroup, viewState)
+        }
+
+        for (collisionGroup in allDayGroups) {
+            expandEventsToMaxWidth(collisionGroup, viewState)
+        }
+    }
+
+    private fun List<EventChip>.toSingleColumnCollisionGroups(): List<CollisionGroup> {
+        return map { CollisionGroup(it) }
+    }
+
+    private fun List<EventChip>.toMultiColumnCollisionGroups(): List<CollisionGroup> {
         val collisionGroups = mutableListOf<CollisionGroup>()
 
-        for (eventChip in eventChips) {
+        for (eventChip in this) {
             val collidingGroup = collisionGroups.firstOrNull { it.collidesWith(eventChip) }
 
             if (collidingGroup != null) {
@@ -45,9 +69,7 @@ internal class EventChipsFactory {
             }
         }
 
-        for (collisionGroup in collisionGroups) {
-            expandEventsToMaxWidth(collisionGroup, viewState)
-        }
+        return collisionGroups
     }
 
     /**
@@ -76,14 +98,14 @@ internal class EventChipsFactory {
                             column.add(eventChip)
                         }
                     } else {
-                        val leftMostColumn = checkNotNull(fittingColumns.minBy { it.index })
+                        val leftMostColumn = checkNotNull(fittingColumns.minByOrNull { it.index })
                         leftMostColumn.add(eventChip)
                     }
                 }
             }
         }
 
-        val rows = columns.map { it.size }.max() ?: 0
+        val rows = columns.map { it.size }.maxOrNull() ?: 0
         val columnWidth = 1f / columns.size
 
         for (row in 0 until rows) {

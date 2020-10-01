@@ -37,7 +37,7 @@ internal object ViewStateFactory {
 
         viewState.headerBottomLinePaint.apply {
             color = a.getColor(R.styleable.WeekView_headerBottomLineColor, context.lineColor)
-            strokeWidth = a.getDimension(R.styleable.WeekView_headerBottomLineWidth, 1f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_headerBottomLineWidth, context.dp(1))
         }
 
         viewState.todayHeaderTextPaint.apply {
@@ -59,18 +59,18 @@ internal object ViewStateFactory {
         viewState.headerBackgroundWithShadowPaint.apply {
             color = viewState.headerBackgroundPaint.color
             val shadowColor = a.getColor(R.styleable.WeekView_headerBottomShadowColor, context.shadowColor)
-            val shadowRadius = a.getDimension(R.styleable.WeekView_headerBottomShadowRadius, 4f)
+            val shadowRadius = a.getDimension(R.styleable.WeekView_headerBottomShadowRadius, context.dp(2))
             setShadowLayer(shadowRadius, 0f, 0f, shadowColor)
         }
 
         viewState.hourSeparatorPaint.apply {
             color = a.getColor(R.styleable.WeekView_hourSeparatorColor, context.lineColor)
-            strokeWidth = a.getDimension(R.styleable.WeekView_hourSeparatorStrokeWidth, 2f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_hourSeparatorStrokeWidth, context.dp(1))
         }
 
         viewState.daySeparatorPaint.apply {
             color = a.getColor(R.styleable.WeekView_daySeparatorColor, context.lineColor)
-            strokeWidth = a.getDimension(R.styleable.WeekView_daySeparatorStrokeWidth, 2f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_daySeparatorStrokeWidth, context.dp(1))
         }
 
         viewState.dayBackgroundPaint.apply {
@@ -99,17 +99,17 @@ internal object ViewStateFactory {
 
         viewState.timeColumnSeparatorPaint.apply {
             color = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, context.lineColor)
-            strokeWidth = a.getDimension(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, 1f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_timeColumnSeparatorStrokeWidth, context.dp(1))
         }
 
         viewState.nowLinePaint.apply {
             color = a.getColor(R.styleable.WeekView_nowLineColor, context.colorAccent)
-            strokeWidth = a.getDimension(R.styleable.WeekView_nowLineStrokeWidth, 5f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_nowLineStrokeWidth, context.dp(3))
         }
 
         viewState.nowDotPaint.apply {
             color = a.getColor(R.styleable.WeekView_nowLineDotColor, context.colorAccent)
-            strokeWidth = a.getDimension(R.styleable.WeekView_nowLineDotRadius, 16f)
+            strokeWidth = a.getDimension(R.styleable.WeekView_nowLineDotRadius, context.dp(4))
         }
 
         viewState.eventTextPaint.apply {
@@ -143,6 +143,7 @@ internal object ViewStateFactory {
             restoreNumberOfVisibleDays = a.getBoolean(R.styleable.WeekView_restoreNumberOfVisibleDays, true)
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
             showCurrentTimeFirst = a.getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false)
+            arrangeAllDayEventsVertically = a.getBoolean(R.styleable.WeekView_arrangeAllDayEventsVertically, true)
         }
 
         viewState.apply {
@@ -166,26 +167,26 @@ internal object ViewStateFactory {
         }
 
         viewState.apply {
-            headerPadding = a.getDimension(R.styleable.WeekView_headerPadding, 10f)
+            headerPadding = a.getDimension(R.styleable.WeekView_headerPadding, context.dp(8))
         }
 
         viewState.apply {
             showWeekNumber = a.getBoolean(R.styleable.WeekView_showWeekNumber, false)
-            weekNumberBackgroundCornerRadius = a.getDimension(R.styleable.WeekView_weekNumberBackgroundCornerRadius, 0f)
+            weekNumberBackgroundCornerRadius = a.getDimension(R.styleable.WeekView_weekNumberBackgroundCornerRadius, context.dp(8))
         }
 
         viewState.apply {
-            eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, 0)
+            eventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, context.dp(2).roundToInt())
             adaptiveEventTextSize = a.getBoolean(R.styleable.WeekView_adaptiveEventTextSize, false)
             defaultEventColor = a.getColor(R.styleable.WeekView_defaultEventColor, context.colorAccent)
         }
 
         viewState.apply {
-            eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, 8)
-            eventPaddingVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, 8)
-            columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, 10)
+            eventPaddingHorizontal = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingHorizontal, context.dp(4).roundToInt())
+            eventPaddingVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventPaddingVertical, context.dp(4).roundToInt())
+            columnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, context.dp(8).roundToInt())
             overlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, 0)
-            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, 2)
+            eventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, context.dp(2).roundToInt())
             singleDayHorizontalPadding = a.getDimensionPixelSize(R.styleable.WeekView_singleDayHorizontalPadding, 0)
         }
 
@@ -277,4 +278,12 @@ private val Context.windowBackground: Int
     get() = resolveColor(android.R.attr.windowBackground)
 
 private val Context.defaultTextSize: Float
-    get() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, resources.displayMetrics)
+    get() = sp(12)
+
+private fun Context.dp(value: Int): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value.toFloat(), resources.displayMetrics)
+}
+
+private fun Context.sp(value: Int): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value.toFloat(), resources.displayMetrics)
+}

@@ -54,6 +54,12 @@ internal data class EventChip(
      */
     var relativeWidth: Float = 0f
 
+    /**
+     * Returns whether the [EventChip] of an all-day event is currently hidden, if all-day events
+     * are arranged vertically.
+     */
+    var isHidden: Boolean = false
+
     var minutesFromStartHour: Int = 0
 
     fun setEmpty() {
