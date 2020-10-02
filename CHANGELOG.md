@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## Version 5.0.0-beta04
+*(2020-10-02)*
+- New: WeekView now works in right-to-left mode.
+
 ## Version 5.0.0-beta03
 *(2020-10-01)*
 - New: Changes of the header height are now animated.
