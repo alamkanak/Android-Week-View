@@ -225,11 +225,12 @@ private class AllDayEventsUpdater(
     }
 
     private val RectF.isValid: Boolean
-        get() = (left < right &&
-            left < viewState.viewWidth &&
-            top < viewState.viewHeight &&
-            right > viewState.timeColumnWidth &&
-            bottom > 0)
+        get() {
+            val hasNonZeroWidth = left < right
+            val calendarArea = viewState.calendarGridBounds
+            val isVisibleHorizontally = right > calendarArea.left && left < calendarArea.right
+            return hasNonZeroWidth && isVisibleHorizontally
+        }
 }
 
 internal class AllDayEventsDrawer(
@@ -291,11 +292,17 @@ internal class AllDayEventsDrawer(
         // Draw +X text
         val text = "+$eventsCount"
         val textPaint = expandInfoTextPaint.apply {
+            textAlign = if (viewState.isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
             textSize = viewState.allDayEventTextPaint.textSize
             color = viewState.headerTextPaint.color
         }
 
-        val x = priorEventChip.bounds.left + viewState.eventPaddingHorizontal.toFloat()
+        val x = if (viewState.isLtr) {
+            priorEventChip.bounds.left + viewState.eventPaddingHorizontal.toFloat()
+        } else {
+            priorEventChip.bounds.right - viewState.eventPaddingHorizontal.toFloat()
+        }
+
         val y = priorEventChip.bounds.bottom +
             viewState.eventMarginVertical +
             viewState.eventPaddingVertical +
@@ -378,7 +385,7 @@ private class HeaderDrawer(
         val width = weekNumberBounds.width().roundToInt()
         val height = bottom - top
 
-        val left = (width - height) / 2
+        val left = weekNumberBounds.left.roundToInt() + (width - height) / 2
         val right = (left + height)
 
         if (allDayEventsExpanded) {

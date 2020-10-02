@@ -19,6 +19,7 @@ internal class TextFitter(
     }
 
     private fun fitAllDayEvent(eventChip: EventChip): StaticLayout {
+        // TODO Ellipsize if RTL?
         val textPaint = viewState.getTextPaint(eventChip.event)
         return eventChip.getText().toTextLayout(textPaint, width = Int.MAX_VALUE)
     }

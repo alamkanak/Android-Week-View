@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
+            android:textDirection="locale"
             android:textSize="16sp"
             tools:text="Lorem ipsum" />
 
@@ -27,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:lineSpacingMultiplier="1.1"
+            android:textDirection="locale"
             android:textSize="15sp"
             tools:text="Lorem ipsum\nDolor sit amet" />
 

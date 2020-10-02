@@ -2,6 +2,7 @@ package com.alamkanak.weekview
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.Typeface
@@ -64,6 +65,11 @@ class WeekView @JvmOverloads constructor(
         }
 
         setLayerType(LAYER_TYPE_SOFTWARE, null)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        viewState.onConfigurationChanged(newConfig)
+        super.onConfigurationChanged(newConfig)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -134,14 +140,19 @@ class WeekView @JvmOverloads constructor(
 
     private fun notifyScrollListeners() {
         val oldFirstVisibleDay = viewState.firstVisibleDate
+
         val daysScrolled = viewState.currentOrigin.x / viewState.dayWidth
         val delta = daysScrolled.roundToInt() * (-1)
 
-        val firstVisibleDate = today() + Days(delta)
-        val visibleDays = viewState.numberOfVisibleDays
+        val firstVisibleDate = if (viewState.isLtr) {
+            today() + Days(delta)
+        } else {
+            today() - Days(delta)
+        }
 
-        val dateRange = firstVisibleDate.rangeWithDays(visibleDays)
-        val adjustedDateRange = dateRange.limitTo(viewState.minDate, viewState.maxDate)
+        val dateRange = viewState.createDateRange(firstVisibleDate)
+        val adjustedDateRange = dateRange.validate(viewState = viewState)
+
         viewState.firstVisibleDate = adjustedDateRange.first()
 
         val hasFirstVisibleDayChanged = oldFirstVisibleDay.toEpochDays() != firstVisibleDate.toEpochDays()

@@ -14,7 +14,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/previousWeekButton"
+            android:id="@+id/leftNavigationButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -35,7 +35,7 @@
             tools:text="01/01/2018" />
 
         <ImageView
-            android:id="@+id/nextWeekButton"
+            android:id="@+id/rightNavigationButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

@@ -1,5 +1,6 @@
 package com.alamkanak.weekview
 
+import android.graphics.Paint
 import android.os.Build
 import android.text.Layout
 import android.text.SpannableString
@@ -45,6 +46,7 @@ internal fun CharSequence.semibold() = SpannableString(this).apply {
 
 internal fun ViewState.getTextPaint(event: ResolvedWeekViewEvent<*>): TextPaint {
     val textPaint = TextPaint(if (event.isAllDay) allDayEventTextPaint else eventTextPaint)
+    textPaint.textAlign = if (isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
     if (event.style.textColor != null) {
         textPaint.color = event.style.textColor
     }

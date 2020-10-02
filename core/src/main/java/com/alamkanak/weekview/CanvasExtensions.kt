@@ -50,5 +50,9 @@ internal fun RectF.insetBy(inset: Float): RectF {
     }
 }
 
+internal fun RectF.intersects(other: RectF): Boolean {
+    return intersects(other.left, other.top, other.right, other.bottom)
+}
+
 internal val RectF.isNotEmpty: Boolean
     get() = !isEmpty

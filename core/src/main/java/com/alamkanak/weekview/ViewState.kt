@@ -1,10 +1,13 @@
 package com.alamkanak.weekview
 
+import android.content.res.Configuration
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.os.Build
 import android.text.TextPaint
+import android.view.View
 import java.util.Calendar
 import kotlin.math.ceil
 import kotlin.math.max
@@ -18,6 +21,8 @@ internal class ViewState {
     // View
     var viewWidth: Int = 0
     var viewHeight: Int = 0
+
+    var isLtr: Boolean = true
 
     // Calendar state
     var firstVisibleDate: Calendar = today()
@@ -93,9 +98,12 @@ internal class ViewState {
     var timeColumnWidth: Float = 0f
     var timeColumnTextHeight: Float = 0f
 
-    val timeColumnTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        textAlign = Paint.Align.RIGHT
-    }
+    private val _timeColumnTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+
+    val timeColumnTextPaint: TextPaint
+        get() = _timeColumnTextPaint.apply {
+            textAlign = if (isLtr) Paint.Align.RIGHT else Paint.Align.LEFT
+        }
 
     val headerTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -124,7 +132,8 @@ internal class ViewState {
     val showAllDayEventsToggleArrow: Boolean
         get() = arrangeAllDayEventsVertically && maxNumberOfAllDayEvents > 2
 
-    // Dates in the past have origin.x > 0, dates in the future have origin.x < 0
+    // In LTR: Dates in the past have origin.x > 0, dates in the future have origin.x < 0
+    // In RTL: Dates in the past have origin.x < 0, dates in the future have origin.x > 0
     var currentOrigin = PointF(0f, 0f)
 
     val headerBackgroundPaint = Paint()
@@ -210,9 +219,9 @@ internal class ViewState {
 
     val headerBounds: RectF
         get() = _headerBounds.apply {
-            left = timeColumnWidth
+            left = if (isLtr) timeColumnWidth else 0f
             top = 0f
-            right = viewWidth.toFloat()
+            right = if (isLtr) viewWidth.toFloat() else (viewWidth - timeColumnWidth)
             bottom = headerHeight
         }
 
@@ -220,9 +229,9 @@ internal class ViewState {
 
     val calendarGridBounds: RectF
         get() = _calendarGridBounds.apply {
-            left = timeColumnWidth
+            left = if (isLtr) timeColumnWidth else 0f
             top = headerHeight
-            right = viewWidth.toFloat()
+            right = if (isLtr) viewWidth.toFloat() else viewWidth.toFloat() - timeColumnWidth
             bottom = viewHeight.toFloat()
         }
 
@@ -230,9 +239,9 @@ internal class ViewState {
 
     val weekNumberBounds: RectF
         get() = _weekNumberBounds.apply {
-            left = 0f
+            left = if (isLtr) 0f else (viewWidth - timeColumnWidth)
             top = 0f
-            right = timeColumnWidth
+            right = if (isLtr) timeColumnWidth else viewWidth.toFloat()
             bottom = headerPadding + dateLabelHeight + headerPadding
         }
 
@@ -240,9 +249,9 @@ internal class ViewState {
 
     val toggleAllDayEventsAreaBounds: RectF
         get() = _toggleAllDayEventsAreaBounds.apply {
-            left = 0f
+            left = if (isLtr) 0f else (viewWidth - timeColumnWidth)
             top = weekNumberBounds.bottom
-            right = timeColumnWidth
+            right = if (isLtr) timeColumnWidth else viewWidth.toFloat()
             bottom = headerHeight
         }
 
@@ -270,20 +279,22 @@ internal class ViewState {
         get() = timeRange step timeColumnHoursInterval
 
     fun getXOriginForDate(date: Calendar): Float {
-        return date.daysFromToday * dayWidth * -1f
+        return if (isLtr) (date.daysFromToday * dayWidth * -1f) else (date.daysFromToday * dayWidth)
     }
 
     private fun scrollToFirstDayOfWeek() {
         // If the week view is being drawn for the first time, consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
-        val currentDayIsNotToday = today.dayOfWeek != today.firstDayOfWeek
+        val currentDayIsNotStartOfWeek = today.dayOfWeek != today.firstDayOfWeek
 
-        if (isWeekView && currentDayIsNotToday) {
+        if (isWeekView && currentDayIsNotStartOfWeek) {
             val difference = today.computeDifferenceWithFirstDayOfWeek()
-            currentOrigin.x += dayWidth * difference
+            val factor = if (isLtr) 1 else -1
+            currentOrigin.x += dayWidth * difference * factor
         }
 
+        // TODO: Test minX and maxX with RTL
         currentOrigin.x = currentOrigin.x.limit(minValue = minX, maxValue = maxX)
     }
 
@@ -456,9 +467,13 @@ internal class ViewState {
 
     private fun updateDateRange() {
         val originX = currentOrigin.x
-
         val daysFromOrigin = ceil(originX / dayWidth).toInt() * (-1)
-        startPixel = timeColumnWidth + originX + dayWidth * daysFromOrigin
+
+        startPixel = if (isLtr) {
+            timeColumnWidth + originX + dayWidth * daysFromOrigin
+        } else {
+            originX + dayWidth * daysFromOrigin
+        }
 
         // If the user is scrolling, a new view becomes partially visible, so we must add an
         // additional date to the date range
@@ -466,9 +481,15 @@ internal class ViewState {
         val visibleDays = if (isNotScrolling) numberOfVisibleDays else numberOfVisibleDays + 1
 
         dateRange.clear()
-        val startDate = today() + Days(daysFromOrigin)
-        val newDateRange = startDate.rangeWithDays(visibleDays)
-        dateRange += newDateRange.limitTo(minDate, maxDate)
+
+        val startDate = if (isLtr) {
+            today() + Days(daysFromOrigin)
+        } else {
+            today() + Days(numberOfVisibleDays - 1 - daysFromOrigin)
+        }
+
+        val newDateRange = createDateRange(startDate, visibleDays)
+        dateRange += newDateRange.validate(viewState = this)
 
         startPixels.clear()
         startPixels += dateRange.indices.map { startPixel + it * dayWidth }
@@ -477,12 +498,27 @@ internal class ViewState {
         dateRangeWithStartPixels += dateRange.zip(startPixels)
     }
 
+    fun createDateRange(
+        startDate: Calendar,
+        visibleDays: Int = numberOfVisibleDays
+    ) = if (isLtr) {
+        (0 until visibleDays).map { startDate + Days(it) }
+    } else {
+        (0 until visibleDays).map { startDate - Days(it) }
+    }
+
     fun onSizeChanged(width: Int, height: Int) {
         viewWidth = width
         viewHeight = height
 
         if (showCompleteDay) {
             updateHourHeight(height)
+        }
+    }
+
+    fun onConfigurationChanged(newConfig: Configuration) {
+        if (Build.VERSION.SDK_INT >= 17) {
+            isLtr = newConfig.layoutDirection == View.LAYOUT_DIRECTION_LTR
         }
     }
 }

@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.activity_basic.weekView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import org.threeten.bp.format.FormatStyle.MEDIUM
+import org.threeten.bp.format.FormatStyle.SHORT
 
 private data class AsyncViewState(
     val events: List<ApiEvent> = emptyList(),
@@ -73,7 +74,7 @@ private class AsyncActivityWeekViewAdapter(
     private val eventClickHandler: (ApiEvent) -> Unit
 ) : WeekViewSimpleAdapterThreeTenAbp<ApiEvent>() {
 
-    private val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+    private val formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM, SHORT)
 
     override fun onEventClick(data: ApiEvent) {
         eventClickHandler(data)

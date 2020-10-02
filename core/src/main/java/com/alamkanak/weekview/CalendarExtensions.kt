@@ -194,7 +194,10 @@ internal fun firstDayOfYear(): Calendar {
 
 internal typealias DateRange = List<Calendar>
 
-internal fun DateRange.limitTo(minDate: Calendar?, maxDate: Calendar?): List<Calendar> {
+internal fun DateRange.validate(viewState: ViewState): List<Calendar> {
+    val minDate = viewState.minDate
+    val maxDate = viewState.maxDate
+
     if (minDate == null && maxDate == null) {
         return this
     }
@@ -214,19 +217,19 @@ internal fun DateRange.limitTo(minDate: Calendar?, maxDate: Calendar?): List<Cal
 
     return when {
         mustAdjustStart -> {
-            minDate!!.rangeWithDays(numberOfDays)
+            // TODO Test this with RTL
+            viewState.createDateRange(minDate!!)
         }
         mustAdjustEnd -> {
+            // TODO Test this with RTL
             val start = maxDate!! - Days(numberOfDays - 1)
-            start.rangeWithDays(numberOfDays)
+            viewState.createDateRange(start)
         }
         else -> {
             this
         }
     }
 }
-
-internal fun Calendar.rangeWithDays(days: Int) = (0 until days).map { this + Days(it) }
 
 internal val Calendar.isWeekend: Boolean
     get() = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
@@ -288,7 +291,7 @@ internal fun defaultDateFormatter(
 
 internal fun defaultTimeFormatter(): SimpleDateFormat = SimpleDateFormat("hh a", Locale.getDefault())
 
-internal fun Calendar.format(
+fun Calendar.format(
     format: Int = java.text.DateFormat.MEDIUM
 ): String {
     val sdf = SimpleDateFormat.getDateInstance(format)

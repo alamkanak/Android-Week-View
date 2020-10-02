@@ -10,20 +10,21 @@ import com.alamkanak.weekview.threetenabp.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.threetenabp.lastVisibleDateAsLocalDate
 import java.util.Calendar
 import kotlinx.android.synthetic.main.activity_static.dateRangeTextView
-import kotlinx.android.synthetic.main.activity_static.nextWeekButton
-import kotlinx.android.synthetic.main.activity_static.previousWeekButton
+import kotlinx.android.synthetic.main.activity_static.leftNavigationButton
+import kotlinx.android.synthetic.main.activity_static.rightNavigationButton
 import kotlinx.android.synthetic.main.activity_static.weekView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import org.threeten.bp.format.FormatStyle.MEDIUM
+import org.threeten.bp.format.FormatStyle.SHORT
 
 class StaticActivity : AppCompatActivity() {
 
     private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
 
-    private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+    private val dateFormatter = DateTimeFormatter.ofLocalizedDate(MEDIUM)
 
     private val adapter: StaticActivityWeekViewAdapter by lazy {
         StaticActivityWeekViewAdapter(
@@ -44,13 +45,13 @@ class StaticActivity : AppCompatActivity() {
             endDate = weekView.lastVisibleDateAsLocalDate
         )
 
-        previousWeekButton.setOnClickListener {
+        leftNavigationButton.setOnClickListener {
             val cal = weekView.firstVisibleDate
             cal.add(Calendar.DATE, -7)
             weekView.goToDate(cal)
         }
 
-        nextWeekButton.setOnClickListener {
+        rightNavigationButton.setOnClickListener {
             val cal = weekView.firstVisibleDate
             cal.add(Calendar.DATE, 7)
             weekView.goToDate(cal)
@@ -77,7 +78,7 @@ private class StaticActivityWeekViewAdapter(
     private val loadMoreHandler: (startDate: LocalDate, endDate: LocalDate) -> Unit
 ) : WeekViewPagingAdapterThreeTenAbp<Event>() {
 
-    private val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+    private val formatter = DateTimeFormatter.ofLocalizedDateTime(MEDIUM, SHORT)
 
     override fun onEventClick(data: Event) {
         context.showToast("Clicked ${data.title}")

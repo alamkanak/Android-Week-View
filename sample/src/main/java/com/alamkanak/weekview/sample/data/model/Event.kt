@@ -43,7 +43,7 @@ data class Event(
 
         val styledLocation = SpannableStringBuilder(location).apply {
             if (isCanceled) {
-                setSpan(StrikethroughSpan(), 0, title.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(StrikethroughSpan(), 0, location.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
 

@@ -132,8 +132,20 @@ internal class WeekViewGestureHandler(
 
     private fun onFlingHorizontal() {
         val destinationDate = when (currentFlingDirection) {
-            Left -> preFlingFirstVisibleDate + Days(viewState.numberOfVisibleDays)
-            Right -> preFlingFirstVisibleDate - Days(viewState.numberOfVisibleDays)
+            Left -> {
+                if (viewState.isLtr) {
+                    preFlingFirstVisibleDate + Days(viewState.numberOfVisibleDays)
+                } else {
+                    preFlingFirstVisibleDate - Days(viewState.numberOfVisibleDays)
+                }
+            }
+            Right -> {
+                if (viewState.isLtr) {
+                    preFlingFirstVisibleDate - Days(viewState.numberOfVisibleDays)
+                } else {
+                    preFlingFirstVisibleDate + Days(viewState.numberOfVisibleDays)
+                }
+            }
             else -> throw IllegalStateException()
         }
 
