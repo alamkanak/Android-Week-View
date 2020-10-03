@@ -30,7 +30,7 @@
             app:headerTextColor="@color/gray_600"
             app:hourHeight="60dp"
             app:nowLineDotRadius="5dp"
-            app:nowLineStrokeWidth="1dp"
+            app:nowLineStrokeWidth="2dp"
             app:numberOfVisibleDays="3"
             app:overlappingEventGap="1dp"
             app:showCurrentTimeFirst="true"

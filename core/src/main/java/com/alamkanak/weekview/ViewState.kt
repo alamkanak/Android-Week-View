@@ -269,7 +269,7 @@ internal class ViewState {
 
     private val timeRange: IntRange
         get() {
-            val includeMidnightHour = showTimeColumnHourSeparators // && showMidnightHour
+            val includeMidnightHour = showTimeColumnHourSeparators
             val padding = if (includeMidnightHour) 0 else timeColumnHoursInterval
             val startHour = minHour + padding
             return startHour until maxHour
@@ -294,7 +294,6 @@ internal class ViewState {
             currentOrigin.x += dayWidth * difference * factor
         }
 
-        // TODO: Test minX and maxX with RTL
         currentOrigin.x = currentOrigin.x.limit(minValue = minX, maxValue = maxX)
     }
 

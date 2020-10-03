@@ -46,7 +46,6 @@ internal class TimeColumnRenderer(
 
         // Draw background
         canvas.drawRect(bounds, timeColumnBackgroundPaint)
-        // canvas.drawRect(0f, topMargin, timeColumnWidth, bottom, timeColumnBackgroundPaint)
 
         val hourLines = FloatArray(hoursPerDay * 4)
 
@@ -67,7 +66,7 @@ internal class TimeColumnRenderer(
             }
 
             val label = timeLabelLayouts[hour]
-            val x = textHorizontalOffset // timeColumnWidth - timeColumnPadding
+            val x = textHorizontalOffset
 
             canvas.withTranslation(x, y) {
                 label.draw(this)
@@ -85,7 +84,7 @@ internal class TimeColumnRenderer(
         // Draw the vertical time column separator
         if (showTimeColumnSeparator) {
             val lineX = if (isLtr) {
-                timeColumnWidth - timeColumnSeparatorPaint.strokeWidth
+                timeColumnWidth - timeColumnSeparatorPaint.strokeWidth / 2
             } else {
                 viewWidth - timeColumnWidth
             }

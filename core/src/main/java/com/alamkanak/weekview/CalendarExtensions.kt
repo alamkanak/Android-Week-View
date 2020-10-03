@@ -217,11 +217,9 @@ internal fun DateRange.validate(viewState: ViewState): List<Calendar> {
 
     return when {
         mustAdjustStart -> {
-            // TODO Test this with RTL
             viewState.createDateRange(minDate!!)
         }
         mustAdjustEnd -> {
-            // TODO Test this with RTL
             val start = maxDate!! - Days(numberOfDays - 1)
             viewState.createDateRange(start)
         }
