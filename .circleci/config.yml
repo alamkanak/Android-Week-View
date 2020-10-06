@@ -3,7 +3,10 @@ jobs:
   build:
     working_directory: ~/code
     docker:
-      - image: circleci/android:api-29
+      - image: circleci/android:api-30
+        auth:
+          username: tillhellmund
+          password: $DOCKER_PASSWORD
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -15,9 +18,6 @@ jobs:
                    -{{ checksum "jsr310/build.gradle" }}
                    -{{ checksum "sample/build.gradle" }}
                    -{{ checksum "threetenabp/build.gradle" }}
-#      - run:
-#         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this. 
-#         command: sudo chmod +x ./gradlew
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
