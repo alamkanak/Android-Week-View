@@ -1565,6 +1565,7 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         fun refresh() {
             eventsCache.clear()
+            eventChipsCache.clear()
             weekView?.invalidate()
         }
 
