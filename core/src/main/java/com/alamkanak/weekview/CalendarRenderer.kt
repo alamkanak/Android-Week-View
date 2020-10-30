@@ -11,18 +11,18 @@ import kotlin.math.min
 
 internal class CalendarRenderer(
     viewState: ViewState,
-    eventChipsCache: EventChipsCache
+    eventChipsCacheProvider: EventChipsCacheProvider
 ) : Renderer {
 
     private val singleEventLabels = ArrayMap<String, StaticLayout>()
-    private val eventsUpdater = SingleEventsUpdater(viewState, eventChipsCache, singleEventLabels)
+    private val eventsUpdater = SingleEventsUpdater(viewState, eventChipsCacheProvider, singleEventLabels)
 
     // Be careful when changing the order of the drawers, as that might cause
     // views to incorrectly draw over each other
     private val drawers = listOf(
         DayBackgroundDrawer(viewState),
         BackgroundGridDrawer(viewState),
-        SingleEventsDrawer(viewState, eventChipsCache, singleEventLabels),
+        SingleEventsDrawer(viewState, eventChipsCacheProvider, singleEventLabels),
         NowLineDrawer(viewState)
     )
 
@@ -37,7 +37,7 @@ internal class CalendarRenderer(
 
 private class SingleEventsUpdater(
     private val viewState: ViewState,
-    private val chipsCache: EventChipsCache,
+    private val chipsCacheProvider: EventChipsCacheProvider,
     private val eventLabels: ArrayMap<String, StaticLayout>
 ) : Updater {
 
@@ -45,7 +45,8 @@ private class SingleEventsUpdater(
     private val textFitter = TextFitter(viewState)
 
     override fun update() {
-        chipsCache.clearSingleEventsCache()
+        val chipsCache = chipsCacheProvider()
+        chipsCache?.clearSingleEventsCache()
 
         for ((date, startPixel) in viewState.dateRangeWithStartPixels) {
             // If we use a horizontal margin in the day view, we need to offset the start pixel.
@@ -54,7 +55,7 @@ private class SingleEventsUpdater(
                 else -> startPixel
             }
 
-            val eventChips = chipsCache.normalEventChipsByDate(date).filter {
+            val eventChips = chipsCache?.normalEventChipsByDate(date).orEmpty().filter {
                 it.event.isWithin(viewState.minHour, viewState.maxHour)
             }
 
@@ -213,7 +214,7 @@ private class BackgroundGridDrawer(
 
 private class SingleEventsDrawer(
     private val viewState: ViewState,
-    private val chipsCache: EventChipsCache,
+    private val chipsCacheProvider: EventChipsCacheProvider,
     private val eventLabels: ArrayMap<String, StaticLayout>
 ) : Drawer {
 
@@ -228,8 +229,10 @@ private class SingleEventsDrawer(
     }
 
     private fun Canvas.drawEventsForDate(date: Calendar) {
-        val eventChips = chipsCache.normalEventChipsByDate(date).filterNot { it.bounds.isEmpty }
-        for (eventChip in eventChips) {
+        val eventChips = chipsCacheProvider()?.normalEventChipsByDate(date).orEmpty()
+        val validEventChips = eventChips.filterNot { it.bounds.isEmpty }
+
+        for (eventChip in validEventChips) {
             val textLayout = eventLabels[eventChip.id] ?: continue
             eventChipDrawer.draw(eventChip, canvas = this, textLayout)
         }

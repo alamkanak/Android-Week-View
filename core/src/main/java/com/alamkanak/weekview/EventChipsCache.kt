@@ -4,6 +4,8 @@ import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
+internal typealias EventChipsCacheProvider = () -> EventChipsCache?
+
 internal class EventChipsCache {
 
     val allEventChips: List<EventChip>

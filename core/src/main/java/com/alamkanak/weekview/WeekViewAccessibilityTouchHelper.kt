@@ -16,7 +16,7 @@ internal class WeekViewAccessibilityTouchHelper(
     private val view: WeekView,
     private val viewState: ViewState,
     private val touchHandler: WeekViewTouchHandler,
-    private val eventChipsCache: EventChipsCache
+    private val eventChipsCacheProvider: EventChipsCacheProvider
 ) : ExploreByTouchHelper(view) {
 
     private val dateFormatter = SimpleDateFormat.getDateInstance(LONG)
@@ -26,7 +26,7 @@ internal class WeekViewAccessibilityTouchHelper(
 
     override fun getVirtualViewAt(x: Float, y: Float): Int {
         // First, we check if an event chip was hit
-        val eventChip = eventChipsCache.findHitEvent(x, y)
+        val eventChip = eventChipsCacheProvider()?.findHitEvent(x, y)
         val eventChipVirtualViewId = eventChip?.let { store[it] }
         if (eventChipVirtualViewId != null) {
             return eventChipVirtualViewId
@@ -45,7 +45,7 @@ internal class WeekViewAccessibilityTouchHelper(
 
     override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
         val dateRange = viewState.dateRange
-        val visibleEventChips = eventChipsCache.allEventChipsInDateRange(dateRange)
+        val visibleEventChips = eventChipsCacheProvider()?.allEventChipsInDateRange(dateRange).orEmpty()
         virtualViewIds += store.put(visibleEventChips)
         virtualViewIds += dateRange.map { store.put(it) }
     }

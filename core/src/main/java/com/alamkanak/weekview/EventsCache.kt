@@ -55,7 +55,7 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
  * Represents an [EventsCache] that caches [ResolvedWeekViewEvent]s for their respective [Period]
  * and allows retrieval based on that [Period].
  */
-internal class PagedEventsCache<T> : EventsCache<T>() {
+internal class PaginatedEventsCache<T> : EventsCache<T>() {
 
     override val allEvents: List<ResolvedWeekViewEvent<T>>
         get() = eventsByPeriod.values.flatten()

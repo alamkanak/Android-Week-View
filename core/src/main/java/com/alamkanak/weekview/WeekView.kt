@@ -27,7 +27,7 @@ class WeekView @JvmOverloads constructor(
         ViewStateFactory.create(context, attrs)
     }
 
-    private val eventChipsCache = EventChipsCache()
+    private val eventChipsCacheProvider: EventChipsCacheProvider = { adapter?.eventChipsCache }
 
     private val touchHandler = WeekViewTouchHandler(viewState)
     private val gestureHandler = WeekViewGestureHandler(
@@ -41,15 +41,15 @@ class WeekView @JvmOverloads constructor(
         view = this,
         viewState = viewState,
         touchHandler = touchHandler,
-        eventChipsCache = eventChipsCache
+        eventChipsCacheProvider = eventChipsCacheProvider
     )
 
     private val scroller = ValueAnimator()
 
     private val renderers: List<Renderer> = listOf(
         TimeColumnRenderer(viewState),
-        CalendarRenderer(viewState, eventChipsCache),
-        HeaderRenderer(context, viewState, eventChipsCache, onHeaderHeightChanged = this::invalidate)
+        CalendarRenderer(viewState, eventChipsCacheProvider),
+        HeaderRenderer(context, viewState, eventChipsCacheProvider, onHeaderHeightChanged = this::invalidate)
     )
 
     init {
@@ -104,8 +104,8 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        val pagedAdapter = adapter as? PagingAdapter ?: return
-        pagedAdapter.loadPeriodsIfNecessary()
+        val pagingAdapter = adapter as? PagingAdapter
+        pagingAdapter?.dispatchLoadRequest()
     }
 
     private fun performRendering(canvas: Canvas) {
@@ -1294,10 +1294,11 @@ class WeekView @JvmOverloads constructor(
         }
 
     private fun setAdapterInternal(adapter: Adapter<*>?) {
-        adapter?.eventChipsCache = eventChipsCache
+//        adapter?.eventChipsCache = eventChipsCache
         internalAdapter = adapter
         touchHandler.adapter = adapter
-        internalAdapter?.registerObserver(this)
+        adapter?.registerObserver(this)
+        invalidate()
     }
 
     @PublicApi
@@ -1349,10 +1350,8 @@ class WeekView @JvmOverloads constructor(
     abstract class Adapter<T> {
 
         internal abstract val eventsCache: EventsCache<T>
-
-        private val eventChipsFactory = EventChipsFactory()
-
-        internal lateinit var eventChipsCache: EventChipsCache
+        internal val eventChipsCache: EventChipsCache by lazy { EventChipsCache() }
+        private val eventChipsFactory: EventChipsFactory by lazy { EventChipsFactory() }
 
         internal val eventsProcessor: EventsProcessor<T> by lazy {
             EventsProcessor(
@@ -1529,7 +1528,7 @@ class WeekView @JvmOverloads constructor(
      */
     open class PagingAdapter<T> : Adapter<T>() {
 
-        override val eventsCache = PagedEventsCache<T>()
+        override val eventsCache = PaginatedEventsCache<T>()
 
         /**
          * Submits a new list of [WeekViewDisplayable] elements to the adapter. These events are
@@ -1569,7 +1568,7 @@ class WeekView @JvmOverloads constructor(
             weekView?.invalidate()
         }
 
-        internal fun loadPeriodsIfNecessary() {
+        internal fun dispatchLoadRequest() {
             val firstVisibleDate = weekView?.viewState?.firstVisibleDate ?: return
             val fetchRange = FetchRange.create(firstVisibleDate)
             if (fetchRange in eventsCache) {

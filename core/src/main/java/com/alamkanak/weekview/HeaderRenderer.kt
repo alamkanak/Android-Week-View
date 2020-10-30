@@ -17,7 +17,7 @@ import kotlin.math.roundToInt
 internal class HeaderRenderer(
     context: Context,
     viewState: ViewState,
-    eventChipsCache: EventChipsCache,
+    eventChipsCacheProvider: EventChipsCacheProvider,
     onHeaderHeightChanged: () -> Unit
 ) : Renderer, DateFormatterDependent {
 
@@ -33,7 +33,7 @@ internal class HeaderRenderer(
     private val eventsUpdater = AllDayEventsUpdater(
         viewState = viewState,
         eventsLabelLayouts = allDayEventLabels,
-        eventChipsCache = eventChipsCache
+        eventChipsCacheProvider = eventChipsCacheProvider
     )
 
     private val dateLabelDrawer = DateLabelsDrawer(
@@ -162,7 +162,7 @@ private class DateLabelsDrawer(
 private class AllDayEventsUpdater(
     private val viewState: ViewState,
     private val eventsLabelLayouts: ArrayMap<EventChip, StaticLayout>,
-    private val eventChipsCache: EventChipsCache
+    private val eventChipsCacheProvider: EventChipsCacheProvider
 ) : Updater {
 
     private val boundsCalculator = EventChipBoundsCalculator(viewState)
@@ -174,7 +174,8 @@ private class AllDayEventsUpdater(
         get() {
             val didScrollHorizontally = previousHorizontalOrigin != viewState.currentOrigin.x
             val dateRange = viewState.dateRange
-            val containsNewChips = eventChipsCache.allDayEventChipsInDateRange(dateRange).any { it.bounds.isEmpty }
+            val eventChips = eventChipsCacheProvider()?.allDayEventChipsInDateRange(dateRange).orEmpty()
+            val containsNewChips = eventChips.any { it.bounds.isEmpty }
             return didScrollHorizontally || containsNewChips
         }
 
@@ -193,8 +194,7 @@ private class AllDayEventsUpdater(
                 else -> startPixel
             }
 
-            val eventChips = eventChipsCache.allDayEventChipsByDate(date)
-
+            val eventChips = eventChipsCacheProvider()?.allDayEventChipsByDate(date).orEmpty()
             eventChips.forEachIndexed { index, eventChip ->
                 eventChip.updateBounds(index = index, startPixel = modifiedStartPixel)
                 if (eventChip.bounds.isNotEmpty) {
