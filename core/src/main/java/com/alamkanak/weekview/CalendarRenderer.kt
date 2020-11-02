@@ -84,7 +84,7 @@ private class SingleEventsUpdater(
             val availableWidth = bounds.width() - horizontalPadding
             val availableHeight = bounds.height() - verticalPadding
             if (availableHeight <= 0 || availableWidth <= 0) {
-                eventChip.setEmpty()
+                // We can't fit any text into this
                 continue
             }
 
