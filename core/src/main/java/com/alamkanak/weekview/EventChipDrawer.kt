@@ -19,7 +19,6 @@ internal class EventChipDrawer(
     ) {
         canvas.drawInBounds(eventChip.bounds) {
             val event = eventChip.event
-
             val cornerRadius = viewState.eventCornerRadius.toFloat()
             updateBackgroundPaint(event, backgroundPaint)
 
@@ -32,7 +31,8 @@ internal class EventChipDrawer(
                 drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
             }
 
-            if (event.isNotAllDay) {
+            val originalEvent = eventChip.originalEvent
+            if (originalEvent.isMultiDay && originalEvent.isNotAllDay) {
                 drawCornersForMultiDayEvents(eventChip, cornerRadius)
             }
 

@@ -17,7 +17,13 @@ internal class EventChipBoundsCalculator(
         val top = calculateDistanceFromTop(minutesFromStart)
 
         val bottomMinutesFromStart = minutesFromStart + eventChip.event.durationInMinutes
-        val bottom = calculateDistanceFromTop(bottomMinutesFromStart) - viewState.eventMarginVertical
+        var bottom = calculateDistanceFromTop(bottomMinutesFromStart)
+
+        if (bottom != viewState.calendarGridBounds.bottom) {
+            // Add the vertical event margin only if the event is not at the end of the day;
+            // otherwise, the event chip would be cut off a few pixels early
+            bottom -= viewState.eventMarginVertical
+        }
 
         var left = startPixel + leftOffset + eventChip.relativeStart * drawableWidth
         var right = left + eventChip.relativeWidth * drawableWidth
