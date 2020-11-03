@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## Version 5.0.1
+*(2020-11-03)*
+
+- Fixed: WeekView no longer handles events incorrectly if their time zone is different from the device’s time zone.
+- Fixed: WeekView no longer renders the bottom border of multi-day events incorrectly.
+
 ## Version 5.0.0
 *(2020-10-20)*
 
