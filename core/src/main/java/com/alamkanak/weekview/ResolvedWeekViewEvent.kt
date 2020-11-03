@@ -10,18 +10,16 @@ internal fun <T> WeekViewDisplayable<T>.toResolvedWeekViewEvent(
 
 internal fun <T> WeekViewEvent<T>.resolve(
     context: Context
-): ResolvedWeekViewEvent<T> {
-    return ResolvedWeekViewEvent(
-        id = id,
-        title = titleResource.resolve(context, semibold = true),
-        startTime = startTime,
-        endTime = endTime,
-        location = locationResource?.resolve(context, semibold = false),
-        isAllDay = isAllDay,
-        style = style.resolve(context),
-        data = data
-    )
-}
+) = ResolvedWeekViewEvent(
+    id = id,
+    title = titleResource.resolve(context, semibold = true),
+    startTime = startTime.withLocalTimeZone(),
+    endTime = endTime.withLocalTimeZone(),
+    location = locationResource?.resolve(context, semibold = false),
+    isAllDay = isAllDay,
+    style = style.resolve(context),
+    data = data
+)
 
 internal fun WeekViewEvent.Style.resolve(
     context: Context
@@ -55,9 +53,11 @@ internal data class ResolvedWeekViewEvent<T>(
 
     internal val isNotAllDay: Boolean = isAllDay.not()
 
-    internal val durationInMinutes: Int = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
+    internal val durationInMinutes: Int
+        get() = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
 
-    internal val isMultiDay: Boolean = startTime.isSameDate(endTime).not()
+    internal val isMultiDay: Boolean
+        get() = startTime.isSameDate(endTime).not()
 
     internal fun isWithin(
         minHour: Int,

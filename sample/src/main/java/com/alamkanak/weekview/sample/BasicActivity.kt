@@ -10,14 +10,11 @@ import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.threetenabp.WeekViewPagingAdapterThreeTenAbp
 import com.alamkanak.weekview.threetenabp.setDateFormatter
-import java.util.Calendar
 import java.util.Locale
 import kotlinx.android.synthetic.main.activity_basic.weekView
 import kotlinx.android.synthetic.main.view_toolbar.toolbar
-import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle.MEDIUM
 import org.threeten.bp.format.FormatStyle.SHORT
@@ -88,8 +85,4 @@ private class BasicActivityWeekViewAdapter(
     override fun onLoadMore(startDate: LocalDate, endDate: LocalDate) {
         loadMoreHandler(startDate, endDate)
     }
-}
-
-private fun Calendar.toLocalDate(): LocalDate {
-    return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()
 }
