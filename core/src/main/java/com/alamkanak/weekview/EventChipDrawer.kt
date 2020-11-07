@@ -15,7 +15,7 @@ internal class EventChipDrawer(
     internal fun draw(
         eventChip: EventChip,
         canvas: Canvas,
-        textLayout: StaticLayout
+        textLayout: StaticLayout?
     ) {
         canvas.drawInBounds(eventChip.bounds) {
             val event = eventChip.event
@@ -36,7 +36,9 @@ internal class EventChipDrawer(
                 drawCornersForMultiDayEvents(eventChip, cornerRadius)
             }
 
-            drawEventTitle(eventChip, textLayout)
+            if (textLayout != null) {
+                drawEventTitle(eventChip, textLayout)
+            }
         }
     }
 

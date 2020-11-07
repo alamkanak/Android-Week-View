@@ -233,7 +233,7 @@ private class SingleEventsDrawer(
         val validEventChips = eventChips.filterNot { it.bounds.isEmpty }
 
         for (eventChip in validEventChips) {
-            val textLayout = eventLabels[eventChip.id] ?: continue
+            val textLayout = eventLabels[eventChip.id]
             eventChipDrawer.draw(eventChip, canvas = this, textLayout)
         }
     }

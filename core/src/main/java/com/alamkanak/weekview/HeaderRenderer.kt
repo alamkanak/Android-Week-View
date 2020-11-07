@@ -221,7 +221,11 @@ private class AllDayEventsUpdater(
 
     private fun EventChip.updateBounds(index: Int, startPixel: Float) {
         val candidate = boundsCalculator.calculateAllDayEvent(index, eventChip = this, startPixel)
-        bounds = if (candidate.isValid) candidate else RectF()
+        if (candidate.isValid) {
+            bounds.set(candidate)
+        } else {
+            bounds.setEmpty()
+        }
     }
 
     private val RectF.isValid: Boolean
