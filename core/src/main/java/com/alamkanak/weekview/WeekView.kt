@@ -1157,9 +1157,9 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     fun goToCurrentTime() {
-        now().apply {
-            goToDate(this)
-            goToHour(hour)
+        val now = now()
+        goToDateWithCompletion(now) {
+            goToHour(now.hour)
         }
     }
 
@@ -1171,6 +1171,10 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     fun goToDate(date: Calendar) {
+        goToDateWithCompletion(date, onComplete = {})
+    }
+
+    private fun goToDateWithCompletion(date: Calendar, onComplete: () -> Unit) {
         val adjustedDate = viewState.getDateWithinDateRange(date)
         if (adjustedDate.toEpochDays() == viewState.firstVisibleDate.toEpochDays()) {
             return
@@ -1205,6 +1209,7 @@ class WeekView @JvmOverloads constructor(
                     firstVisibleDate = adjustedDate,
                     lastVisibleDate = lastVisibleDate
                 )
+                onComplete()
             }
         )
     }
