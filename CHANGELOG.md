@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 5.0.2
+*(2020-11-10)*
+
+- Changed: WeekView no longer throws an `IllegalArgumentException` if `goToHour()` is called with an hour outside the accepted time range. Instead, it coerces the provided argument into the range of `minHour` and `maxHour`.
+- Fixed: WeekView no longer renders very short events incorrectly.
+- Fixed: WeekView no longer scrolls to the wrong time when calling `goToCurrentTime()`.
+
 ## Version 5.0.1
 *(2020-11-03)*
 
