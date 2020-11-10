@@ -14,7 +14,6 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -1143,40 +1142,89 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     val lastVisibleDate: Calendar
-        get() = viewState.firstVisibleDate.copy() + Days(viewState.numberOfVisibleDays - 1)
+        get() = viewState.firstVisibleDate + Days(viewState.numberOfVisibleDays - 1)
 
     /**
-     * Shows the current date.
+     * Scrolls to the specified date. Any provided [Calendar] that falls outside the range of
+     * [minDate] and [maxDate] will be adjusted to fit into this range.
+     *
+     * @param date A [Calendar] representing the date to scroll to.
      */
+    @PublicApi
+    fun scrollToDate(date: Calendar) {
+        scrollToDateWithCompletion(date.withLocalTimeZone())
+    }
+
+    /**
+     * Scrolls to the specified date time. Any provided [Calendar] that falls outside the range of
+     * [minDate] and [maxDate], or [minHour] and [maxHour], will be adjusted to fit into these
+     * ranges.
+     *
+     * @param dateTime A [Calendar] representing the date time to scroll to.
+     */
+    @PublicApi
+    fun scrollToDateTime(dateTime: Calendar) {
+        val localeDate = dateTime.withLocalTimeZone()
+        scrollToDateWithCompletion(localeDate) {
+            goToHour(localeDate.hour)
+        }
+    }
+
+    /**
+     * Scrolls to the specified time. Any provided time that falls outside the range of [minHour]
+     * and [maxHour] will be adjusted to fit into these ranges.
+     *
+     * @param hour The hour to scroll to.
+     * @param minute The minute to scroll to.
+     */
+    @PublicApi
+    fun scrollToTime(hour: Int, minute: Int) {
+        val date = viewState.firstVisibleDate.withTime(hour, minute)
+        scrollToDateTime(date)
+    }
+
+    /**
+     * Scrolls to the current date.
+     */
+    @Deprecated(
+        message = "This method will be removed in a future release. Use scrollToDate() instead.",
+        replaceWith = ReplaceWith(expression = "scrollToDate")
+    )
     @PublicApi
     fun goToToday() {
         goToDate(today())
     }
 
     /**
-     * Shows the current date and time.
+     * Scrolls to the current date and time.
      */
+    @Deprecated(
+        message = "This method will be removed in a future release. Use scrollToDateTime() instead.",
+        replaceWith = ReplaceWith(expression = "scrollToDateTime")
+    )
     @PublicApi
     fun goToCurrentTime() {
         val now = now()
-        goToDateWithCompletion(now) {
-            goToHour(now.hour)
-        }
+        scrollToDateWithCompletion(now, onComplete = { goToHour(now.hour) })
     }
 
     /**
-     * Shows a specific date. If it is before [minDate] or after [maxDate], these will be shown
-     * instead.
+     * Scrolls to a specific date. If the date is before [minDate] or after [maxDate], [WeekView]
+     * will scroll to them instead.
      *
      * @param date The date to show.
      */
+    @Deprecated(
+        message = "This method will be removed in a future release. Use scrollToDate() instead.",
+        replaceWith = ReplaceWith(expression = "scrollToDate")
+    )
     @PublicApi
     fun goToDate(date: Calendar) {
-        goToDateWithCompletion(date, onComplete = {})
+        scrollToDateWithCompletion(date)
     }
 
-    private fun goToDateWithCompletion(date: Calendar, onComplete: () -> Unit) {
-        val adjustedDate = viewState.getDateWithinDateRange(date)
+    private fun scrollToDateWithCompletion(date: Calendar, onComplete: () -> Unit = {}) {
+        val adjustedDate = viewState.getStartDateInAllowedRange(date)
         if (adjustedDate.toEpochDays() == viewState.firstVisibleDate.toEpochDays()) {
             onComplete()
             return
@@ -1193,9 +1241,9 @@ class WeekView @JvmOverloads constructor(
         }
 
         val destinationOffset = viewState.getXOriginForDate(date)
-        val adjustedDestinationOffset = destinationOffset.limit(
-            minValue = viewState.minX,
-            maxValue = viewState.maxX
+        val adjustedDestinationOffset = destinationOffset.coerceIn(
+            minimumValue = viewState.minX,
+            maximumValue = viewState.maxX
         )
 
         scroller.animate(
@@ -1217,28 +1265,43 @@ class WeekView @JvmOverloads constructor(
     }
 
     /**
-     * Scrolls to a specific hour. If it is before [minHour] or after [maxHour], these will be shown
-     * instead.
+     * Scrolls to a specific hour. If the hour is before [minHour] or after [maxHour], [WeekView]
+     * will scroll to them instead.
      *
      * @param hour The hour to scroll to, in 24-hour format. Supported values are 0-24.
      */
+    @Deprecated(
+        message = "This method will be removed in a future release. Use scrollToTime() instead.",
+        replaceWith = ReplaceWith(expression = "scrollToTime")
+    )
     @PublicApi
     fun goToHour(hour: Int) {
         val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
         if (isWaitingToBeLaidOut) {
+            // If the view's dimensions have just changed or if it hasn't been laid out yet, we
+            // postpone the action until onDraw() is called the next time.
             viewState.scrollToHour = hour
             return
         }
 
-        val sanitizedHour = min(max(hour, viewState.minHour), viewState.maxHour)
-        val hourHeight = viewState.hourHeight
-        val desiredOffset = hourHeight * (sanitizedHour - viewState.minHour)
+        val sanitizedHour = hour.coerceIn(minimumValue = minHour, maximumValue = maxHour)
+        val desired = now().withTime(hour = sanitizedHour, minutes = 0)
+
+        if (desired.hour > minHour) {
+            // Add some padding above the current time (and thus: the now line)
+            desired -= Hours(1)
+        } else {
+            desired -= Minutes(desired.minute)
+        }
+
+        val fraction = desired.minute / 60f
+        val verticalOffset = hourHeight * (desired.hour + fraction)
 
         // We make sure that WeekView doesn't "over-scroll" by limiting the offset to the total day
         // height minus the height of WeekView, which would result in scrolling all the way to the
         // bottom.
         val maxOffset = viewState.dayHeight - height
-        val finalOffset = min(maxOffset, desiredOffset) * (-1)
+        val finalOffset = min(maxOffset, verticalOffset) * (-1)
 
         scroller.animate(
             fromValue = viewState.currentOrigin.y,

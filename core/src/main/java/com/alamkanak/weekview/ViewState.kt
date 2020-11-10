@@ -294,10 +294,10 @@ internal class ViewState {
             currentOrigin.x += dayWidth * difference * factor
         }
 
-        currentOrigin.x = currentOrigin.x.limit(minValue = minX, maxValue = maxX)
+        currentOrigin.x = currentOrigin.x.coerceIn(minimumValue = minX, maximumValue = maxX)
     }
 
-    private fun scrollToCurrentTime() {
+    private fun renderCurrentTime() {
         val desired = now()
         if (desired.hour > minHour) {
             // Add some padding above the current time (and thus: the now line)
@@ -306,7 +306,7 @@ internal class ViewState {
             desired -= Minutes(desired.minute)
         }
 
-        desired.hour = min(max(desired.hour, minHour), maxHour)
+        desired.hour = desired.hour.coerceIn(minimumValue = minHour, maximumValue = maxHour)
         desired.minute = 0
 
         val fraction = desired.minute / 60f
@@ -317,22 +317,24 @@ internal class ViewState {
     }
 
     /**
-     * Returns the provided date, if it is within [minDate] and [maxDate]. Otherwise, it returns
-     * [minDate] or [maxDate].
+     * Returns a valid start date based on the provided [candidate]. If it falls outside the range
+     * of [minDate] and [maxDate], it will be adjusted accordingly.
+     *
+     * @return A [Calendar] of the valid start date
      */
-    fun getDateWithinDateRange(date: Calendar): Calendar {
-        val minDate = minDate ?: date
-        val maxDate = maxDate ?: date
+    fun getStartDateInAllowedRange(candidate: Calendar): Calendar {
+        val minDate = minDate ?: candidate
+        val maxDate = maxDate ?: candidate
 
-        return if (date.isBefore(minDate)) {
+        return if (candidate.isBefore(minDate)) {
             minDate
-        } else if (date.isAfter(maxDate)) {
+        } else if (candidate.isAfter(maxDate)) {
             maxDate - Days(numberOfVisibleDays - 1)
         } else if (numberOfVisibleDays >= 7 && showFirstDayOfWeekFirst) {
-            val diff = date.computeDifferenceWithFirstDayOfWeek()
-            date - Days(diff)
+            val diff = candidate.computeDifferenceWithFirstDayOfWeek()
+            candidate - Days(diff)
         } else {
-            date
+            candidate
         }
     }
 
@@ -362,9 +364,9 @@ internal class ViewState {
             val newMinHourHeight = (viewHeight - headerHeight) / hoursPerDay
             val effectiveMinHourHeight = max(minHourHeight, newMinHourHeight)
 
-            newHourHeight = newHourHeight.limit(
-                minValue = effectiveMinHourHeight,
-                maxValue = maxHourHeight
+            newHourHeight = newHourHeight.coerceIn(
+                minimumValue = effectiveMinHourHeight,
+                maximumValue = maxHourHeight
             )
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
@@ -458,7 +460,7 @@ internal class ViewState {
         }
 
         if (showCurrentTimeFirst) {
-            scrollToCurrentTime()
+            renderCurrentTime()
         }
 
         isFirstDraw = false

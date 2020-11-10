@@ -4,6 +4,7 @@ import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEvent
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import org.joda.time.LocalTime
 
 fun <T : Any> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
     return setStartTime(startTime.toCalendar())
@@ -46,13 +47,48 @@ val WeekView.lastVisibleDateAsLocalDate: LocalDate
     get() = lastVisibleDate.toLocalDate()
 
 /**
- * Shows a specific date. If it is before [WeekView.minDate] or after [WeekView.maxDate], these will be shown
- * instead.
+ * Scrolls to the specified date. If it is before [WeekView.minDate] or after [WeekView.maxDate],
+ * these will be shown instead.
  *
  * @param date The [LocalDate] to show.
  */
+@Deprecated(
+    message = "This method has been renamed to scrollTo().",
+    replaceWith = ReplaceWith(expression = "scrollTo")
+)
 fun WeekView.goToDate(date: LocalDate) {
-    goToDate(date.toCalendar())
+    scrollToDate(date)
+}
+
+/**
+ * Scrolls to the specified date. Any provided [LocalDate] that falls outside the range of
+ * [WeekView.minDate] and [WeekView.maxDate] will be adjusted to fit into this range.
+ *
+ * @param date The [LocalDate] to scroll to.
+ */
+fun WeekView.scrollToDate(date: LocalDate) {
+    scrollToDate(date.toCalendar())
+}
+
+/**
+ * Scrolls to the specified date time. Any provided [LocalDateTime] that falls outside the range of
+ * [WeekView.minDate] and [WeekView.maxDate], or [WeekView.minHour] and [WeekView.maxHour], will be
+ * adjusted to fit into these ranges.
+ *
+ * @param dateTime The [LocalDateTime] to scroll to.
+ */
+fun WeekView.scrollToDateTime(dateTime: LocalDateTime) {
+    scrollToDateTime(dateTime.toCalendar())
+}
+
+/**
+ * Scrolls to the specified time. Any provided [LocalTime] that falls outside the range of
+ * [WeekView.minHour] and [WeekView.maxHour] will be adjusted to fit into these ranges.
+ *
+ * @param time The [LocalTime] to scroll to.
+ */
+fun WeekView.scrollToTime(time: LocalTime) {
+    scrollToTime(time.hourOfDay, time.secondOfMinute)
 }
 
 fun WeekView.setDateFormatter(formatter: (LocalDate) -> String) {

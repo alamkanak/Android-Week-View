@@ -12,8 +12,6 @@ import com.alamkanak.weekview.Direction.Right
 import com.alamkanak.weekview.Direction.Vertical
 import java.util.Calendar
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 private enum class Direction {
@@ -89,9 +87,9 @@ internal class WeekViewGestureHandler(
         when (currentScrollDirection) {
             Left, Right -> {
                 viewState.currentOrigin.x -= distanceX
-                viewState.currentOrigin.x = viewState.currentOrigin.x.limit(
-                    minValue = viewState.minX,
-                    maxValue = viewState.maxX
+                viewState.currentOrigin.x = viewState.currentOrigin.x.coerceIn(
+                    minimumValue = viewState.minX,
+                    maximumValue = viewState.maxX
                 )
                 onInvalidation()
             }
@@ -150,9 +148,9 @@ internal class WeekViewGestureHandler(
         }
 
         val destinationOffset = viewState.getXOriginForDate(destinationDate)
-        val adjustedDestinationOffset = destinationOffset.limit(
-            minValue = viewState.minX,
-            maxValue = viewState.maxX
+        val adjustedDestinationOffset = destinationOffset.coerceIn(
+            minimumValue = viewState.minX,
+            maximumValue = viewState.maxX
         )
 
         scroller.animate(
@@ -176,7 +174,10 @@ internal class WeekViewGestureHandler(
 
         val currentOffset = viewState.currentOrigin.y
         val destinationOffset = currentOffset + (originalVelocityY * 0.18).roundToInt()
-        val adjustedDestinationOffset = destinationOffset.limit(minValue = minY, maxValue = maxY)
+        val adjustedDestinationOffset = destinationOffset.coerceIn(
+            minimumValue = minY,
+            maximumValue = maxY
+        )
 
         scroller.animate(
             fromValue = viewState.currentOrigin.y,
@@ -248,5 +249,3 @@ internal class WeekViewGestureHandler(
     private val Context.scaledTouchSlop: Int
         get() = ViewConfiguration.get(this).scaledTouchSlop
 }
-
-internal fun Float.limit(minValue: Float, maxValue: Float): Float = min(max(this, minValue), maxValue)

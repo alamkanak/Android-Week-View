@@ -6,6 +6,8 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.sample.R
+import com.alamkanak.weekview.threetenabp.scrollToDateTime
+import org.threeten.bp.LocalDateTime
 
 private enum class WeekViewType(val value: Int) {
     DayView(1),
@@ -29,7 +31,7 @@ fun Toolbar.setupWithWeekView(weekView: WeekView) {
     setOnMenuItemClickListener { item ->
         when (item.itemId) {
             R.id.action_today -> {
-                weekView.goToToday()
+                weekView.scrollToDateTime(dateTime = LocalDateTime.now())
                 true
             }
             else -> {
