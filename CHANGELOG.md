@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Version 5.0.3
+*(2020-11-10)*
+
+- Fixed: WeekView no longer ignores `goToCurrentTime()` if it’s already scrolled to the current date, but not the current time.
+
+Thanks for reporting this, [FeFelten](https://github.com/FeFelten)!
+
 ## Version 5.0.2
 *(2020-11-10)*
 
