@@ -1178,6 +1178,7 @@ class WeekView @JvmOverloads constructor(
     private fun goToDateWithCompletion(date: Calendar, onComplete: () -> Unit) {
         val adjustedDate = viewState.getDateWithinDateRange(date)
         if (adjustedDate.toEpochDays() == viewState.firstVisibleDate.toEpochDays()) {
+            onComplete()
             return
         }
 
