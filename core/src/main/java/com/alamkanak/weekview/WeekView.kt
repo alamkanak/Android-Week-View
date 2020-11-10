@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -1215,12 +1216,10 @@ class WeekView @JvmOverloads constructor(
     }
 
     /**
-     * Scrolls to a specific hour.
+     * Scrolls to a specific hour. If it is before [minHour] or after [maxHour], these will be shown
+     * instead.
      *
      * @param hour The hour to scroll to, in 24-hour format. Supported values are 0-24.
-     *
-     * @throws IllegalArgumentException Throws exception if the provided hour is smaller than
-     *                                   [minHour] or larger than [maxHour].
      */
     @PublicApi
     fun goToHour(hour: Int) {
@@ -1230,15 +1229,9 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        if (hour !in viewState.minHour..viewState.maxHour) {
-            throw IllegalArgumentException(
-                "The provided hour ($hour) is outside of the set time range " +
-                    "(${viewState.minHour} – ${viewState.maxHour})"
-            )
-        }
-
+        val sanitizedHour = min(max(hour, viewState.minHour), viewState.maxHour)
         val hourHeight = viewState.hourHeight
-        val desiredOffset = hourHeight * (hour - viewState.minHour)
+        val desiredOffset = hourHeight * (sanitizedHour - viewState.minHour)
 
         // We make sure that WeekView doesn't "over-scroll" by limiting the offset to the total day
         // height minus the height of WeekView, which would result in scrolling all the way to the
@@ -1299,7 +1292,6 @@ class WeekView @JvmOverloads constructor(
         }
 
     private fun setAdapterInternal(adapter: Adapter<*>?) {
-//        adapter?.eventChipsCache = eventChipsCache
         internalAdapter = adapter
         touchHandler.adapter = adapter
         adapter?.registerObserver(this)
