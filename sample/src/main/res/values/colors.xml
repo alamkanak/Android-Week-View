@@ -10,7 +10,9 @@
 
     <color name="gray_200">#EFEFEF</color>
     <color name="gray_300">#E0E0E0</color>
+    <color name="gray_500">#9E9E9E</color>
     <color name="gray_600">#757575</color>
+    <color name="gray_alpha10">#1A212121</color>
 
     <color name="accent">#2789e4</color>
 </resources>

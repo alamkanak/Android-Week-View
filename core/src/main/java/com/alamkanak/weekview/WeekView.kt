@@ -1410,11 +1410,11 @@ class WeekView @JvmOverloads constructor(
      */
     abstract class Adapter<T> {
 
-        internal abstract val eventsCache: EventsCache<T>
+        internal abstract val eventsCache: EventsCache
         internal val eventChipsCache: EventChipsCache by lazy { EventChipsCache() }
         private val eventChipsFactory: EventChipsFactory by lazy { EventChipsFactory() }
 
-        internal val eventsProcessor: EventsProcessor<T> by lazy {
+        internal val eventsProcessor: EventsProcessor by lazy {
             EventsProcessor(
                 context = context,
                 eventsCache = eventsCache,
@@ -1426,6 +1426,9 @@ class WeekView @JvmOverloads constructor(
         internal var weekView: WeekView? = null
             private set
 
+        /**
+         * Provides the [Context] that the adapter's [WeekView] is running in.
+         */
         val context: Context
             get() = checkNotNull(weekView).context
 
@@ -1476,46 +1479,64 @@ class WeekView @JvmOverloads constructor(
             weekView?.invalidate()
         }
 
-        internal fun onEventClick(id: Long) {
-            val event = eventsCache[id] ?: return
-            onEventClick(data = event.data)
+        internal fun onEventClick(id: Long, bounds: RectF) {
+            val data = findEventData(id) ?: return
+            onEventClick(data)
+            onEventClick(data, bounds)
         }
 
-        internal fun onEventLongClick(id: Long) {
-            val event = eventsCache[id] ?: return
-            onEventLongClick(data = event.data)
+        internal fun onEventLongClick(id: Long, bounds: RectF) {
+            val data = findEventData(id) ?: return
+            onEventLongClick(data)
+            onEventLongClick(data, bounds)
         }
 
-        private fun findEventData(id: Long): T? = eventsCache[id]?.data
+        @Suppress("UNCHECKED_CAST")
+        private fun findEventData(id: Long): T? {
+            val match = eventsCache[id]
+            return (match as? ResolvedWeekViewEntity.Event<T>)?.data
+        }
 
         /**
-         * Returns the data of the [WeekViewEvent] that the user clicked on.
+         * Called for each element of type [T] that was submitted to this adapter. This method must
+         * return a [WeekViewEntity] that will be rendered in the [WeekView] that is associated with
+         * this adapter.
          *
-         * @param data The data of the [WeekViewEvent]
+         * @param item The item of type [T] that was submitted to [WeekView]
+         * @return A [WeekViewEntity] that will be rendered in [WeekView]
+         */
+        open fun onCreateEntity(item: T): WeekViewEntity {
+            throw RuntimeException("You called submitList() on WeekView's adapter, but didn't implement onCreateEntity(). Please do so to convert the submitted elements to WeekViewEntity objects.")
+        }
+
+        /**
+         * Returns the data of the [WeekViewEntity.Event] that the user clicked on.
+         *
+         * @param data The data of the [WeekViewEntity.Event]
          */
         open fun onEventClick(data: T) = Unit
 
         /**
-         * Returns the data of the [WeekViewEvent] that the user clicked on as well as the bounds
-         * of the [EventChip] in which it is displayed.
+         * Returns the data of the [WeekViewEntity.Event] that the user clicked on as well as the
+         * bounds of the [EventChip] in which it is displayed.
          *
-         * @param data The data of the [WeekViewEvent]
+         * @param data The data of the [WeekViewEntity.Event]
          * @param bounds The [RectF] representing the bounds of the event's [EventChip]
          */
         open fun onEventClick(data: T, bounds: RectF) = Unit
 
         /**
-         * Returns the data of the [WeekViewEvent] that the user long-clicked on.
+         * Returns the data of the [WeekViewEntity.Event] that the user long-clicked on.
          *
-         * @param data The data of the [WeekViewEvent]
+         * @param data The data of the [WeekViewEntity.Event]
          */
         open fun onEventLongClick(data: T) = Unit
 
         /**
-         * Returns the data of the [WeekViewEvent] that the user long-clicked on as well as the
-         * bounds of the [EventChip] in which it is displayed.
+         * Returns the data of the [WeekViewEntity.Event] that the user long-clicked on as well as
+         * the bounds of the [EventChip] in which it is displayed.
          *
-         * @param data The data of the [WeekViewEvent]
+         * @param data The data of the [WeekViewEntity.Event]
          * @param bounds The [RectF] representing the bounds of the event's [EventChip]
          */
         open fun onEventLongClick(data: T, bounds: RectF) = Unit
@@ -1549,15 +1570,15 @@ class WeekView @JvmOverloads constructor(
      * An implementation of [WeekView.Adapter] that allows to submit a list of new elements to
      * [WeekView].
      *
-     * Newly submitted events are processed on a background thread and then presented in
-     * [WeekView]. Previously submitted events are replaced completely. If you require a paginated
-     * approach, you might want to use [WeekView.PagingAdapter].
+     * Newly submitted events are processed on a background thread and then presented in [WeekView].
+     * Previously submitted events are replaced completely. If you require a paginated approach, you
+     * might want to use [WeekView.PagingAdapter].
      *
      * @param T The type of elements that are displayed in the corresponding [WeekView].
      */
-    open class SimpleAdapter<T> : Adapter<T>() {
+    abstract class SimpleAdapter<T> : Adapter<T>() {
 
-        override val eventsCache = SimpleEventsCache<T>()
+        override val eventsCache = SimpleEventsCache()
 
         /**
          * Submits a new list of [WeekViewDisplayable] elements to the adapter. These events are
@@ -1567,9 +1588,28 @@ class WeekView @JvmOverloads constructor(
          * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
          */
         @PublicApi
+        @Deprecated(
+            message = "Use submitList() to submit a list of elements of type T instead. Then, overwrite the adapter's onCreateEntity() method to create a WeekViewEntity.",
+            replaceWith = ReplaceWith(expression = "submitList")
+        )
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
-            eventsProcessor.submit(events, viewState, onFinished = this::updateObserver)
+            val entities = events.map { it.toWeekViewEntity(context) }
+            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
+        }
+
+        /**
+         * Submits a new list of elements to the adapter. These events are processed on a background
+         * thread and then presented in [WeekView]. Previously submitted events are replaced
+         * completely.
+         *
+         * @param elements The elements of type [T] that are to be displayed in [WeekView]
+         */
+        @PublicApi
+        fun submitList(elements: List<T>) {
+            val viewState = weekView?.viewState ?: return
+            val entities = elements.map(this::onCreateEntity)
+            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
         }
     }
 
@@ -1577,40 +1617,57 @@ class WeekView @JvmOverloads constructor(
      * An implementation of [WeekView.Adapter] that allows to submit a list of new elements to
      * [WeekView] in a paginated way.
      *
-     * This adapter keeps a cache of [WeekViewDisplayable] elements grouped by month. Whenever the
-     * user scrolls to a different month, this adapter will check whether that month's events are
-     * present in the cache. If not, it will dispatch a callback to [onLoadMore] with the start and
-     * end dates of the months that need to be fetched.
+     * This adapter keeps a cache of the submitted elements grouped by month. Whenever the user
+     * scrolls to a different month, this adapter will check whether that month's events are present
+     * in the cache. If not, it will dispatch a callback to [onLoadMore] with the start and end
+     * dates of the months that need to be fetched.
      *
-     * Newly submitted events are processed on a background thread and then presented in
-     * [WeekView]. To clear the cache and thus refresh all events, you can call [refresh].
+     * Newly submitted events are processed on a background thread and then presented in [WeekView].
+     * To clear the cache and thus refresh all events, you can call [refresh].
      *
      * @param T The type of elements that are displayed in the corresponding [WeekView].
      */
-    open class PagingAdapter<T> : Adapter<T>() {
+    abstract class PagingAdapter<T> : Adapter<T>() {
 
-        override val eventsCache = PaginatedEventsCache<T>()
+        override val eventsCache = PaginatedEventsCache()
 
         /**
          * Submits a new list of [WeekViewDisplayable] elements to the adapter. These events are
-         * processed on a background thread and then presented in [WeekView]. Previously submitted
-         * events of the same month are replaced completely.
+         * processed on a background thread and then presented in [WeekView].
          *
          * @param events The [WeekViewDisplayable] elements that are to be displayed in [WeekView]
          */
         @PublicApi
+        @Deprecated(
+            message = "Use submitList() to submit a list of elements of type T instead. Then, overwrite the adapter's onCreateEntity() method to create a WeekViewEntity.",
+            replaceWith = ReplaceWith(expression = "submitList")
+        )
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
-            eventsProcessor.submit(events, viewState, onFinished = this::updateObserver)
+            val entities = events.map { it.toWeekViewEntity(context) }
+            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
         }
 
         /**
-         * Called whenever [WeekView] needs to fetch [WeekViewDisplayable] elements of a given
-         * month in order to allow for a smooth scrolling experience.
+         * Submits a new list of elements of type [T] to the adapter. These events are processed on
+         * a background thread and then presented in [WeekView].
          *
-         * This adapter caches [WeekViewDisplayable] elements of the current month as well as its
-         * previous and next month. If [WeekView] scrolls to a new month, that month as well as its
-         * surrounding months need to potentially be fetched.
+         * @param elements The elements of type [T] that are to be displayed in [WeekView]
+         */
+        @PublicApi
+        fun submitList(elements: List<T>) {
+            val viewState = weekView?.viewState ?: return
+            val entities = elements.map(this::onCreateEntity)
+            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
+        }
+
+        /**
+         * Called whenever [WeekView] needs to fetch new elements of a given month in order to allow
+         * for a smooth scrolling experience.
+         *
+         * This adapter caches submitted elements of the current month as well as its previous and
+         * next month. If [WeekView] scrolls to a new month, that month as well as its surrounding
+         * months need to potentially be fetched.
          *
          * @param startDate A [Calendar] of the first date of the month that needs to be fetched
          * @param endDate A [Calendar] of the last date of the month that needs to be fetched
@@ -1619,8 +1676,8 @@ class WeekView @JvmOverloads constructor(
         open fun onLoadMore(startDate: Calendar, endDate: Calendar) = Unit
 
         /**
-         * Refreshes the [WeekViewDisplayable] elements presented by this adapter. All cached
-         * elements will be removed and a call to [onLoadMore] will be triggered.
+         * Refreshes the elements presented by this adapter. All cached elements will be removed and
+         * a call to [onLoadMore] will be triggered.
          */
         @PublicApi
         fun refresh() {

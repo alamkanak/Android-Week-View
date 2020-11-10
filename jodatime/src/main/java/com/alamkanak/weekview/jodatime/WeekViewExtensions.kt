@@ -1,18 +1,26 @@
 package com.alamkanak.weekview.jodatime
 
 import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.WeekViewEvent
+import com.alamkanak.weekview.WeekViewEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 
-fun <T : Any> WeekViewEvent.Builder<T>.setStartTime(startTime: LocalDateTime): WeekViewEvent.Builder<T> {
-    return setStartTime(startTime.toCalendar())
-}
+fun <T : Any> WeekViewEntity.Event.Builder<T>.setStartTime(
+    startTime: LocalDateTime
+) = setStartTime(startTime.toCalendar())
 
-fun <T : Any> WeekViewEvent.Builder<T>.setEndTime(endTime: LocalDateTime): WeekViewEvent.Builder<T> {
-    return setEndTime(endTime.toCalendar())
-}
+fun <T : Any> WeekViewEntity.Event.Builder<T>.setEndTime(
+    endTime: LocalDateTime
+) = setEndTime(endTime.toCalendar())
+
+fun WeekViewEntity.BlockedTime.Builder.setStartTime(
+    startTime: LocalDateTime
+) = setStartTime(startTime.toCalendar())
+
+fun WeekViewEntity.BlockedTime.Builder.setEndTime(
+    endTime: LocalDateTime
+) = setEndTime(endTime.toCalendar())
 
 /**
  * Returns the minimum date that [WeekView] will display as a [LocalDate], or null if none is set.

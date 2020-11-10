@@ -4,54 +4,49 @@ import android.content.Context
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-internal fun <T> WeekViewDisplayable<T>.toResolvedWeekViewEvent(
-    context: Context
-) = toWeekViewEvent().resolve(context)
+internal sealed class ResolvedWeekViewEntity {
 
-internal fun <T> WeekViewEvent<T>.resolve(
-    context: Context
-) = ResolvedWeekViewEvent(
-    id = id,
-    title = titleResource.resolve(context, semibold = true),
-    startTime = startTime.withLocalTimeZone(),
-    endTime = endTime.withLocalTimeZone(),
-    location = locationResource?.resolve(context, semibold = false),
-    isAllDay = isAllDay,
-    style = style.resolve(context),
-    data = data
-)
+    internal abstract val id: Long
+    internal abstract val title: CharSequence
+    internal abstract val subtitle: CharSequence?
+    internal abstract val startTime: Calendar
+    internal abstract val endTime: Calendar
+    internal abstract val isAllDay: Boolean
+    internal abstract val style: Style
 
-internal fun WeekViewEvent.Style.resolve(
-    context: Context
-) = ResolvedWeekViewEvent.Style(
-    backgroundColor = backgroundColorResource?.resolve(context),
-    borderColor = borderColorResource?.resolve(context),
-    borderWidth = borderWidthResource?.resolve(context),
-    textColor = textColorResource?.resolve(context),
-    isTextStrikeThrough = isTextStrikeThrough
-)
+    data class Event<T>(
+        override val id: Long,
+        override val title: CharSequence,
+        override val startTime: Calendar,
+        override val endTime: Calendar,
+        override val subtitle: CharSequence?,
+        override val isAllDay: Boolean,
+        override val style: Style,
+        val data: T?
+    ) : ResolvedWeekViewEntity()
 
-internal data class ResolvedWeekViewEvent<T>(
-    val id: Long,
-    val title: CharSequence,
-    val startTime: Calendar,
-    val endTime: Calendar,
-    val location: CharSequence?,
-    val isAllDay: Boolean,
-    val style: Style,
-    val data: T
-) {
+    data class BlockedTime(
+        override val id: Long,
+        override val title: CharSequence,
+        override val subtitle: CharSequence?,
+        override val startTime: Calendar,
+        override val endTime: Calendar,
+        override val style: Style
+    ) : ResolvedWeekViewEntity() {
+        override val isAllDay: Boolean = false
+    }
 
     data class Style(
+        val textColor: Int? = null,
         val backgroundColor: Int? = null,
+        val pattern: WeekViewEntity.Style.Pattern? = null,
         val borderColor: Int? = null,
         val borderWidth: Int? = null,
-        val textColor: Int? = null,
-        @Deprecated("No longer used.")
-        val isTextStrikeThrough: Boolean = false
+        val cornerRadius: Int? = null
     )
 
-    internal val isNotAllDay: Boolean = isAllDay.not()
+    internal val isNotAllDay: Boolean
+        get() = isAllDay.not()
 
     internal val durationInMinutes: Int
         get() = ((endTime.timeInMillis - startTime.timeInMillis).toFloat() / 60_000).roundToInt()
@@ -64,7 +59,7 @@ internal data class ResolvedWeekViewEvent<T>(
         maxHour: Int
     ): Boolean = startTime.hour >= minHour && endTime.hour <= maxHour
 
-    internal fun collidesWith(other: ResolvedWeekViewEvent<*>): Boolean {
+    internal fun collidesWith(other: ResolvedWeekViewEntity): Boolean {
         if (isAllDay != other.isAllDay) {
             return false
         }
@@ -86,10 +81,52 @@ internal data class ResolvedWeekViewEvent<T>(
     }
 
     internal fun startsOnEarlierDay(
-        originalEvent: ResolvedWeekViewEvent<*>
+        originalEvent: ResolvedWeekViewEntity
     ): Boolean = startTime.isNotEqual(originalEvent.startTime)
 
     internal fun endsOnLaterDay(
-        originalEvent: ResolvedWeekViewEvent<*>
+        originalEvent: ResolvedWeekViewEntity
     ): Boolean = endTime.isNotEqual(originalEvent.endTime)
+
+    internal fun createCopy(
+        startTime: Calendar = this.startTime,
+        endTime: Calendar = this.endTime
+    ): ResolvedWeekViewEntity = when (this) {
+        is Event<*> -> copy(startTime = startTime, endTime = endTime)
+        is BlockedTime -> copy(startTime = startTime, endTime = endTime)
+    }
 }
+
+internal fun WeekViewEntity.resolve(
+    context: Context
+): ResolvedWeekViewEntity = when (this) {
+    is WeekViewEntity.Event<*> -> ResolvedWeekViewEntity.Event(
+        id = id,
+        title = titleResource.resolve(context, semibold = true),
+        startTime = startTime.withLocalTimeZone(),
+        endTime = endTime.withLocalTimeZone(),
+        subtitle = subtitleResource?.resolve(context, semibold = false),
+        isAllDay = isAllDay,
+        style = style.resolve(context),
+        data = data
+    )
+    is WeekViewEntity.BlockedTime -> ResolvedWeekViewEntity.BlockedTime(
+        id = id,
+        title = titleResource.resolve(context, semibold = true),
+        subtitle = subtitleResource?.resolve(context, semibold = false),
+        startTime = startTime.withLocalTimeZone(),
+        endTime = endTime.withLocalTimeZone(),
+        style = style.resolve(context)
+    )
+}
+
+internal fun WeekViewEntity.Style.resolve(
+    context: Context
+) = ResolvedWeekViewEntity.Style(
+    textColor = textColorResource?.resolve(context),
+    backgroundColor = backgroundColorResource?.resolve(context),
+    pattern = pattern,
+    borderColor = borderColorResource?.resolve(context),
+    borderWidth = borderWidthResource?.resolve(context),
+    cornerRadius = cornerRadiusResource?.resolve(context)
+)

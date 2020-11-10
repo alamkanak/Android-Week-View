@@ -4,27 +4,27 @@ import androidx.collection.ArrayMap
 import java.util.Calendar
 
 /**
- * An abstract class that provides functionality to cache [WeekViewEvent]s.
+ * An abstract class that provides functionality to cache [ResolvedWeekViewEntity] elements.
  */
-internal abstract class EventsCache<T> {
+internal abstract class EventsCache {
 
-    abstract val allEvents: List<ResolvedWeekViewEvent<T>>
-    abstract fun update(events: List<ResolvedWeekViewEvent<T>>)
+    abstract val allEvents: List<ResolvedWeekViewEntity>
+    abstract fun update(events: List<ResolvedWeekViewEntity>)
     abstract fun clear()
 
-    operator fun get(id: Long): ResolvedWeekViewEvent<T>? = allEvents.firstOrNull { it.id == id }
+    operator fun get(id: Long): ResolvedWeekViewEntity? = allEvents.firstOrNull { it.id == id }
 
     operator fun get(
         dateRange: List<Calendar>
-    ): List<ResolvedWeekViewEvent<T>> {
-        val startDate = checkNotNull(dateRange.min())
-        val endDate = checkNotNull(dateRange.max())
+    ): List<ResolvedWeekViewEntity> {
+        val startDate = checkNotNull(dateRange.minOrNull())
+        val endDate = checkNotNull(dateRange.maxOrNull())
         return allEvents.filter { it.endTime >= startDate || it.startTime <= endDate }
     }
 
     operator fun get(
         fetchRange: FetchRange
-    ): List<ResolvedWeekViewEvent<T>> {
+    ): List<ResolvedWeekViewEntity> {
         val startTime = fetchRange.previous.startDate
         val endTime = fetchRange.next.endDate
         return allEvents.filter { it.endTime >= startTime && it.startTime <= endTime }
@@ -32,17 +32,17 @@ internal abstract class EventsCache<T> {
 }
 
 /**
- * Represents an [EventsCache] that relies on a simple list of [WeekViewEvent]s. When updated with
- * new [WeekViewEvent]s, all existing ones are replaced.
+ * Represents an [EventsCache] that relies on a simple list of [ResolvedWeekViewEntity] objects.
+ * When updated with new [ResolvedWeekViewEntity] objects, all existing ones are replaced.
  */
-internal class SimpleEventsCache<T> : EventsCache<T>() {
+internal class SimpleEventsCache : EventsCache() {
 
-    private var _allEvents: List<ResolvedWeekViewEvent<T>>? = null
+    private var _allEvents: List<ResolvedWeekViewEntity>? = null
 
-    override val allEvents: List<ResolvedWeekViewEvent<T>>
+    override val allEvents: List<ResolvedWeekViewEntity>
         get() = _allEvents.orEmpty()
 
-    override fun update(events: List<ResolvedWeekViewEvent<T>>) {
+    override fun update(events: List<ResolvedWeekViewEntity>) {
         _allEvents = events
     }
 
@@ -52,17 +52,17 @@ internal class SimpleEventsCache<T> : EventsCache<T>() {
 }
 
 /**
- * Represents an [EventsCache] that caches [ResolvedWeekViewEvent]s for their respective [Period]
+ * Represents an [EventsCache] that caches [ResolvedWeekViewEntity]s for their respective [Period]
  * and allows retrieval based on that [Period].
  */
-internal class PaginatedEventsCache<T> : EventsCache<T>() {
+internal class PaginatedEventsCache : EventsCache() {
 
-    override val allEvents: List<ResolvedWeekViewEvent<T>>
+    override val allEvents: List<ResolvedWeekViewEntity>
         get() = eventsByPeriod.values.flatten()
 
-    private val eventsByPeriod: ArrayMap<Period, List<ResolvedWeekViewEvent<T>>> = ArrayMap()
+    private val eventsByPeriod: ArrayMap<Period, List<ResolvedWeekViewEntity>> = ArrayMap()
 
-    override fun update(events: List<ResolvedWeekViewEvent<T>>) {
+    override fun update(events: List<ResolvedWeekViewEntity>) {
         val groupedEvents = events.groupBy { Period.fromDate(it.startTime) }
         for ((period, periodEvents) in groupedEvents) {
             eventsByPeriod[period] = periodEvents

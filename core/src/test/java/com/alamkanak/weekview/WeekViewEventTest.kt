@@ -8,7 +8,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when` as whenever
 import org.mockito.MockitoAnnotations
 
-class ResolvedWeekViewEventTest {
+class WeekViewEventTest {
 
     private val viewState = Mockito.mock(ViewState::class.java)
 

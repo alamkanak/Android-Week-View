@@ -1,12 +1,18 @@
 package com.alamkanak.weekview.sample
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StrikethroughSpan
+import android.text.style.TypefaceSpan
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.sample.data.EventsDatabase
-import com.alamkanak.weekview.sample.data.model.Event
+import com.alamkanak.weekview.sample.data.model.CalendarEntity
 import com.alamkanak.weekview.sample.util.lazyView
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.google.android.material.appbar.MaterialToolbar
@@ -38,7 +44,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
         val start = getStartDate()
         val end = getEndDate()
 
-        val adapter = WeekView.SimpleAdapter<Event>()
+        val adapter = FragmentWeekViewAdapter()
         weekView.adapter = adapter
 
         // Limit WeekView to the current month
@@ -46,7 +52,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
         weekView.maxDate = end
 
         val events = database.getEventsInRange(start, end)
-        adapter.submit(events)
+        adapter.submitList(events)
     }
 
     private fun getStartDate(): Calendar = Calendar.getInstance().apply {
@@ -62,5 +68,45 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
 
     companion object {
         fun newInstance() = WeekFragment()
+    }
+}
+
+private class FragmentWeekViewAdapter : WeekView.SimpleAdapter<CalendarEntity.Event>() {
+
+    override fun onCreateEntity(item: CalendarEntity.Event): WeekViewEntity {
+        val backgroundColor = if (!item.isCanceled) item.color else Color.WHITE
+        val textColor = if (!item.isCanceled) Color.WHITE else item.color
+        val borderWidthResId = if (!item.isCanceled) R.dimen.no_border_width else R.dimen.border_width
+
+        val style = WeekViewEntity.Style.Builder()
+            .setTextColor(textColor)
+            .setBackgroundColor(backgroundColor)
+            .setBorderWidthResource(borderWidthResId)
+            .setBorderColor(item.color)
+            .build()
+
+        val title = SpannableStringBuilder(item.title).apply {
+            val titleSpan = TypefaceSpan("sans-serif-medium")
+            setSpan(titleSpan, 0, item.title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (item.isCanceled) {
+                setSpan(StrikethroughSpan(), 0, item.title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+
+        val subtitle = SpannableStringBuilder(item.location).apply {
+            if (item.isCanceled) {
+                setSpan(StrikethroughSpan(), 0, item.location.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+
+        return WeekViewEntity.Event.Builder(item)
+            .setId(item.id)
+            .setTitle(title)
+            .setStartTime(item.startTime)
+            .setEndTime(item.endTime)
+            .setSubtitle(subtitle)
+            .setAllDay(item.isAllDay)
+            .setStyle(style)
+            .build()
     }
 }

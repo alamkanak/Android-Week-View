@@ -33,7 +33,7 @@ internal class TextFitter(
     private fun EventChip.fitText(availableWidth: Int, availableHeight: Int): StaticLayout {
         val textPaint = viewState.getTextPaint(event)
 
-        var text = getText(includeLocation = true)
+        var text = getText(includeSubtitle = true)
         var textLayout = text.toTextLayout(textPaint, width = availableWidth)
 
         val fitsCompletely = textLayout.height <= availableHeight
@@ -41,7 +41,7 @@ internal class TextFitter(
             return textLayout
         }
 
-        text = getText(includeLocation = false)
+        text = getText(includeSubtitle = false)
         textLayout = text.toTextLayout(textPaint, width = availableWidth)
 
         val titleOnlyFits = textLayout.height <= availableHeight
@@ -66,22 +66,22 @@ internal class TextFitter(
         return textLayout
     }
 
-    private fun EventChip.getText(includeLocation: Boolean = false): CharSequence {
+    private fun EventChip.getText(includeSubtitle: Boolean = false): CharSequence {
         return if (event.isAllDay) {
             val title = event.title.emojified
-            combineTitleAndLocation(title, location = null, isMultiLine = false)
+            combineTitleAndSubtitle(title, subtitle = null, isMultiLine = false)
         } else {
             val title = event.title.emojified
-            val location = event.location?.emojified.takeIf { includeLocation }
-            combineTitleAndLocation(title, location, isMultiLine = true)
+            val subtitle = event.subtitle?.emojified.takeIf { includeSubtitle }
+            combineTitleAndSubtitle(title, subtitle, isMultiLine = true)
         }
     }
 
-    private fun combineTitleAndLocation(
+    private fun combineTitleAndSubtitle(
         title: CharSequence,
-        location: CharSequence?,
+        subtitle: CharSequence?,
         isMultiLine: Boolean
-    ): CharSequence = when (location) {
+    ): CharSequence = when (subtitle) {
         null -> title
         else -> {
             val separator = if (isMultiLine) "\n" else " "
@@ -89,7 +89,7 @@ internal class TextFitter(
             spannableStringBuilder
                 .append(title)
                 .append(separator)
-                .append(location)
+                .append(subtitle)
                 .build()
         }
     }

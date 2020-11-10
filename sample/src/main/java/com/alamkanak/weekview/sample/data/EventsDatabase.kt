@@ -2,9 +2,8 @@ package com.alamkanak.weekview.sample.data
 
 import android.content.Context
 import androidx.core.content.ContextCompat
-import com.alamkanak.weekview.WeekViewDisplayable
 import com.alamkanak.weekview.sample.R
-import com.alamkanak.weekview.sample.data.model.Event
+import com.alamkanak.weekview.sample.data.model.CalendarEntity
 import com.alamkanak.weekview.sample.util.toCalendar
 import java.util.Calendar
 import java.util.TimeZone
@@ -17,17 +16,53 @@ class EventsDatabase(context: Context) {
     private val color3 = ContextCompat.getColor(context, R.color.event_color_03)
     private val color4 = ContextCompat.getColor(context, R.color.event_color_04)
 
-    fun getEventsInRange(
+    fun getEntitiesInRange(
         startDate: LocalDate,
         endDate: LocalDate
-    ): List<WeekViewDisplayable<Event>> {
-        return getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
+    ): List<CalendarEntity> {
+        val events = getEventsInRange(startDate, endDate)
+        val blockedTimes = getBlockedTimesInRange(startDate, endDate)
+        return events + blockedTimes
+    }
+
+    private fun getEventsInRange(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ) = getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
+
+    private fun getBlockedTimesInRange(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): List<CalendarEntity> {
+        val start = startDate.toCalendar()
+        val year = start.get(Calendar.YEAR)
+        val month = start.get(Calendar.MONTH)
+        val dayOfMonth = start.get(Calendar.DAY_OF_MONTH)
+
+        return listOf(
+            newBlockedTime(
+                id = 123456789L,
+                year = year,
+                month = month,
+                dayOfMonth = dayOfMonth,
+                hour = 16,
+                duration = 2 * 60
+            ),
+            newBlockedTime(
+                id = 123456790L,
+                year = year,
+                month = month,
+                dayOfMonth = dayOfMonth,
+                hour = 19,
+                duration = 2 * 60
+            )
+        )
     }
 
     fun getEventsInRange(
         startDate: Calendar,
         endDate: Calendar
-    ): List<WeekViewDisplayable<Event>> {
+    ): List<CalendarEntity.Event> {
         val monthStartDates = mutableListOf<Calendar>()
         while (startDate < endDate) {
             val monthStartDate = Calendar.getInstance()
@@ -40,12 +75,12 @@ class EventsDatabase(context: Context) {
 
     private fun simulateEventsForRange(
         startDate: Calendar
-    ): List<WeekViewDisplayable<Event>> {
+    ): List<CalendarEntity.Event> {
         val year = startDate.get(Calendar.YEAR)
         val month = startDate.get(Calendar.MONTH)
 
-        val idOffset = year + 10L * month
-        val events = mutableListOf<WeekViewDisplayable<Event>>()
+        val idOffset = "$year${month}00".toLong()
+        val events = mutableListOf<CalendarEntity.Event>()
 
         events += newEvent(
             id = idOffset + 1,
@@ -245,7 +280,7 @@ class EventsDatabase(context: Context) {
         title: String = "Event $id",
         isAllDay: Boolean = false,
         isCanceled: Boolean = false
-    ): Event {
+    ): CalendarEntity.Event {
         val startTime = Calendar.getInstance(timeZone).apply {
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, month)
@@ -258,7 +293,7 @@ class EventsDatabase(context: Context) {
         val endTime = startTime.clone() as Calendar
         endTime.add(Calendar.MINUTE, duration)
 
-        return Event(
+        return CalendarEntity.Event(
             id = id,
             title = title,
             startTime = startTime,
@@ -269,4 +304,38 @@ class EventsDatabase(context: Context) {
             isCanceled = isCanceled
         )
     }
+
+    private fun newBlockedTime(
+        id: Long,
+        year: Int,
+        month: Int,
+        dayOfMonth: Int,
+        hour: Int,
+        minute: Int = 0,
+        duration: Int
+    ): CalendarEntity.BlockedTimeSlot {
+        val startTime = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month)
+            set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val endTime = startTime.clone() as Calendar
+        endTime.add(Calendar.MINUTE, duration)
+
+        return CalendarEntity.BlockedTimeSlot(
+            id = id,
+            startTime = startTime,
+            endTime = endTime
+        )
+    }
+}
+
+private fun Calendar.copy(block: Calendar.() -> Unit): Calendar {
+    val copy = clone() as Calendar
+    copy.block()
+    return copy
 }

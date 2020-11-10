@@ -10,16 +10,22 @@ internal class EventChipBoundsCalculator(
         eventChip: EventChip,
         startPixel: Float
     ): RectF {
-        val drawableWidth = viewState.drawableDayWidth
-        val leftOffset = if (viewState.isLtr) 0 else viewState.columnGap
+        val drawableWidth = when (eventChip.event) {
+            is ResolvedWeekViewEntity.Event<*> -> viewState.drawableDayWidth
+            is ResolvedWeekViewEntity.BlockedTime -> viewState.dayWidth
+        }
+
+        val isFullWidth = eventChip.originalEvent is ResolvedWeekViewEntity.BlockedTime
+        val leftOffset = if (viewState.isLtr || isFullWidth) 0 else viewState.columnGap
 
         val minutesFromStart = eventChip.minutesFromStartHour
         val top = calculateDistanceFromTop(minutesFromStart)
 
         val bottomMinutesFromStart = minutesFromStart + eventChip.event.durationInMinutes
         var bottom = calculateDistanceFromTop(bottomMinutesFromStart)
+        val isEvent = eventChip.event is ResolvedWeekViewEntity.Event<*>
 
-        if (bottom != viewState.calendarGridBounds.bottom) {
+        if (isEvent && bottom != viewState.calendarGridBounds.bottom) {
             // Add the vertical event margin only if the event is not at the end of the day;
             // otherwise, the event chip would be cut off a few pixels early
             bottom -= viewState.eventMarginVertical

@@ -1,6 +1,6 @@
 package com.alamkanak.weekview
 
-import com.alamkanak.weekview.model.Event
+import com.alamkanak.weekview.util.Event
 import com.alamkanak.weekview.util.createResolvedWeekViewEvent
 import org.junit.Assert.assertEquals
 import org.junit.Test

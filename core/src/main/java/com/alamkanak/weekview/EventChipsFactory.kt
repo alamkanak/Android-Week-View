@@ -4,8 +4,8 @@ import java.util.Calendar
 
 internal class EventChipsFactory {
 
-    fun createEventChips(
-        events: List<ResolvedWeekViewEvent<*>>,
+    fun create(
+        events: List<ResolvedWeekViewEntity>,
         viewState: ViewState
     ): List<EventChip> {
         val eventChips = convertEventsToEventChips(events, viewState)
@@ -19,7 +19,7 @@ internal class EventChipsFactory {
     }
 
     private fun convertEventsToEventChips(
-        events: List<ResolvedWeekViewEvent<*>>,
+        events: List<ResolvedWeekViewEntity>,
         viewState: ViewState
     ): List<EventChip> = events
         .sortedWith(compareBy({ it.startTime }, { it.endTime }))

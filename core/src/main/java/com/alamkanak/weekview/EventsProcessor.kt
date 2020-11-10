@@ -3,6 +3,7 @@ package com.alamkanak.weekview
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.WorkerThread
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -14,12 +15,12 @@ class MainExecutor : Executor {
 }
 
 /**
- * A helper class that processes the submitted [WeekViewEvent]s and creates [EventChip]s on a
- * background thread.
+ * A helper class that processes the submitted [WeekViewEntity] objects and creates [EventChip]s
+ * on a background thread.
  */
-internal class EventsProcessor<T>(
+internal class EventsProcessor(
     private val context: Context,
-    private val eventsCache: EventsCache<T>,
+    private val eventsCache: EventsCache,
     private val eventChipsFactory: EventChipsFactory,
     private val eventChipsCache: EventChipsCache
 ) {
@@ -28,38 +29,42 @@ internal class EventsProcessor<T>(
     private val mainThreadExecutor = MainExecutor()
 
     /**
-     * Updates the [EventsCache] with the provided [WeekViewDisplayable]s and creates [EventChip]s.
+     * Updates the [EventsCache] with the provided [WeekViewEntity] elements and creates
+     * [EventChip]s.
      *
-     * @param items The list of new [WeekViewDisplayable]s
+     * @param entities The list of new [WeekViewEntity] elements
      * @param viewState The current [ViewState] of [WeekView]
      * @param onFinished Callback to inform the caller whether [WeekView] should invalidate.
      */
     fun submit(
-        items: List<WeekViewDisplayable<T>>,
+        entities: List<WeekViewEntity>,
         viewState: ViewState,
         onFinished: () -> Unit
     ) {
         backgroundExecutor.execute {
-            submitItems(items, viewState)
+            submitItems(entities, viewState)
             mainThreadExecutor.execute {
                 onFinished()
             }
         }
     }
 
+    @WorkerThread
     private fun submitItems(
-        items: List<WeekViewDisplayable<T>>,
+        items: List<WeekViewEntity>,
         viewState: ViewState
     ) {
-        val events = items.map { it.toResolvedWeekViewEvent(context) }
-        eventsCache.update(events)
+        val resolvedItems = items.map { it.resolve(context) }
+        eventsCache.update(resolvedItems)
 
         if (eventsCache is SimpleEventsCache) {
-            // When using SimpleEventsCache, we completely replace all event chips that are
-            // currently cached.
-            eventChipsCache.clear()
+            val eventChips = eventChipsFactory.create(resolvedItems, viewState)
+            eventChipsCache.replaceAll(eventChips)
+        } else {
+            val existingIds = eventChipsCache.eventIds
+            val newResolvedItems = resolvedItems.filterNot { it.id in existingIds }
+            val eventChips = eventChipsFactory.create(newResolvedItems, viewState)
+            eventChipsCache.addAll(eventChips)
         }
-
-        eventChipsCache += eventChipsFactory.createEventChips(events, viewState)
     }
 }
