@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
@@ -39,8 +40,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.alamkanak.weekview.WeekViewUtil.*;
 
@@ -744,6 +749,7 @@ public class WeekView extends View {
 
     /**
      * Get the time and date where the user clicked on.
+     *
      * @param x The x position of the touch event.
      * @param y The y position of the touch event.
      * @return The time and date at the clicked position.
@@ -949,6 +955,23 @@ public class WeekView extends View {
             this.event = event;
             this.rectF = rectF;
             this.originalEvent = originalEvent;
+        }
+    }
+
+    private class EventTreeNode {
+        private EventRect event;
+        private List<EventTreeNode> children = new ArrayList<>();
+
+        public EventTreeNode(EventRect event) {
+            this.event = event;
+        }
+
+        public EventRect getEvent() {
+            return event;
+        }
+
+        public List<EventTreeNode> getChildren() {
+            return children;
         }
     }
 
@@ -1159,30 +1182,184 @@ public class WeekView extends View {
         // Calculate left and right position for all the events.
         // Get the maxRowCount by looking in all columns.
         int maxRowCount = 0;
-        for (List<EventRect> column : columns){
+        for (List<EventRect> column : columns) {
             maxRowCount = Math.max(maxRowCount, column.size());
         }
-        for (int i = 0; i < maxRowCount; i++) {
+        float j = 0;
+        for (List<EventRect> column : columns) {
             // Set the left and right values of the event.
-            float j = 0;
-            for (List<EventRect> column : columns) {
-                if (column.size() >= i+1) {
+            for (int i = 0; i < maxRowCount; i++) {
+                if (column.size() >= i + 1) {
                     EventRect eventRect = column.get(i);
-                    eventRect.width = 1f / columns.size();
-                    eventRect.left = j / columns.size();
-                    if(!eventRect.event.isAllDay()) {
+                    List<EventRect> colidingEvents = directlyColidingEvents(eventRect, collisionGroup);
+
+                    Map<EventRect, List<EventRect>> clashMap = createClashMap(colidingEvents);
+                    List<EventTreeNode> treeList = createTreeList(clashMap);
+                    int maxHeight = maxTreeHeight(colidingEvents, treeList);
+
+                    ConcurrentMap<Integer, List<EventRect>> colidingByColumn = colidingEventsByColumn(columns, colidingEvents);
+                    eventRect.width = calculateWidth(maxHeight, columns, colidingByColumn, j);
+                    eventRect.left = calculateLeft(colidingByColumn, j);
+                    if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
                         eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
-                    }
-                    else{
+                    } else {
                         eventRect.top = 0;
                         eventRect.bottom = mAllDayEventHeight;
                     }
                     mEventRects.add(eventRect);
                 }
-                j++;
+            }
+            j++;
+        }
+    }
+
+    private ConcurrentMap<Integer, List<EventRect>> colidingEventsByColumn(List<List<EventRect>> columns, List<EventRect> colidingEvents) {
+        ConcurrentMap<Integer, List<EventRect>> colidingByColumn = new ConcurrentHashMap<>();
+        for (EventRect event : colidingEvents) {
+            for (int i = 0; i < columns.size(); ++i) {
+                List<EventRect> col = columns.get(i);
+                if (col.contains(event)) {
+                    colidingByColumn.putIfAbsent(i, new ArrayList<EventRect>());
+                    List<EventRect> events = colidingByColumn.get(i);
+                    events.add(event);
+                }
             }
         }
+        return colidingByColumn;
+    }
+
+    private float calculateWidth(int maxTreeHeight, List<List<EventRect>> columns, ConcurrentMap<Integer, List<EventRect>> colidingByColumn, float column) {
+        if (column == columns.size() - 1) {
+            for (int j = (int) column - 1; j >= 0; --j) {
+                List<EventRect> columnClashes = colidingByColumn.get(j);
+                if (columnClashes != null && !columnClashes.isEmpty()) {
+                    float max = 0;
+                    for (EventRect event : columnClashes) {
+                        if (event.width + event.left > max) {
+                            max = event.width + event.left;
+                        }
+                    }
+                    return 1f - max;
+                }
+            }
+        }
+        return 1f / (maxTreeHeight + 1);
+    }
+
+    private Map<EventRect, List<EventRect>> createClashMap(List<EventRect> collidingEvents) {
+        Map<EventRect, List<EventRect>> result = new HashMap<>();
+        for (EventRect e : collidingEvents) {
+            List<EventRect> subsequentColiding = directlyColidingEvents(e, collidingEvents);
+            result.put(e, subsequentColiding);
+        }
+        return result;
+    }
+
+    private int maxTreeHeight(List<EventRect> colidingEvents, List<EventTreeNode> treeList) {
+        List<Integer> depths = new ArrayList<>();
+        int maxHeight = colidingEvents.size() > 0 ? 1 : 0;
+        for (EventTreeNode node : treeList) {
+            int height = treeHeight(node);
+            depths.add(height);
+            if (height > maxHeight) {
+                maxHeight = height;
+            }
+        }
+        return maxHeight;
+    }
+
+    private List<EventTreeNode> createTreeList(Map<EventRect, List<EventRect>> clashMap) {
+        List<EventTreeNode> result = new ArrayList<>();
+        for (EventRect e : clashMap.keySet()) {
+            EventTreeNode node = new EventTreeNode(e);
+            setChildren(node, node, clashMap, new ArrayList<EventRect>());
+            result.add(node);
+        }
+        return result;
+
+    }
+
+    private int treeHeight(EventTreeNode root) {
+        return heightAcc(root, 0) + 1;
+    }
+
+    private int heightAcc(EventTreeNode root, int acc) {
+        if (root.getChildren() == null || root.getChildren().isEmpty()) {
+            return acc;
+        }
+        int max = 0;
+        for (EventTreeNode node : root.getChildren()) {
+            int val = heightAcc(node, acc + 1);
+            if (val > max) {
+                max = val;
+            }
+        }
+        return max;
+    }
+
+    private void setChildren(EventTreeNode root, EventTreeNode target, Map<EventRect, List<EventRect>> clashMap, List<EventRect> exclude) {
+        List<EventRect> directClashes = clashMap.get(target.event);
+        for (EventRect e : directClashes) {
+            if (e != target.event && e != root.event && !exclude.contains(e)) {
+                if (isEventsCollide(root.event.event, e.event)) {
+                    EventTreeNode node = new EventTreeNode(e);
+                    target.getChildren().add(node);
+                    exclude.add(e);
+                    setChildren(root, node, clashMap, exclude);
+                }
+            }
+        }
+    }
+
+
+    private float calculateLeft(ConcurrentMap<Integer, List<EventRect>> colidingByColumn, float currentColumn) {
+        for (int j = (int) currentColumn - 1; j >= 0; --j) {
+            List<EventRect> column = colidingByColumn.get(j);
+            if (column != null && !column.isEmpty()) {
+                float min = getMinWidth(column);
+                float max = 0;
+                for (EventRect event : column) {
+                    if (event.width + event.left > max) {
+                        max = event.width + event.left;
+                        if (event.width != min) {
+                            // Close up gaps made when multiple coliding events are diffenent widths
+                            if (j == 0) {
+                                List<EventRect> rightEvents = colidingByColumn.get(((int)currentColumn) + 1);
+                                if (rightEvents != null && !rightEvents.isEmpty()) {
+                                    event.width = min;
+                                }
+                            }
+                        }
+                    }
+                }
+                return max;
+            }
+        }
+        return 0;
+    }
+
+    private float getMinWidth(List<EventRect> column) {
+        EventRect firstEvent = column.get(0);
+        float min = firstEvent.width;
+        for (EventRect event : column) {
+            if (event.width < min) {
+                min = event.width;
+            }
+        }
+        return min;
+    }
+
+    private List<EventRect> directlyColidingEvents(EventRect eventRect, List<EventRect> collisionGroup) {
+        List<EventRect> copy = new ArrayList<>(collisionGroup);
+        copy.remove(eventRect);
+        List<EventRect> clashes = new ArrayList<>();
+        for (EventRect event : copy) {
+            if (isEventsCollide(eventRect.event, event.event)) {
+                clashes.add(event);
+            }
+        }
+        return clashes;
     }
 
 
