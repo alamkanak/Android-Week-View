@@ -25,7 +25,7 @@ internal class WeekViewTouchHandler(
         val handled = adapter?.handleClick(x, y) ?: false
         if (!handled && y > viewState.headerHeight) {
             val time = calculateTimeFromPoint(x, y) ?: return
-            adapter?.handleEmptyViewClick(time)
+            adapter?.onEmptyViewClick(time)
         }
     }
 
@@ -37,7 +37,8 @@ internal class WeekViewTouchHandler(
 
         val handled = adapter?.handleLongClick(x, y) ?: false
         if (!handled && y > viewState.headerHeight) {
-            adapter?.handleLongClick(x, y)
+            val time = calculateTimeFromPoint(x, y) ?: return
+            adapter?.onEmptyViewLongClick(time)
         }
     }
 
