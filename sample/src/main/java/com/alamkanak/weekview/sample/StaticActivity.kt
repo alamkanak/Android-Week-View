@@ -14,7 +14,7 @@ import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.threetenabp.WeekViewPagingAdapterThreeTenAbp
 import com.alamkanak.weekview.threetenabp.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.threetenabp.lastVisibleDateAsLocalDate
-import java.util.Calendar
+import com.alamkanak.weekview.threetenabp.scrollToDate
 import kotlinx.android.synthetic.main.activity_static.dateRangeTextView
 import kotlinx.android.synthetic.main.activity_static.leftNavigationButton
 import kotlinx.android.synthetic.main.activity_static.rightNavigationButton
@@ -52,15 +52,15 @@ class StaticActivity : AppCompatActivity() {
         )
 
         leftNavigationButton.setOnClickListener {
-            val cal = weekView.firstVisibleDate
-            cal.add(Calendar.DATE, -7)
-            weekView.goToDate(cal)
+            val firstDate = weekView.firstVisibleDateAsLocalDate
+            val newFirstDate = firstDate.minusDays(7)
+            weekView.scrollToDate(newFirstDate)
         }
 
         rightNavigationButton.setOnClickListener {
-            val cal = weekView.firstVisibleDate
-            cal.add(Calendar.DATE, 7)
-            weekView.goToDate(cal)
+            val firstDate = weekView.firstVisibleDateAsLocalDate
+            val newFirstDate = firstDate.plusDays(7)
+            weekView.scrollToDate(newFirstDate)
         }
     }
 
