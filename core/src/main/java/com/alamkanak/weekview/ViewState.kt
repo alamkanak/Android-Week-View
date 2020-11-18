@@ -225,6 +225,16 @@ internal class ViewState {
             bottom = headerHeight
         }
 
+    private val _timeColumnBounds: RectF = RectF()
+
+    val timeColumnBounds: RectF
+        get() = _timeColumnBounds.apply {
+            left = if (isLtr) 0f else (viewWidth - timeColumnWidth)
+            top = _headerBounds.bottom
+            right = if (isLtr) timeColumnWidth else viewWidth.toFloat()
+            bottom = viewHeight.toFloat()
+        }
+
     private val _calendarGridBounds: RectF = RectF()
 
     val calendarGridBounds: RectF

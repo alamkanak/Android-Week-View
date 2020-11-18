@@ -1,7 +1,6 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
-import android.graphics.RectF
 import android.text.StaticLayout
 import android.util.SparseArray
 
@@ -10,30 +9,13 @@ internal class TimeColumnRenderer(
 ) : Renderer, TimeFormatterDependent {
 
     private val timeLabelLayouts = SparseArray<StaticLayout>()
-    private val bounds = RectF()
-
-    private val textHorizontalOffset: Float
-        get() = if (viewState.isLtr) {
-            bounds.right - viewState.timeColumnPadding
-        } else {
-            bounds.left + viewState.timeColumnPadding
-        }
 
     init {
         updateTimeLabels()
     }
 
     override fun onSizeChanged(width: Int, height: Int) {
-        updateBounds()
         updateTimeLabels()
-    }
-
-    private fun updateBounds() {
-        val startX = if (viewState.isLtr) 0f else viewState.viewWidth - viewState.timeColumnWidth
-        val endX = startX + viewState.timeColumnWidth
-        val startY = viewState.headerHeight
-        val endY = viewState.viewHeight.toFloat()
-        bounds.set(startX, startY, endX, endY)
     }
 
     override fun onTimeFormatterChanged(formatter: TimeFormatter) {
@@ -41,8 +23,8 @@ internal class TimeColumnRenderer(
     }
 
     override fun render(canvas: Canvas) = with(viewState) {
-        // var topMargin = headerHeight
         val bottom = viewState.viewHeight.toFloat()
+        val bounds = viewState.timeColumnBounds
 
         // Draw background
         canvas.drawRect(bounds, timeColumnBackgroundPaint)
@@ -66,7 +48,11 @@ internal class TimeColumnRenderer(
             }
 
             val label = timeLabelLayouts[hour]
-            val x = textHorizontalOffset
+            val x = if (viewState.isLtr) {
+                bounds.right - viewState.timeColumnPadding
+            } else {
+                bounds.left + viewState.timeColumnPadding
+            }
 
             canvas.withTranslation(x, y) {
                 label.draw(this)
