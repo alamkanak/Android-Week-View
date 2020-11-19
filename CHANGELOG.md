@@ -1,6 +1,15 @@
 Changelog
 =========
 
+## Version 5.2.0
+*(2020-11-19)*
+
+- New: WeekView can now display blocked times. To enable this, `WeekViewEvent<T>` was replaced by the sealed class `WeekViewEntity`, which can be of type `Event<T>` or `BlockedTime`. Refer to the [wiki](https://github.com/thellmund/Android-Week-View/wiki) to get started.
+- Changed: `WeekViewDisplayable<T>` is now deprecated. Now, submit elements of type `T` directly to WeekView’s adapter by calling `adapter.submitList(List<T>)`. Then, implement `onCreateEntity()` in your adapter to create a `WeekViewEntity` from your object. 
+- Changed: The methods for scrolling to specific dates and times have been streamlined. You should now use `scrollToDate(date: Calendar)`, `scrollToTime(hour: Int, minute: Int)`, and `scrollToDateTime(dateTime: Calendar)`.
+- Changed: WeekView no longer supports emojis by default. To add emoji support, you must add a dependency to `com.github.thellmund.Android-Week-View:emoji:x.y.z` and call `weekView.enableEmojiProcessing()` before submitting events.
+- Fixed: WeekView no longer forgets to call `onEmptyViewLongClick()` if an empty area in the calendar was long-clicked.
+
 ## Version 5.0.3
 *(2020-11-10)*
 
