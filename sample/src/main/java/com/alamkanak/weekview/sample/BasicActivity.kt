@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.emoji.enableEmojiProcessing
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
 import com.alamkanak.weekview.sample.util.setupWithWeekView
@@ -86,6 +87,7 @@ class BasicActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_basic)
 
+        weekView.enableEmojiProcessing()
         toolbar.setupWithWeekView(weekView)
 
         val adapter = BasicActivityWeekViewAdapter(

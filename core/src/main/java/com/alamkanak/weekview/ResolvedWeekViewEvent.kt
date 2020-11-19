@@ -102,18 +102,18 @@ internal fun WeekViewEntity.resolve(
 ): ResolvedWeekViewEntity = when (this) {
     is WeekViewEntity.Event<*> -> ResolvedWeekViewEntity.Event(
         id = id,
-        title = titleResource.resolve(context, semibold = true),
+        title = titleResource.resolve(context, semibold = true).processed,
         startTime = startTime.withLocalTimeZone(),
         endTime = endTime.withLocalTimeZone(),
-        subtitle = subtitleResource?.resolve(context, semibold = false),
+        subtitle = subtitleResource?.resolve(context, semibold = false)?.processed,
         isAllDay = isAllDay,
         style = style.resolve(context),
         data = data
     )
     is WeekViewEntity.BlockedTime -> ResolvedWeekViewEntity.BlockedTime(
         id = id,
-        title = titleResource.resolve(context, semibold = true),
-        subtitle = subtitleResource?.resolve(context, semibold = false),
+        title = titleResource.resolve(context, semibold = true).processed,
+        subtitle = subtitleResource?.resolve(context, semibold = false)?.processed,
         startTime = startTime.withLocalTimeZone(),
         endTime = endTime.withLocalTimeZone(),
         style = style.resolve(context)

@@ -67,14 +67,12 @@ internal class TextFitter(
     }
 
     private fun EventChip.getText(includeSubtitle: Boolean = false): CharSequence {
-        return if (event.isAllDay) {
-            val title = event.title.emojified
-            combineTitleAndSubtitle(title, subtitle = null, isMultiLine = false)
-        } else {
-            val title = event.title.emojified
-            val subtitle = event.subtitle?.emojified.takeIf { includeSubtitle }
-            combineTitleAndSubtitle(title, subtitle, isMultiLine = true)
-        }
+        val subtitle = event.subtitle?.takeIf { event.isNotAllDay && includeSubtitle }
+        return combineTitleAndSubtitle(
+            title = event.title,
+            subtitle = subtitle,
+            isMultiLine = event.isNotAllDay
+        )
     }
 
     private fun combineTitleAndSubtitle(

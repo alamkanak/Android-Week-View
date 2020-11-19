@@ -25,9 +25,9 @@ android {
 }
 
 dependencies {
+    implementation project(':base')
     implementation libraries.kotlin
     implementation libraries.appCompat
-    implementation libraries.emoji
 
     testImplementation testing.androidxjUnit
     testImplementation testing.androidxTestRunner

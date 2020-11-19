@@ -1,1 +1,3 @@
+include ':emoji'
+include ':base'
 include ':core', ':jodatime', ':jsr310', ':sample', ':threetenabp'

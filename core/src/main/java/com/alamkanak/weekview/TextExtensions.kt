@@ -8,13 +8,10 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.TypefaceSpan
-import androidx.emoji.text.EmojiCompat
+import com.alamkanak.weekview.base.TextProcessors
 
-private val emojiCompat: EmojiCompat?
-    get() = try { EmojiCompat.get() } catch (e: IllegalStateException) { null }
-
-internal val CharSequence.emojified: CharSequence
-    get() = emojiCompat?.process(this) ?: this
+internal val CharSequence.processed: CharSequence
+    get() = TextProcessors.process(this)
 
 internal fun CharSequence.toTextLayout(
     textPaint: TextPaint,
