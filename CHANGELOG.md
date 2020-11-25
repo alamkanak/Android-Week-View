@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 5.2.1
+*(2020-11-25)*
+
+This release fixes a build issue introduced in the last version.
+
 ## Version 5.2.0
 *(2020-11-19)*
 
