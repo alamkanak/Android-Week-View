@@ -1,8 +1,7 @@
+group = 'com.github.thellmund.Android-Week-View'
+version = '5.2.1'
+
 apply plugin: 'com.github.dcendents.android-maven'
-
-group='com.github.thellmund.Android-Week-View'
-version = '5.2.0'
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -13,10 +12,13 @@ android {
         minSdkVersion buildConfig.minSdkJsr310
         targetSdkVersion buildConfig.targetSdk
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':core')
 
     implementation libraries.kotlin
