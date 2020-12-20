@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
+import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -1317,8 +1318,15 @@ class WeekView @JvmOverloads constructor(
      * Returns the first hour that is visible on the screen.
      */
     @PublicApi
-    val firstVisibleHour: Double
-        get() = (viewState.currentOrigin.y * -1 / viewState.hourHeight).toDouble()
+    val firstVisibleHour: Int
+        get() = viewState.minHour + (viewState.currentOrigin.y * -1 / viewState.hourHeight).toInt()
+
+    /**
+     * Returns the first hour that is fully visible on the screen.
+     */
+    @PublicApi
+    val firstFullyVisibleHour: Int
+        get() = viewState.minHour + ceil(viewState.currentOrigin.y * -1 / viewState.hourHeight).toInt()
 
     /*
      ***********************************************************************************************
