@@ -72,6 +72,12 @@ class WeekView @JvmOverloads constructor(
         HeaderRenderer(context, viewState, eventChipsCacheProvider, onHeaderHeightChanged = this::invalidate)
     )
 
+    // We use width and height instead of view.isLaidOut(), because the latter seems to
+    // struggle when used in a ViewPager.
+    // See: https://github.com/thellmund/Android-Week-View/issues/214
+    private val isWaitingToBeLaidOut: Boolean
+        get() = width <= 0 || height <= 0
+
     init {
         val accessibilityManager =
             context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
@@ -1210,7 +1216,6 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     fun scrollToTime(hour: Int, minute: Int) {
-        val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
         if (isWaitingToBeLaidOut) {
             // If the view's dimensions have just changed or if it hasn't been laid out yet, we
             // postpone the action until onDraw() is called the next time.
@@ -1291,7 +1296,6 @@ class WeekView @JvmOverloads constructor(
 
         gestureHandler.forceScrollFinished()
 
-        val isWaitingToBeLaidOut = ViewCompat.isLaidOut(this).not()
         if (isWaitingToBeLaidOut) {
             // If the view's dimensions have just changed or if it hasn't been laid out yet, we
             // postpone the action until onDraw() is called the next time.
