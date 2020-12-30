@@ -37,7 +37,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
     private val database: EventsDatabase by lazy { EventsDatabase(requireContext()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar)
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setupWithWeekView(weekView)
 
         val start = getStartDate()
