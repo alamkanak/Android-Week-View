@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample;
+package com.alamkanak.weekview.sample.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,11 +10,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEntity;
+import com.alamkanak.weekview.sample.R;
 import com.alamkanak.weekview.sample.data.model.CalendarEntity;
+import com.alamkanak.weekview.sample.databinding.ActivityBasicBinding;
 import com.alamkanak.weekview.sample.util.ToolbarUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,16 +34,16 @@ public class LegacyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_basic);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        WeekView weekView = findViewById(R.id.weekView);
-        ToolbarUtils.setupWithWeekView(toolbar, weekView);
+        ActivityBasicBinding binding = ActivityBasicBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        ToolbarUtils.setupWithWeekView(binding.toolbarContainer.toolbar, binding.weekView);
 
         weekViewAdapter = new WeekViewAdapter(this::onLoadMore);
         eventsFetcher = new EventsFetcher(this);
 
-        weekView.setAdapter(weekViewAdapter);
+        binding.weekView.setAdapter(weekViewAdapter);
     }
 
     private void onLoadMore(@NotNull Calendar startDate, @NotNull Calendar endDate) {
@@ -56,7 +57,7 @@ public class LegacyActivity extends AppCompatActivity {
     private static class WeekViewAdapter extends WeekView.PagingAdapter<CalendarEntity.Event> {
 
         @NonNull
-        private OnLoadMoreNotifier notifier;
+        private final OnLoadMoreNotifier notifier;
 
         public WeekViewAdapter(@NonNull OnLoadMoreNotifier notifier) {
             super();

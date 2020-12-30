@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample
+package com.alamkanak.weekview.sample.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -9,18 +9,22 @@ import android.text.style.TypefaceSpan
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.sample.R
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
+import com.alamkanak.weekview.sample.databinding.ActivityLimitedBinding
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Calendar.DAY_OF_MONTH
-import kotlinx.android.synthetic.main.activity_limited.weekView
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 class LimitedActivity : AppCompatActivity() {
 
     private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
+
+    private val binding: ActivityLimitedBinding by lazy {
+        ActivityLimitedBinding.inflate(layoutInflater)
+    }
 
     private val adapter: LimitedActivityWeekViewAdapter by lazy {
         LimitedActivityWeekViewAdapter(loadMoreHandler = this::onLoadMore)
@@ -28,12 +32,12 @@ class LimitedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_limited)
+        setContentView(binding.root)
 
-        toolbar.setupWithWeekView(weekView)
+        binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
         setupDateRange()
 
-        weekView.adapter = adapter
+        binding.weekView.adapter = adapter
     }
 
     private fun setupDateRange() {
@@ -41,11 +45,11 @@ class LimitedActivity : AppCompatActivity() {
 
         val min = now.clone() as Calendar
         min.set(DAY_OF_MONTH, 1)
-        weekView.minDate = min
+        binding.weekView.minDate = min
 
         val max = now.clone() as Calendar
         max.set(DAY_OF_MONTH, max.getActualMaximum(DAY_OF_MONTH))
-        weekView.maxDate = max
+        binding.weekView.maxDate = max
     }
 
     private fun onLoadMore(startDate: Calendar, endDate: Calendar) {

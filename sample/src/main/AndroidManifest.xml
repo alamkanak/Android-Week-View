@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,60 +23,60 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BasicActivity"
+            android:name=".ui.basic.BasicActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".LegacyActivity"
+            android:name=".ui.LegacyActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".StaticActivity"
+            android:name=".ui.StaticActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".AsyncActivity"
+            android:name=".ui.async.AsyncActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".LimitedActivity"
+            android:name=".ui.LimitedActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".CustomFontActivity"
+            android:name=".ui.CustomFontActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".WithFragmentActivity"
+            android:name=".ui.WithFragmentActivity"
             android:label="@string/week_view"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.main.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".ui.main.MainActivity" />
         </activity>
     </application>
 

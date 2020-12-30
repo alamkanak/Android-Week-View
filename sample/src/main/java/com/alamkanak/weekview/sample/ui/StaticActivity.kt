@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample
+package com.alamkanak.weekview.sample.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -8,17 +8,14 @@ import android.text.style.StrikethroughSpan
 import android.text.style.TypefaceSpan
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.sample.R
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
+import com.alamkanak.weekview.sample.databinding.ActivityStaticBinding
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.threetenabp.WeekViewPagingAdapterThreeTenAbp
 import com.alamkanak.weekview.threetenabp.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.threetenabp.scrollToDate
-import kotlinx.android.synthetic.main.activity_static.dateRangeTextView
-import kotlinx.android.synthetic.main.activity_static.leftNavigationButton
-import kotlinx.android.synthetic.main.activity_static.rightNavigationButton
-import kotlinx.android.synthetic.main.activity_static.weekView
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -26,6 +23,10 @@ import org.threeten.bp.format.FormatStyle.MEDIUM
 import org.threeten.bp.format.FormatStyle.SHORT
 
 class StaticActivity : AppCompatActivity() {
+
+    private val binding: ActivityStaticBinding by lazy {
+        ActivityStaticBinding.inflate(layoutInflater)
+    }
 
     private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
 
@@ -40,21 +41,21 @@ class StaticActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_static)
+        setContentView(binding.root)
 
-        toolbar.setupWithWeekView(weekView)
-        weekView.adapter = adapter
+        binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
+        binding.weekView.adapter = adapter
 
-        leftNavigationButton.setOnClickListener {
-            val firstDate = weekView.firstVisibleDateAsLocalDate
+        binding.leftNavigationButton.setOnClickListener {
+            val firstDate = binding.weekView.firstVisibleDateAsLocalDate
             val newFirstDate = firstDate.minusDays(7)
-            weekView.scrollToDate(newFirstDate)
+            binding.weekView.scrollToDate(newFirstDate)
         }
 
-        rightNavigationButton.setOnClickListener {
-            val firstDate = weekView.firstVisibleDateAsLocalDate
+        binding.rightNavigationButton.setOnClickListener {
+            val firstDate = binding.weekView.firstVisibleDateAsLocalDate
             val newFirstDate = firstDate.plusDays(7)
-            weekView.scrollToDate(newFirstDate)
+            binding.weekView.scrollToDate(newFirstDate)
         }
     }
 
@@ -63,7 +64,7 @@ class StaticActivity : AppCompatActivity() {
     }
 
     private fun onRangeChanged(startDate: LocalDate, endDate: LocalDate) {
-        dateRangeTextView.text = buildDateRangeText(startDate, endDate)
+        binding.dateRangeTextView.text = buildDateRangeText(startDate, endDate)
     }
 
     private fun buildDateRangeText(startDate: LocalDate, endDate: LocalDate): String {

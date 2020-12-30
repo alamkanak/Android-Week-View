@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample;
+package com.alamkanak.weekview.sample.ui;
 
 import android.content.Context;
 import android.os.Handler;
@@ -16,7 +16,7 @@ import java.util.List;
 
 class EventsFetcher {
 
-    protected EventsDatabase database;
+    protected final EventsDatabase database;
 
     public EventsFetcher(Context context) {
         database = new EventsDatabase(context);

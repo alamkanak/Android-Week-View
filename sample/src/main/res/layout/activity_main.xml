@@ -4,9 +4,11 @@
     android:layout_height="match_parent"
     android:background="#fff"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".ui.main.MainActivity">
 
-    <include layout="@layout/view_toolbar" />
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

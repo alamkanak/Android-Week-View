@@ -21,7 +21,7 @@ class EventsDatabase(context: Context) {
         endDate: LocalDate
     ): List<CalendarEntity> {
         val events = getEventsInRange(startDate, endDate)
-        val blockedTimes = getBlockedTimesInRange(startDate, endDate)
+        val blockedTimes = getBlockedTimesInRange(startDate)
         return events + blockedTimes
     }
 
@@ -31,8 +31,7 @@ class EventsDatabase(context: Context) {
     ) = getEventsInRange(startDate.toCalendar(), endDate.toCalendar())
 
     private fun getBlockedTimesInRange(
-        startDate: LocalDate,
-        endDate: LocalDate
+        startDate: LocalDate
     ): List<CalendarEntity> {
         val start = startDate.toCalendar()
         val year = start.get(Calendar.YEAR)
@@ -332,10 +331,4 @@ class EventsDatabase(context: Context) {
             endTime = endTime
         )
     }
-}
-
-private fun Calendar.copy(block: Calendar.() -> Unit): Calendar {
-    val copy = clone() as Calendar
-    copy.block()
-    return copy
 }

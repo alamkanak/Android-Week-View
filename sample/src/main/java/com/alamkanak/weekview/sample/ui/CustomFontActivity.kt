@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample
+package com.alamkanak.weekview.sample.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -9,16 +9,20 @@ import android.text.style.TypefaceSpan
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.sample.R
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
+import com.alamkanak.weekview.sample.databinding.ActivityCustomFontBinding
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import kotlinx.android.synthetic.main.activity_custom_font.weekView
-import kotlinx.android.synthetic.main.view_toolbar.toolbar
 
 class CustomFontActivity : AppCompatActivity() {
+
+    private val binding: ActivityCustomFontBinding by lazy {
+        ActivityCustomFontBinding.inflate(layoutInflater)
+    }
 
     private val database: EventsDatabase by lazy { EventsDatabase(this) }
 
@@ -28,9 +32,9 @@ class CustomFontActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_custom_font)
-        toolbar.setupWithWeekView(weekView)
-        weekView.adapter = adapter
+        setContentView(binding.root)
+        binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
+        binding.weekView.adapter = adapter
     }
 
     private fun onLoadMore(startDate: Calendar, endDate: Calendar) {

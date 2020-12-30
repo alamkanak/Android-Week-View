@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/view_toolbar" />
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/view_toolbar" />
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
 
     <com.alamkanak.weekview.WeekView
         android:id="@+id/weekView"

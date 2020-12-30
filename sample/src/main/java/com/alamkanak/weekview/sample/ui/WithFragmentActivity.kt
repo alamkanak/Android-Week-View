@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.sample
+package com.alamkanak.weekview.sample.ui
 
 import android.graphics.Color
 import android.os.Bundle
@@ -6,17 +6,19 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.TypefaceSpan
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.sample.R
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
+import com.alamkanak.weekview.sample.databinding.FragmentWeekBinding
 import com.alamkanak.weekview.sample.util.setupWithWeekView
-import com.google.android.material.appbar.MaterialToolbar
 import java.util.Calendar
-import kotlinx.android.synthetic.main.fragment_week.weekView
 
 class WithFragmentActivity : AppCompatActivity(R.layout.activity_with_fragment) {
 
@@ -34,21 +36,31 @@ class WithFragmentActivity : AppCompatActivity(R.layout.activity_with_fragment) 
 
 class WeekFragment : Fragment(R.layout.fragment_week) {
 
+    private lateinit var binding: FragmentWeekBinding
+
     private val database: EventsDatabase by lazy { EventsDatabase(requireContext()) }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentWeekBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        toolbar.setupWithWeekView(weekView)
+        binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
 
         val start = getStartDate()
         val end = getEndDate()
 
         val adapter = FragmentWeekViewAdapter()
-        weekView.adapter = adapter
+        binding.weekView.adapter = adapter
 
         // Limit WeekView to the current month
-        weekView.minDate = start
-        weekView.maxDate = end
+        binding.weekView.minDate = start
+        binding.weekView.maxDate = end
 
         val events = database.getEventsInRange(start, end)
         adapter.submitList(events)

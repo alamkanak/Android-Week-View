@@ -1,12 +1,12 @@
-package com.alamkanak.weekview.sample
+package com.alamkanak.weekview.sample.ui.main
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.list_item_sample.view.details
-import kotlinx.android.synthetic.main.list_item_sample.view.title
+import com.alamkanak.weekview.sample.R
+import com.alamkanak.weekview.sample.databinding.ListItemSampleBinding
 
 data class Sample(
     val labelResId: Int,
@@ -32,10 +32,15 @@ class SamplesAdapter(
     override fun getItemCount() = samples.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(sample: Sample, onClick: (Sample) -> Unit) = with(itemView) {
-            title.text = context.getString(sample.labelResId)
-            details.text = sample.details
-            setOnClickListener { onClick(sample) }
+
+        private val binding: ListItemSampleBinding by lazy {
+            ListItemSampleBinding.bind(itemView)
+        }
+
+        fun bind(sample: Sample, onClick: (Sample) -> Unit) {
+            binding.title.text = itemView.context.getString(sample.labelResId)
+            binding.details.text = sample.details
+            binding.root.setOnClickListener { onClick(sample) }
         }
     }
 }
