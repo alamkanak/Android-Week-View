@@ -7,32 +7,31 @@ import android.view.ScaleGestureDetector as AndroidScaleGestureDetector
 internal class ScaleGestureDetector(
     context: Context,
     private val viewState: ViewState,
-    private val valueAnimator: ValueAnimator,
-    private val onInvalidation: () -> Unit
+    private val navigator: Navigator
 ) {
 
     private val listener = object : AndroidScaleGestureDetector.OnScaleGestureListener {
 
         override fun onScaleBegin(
             detector: AndroidScaleGestureDetector
-        ): Boolean = !valueAnimator.isRunning
+        ): Boolean = navigator.isNotRunning
 
         override fun onScale(detector: AndroidScaleGestureDetector): Boolean {
             val hourHeight = viewState.hourHeight
             viewState.newHourHeight = hourHeight * detector.scaleFactor
-            onInvalidation()
+            navigator.requestInvalidation()
             return true
         }
 
         override fun onScaleEnd(detector: AndroidScaleGestureDetector) {
-            onInvalidation()
+            navigator.requestInvalidation()
         }
     }
 
     private val detector = AndroidScaleGestureDetector(context, listener)
 
     fun onTouchEvent(event: MotionEvent) {
-        if (!valueAnimator.isRunning && !viewState.showCompleteDay) {
+        if (navigator.isNotRunning && !viewState.showCompleteDay) {
             detector.onTouchEvent(event)
         }
     }

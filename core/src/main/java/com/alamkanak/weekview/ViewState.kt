@@ -292,7 +292,7 @@ internal class ViewState {
         return if (isLtr) (date.daysFromToday * dayWidth * -1f) else (date.daysFromToday * dayWidth)
     }
 
-    private fun scrollToFirstDayOfWeek() {
+    private fun scrollToFirstDayOfWeek(navigationListener: Navigator.NavigationListener) {
         // If the week view is being drawn for the first time, consider the first day of the week.
         val today = today()
         val isWeekView = numberOfVisibleDays >= 7
@@ -305,6 +305,7 @@ internal class ViewState {
         }
 
         currentOrigin.x = currentOrigin.x.coerceIn(minimumValue = minX, maximumValue = maxX)
+        navigationListener.onHorizontalScrollingFinished()
     }
 
     private fun renderCurrentTime() {
@@ -449,8 +450,8 @@ internal class ViewState {
         timeColumnWidth = lineLength + timeColumnPadding * 2
     }
 
-    fun update() {
-        updateViewState()
+    fun update(navigationListener: Navigator.NavigationListener) {
+        updateViewState(navigationListener)
         updateScrollState()
         updateDateRange()
     }
@@ -460,13 +461,13 @@ internal class ViewState {
         updateVerticalOrigin()
     }
 
-    private fun updateViewState() {
+    private fun updateViewState(navigationListener: Navigator.NavigationListener) {
         if (!isFirstDraw) {
             return
         }
 
         if (showFirstDayOfWeekFirst) {
-            scrollToFirstDayOfWeek()
+            scrollToFirstDayOfWeek(navigationListener)
         }
 
         if (showCurrentTimeFirst) {

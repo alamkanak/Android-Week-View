@@ -13,7 +13,6 @@ import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
 import com.alamkanak.weekview.threetenabp.WeekViewPagingAdapterThreeTenAbp
 import com.alamkanak.weekview.threetenabp.firstVisibleDateAsLocalDate
-import com.alamkanak.weekview.threetenabp.lastVisibleDateAsLocalDate
 import com.alamkanak.weekview.threetenabp.scrollToDate
 import kotlinx.android.synthetic.main.activity_static.dateRangeTextView
 import kotlinx.android.synthetic.main.activity_static.leftNavigationButton
@@ -30,7 +29,7 @@ class StaticActivity : AppCompatActivity() {
 
     private val eventsFetcher: EventsFetcher by lazy { EventsFetcher(this) }
 
-    private val dateFormatter = DateTimeFormatter.ofLocalizedDate(MEDIUM)
+    private val dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
 
     private val adapter: StaticActivityWeekViewAdapter by lazy {
         StaticActivityWeekViewAdapter(
@@ -45,11 +44,6 @@ class StaticActivity : AppCompatActivity() {
 
         toolbar.setupWithWeekView(weekView)
         weekView.adapter = adapter
-
-        dateRangeTextView.text = buildDateRangeText(
-            startDate = weekView.firstVisibleDateAsLocalDate,
-            endDate = weekView.lastVisibleDateAsLocalDate
-        )
 
         leftNavigationButton.setOnClickListener {
             val firstDate = weekView.firstVisibleDateAsLocalDate
