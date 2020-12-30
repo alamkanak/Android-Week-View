@@ -1,6 +1,16 @@
 Changelog
 =========
 
+## Version 5.2.2
+*(2020-12-30)*
+
+- Changed: `firstVisibleHour` now returns the first partially visible hour as an `Int` and takes into account `minHour`. To retrieve the first fully visible hour, you can use `firstFullyVisibleHour`.
+- Fixed: WeekView now only calls `onRangeChanged()` when a scroll has finished. Previously, it would call it for every date that it scrolled past.
+- Fixed: WeekView now correctly preserves the first visible date when switching the number of visible days.
+- Fixed: WeekView now scrolls correctly when used in the Fragment of a ViewPager.
+
+Thanks to everyone who reported issues!
+
 ## Version 5.2.1
 *(2020-11-25)*
 
