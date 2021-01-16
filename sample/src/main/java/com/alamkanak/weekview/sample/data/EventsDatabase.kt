@@ -63,11 +63,10 @@ class EventsDatabase(context: Context) {
         endDate: Calendar
     ): List<CalendarEntity.Event> {
         val monthStartDates = mutableListOf<Calendar>()
-        while (startDate < endDate) {
-            val monthStartDate = Calendar.getInstance()
-            monthStartDate.timeInMillis = startDate.timeInMillis
-            monthStartDates.add(monthStartDate)
-            startDate.add(Calendar.MONTH, 1)
+        val currentStartDate = startDate.clone() as Calendar
+        while (currentStartDate < endDate) {
+            monthStartDates.add(currentStartDate.clone() as Calendar)
+            currentStartDate.add(Calendar.MONTH, 1)
         }
         return monthStartDates.flatMap(this::simulateEventsForRange)
     }
