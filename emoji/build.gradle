@@ -23,4 +23,5 @@ dependencies {
 
     implementation libraries.kotlin
     implementation libraries.emoji
+    implementation libraries.startup
 }

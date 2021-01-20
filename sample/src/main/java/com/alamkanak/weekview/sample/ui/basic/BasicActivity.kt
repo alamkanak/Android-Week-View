@@ -2,7 +2,6 @@ package com.alamkanak.weekview.sample.ui.basic
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.alamkanak.weekview.emoji.enableEmojiProcessing
 import com.alamkanak.weekview.sample.data.EventsDatabase
 import com.alamkanak.weekview.sample.databinding.ActivityBasicBinding
 import com.alamkanak.weekview.sample.util.setupWithWeekView
@@ -34,7 +33,6 @@ class BasicActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.weekView.enableEmojiProcessing()
         binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
 
         val adapter = BasicActivityWeekViewAdapter(

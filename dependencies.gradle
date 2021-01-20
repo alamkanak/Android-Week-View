@@ -18,6 +18,7 @@ ext {
             kotlin            : '1.4.21',
             mockito           : '3.3.3',
             robolectric       : '4.3.1',
+            startup           : '1.0.0',
             threeTen          : '1.4.4',
             threeTenAbp       : '1.2.4',
     ]
@@ -27,6 +28,7 @@ ext {
             jodaTime       : "joda-time:joda-time:${versions.jodaTime}",
             jodaTimeAndroid: "net.danlew:android.joda:${versions.jodaTimeAndroid}",
             kotlin         : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+            startup        : "androidx.startup:startup-runtime:${versions.startup}",
             threeTen       : "org.threeten:threetenbp:${versions.threeTen}",
             threeTenAbp    : "com.jakewharton.threetenabp:threetenabp:${versions.threeTenAbp}",
     ]
