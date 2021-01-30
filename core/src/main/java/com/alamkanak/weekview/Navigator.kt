@@ -1,5 +1,8 @@
 package com.alamkanak.weekview
 
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import java.util.Calendar
 
 internal class Navigator(
@@ -32,22 +35,23 @@ internal class Navigator(
             minimumValue = viewState.minX,
             maximumValue = viewState.maxX
         )
+        scrollHorizontallyTo(offset = adjustedDestinationOffset, onFinished = onFinished)
 
-        animator.animate(
-            fromValue = viewState.currentOrigin.x,
-            toValue = adjustedDestinationOffset,
-            onUpdate = {
-                viewState.currentOrigin.x = it
-                listener.onHorizontalScrollPositionChanged()
-            },
-            onEnd = {
-                listener.onHorizontalScrollingFinished()
-                onFinished()
-            }
-        )
+//        animator.animate(
+//            fromValue = viewState.currentOrigin.x,
+//            toValue = adjustedDestinationOffset,
+//            onUpdate = {
+//                viewState.currentOrigin.x = it
+//                listener.onHorizontalScrollPositionChanged()
+//            },
+//            onEnd = {
+//                listener.onHorizontalScrollingFinished()
+//                onFinished()
+//            }
+//        )
     }
 
-    fun scrollHorizontallyTo(offset: Float) {
+    fun scrollHorizontallyTo(offset: Float, onFinished: () -> Unit = {}) {
         animator.animate(
             fromValue = viewState.currentOrigin.x,
             toValue = offset,
@@ -55,7 +59,18 @@ internal class Navigator(
                 viewState.currentOrigin.x = it
                 listener.onHorizontalScrollPositionChanged()
             },
-            onEnd = listener::onHorizontalScrollingFinished
+            onEnd = {
+                if (Build.VERSION.SDK_INT > 25) {
+                    listener.onHorizontalScrollingFinished()
+                } else {
+                    // Delay calling the listener to avoid navigator.isNotRunning still
+                    // being false on API 25 and below.
+                    // See: https://github.com/thellmund/Android-Week-View/issues/227
+                    Handler(Looper.getMainLooper()).post {
+                        listener.onHorizontalScrollingFinished()
+                    }
+                }
+            }
         )
     }
 
