@@ -1,6 +1,15 @@
 Changelog
 =========
 
+## Version 5.2.3
+*(2021-02-06)*
+
+- Changed: The `emoji` module now initializes automatically on start-up. Calling `weekView.enableEmojiProcessing()` is no longer necessary.
+- Fixed: WeekView no longer crashes when accessing `firstVisibleDate` and `lastVisibleDate` before the initial render.
+- Fixed: WeekView now calls `adapter.onRangeChanged()` reliably again on API 25 and below.
+
+Thanks for contributing, [RemiNV](https://github.com/RemiNV)!
+
 ## Version 5.2.2
 *(2020-12-30)*
 
