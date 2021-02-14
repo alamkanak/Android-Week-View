@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 5.2.4
+*(2021-02-14)*
+
+- Changed: The `jsr310` module now uses core library desugaring, which allows it to be used starting at API 21 instead of API 26.
+
 ## Version 5.2.3
 *(2021-02-06)*
 
