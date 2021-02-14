@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.threetenabp
 
+import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
 import java.util.Calendar
 import org.threeten.bp.LocalDate
@@ -15,6 +16,7 @@ import org.threeten.bp.LocalDateTime
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
+@PublicApi
 abstract class WeekViewSimpleAdapterThreeTenAbp<T> : WeekView.SimpleAdapter<T>() {
 
     final override fun onEmptyViewClick(time: Calendar) {
@@ -68,6 +70,7 @@ abstract class WeekViewSimpleAdapterThreeTenAbp<T> : WeekView.SimpleAdapter<T>()
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
+@PublicApi
 abstract class WeekViewPagingAdapterThreeTenAbp<T> : WeekView.PagingAdapter<T>() {
 
     final override fun onEmptyViewClick(time: Calendar) {

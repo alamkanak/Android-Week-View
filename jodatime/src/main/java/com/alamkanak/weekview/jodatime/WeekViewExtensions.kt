@@ -1,23 +1,28 @@
 package com.alamkanak.weekview.jodatime
 
+import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
 
+@PublicApi
 fun <T : Any> WeekViewEntity.Event.Builder<T>.setStartTime(
     startTime: LocalDateTime
 ) = setStartTime(startTime.toCalendar())
 
+@PublicApi
 fun <T : Any> WeekViewEntity.Event.Builder<T>.setEndTime(
     endTime: LocalDateTime
 ) = setEndTime(endTime.toCalendar())
 
+@PublicApi
 fun WeekViewEntity.BlockedTime.Builder.setStartTime(
     startTime: LocalDateTime
 ) = setStartTime(startTime.toCalendar())
 
+@PublicApi
 fun WeekViewEntity.BlockedTime.Builder.setEndTime(
     endTime: LocalDateTime
 ) = setEndTime(endTime.toCalendar())
@@ -26,6 +31,7 @@ fun WeekViewEntity.BlockedTime.Builder.setEndTime(
  * Returns the minimum date that [WeekView] will display as a [LocalDate], or null if none is set.
  * Events before this date will not be shown.
  */
+@PublicApi
 var WeekView.minDateAsLocalDate: LocalDate?
     get() = minDate?.toLocalDate()
     set(value) {
@@ -36,6 +42,7 @@ var WeekView.minDateAsLocalDate: LocalDate?
  * Returns the maximum date that [WeekView] will display as a [LocalDate], or null if none is set.
  * Events after this date will not be shown.
  */
+@PublicApi
 var WeekView.maxDateAsLocalDate: LocalDate?
     get() = maxDate?.toLocalDate()
     set(value) {
@@ -45,12 +52,14 @@ var WeekView.maxDateAsLocalDate: LocalDate?
 /**
  * Returns the first visible date as a [LocalDate].
  */
+@PublicApi
 val WeekView.firstVisibleDateAsLocalDate: LocalDate
     get() = firstVisibleDate.toLocalDate()
 
 /**
  * Returns the last visible date as a [LocalDate].
  */
+@PublicApi
 val WeekView.lastVisibleDateAsLocalDate: LocalDate
     get() = lastVisibleDate.toLocalDate()
 
@@ -74,6 +83,7 @@ fun WeekView.goToDate(date: LocalDate) {
  *
  * @param date The [LocalDate] to scroll to.
  */
+@PublicApi
 fun WeekView.scrollToDate(date: LocalDate) {
     scrollToDate(date.toCalendar())
 }
@@ -85,6 +95,7 @@ fun WeekView.scrollToDate(date: LocalDate) {
  *
  * @param dateTime The [LocalDateTime] to scroll to.
  */
+@PublicApi
 fun WeekView.scrollToDateTime(dateTime: LocalDateTime) {
     scrollToDateTime(dateTime.toCalendar())
 }
@@ -95,10 +106,12 @@ fun WeekView.scrollToDateTime(dateTime: LocalDateTime) {
  *
  * @param time The [LocalTime] to scroll to.
  */
+@PublicApi
 fun WeekView.scrollToTime(time: LocalTime) {
     scrollToTime(time.hourOfDay, time.secondOfMinute)
 }
 
+@PublicApi
 fun WeekView.setDateFormatter(formatter: (LocalDate) -> String) {
     setDateFormatter { formatter(it.toLocalDate()) }
 }

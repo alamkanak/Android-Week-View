@@ -13,9 +13,6 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-typealias DateFormatter = (Calendar) -> String
-typealias TimeFormatter = (Int) -> String
-
 internal class ViewState {
 
     // View

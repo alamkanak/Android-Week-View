@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.jsr310
 
+import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -15,6 +16,7 @@ import java.util.Calendar
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
+@PublicApi
 abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
     final override fun onEmptyViewClick(time: Calendar) {
         onEmptyViewClick(time.toLocalDateTime())
@@ -67,7 +69,8 @@ abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
-abstract class WeekViewPagingAdapterJodaTime<T> : WeekView.PagingAdapter<T>() {
+@PublicApi
+abstract class WeekViewPagingAdapterJsr310<T> : WeekView.PagingAdapter<T>() {
 
     final override fun onEmptyViewClick(time: Calendar) {
         onEmptyViewClick(time.toLocalDateTime())

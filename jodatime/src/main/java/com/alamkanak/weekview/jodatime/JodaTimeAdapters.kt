@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.jodatime
 
+import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
 import java.util.Calendar
 import org.joda.time.LocalDate
@@ -15,6 +16,7 @@ import org.joda.time.LocalDateTime
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
+@PublicApi
 abstract class WeekViewSimpleAdapterJodaTime<T> : WeekView.SimpleAdapter<T>() {
     final override fun onEmptyViewClick(time: Calendar) {
         onEmptyViewClick(time.toLocalDateTime())
@@ -67,6 +69,7 @@ abstract class WeekViewSimpleAdapterJodaTime<T> : WeekView.SimpleAdapter<T>() {
  *
  * @param T The type of elements that are displayed in the corresponding [WeekView].
  */
+@PublicApi
 abstract class WeekViewPagingAdapterJodaTime<T> : WeekView.PagingAdapter<T>() {
 
     final override fun onEmptyViewClick(time: Calendar) {
