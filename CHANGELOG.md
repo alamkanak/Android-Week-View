@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## Version 5.3.0
+*(2021-03-03)*
+
+- **Breaking**: The deprecation level of several properties has been increased from `warning` to `error`.
+- Fixed: WeekView no longer ignores uses day background colors set in code or XML.
+
 ## Version 5.2.4
 *(2021-02-14)*
 
