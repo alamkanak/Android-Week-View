@@ -100,23 +100,17 @@ class WeekView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        performPendingScrolls()
+        performPendingScroll()
         updateViewState()
         refreshEvents()
         performRendering(canvas)
     }
 
-    private fun performPendingScrolls() {
-        val pendingDateScroll = viewState.scrollToDate
-        viewState.scrollToDate = null
-        pendingDateScroll?.let { date ->
-            goToDate(date)
-        }
-
-        val pendingHourScroll = viewState.scrollToHour
-        viewState.scrollToHour = null
-        pendingHourScroll?.let { hour ->
-            goToHour(hour)
+    private fun performPendingScroll() {
+        val pendingScroll = viewState.pendingScroll
+        viewState.pendingScroll = null
+        pendingScroll?.let { dateTime ->
+            scrollToDateTime(dateTime)
         }
     }
 
@@ -154,7 +148,7 @@ class WeekView @JvmOverloads constructor(
             viewState.numberOfVisibleDays = savedState.numberOfVisibleDays
         }
 
-        goToDate(savedState.firstVisibleDate)
+        scrollToDate(savedState.firstVisibleDate)
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -212,7 +206,6 @@ class WeekView @JvmOverloads constructor(
             val currentFirstVisibleDate = viewState.firstVisibleDate
             viewState.numberOfVisibleDays = value
 
-            dateTimeInterpreter.onSetNumberOfDays(value)
             renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
                 it.onDateFormatterChanged(viewState.dateFormatter)
             }
@@ -1107,7 +1100,10 @@ class WeekView @JvmOverloads constructor(
      * Returns the scrolling speed factor in horizontal direction.
      */
     @PublicApi
-    @Deprecated("This value is no longer being taken into account.")
+    @Deprecated(
+        message = "This value is no longer being taken into account.",
+        level = DeprecationLevel.ERROR
+    )
     var xScrollingSpeed: Float
         get() = viewState.xScrollingSpeed
         set(value) {
@@ -1120,7 +1116,8 @@ class WeekView @JvmOverloads constructor(
     @PublicApi
     @Deprecated(
         message = "Use isHorizontalScrollingEnabled instead.",
-        replaceWith = ReplaceWith("isHorizontalScrollingEnabled")
+        replaceWith = ReplaceWith("isHorizontalScrollingEnabled"),
+        level = DeprecationLevel.ERROR
     )
     var isHorizontalFlingEnabled: Boolean
         get() = viewState.horizontalFlingEnabled
@@ -1141,7 +1138,10 @@ class WeekView @JvmOverloads constructor(
     /**
      * Returns whether WeekView can fling vertically.
      */
-    @Deprecated("This value is no longer being taken into account.")
+    @Deprecated(
+        message = "This value is no longer being taken into account.",
+        level = DeprecationLevel.ERROR
+    )
     @PublicApi
     var isVerticalFlingEnabled: Boolean
         get() = viewState.verticalFlingEnabled
@@ -1150,7 +1150,10 @@ class WeekView @JvmOverloads constructor(
         }
 
     @PublicApi
-    @Deprecated("This value is no longer being taken into account.")
+    @Deprecated(
+        message = "This value is no longer being taken into account.",
+        level = DeprecationLevel.ERROR
+    )
     var scrollDuration: Int
         get() = viewState.scrollDuration
         set(value) {
@@ -1220,7 +1223,7 @@ class WeekView @JvmOverloads constructor(
         if (isWaitingToBeLaidOut) {
             // If the view's dimensions have just changed or if it hasn't been laid out yet, we
             // postpone the action until onDraw() is called the next time.
-            viewState.scrollToHour = hour
+            viewState.pendingScroll = viewState.firstVisibleDate.withTime(hour, minute)
             return
         }
 
@@ -1251,7 +1254,8 @@ class WeekView @JvmOverloads constructor(
      */
     @Deprecated(
         message = "This method will be removed in a future release. Use scrollToDate() instead.",
-        replaceWith = ReplaceWith(expression = "scrollToDate")
+        replaceWith = ReplaceWith(expression = "scrollToDate"),
+        level = DeprecationLevel.ERROR
     )
     @PublicApi
     fun goToToday() {
@@ -1263,7 +1267,8 @@ class WeekView @JvmOverloads constructor(
      */
     @Deprecated(
         message = "This method will be removed in a future release. Use scrollToDateTime() instead.",
-        replaceWith = ReplaceWith(expression = "scrollToDateTime")
+        replaceWith = ReplaceWith(expression = "scrollToDateTime"),
+        level = DeprecationLevel.ERROR
     )
     @PublicApi
     fun goToCurrentTime() {
@@ -1281,7 +1286,8 @@ class WeekView @JvmOverloads constructor(
      */
     @Deprecated(
         message = "This method will be removed in a future release. Use scrollToDate() instead.",
-        replaceWith = ReplaceWith(expression = "scrollToDate")
+        replaceWith = ReplaceWith(expression = "scrollToDate"),
+        level = DeprecationLevel.ERROR
     )
     @PublicApi
     fun goToDate(date: Calendar) {
@@ -1300,7 +1306,7 @@ class WeekView @JvmOverloads constructor(
         if (isWaitingToBeLaidOut) {
             // If the view's dimensions have just changed or if it hasn't been laid out yet, we
             // postpone the action until onDraw() is called the next time.
-            viewState.scrollToDate = adjustedDate
+            viewState.pendingScroll = adjustedDate
             return
         }
 
@@ -1315,7 +1321,8 @@ class WeekView @JvmOverloads constructor(
      */
     @Deprecated(
         message = "This method will be removed in a future release. Use scrollToTime() instead.",
-        replaceWith = ReplaceWith(expression = "scrollToTime")
+        replaceWith = ReplaceWith(expression = "scrollToTime"),
+        level = DeprecationLevel.ERROR
     )
     @PublicApi
     fun goToHour(hour: Int) {
@@ -1379,7 +1386,10 @@ class WeekView @JvmOverloads constructor(
     }
 
     @PublicApi
-    @Deprecated("Use setDateFormatter() and setTimeFormatter() instead.")
+    @Deprecated(
+        message = "Use setDateFormatter() and setTimeFormatter() instead.",
+        level = DeprecationLevel.ERROR
+    )
     var dateTimeInterpreter: DateTimeInterpreter
         get() = object : DateTimeInterpreter {
             override fun interpretDate(date: Calendar): String = viewState.dateFormatter(date)
@@ -1599,7 +1609,8 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         @Deprecated(
             message = "Use submitList() to submit a list of elements of type T instead. Then, overwrite the adapter's onCreateEntity() method to create a WeekViewEntity.",
-            replaceWith = ReplaceWith(expression = "submitList")
+            replaceWith = ReplaceWith(expression = "submitList"),
+            level = DeprecationLevel.ERROR
         )
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return
@@ -1649,7 +1660,8 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         @Deprecated(
             message = "Use submitList() to submit a list of elements of type T instead. Then, overwrite the adapter's onCreateEntity() method to create a WeekViewEntity.",
-            replaceWith = ReplaceWith(expression = "submitList")
+            replaceWith = ReplaceWith(expression = "submitList"),
+            level = DeprecationLevel.ERROR
         )
         fun submit(events: List<WeekViewDisplayable<T>>) {
             val viewState = weekView?.viewState ?: return

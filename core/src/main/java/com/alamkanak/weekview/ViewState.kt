@@ -23,8 +23,7 @@ internal class ViewState {
 
     // Calendar state
     var firstVisibleDate: Calendar = today()
-    var scrollToDate: Calendar? = null
-    var scrollToHour: Int? = null
+    var pendingScroll: Calendar? = null
 
     private var isFirstDraw: Boolean = true
 

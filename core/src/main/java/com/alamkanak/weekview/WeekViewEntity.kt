@@ -66,7 +66,8 @@ sealed class WeekViewEntity {
 
             @Deprecated(
                 message = "Use setSubtitle() instead.",
-                replaceWith = ReplaceWith(expression = "setSubtitle")
+                replaceWith = ReplaceWith(expression = "setSubtitle"),
+                level = DeprecationLevel.ERROR
             )
             @PublicApi
             fun setLocation(location: CharSequence): Builder<T> {
@@ -76,7 +77,8 @@ sealed class WeekViewEntity {
 
             @Deprecated(
                 message = "Use setSubtitle() instead.",
-                replaceWith = ReplaceWith(expression = "setSubtitle")
+                replaceWith = ReplaceWith(expression = "setSubtitle"),
+                level = DeprecationLevel.ERROR
             )
             @PublicApi
             fun setLocation(resId: Int): Builder<T> {
@@ -251,7 +253,10 @@ sealed class WeekViewEntity {
             }
 
             @PublicApi
-            @Deprecated("Use a SpannableString for the title or location instead.")
+            @Deprecated(
+                message = "Use a SpannableString for the title and subtitle instead.",
+                level = DeprecationLevel.ERROR
+            )
             fun setTextStrikeThrough(strikeThrough: Boolean): Builder {
                 style.isTextStrikeThrough = strikeThrough
                 return this
@@ -377,7 +382,7 @@ data class WeekViewEvent<T> internal constructor(
             }
 
             @PublicApi
-            @Deprecated("Use a SpannableString for the title or location instead.")
+            @Deprecated("Use a SpannableString for the title or subtitle instead.")
             fun setTextStrikeThrough(strikeThrough: Boolean): Builder {
                 style.isTextStrikeThrough = strikeThrough
                 return this

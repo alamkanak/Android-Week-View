@@ -24,7 +24,8 @@ class EmojiProcessingInitializer : Initializer<Unit> {
  * Enables emoji processing for entity titles and subtitles in WeekView.
  */
 @Deprecated(
-    message = "Emoji processing is now done automatically. Calling this method is not necessary anymore."
+    message = "Emoji processing is now done automatically. Calling this method is not necessary anymore.",
+    level = DeprecationLevel.ERROR
 )
 fun WeekView.enableEmojiProcessing() {
     // Nothing to do here

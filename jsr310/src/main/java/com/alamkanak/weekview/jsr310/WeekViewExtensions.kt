@@ -71,7 +71,8 @@ val WeekView.lastVisibleDateAsLocalDate: LocalDate
  */
 @Deprecated(
     message = "This method has been renamed to scrollTo().",
-    replaceWith = ReplaceWith(expression = "scrollTo")
+    replaceWith = ReplaceWith(expression = "scrollTo"),
+    level = DeprecationLevel.ERROR
 )
 fun WeekView.goToDate(date: LocalDate) {
     scrollToDate(date)
