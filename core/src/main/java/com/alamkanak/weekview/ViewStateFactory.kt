@@ -3,6 +3,7 @@ package com.alamkanak.weekview
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build
 import android.util.AttributeSet
@@ -83,25 +84,12 @@ internal object ViewStateFactory {
             color = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.windowBackground)
         }
 
-        viewState.todayBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_todayBackgroundColor, viewState.dayBackgroundPaint.color)
-        }
+        viewState.todayBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_todayBackgroundColor)
+        viewState.pastBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_pastBackgroundColor)
+        viewState.futureBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_futureBackgroundColor)
 
-        viewState.pastBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_pastBackgroundColor, viewState.dayBackgroundPaint.color)
-        }
-
-        viewState.futureBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_futureBackgroundColor, viewState.dayBackgroundPaint.color)
-        }
-
-        viewState.pastWeekendBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, viewState.pastBackgroundPaint.color)
-        }
-
-        viewState.futureWeekendBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, viewState.futureBackgroundPaint.color)
-        }
+        viewState.pastWeekendBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_pastWeekendBackgroundColor)
+        viewState.futureWeekendBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_futureWeekendBackgroundColor)
 
         viewState.timeColumnSeparatorPaint.apply {
             color = a.getColor(R.styleable.WeekView_timeColumnSeparatorColor, context.lineColor)
@@ -227,6 +215,14 @@ internal object ViewStateFactory {
 
         return viewState
     }
+}
+
+private fun TypedArray.paintFromColor(colorIndex: Int): Paint? {
+    return if (hasValue(colorIndex)) getColor(colorIndex, 0).toPaint() else null
+}
+
+internal fun Int.toPaint(): Paint {
+    return Paint().apply { color = this@toPaint }
 }
 
 private const val SANS = 1

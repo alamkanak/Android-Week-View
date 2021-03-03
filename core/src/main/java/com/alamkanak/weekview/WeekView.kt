@@ -753,61 +753,62 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
-     * Returns the background color of the current date.
+     * Returns the background color of the current date. If not explicitly set, WeekView will use
+     * [dayBackgroundColor].
      */
     @PublicApi
     var todayBackgroundColor: Int
-        get() = viewState.todayBackgroundPaint.color
+        get() = viewState.todayBackgroundPaint?.color ?: dayBackgroundColor
         set(value) {
-            viewState.todayBackgroundPaint.color = value
+            viewState.todayBackgroundPaint = value.toPaint()
             invalidate()
         }
 
     /**
-     * Returns the background color for past dates. If not explicitly set, WeekView will used
+     * Returns the background color for past dates. If not explicitly set, WeekView will use
      * [dayBackgroundColor].
      */
     @PublicApi
     var pastBackgroundColor: Int
-        get() = viewState.pastBackgroundPaint.color
+        get() = viewState.pastBackgroundPaint?.color ?: dayBackgroundColor
         set(value) {
-            viewState.pastBackgroundPaint.color = value
+            viewState.pastBackgroundPaint = value.toPaint()
             invalidate()
         }
 
     /**
-     * Returns the background color for past weekend dates. If not explicitly set, WeekView will
-     * used [pastBackgroundColor].
+     * Returns the background color for past weekend dates. If not explicitly set, WeekView will use
+     * [dayBackgroundColor].
      */
     @PublicApi
     var pastWeekendBackgroundColor: Int
-        get() = viewState.pastWeekendBackgroundPaint.color
+        get() = viewState.pastWeekendBackgroundPaint?.color ?: dayBackgroundColor
         set(value) {
-            viewState.pastWeekendBackgroundPaint.color = value
+            viewState.pastWeekendBackgroundPaint = value.toPaint()
             invalidate()
         }
 
     /**
-     * Returns the background color for future dates. If not explicitly set, WeekView will used
+     * Returns the background color for future dates. If not explicitly set, WeekView will use
      * [dayBackgroundColor].
      */
     @PublicApi
     var futureBackgroundColor: Int
-        get() = viewState.futureBackgroundPaint.color
+        get() = viewState.futureBackgroundPaint?.color ?: dayBackgroundColor
         set(value) {
-            viewState.futureBackgroundPaint.color = value
+            viewState.futureBackgroundPaint = value.toPaint()
             invalidate()
         }
 
     /**
      * Returns the background color for future weekend dates. If not explicitly set, WeekView will
-     * used [futureBackgroundColor].
+     * use [dayBackgroundColor].
      */
     @PublicApi
     var futureWeekendBackgroundColor: Int
-        get() = viewState.futureWeekendBackgroundPaint.color
+        get() = viewState.futureWeekendBackgroundPaint?.color ?: dayBackgroundColor
         set(value) {
-            viewState.futureWeekendBackgroundPaint.color = value
+            viewState.futureWeekendBackgroundPaint = value.toPaint()
             invalidate()
         }
 

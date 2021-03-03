@@ -154,15 +154,15 @@ internal class ViewState {
         style = Paint.Style.STROKE
     }
 
-    val todayBackgroundPaint = Paint()
+    var todayBackgroundPaint: Paint? = null
 
-    val futureBackgroundPaint = Paint()
+    var futureBackgroundPaint: Paint? = null
 
-    val pastBackgroundPaint = Paint()
+    var pastBackgroundPaint: Paint? = null
 
-    val futureWeekendBackgroundPaint = Paint()
+    var futureWeekendBackgroundPaint: Paint? = null
 
-    val pastWeekendBackgroundPaint = Paint()
+    var pastWeekendBackgroundPaint: Paint? = null
 
     val timeColumnSeparatorPaint = Paint()
 
@@ -393,12 +393,22 @@ internal class ViewState {
         currentOrigin.y = min(currentOrigin.y, 0f)
     }
 
-    fun getPastBackgroundPaint(isWeekend: Boolean): Paint {
-        return if (isWeekend) pastWeekendBackgroundPaint else pastBackgroundPaint
+    fun getPastBackgroundPaint(date: Calendar): Paint {
+        val paint = when {
+            date.isToday -> todayBackgroundPaint
+            date.isWeekend -> pastWeekendBackgroundPaint
+            else -> pastBackgroundPaint
+        }
+        return paint ?: dayBackgroundPaint
     }
 
-    fun getFutureBackgroundPaint(isWeekend: Boolean): Paint {
-        return if (isWeekend) futureWeekendBackgroundPaint else futureBackgroundPaint
+    fun getFutureBackgroundPaint(date: Calendar): Paint {
+        val paint = when {
+            date.isToday -> todayBackgroundPaint
+            date.isWeekend -> futureWeekendBackgroundPaint
+            else -> futureBackgroundPaint
+        }
+        return paint ?: dayBackgroundPaint
     }
 
     private fun updateHourHeight(viewHeight: Int) {

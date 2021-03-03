@@ -120,12 +120,12 @@ private class DayBackgroundDrawer(
     /**
      * Draws a day's background color in the corresponding bounds.
      *
-     * @param day The [Calendar] indicating the date
+     * @param date The [Calendar] indicating the date
      * @param startPixel The x-coordinate on which to start drawing the background
      * @param canvas The [Canvas] on which to draw the background
      */
     private fun drawDayBackground(
-        day: Calendar,
+        date: Calendar,
         startPixel: Float,
         canvas: Canvas
     ) {
@@ -133,15 +133,15 @@ private class DayBackgroundDrawer(
         val height = viewState.viewHeight.toFloat()
 
         // If not specified, this will use the normal day background.
-        val pastPaint = viewState.getPastBackgroundPaint(isWeekend = day.isWeekend)
-        val futurePaint = viewState.getFutureBackgroundPaint(isWeekend = day.isWeekend)
+        val pastPaint = viewState.getPastBackgroundPaint(date = date)
+        val futurePaint = viewState.getFutureBackgroundPaint(date = date)
 
         val startY = viewState.headerHeight + viewState.currentOrigin.y
         val endX = startPixel + viewState.dayWidth
 
         when {
-            day.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
-            day.isBeforeToday -> canvas.drawRect(actualStartPixel, startY, endX, height, pastPaint)
+            date.isToday -> drawPastAndFutureRect(actualStartPixel, startY, endX, pastPaint, futurePaint, height, canvas)
+            date.isBeforeToday -> canvas.drawRect(actualStartPixel, startY, endX, height, pastPaint)
             else -> canvas.drawRect(actualStartPixel, startY, endX, height, futurePaint)
         }
     }
