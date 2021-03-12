@@ -374,7 +374,7 @@ internal class ViewState {
 
             newHourHeight = newHourHeight.coerceIn(
                 minimumValue = effectiveMinHourHeight,
-                maximumValue = maxHourHeight
+                maximumValue = max(effectiveMinHourHeight, maxHourHeight)
             )
 
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight

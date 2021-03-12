@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import java.util.Calendar
+import kotlin.math.max
 
 internal class Navigator(
     private val viewState: ViewState,
@@ -72,7 +73,7 @@ internal class Navigator(
 
         val finalOffset = offset.coerceIn(
             minimumValue = minY,
-            maximumValue = maxY
+            maximumValue = max(minY, maxY)
         )
 
         animator.animate(

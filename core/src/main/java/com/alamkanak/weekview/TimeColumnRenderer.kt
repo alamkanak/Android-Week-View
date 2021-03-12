@@ -94,8 +94,8 @@ internal class TimeColumnRenderer(
             timeLabelLayouts.put(hour, textLayout)
         }
 
-        val maxLineLength = textLayouts.maxOf { it.maxLineLength }
-        val maxLineHeight = textLayouts.maxOf { it.height }
+        val maxLineLength = textLayouts.maxOfOrNull { it.maxLineLength } ?: 0f
+        val maxLineHeight = textLayouts.maxOfOrNull { it.height } ?: 0
 
         updateTimeColumnBounds(
             lineLength = maxLineLength,
