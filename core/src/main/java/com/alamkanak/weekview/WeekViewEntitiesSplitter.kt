@@ -1,54 +1,71 @@
 package com.alamkanak.weekview
 
+import java.util.Calendar
+
 internal fun ResolvedWeekViewEntity.split(viewState: ViewState): List<ResolvedWeekViewEntity> {
     if (startTime >= endTime) {
         return emptyList()
     }
 
-    // Check whether the end date of the event is exactly 12 AM. If so, the event will be
-    // shortened by a millisecond.
-    val endsOnStartOfNextDay = endTime.isAtStartOfNextDay(startTime)
-    val isAtStartOfNextPeriod = viewState.minHour == 0 && endsOnStartOfNextDay
-
-    return when {
-        isAtStartOfNextPeriod -> listOf(shortenTooLongAllDayEvent(viewState))
-        isMultiDay -> splitEventByDates(viewState)
-        else -> listOf(this)
+    val entities = if (isMultiDay) {
+        splitByDates(minHour = viewState.minHour, maxHour = viewState.maxHour)
+    } else {
+        listOf(limitTo(minHour = viewState.minHour, maxHour = viewState.maxHour))
     }
+
+    return entities.filter { it.startTime < it.endTime }
 }
 
-private fun ResolvedWeekViewEntity.shortenTooLongAllDayEvent(
-    viewState: ViewState
-): ResolvedWeekViewEntity {
-    val newEndTime = endTime.withTimeAtEndOfPeriod(viewState.maxHour)
-    return createCopy(endTime = newEndTime)
-}
-
-private fun ResolvedWeekViewEntity.splitEventByDates(
-    viewState: ViewState
+private fun ResolvedWeekViewEntity.splitByDates(
+    minHour: Int,
+    maxHour: Int
 ): List<ResolvedWeekViewEntity> {
-    val results = mutableListOf<ResolvedWeekViewEntity>()
+    val firstEvent = createCopy(
+        startTime = startTime.limitToMinHour(minHour),
+        endTime = startTime.atEndOfDay.limitToMaxHour(maxHour)
+    )
 
-    val firstEventEnd = startTime.withTimeAtEndOfPeriod(viewState.maxHour)
-    val firstEvent = createCopy(endTime = firstEventEnd)
+    val results = mutableListOf<ResolvedWeekViewEntity>()
     results += firstEvent
 
-    val lastEventStart = endTime.withTimeAtStartOfPeriod(viewState.minHour)
-    val lastEvent = createCopy(startTime = lastEventStart)
-    results += lastEvent
-
-    val diff = lastEvent.startTime.timeInMillis - firstEvent.startTime.timeInMillis
-    val daysInBetween = diff / DAY_IN_MILLIS
+    val daysInBetween = endTime.toEpochDays() - startTime.toEpochDays() - 1
 
     if (daysInBetween > 0) {
-        val start = firstEventEnd.withTimeAtStartOfPeriod(viewState.minHour) + Days(1)
-        while (start.isSameDate(lastEventStart).not()) {
-            val intermediateStart = start.withTimeAtStartOfPeriod(viewState.minHour)
-            val intermediateEnd = start.withTimeAtEndOfPeriod(viewState.maxHour)
+        val currentDate = startTime.atStartOfDay + Days(1)
+        while (currentDate.toEpochDays() < endTime.toEpochDays()) {
+            val intermediateStart = currentDate.withTimeAtStartOfPeriod(minHour)
+            val intermediateEnd = currentDate.withTimeAtEndOfPeriod(maxHour)
             results += createCopy(startTime = intermediateStart, endTime = intermediateEnd)
-            start += Days(1)
+            currentDate += Days(1)
         }
     }
 
+    val lastEvent = createCopy(
+        startTime = endTime.atStartOfDay.limitToMinHour(minHour),
+        endTime = endTime.limitToMaxHour(maxHour)
+    )
+    results += lastEvent
+
     return results.sortedWith(compareBy({ it.startTime }, { it.endTime }))
+}
+
+private fun ResolvedWeekViewEntity.limitTo(minHour: Int, maxHour: Int) = createCopy(
+    startTime = startTime.limitToMinHour(minHour),
+    endTime = endTime.limitToMaxHour(maxHour)
+)
+
+private fun Calendar.limitToMinHour(minHour: Int): Calendar {
+    return if (hour < minHour) {
+        withTimeAtStartOfPeriod(hour = minHour)
+    } else {
+        this
+    }
+}
+
+private fun Calendar.limitToMaxHour(maxHour: Int): Calendar {
+    return if (hour >= maxHour) {
+        withTimeAtEndOfPeriod(hour = maxHour)
+    } else {
+        this
+    }
 }

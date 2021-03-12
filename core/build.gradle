@@ -30,5 +30,6 @@ dependencies {
     testImplementation testing.jUnit
     testImplementation testing.mockitoCore
     testImplementation testing.mockitoInline
+    testImplementation testing.mockitoKotlin
     testImplementation testing.robolectric
 }

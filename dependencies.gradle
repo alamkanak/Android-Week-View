@@ -18,6 +18,7 @@ ext {
             jUnit                : '4.13',
             kotlin               : '1.4.21',
             mockito              : '3.3.3',
+            mockitoKotlin        : '2.2.0',
             robolectric          : '4.3.1',
             startup              : '1.0.0',
             threeTen             : '1.4.4',
@@ -40,6 +41,7 @@ ext {
             jUnit             : "junit:junit:${versions.jUnit}",
             mockitoCore       : "org.mockito:mockito-core:${versions.mockito}",
             mockitoInline     : "org.mockito:mockito-inline:${versions.mockito}",
+            mockitoKotlin     : "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin",
             robolectric       : "org.robolectric:robolectric:${versions.robolectric}",
     ]
 }
