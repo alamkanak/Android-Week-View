@@ -1,22 +1,66 @@
 package com.alamkanak.weekview.sample.data.model
 
-import com.google.gson.annotations.Expose
+import android.graphics.Color
 import com.google.gson.annotations.SerializedName
+import java.time.DateTimeException
+import java.time.LocalTime
+import java.time.YearMonth
+import kotlin.random.Random
+
+interface ApiResult {
+    fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity?
+}
 
 data class ApiEvent(
-    @Expose
-    @SerializedName("name")
-    var title: String,
-    @Expose
-    @SerializedName("dayOfMonth")
-    var dayOfMonth: Int,
-    @Expose
-    @SerializedName("startTime")
-    var startTime: String,
-    @Expose
-    @SerializedName("endTime")
-    var endTime: String,
-    @Expose
-    @SerializedName("color")
-    var color: String
-)
+    @SerializedName("title") val title: String,
+    @SerializedName("location") val location: String,
+    @SerializedName("day_of_month") val dayOfMonth: Int,
+    @SerializedName("start_time") val startTime: String,
+    @SerializedName("duration") val duration: Int,
+    @SerializedName("color") val color: String,
+    @SerializedName("is_canceled") val isCanceled: Boolean,
+    @SerializedName("is_all_day") val isAllDay: Boolean
+) : ApiResult {
+
+    override fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity? {
+        return try {
+            val startTime = LocalTime.parse(startTime)
+            val startDateTime = yearMonth.atDay(dayOfMonth).atTime(startTime)
+            val endDateTime = startDateTime.plusMinutes(duration.toLong())
+            CalendarEntity.Event(
+                id = Random.nextLong(),
+                title = title,
+                location = location,
+                startTime = startDateTime,
+                endTime = endDateTime,
+                color = Color.parseColor(color),
+                isAllDay = isAllDay,
+                isCanceled = isCanceled
+            )
+        } catch (e: DateTimeException) {
+            null
+        }
+    }
+}
+
+data class ApiBlockedTime(
+    @SerializedName("day_of_month") val dayOfMonth: Int,
+    @SerializedName("start_time") val startTime: String,
+    @SerializedName("duration") val duration: Int
+) : ApiResult {
+
+    override fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity? {
+        return try {
+            val startTime = LocalTime.parse(startTime)
+            val startDateTime = yearMonth.atDay(dayOfMonth).atTime(startTime)
+            val endDateTime = startDateTime.plusMinutes(duration.toLong())
+            CalendarEntity.BlockedTimeSlot(
+                id = Random.nextLong(),
+                startTime = startDateTime,
+                endTime = endDateTime
+            )
+        } catch (e: DateTimeException) {
+            null
+        }
+    }
+}

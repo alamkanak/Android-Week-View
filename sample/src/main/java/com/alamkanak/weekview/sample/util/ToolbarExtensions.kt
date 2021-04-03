@@ -5,9 +5,9 @@ import android.app.Activity
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import com.alamkanak.weekview.WeekView
+import com.alamkanak.weekview.jsr310.scrollToDateTime
 import com.alamkanak.weekview.sample.R
-import com.alamkanak.weekview.threetenabp.scrollToDateTime
-import org.threeten.bp.LocalDateTime
+import java.time.LocalDateTime
 
 private enum class WeekViewType(val value: Int) {
     DayView(1),
@@ -15,9 +15,7 @@ private enum class WeekViewType(val value: Int) {
     WeekView(7);
 
     companion object {
-        fun create(
-            numberOfVisibleDays: Int
-        ): WeekViewType = values().first { it.value == numberOfVisibleDays }
+        fun of(days: Int): WeekViewType = values().first { it.value == days }
     }
 }
 
@@ -25,7 +23,7 @@ fun Toolbar.setupWithWeekView(weekView: WeekView) {
     val activity = context as Activity
     title = activity.label
 
-    var currentViewType = WeekViewType.create(weekView.numberOfVisibleDays)
+    var currentViewType = WeekViewType.of(weekView.numberOfVisibleDays)
 
     inflateMenu(R.menu.menu_main)
     setOnMenuItemClickListener { item ->
