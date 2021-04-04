@@ -2,9 +2,9 @@ package com.alamkanak.weekview.threetenabp
 
 import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
-import java.util.Calendar
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import java.util.Calendar
 
 /**
  * An abstract implementation of [WeekView.Adapter] that allows to submit a list of new elements to

@@ -1524,8 +1524,9 @@ class WeekView @JvmOverloads constructor(
          * @return A [WeekViewEntity] that will be rendered in [WeekView]
          */
         open fun onCreateEntity(item: T): WeekViewEntity {
-            throw RuntimeException("You called submitList() on WeekView's adapter, but didn't implement onCreateEntity(). " +
-                "Please do so to convert the submitted elements to WeekViewEntity objects.")
+            throw RuntimeException(
+                "You called submitList() on WeekView's adapter, but didn't implement onCreateEntity()."
+            )
         }
 
         /**

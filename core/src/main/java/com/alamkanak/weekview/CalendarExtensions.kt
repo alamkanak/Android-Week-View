@@ -220,8 +220,9 @@ internal fun DateRange.validate(viewState: ViewState): List<Calendar> {
 
     if (mustAdjustStart && mustAdjustEnd) {
         // The date range is longer than the range from min date to max date.
-        throw IllegalStateException("Can't render $numberOfDays days " +
-            "between the provided minDate and maxDate.")
+        throw IllegalStateException(
+            "Can't render $numberOfDays days between the provided minDate and maxDate."
+        )
     }
 
     return when {

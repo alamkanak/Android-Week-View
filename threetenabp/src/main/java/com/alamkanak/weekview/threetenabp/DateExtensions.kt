@@ -1,11 +1,11 @@
 package com.alamkanak.weekview.threetenabp
 
-import java.util.Calendar
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
+import java.util.Calendar
 
 internal fun Calendar.toLocalDate(): LocalDate {
     return Instant.ofEpochMilli(timeInMillis).atZone(ZoneId.systemDefault()).toLocalDate()

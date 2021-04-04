@@ -1,8 +1,8 @@
 package com.alamkanak.weekview
 
 import android.animation.Animator
-import android.animation.ValueAnimator as AndroidValueAnimator
 import android.view.animation.DecelerateInterpolator
+import android.animation.ValueAnimator as AndroidValueAnimator
 
 internal class ValueAnimator {
 

@@ -1,10 +1,10 @@
 package com.alamkanak.weekview.jodatime
 
-import java.util.Calendar
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import java.util.Calendar
 
 internal fun Calendar.toLocalDate(): LocalDate {
     val dateTimeZone = DateTimeZone.forID(timeZone.id)

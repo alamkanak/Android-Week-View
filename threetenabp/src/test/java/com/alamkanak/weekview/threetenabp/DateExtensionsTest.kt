@@ -1,11 +1,11 @@
 package com.alamkanak.weekview.threetenabp
 
-import java.util.Calendar
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.Month
+import java.util.Calendar
 
 class DateExtensionsTest {
 

@@ -2,9 +2,9 @@ package com.alamkanak.weekview.jodatime
 
 import com.alamkanak.weekview.PublicApi
 import com.alamkanak.weekview.WeekView
-import java.util.Calendar
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
+import java.util.Calendar
 
 /**
  * An abstract implementation of [WeekView.Adapter] that allows to submit a list of new elements to
