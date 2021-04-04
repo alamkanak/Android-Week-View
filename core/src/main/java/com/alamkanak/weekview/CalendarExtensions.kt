@@ -168,6 +168,14 @@ internal fun Calendar.withTimeAtEndOfPeriod(hour: Int): Calendar {
     }
 }
 
+internal fun Calendar.isAtStartOfPeriod(hour: Int): Boolean {
+    return isEqual(withTimeAtStartOfPeriod(hour))
+}
+
+internal fun Calendar.isAtEndOfPeriod(hour: Int): Boolean {
+    return isEqual(withTimeAtEndOfPeriod(hour))
+}
+
 internal val Calendar.atStartOfDay: Calendar
     get() = withTimeAtStartOfPeriod(0)
 
@@ -270,22 +278,6 @@ internal fun Calendar.withLocalTimeZone(): Calendar {
 }
 
 internal fun Calendar.copy(): Calendar = clone() as Calendar
-
-/**
- * Checks if this date is at the start of the next day after startTime.
- * For example, if the start date was January the 1st and startDate was January the 2nd at 00:00,
- * this method would return true.
- * @param startDate The start date of the event
- * @return Whether or not this date is at the start of the day after startDate
- */
-internal fun Calendar.isAtStartOfNextDay(startDate: Calendar): Boolean {
-    return if (isEqual(atStartOfDay)) {
-        val endOfPreviousDay = this - Millis(1)
-        endOfPreviousDay.isSameDate(startDate)
-    } else {
-        false
-    }
-}
 
 internal fun defaultDateFormatter(
     numberOfDays: Int

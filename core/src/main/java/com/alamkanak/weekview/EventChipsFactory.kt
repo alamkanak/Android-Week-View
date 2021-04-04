@@ -23,6 +23,7 @@ internal class EventChipsFactory {
         viewState: ViewState
     ): List<EventChip> = events
         .sortedWith(compareBy({ it.startTime }, { it.endTime }))
+        .map { event -> event.sanitize(viewState) }
         .map { event -> event.split(viewState).map { EventChip(it, event) } }
         .flatten()
 
@@ -233,5 +234,13 @@ internal class EventChipsFactory {
 
     private fun List<EventChip>.groupedByDate(): Map<Calendar, List<EventChip>> {
         return groupBy { it.event.startTime.atStartOfDay }
+    }
+}
+
+private fun ResolvedWeekViewEntity.sanitize(viewState: ViewState): ResolvedWeekViewEntity {
+    return if (endTime.isAtStartOfPeriod(hour = viewState.minHour)) {
+        createCopy(endTime = endTime - Millis(1))
+    } else {
+        this
     }
 }
