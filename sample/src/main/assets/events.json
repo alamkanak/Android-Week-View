@@ -7,7 +7,7 @@
         "duration": 60,
         "color": "#F57F68",
         "is_canceled": false,
-        "is_all_day":false
+        "is_all_day": false
     },
     {
         "title": "Event 2",
@@ -193,11 +193,11 @@
         "title": "Event 20",
         "location": "Location 20",
         "day_of_month": 6,
-        "start_time": "06:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#59DBE0",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 21",
@@ -223,11 +223,11 @@
         "title": "Event 23",
         "location": "Location 23",
         "day_of_month": 6,
-        "start_time": "16:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F8B552",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 24",
@@ -583,11 +583,11 @@
         "title": "Event 59",
         "location": "Location 59",
         "day_of_month": 13,
-        "start_time": "08:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F8B552",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 60",
@@ -833,31 +833,31 @@
         "title": "Event 84",
         "location": "Location 84",
         "day_of_month": 17,
-        "start_time": "14:00",
-        "duration": 120,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#59DBE0",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 85",
         "location": "Location 85",
         "day_of_month": 17,
-        "start_time": "20:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F57F68",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 86",
         "location": "Location 86",
-        "day_of_month": 18,
-        "start_time": "01:00",
-        "duration": 120,
+        "day_of_month": 17,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#87D288",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 87",
@@ -1003,11 +1003,11 @@
         "title": "Event 101",
         "location": "Location 101",
         "day_of_month": 20,
-        "start_time": "09:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F57F68",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 102",
@@ -1283,11 +1283,11 @@
         "title": "Event 129",
         "location": "Location 129",
         "day_of_month": 24,
-        "start_time": "18:00",
-        "duration": 60,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F57F68",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 130",
@@ -1623,11 +1623,11 @@
         "title": "Event 181",
         "location": "Location 181",
         "day_of_month": 3,
-        "start_time": "21:00",
-        "duration": 120,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#F57F68",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 182",
@@ -1693,11 +1693,11 @@
         "title": "Event 188",
         "location": "Location 146",
         "day_of_month": 31,
-        "start_time": "10:00",
-        "duration": 120,
+        "start_time": "00:00",
+        "duration": 1440,
         "color": "#87D288",
         "is_canceled": false,
-        "is_all_day": false
+        "is_all_day": true
     },
     {
         "title": "Event 189",

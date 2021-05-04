@@ -10,12 +10,17 @@ fun Context.showToast(text: String) {
 }
 
 fun yearMonthsBetween(startDate: LocalDate, endDate: LocalDate): List<YearMonth> {
-    val startDates = mutableListOf(startDate)
-    var currentStartDate = startDate
-    while (currentStartDate <= endDate) {
-        startDates += currentStartDate
-        currentStartDate = currentStartDate.plusMonths(1)
+    val yearMonths = mutableListOf<YearMonth>()
+    val maxYearMonth = endDate.yearMonth
+    var currentYearMonth = startDate.yearMonth
+
+    while (currentYearMonth <= maxYearMonth) {
+        yearMonths += currentYearMonth
+        currentYearMonth = currentYearMonth.plusMonths(1)
     }
 
-    return startDates.map { YearMonth.of(it.year, it.month) }
+    return yearMonths
 }
+
+private val LocalDate.yearMonth: YearMonth
+    get() = YearMonth.of(year, month)

@@ -1,18 +1,10 @@
 package com.alamkanak.weekview
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.annotation.WorkerThread
+import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-
-class MainExecutor : Executor {
-    private val handler = Handler(Looper.getMainLooper())
-    override fun execute(runnable: Runnable) {
-        handler.post(runnable)
-    }
-}
 
 /**
  * A helper class that processes the submitted [WeekViewEntity] objects and creates [EventChip]s
@@ -22,11 +14,10 @@ internal class EventsProcessor(
     private val context: Context,
     private val eventsCache: EventsCache,
     private val eventChipsFactory: EventChipsFactory,
-    private val eventChipsCache: EventChipsCache
+    private val eventChipsCache: EventChipsCache,
+    private val backgroundExecutor: Executor = Executors.newSingleThreadExecutor(),
+    private val mainThreadExecutor: Executor = ContextCompat.getMainExecutor(context),
 ) {
-
-    private val backgroundExecutor = Executors.newSingleThreadExecutor()
-    private val mainThreadExecutor = MainExecutor()
 
     /**
      * Updates the [EventsCache] with the provided [WeekViewEntity] elements and creates
@@ -42,7 +33,7 @@ internal class EventsProcessor(
         onFinished: () -> Unit
     ) {
         backgroundExecutor.execute {
-            submitItems(entities, viewState)
+            submitEntities(entities, viewState)
             mainThreadExecutor.execute {
                 onFinished()
             }
@@ -50,21 +41,71 @@ internal class EventsProcessor(
     }
 
     @WorkerThread
-    private fun submitItems(
-        items: List<WeekViewEntity>,
+    private fun submitEntities(
+        entities: List<WeekViewEntity>,
         viewState: ViewState
     ) {
-        val resolvedItems = items.map { it.resolve(context) }
-        eventsCache.update(resolvedItems)
+        val resolvedEntities = entities.map { it.resolve(context) }
+        eventsCache.update(resolvedEntities)
 
         if (eventsCache is SimpleEventsCache) {
-            val eventChips = eventChipsFactory.create(resolvedItems, viewState)
-            eventChipsCache.replaceAll(eventChips)
+            submitEntitiesToSimpleCache(resolvedEntities, viewState)
         } else {
-            val existingIds = eventChipsCache.eventIds
-            val newResolvedItems = resolvedItems.filterNot { it.id in existingIds }
-            val eventChips = eventChipsFactory.create(newResolvedItems, viewState)
-            eventChipsCache.addAll(eventChips)
+            submitEntitiesToPagedCache(resolvedEntities, viewState)
+        }
+    }
+
+    private fun submitEntitiesToSimpleCache(
+        entities: List<ResolvedWeekViewEntity>,
+        viewState: ViewState,
+    ) {
+        val eventChips = eventChipsFactory.create(entities, viewState)
+        eventChipsCache.replaceAll(eventChips)
+    }
+
+    private fun submitEntitiesToPagedCache(
+        entities: List<ResolvedWeekViewEntity>,
+        viewState: ViewState,
+    ) {
+        val diffResult = performDiff(entities)
+        eventChipsCache.removeAll(diffResult.itemsToRemove)
+
+        val eventChips = eventChipsFactory.create(diffResult.itemsToAddOrUpdate, viewState)
+        eventChipsCache.addAll(eventChips)
+    }
+
+    private fun performDiff(newEntities: List<ResolvedWeekViewEntity>): DiffResult {
+        val existingEventChips = eventChipsCache.allEventChips
+        val existingEntities = existingEventChips.map { it.event }
+        return DiffResult.calculateDiff(
+            existingEntities = existingEntities,
+            newEntities = newEntities,
+        )
+    }
+
+    data class DiffResult(
+        val itemsToAddOrUpdate: List<ResolvedWeekViewEntity>,
+        val itemsToRemove: List<ResolvedWeekViewEntity>,
+    ) {
+        companion object {
+            fun calculateDiff(
+                existingEntities: List<ResolvedWeekViewEntity>,
+                newEntities: List<ResolvedWeekViewEntity>,
+            ): DiffResult {
+                val existingEntityIds = existingEntities.map { it.id }
+
+                val submittedEntityIds = newEntities.map { it.id }
+                val addedEvents = newEntities.filter { it.id !in existingEntityIds }
+                val deletedEvents = existingEntities.filter { it.id !in submittedEntityIds }
+
+                val updatedEvents = newEntities.filter { it.id in existingEntityIds }
+                val changed = updatedEvents.filter { it !in existingEntities }
+
+                return DiffResult(
+                    itemsToAddOrUpdate = addedEvents + changed,
+                    itemsToRemove = deletedEvents,
+                )
+            }
         }
     }
 }

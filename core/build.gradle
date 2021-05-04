@@ -35,4 +35,5 @@ dependencies {
     testImplementation testing.mockitoInline
     testImplementation testing.mockitoKotlin
     testImplementation testing.robolectric
+    testImplementation testing.truth
 }

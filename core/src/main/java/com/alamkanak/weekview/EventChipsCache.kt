@@ -8,9 +8,6 @@ internal typealias EventChipsCacheProvider = () -> EventChipsCache?
 
 internal class EventChipsCache {
 
-    val eventIds: Set<Long>
-        get() = allEventChips.map { it.originalEvent.id }.toSet()
-
     val allEventChips: List<EventChip>
         get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
 
@@ -70,6 +67,22 @@ internal class EventChipsCache {
             // single event is rendered underneath it. We return the all-day event.
             candidates.size == 2 -> candidates.first { it.event.isAllDay }
             else -> candidates.first()
+        }
+    }
+
+    fun removeAll(events: List<ResolvedWeekViewEntity>) {
+        val eventIds = events.map { it.id }
+        val eventChips = allEventChips.filter { it.event.id in eventIds }
+
+        for (eventChip in eventChips) {
+            val key = eventChip.event.startTime.atStartOfDay.timeInMillis
+            val eventId = eventChip.event.id
+
+            if (eventChip.event.isAllDay) {
+                allDayEventChipsByDate[key]?.removeAll { it.event.id == eventId }
+            } else {
+                normalEventChipsByDate[key]?.removeAll { it.event.id == eventId }
+            }
         }
     }
 

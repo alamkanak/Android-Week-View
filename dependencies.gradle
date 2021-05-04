@@ -25,6 +25,7 @@ ext {
             startup              : '1.0.0',
             threeTen             : '1.5.0',
             threeTenAbp          : '1.3.0',
+            truth                : '1.1.2',
     ]
     libraries = [
             androidxCore         : "androidx.core:core-ktx:${versions.androidxCore}",
@@ -47,5 +48,6 @@ ext {
             mockitoInline     : "org.mockito:mockito-inline:${versions.mockito}",
             mockitoKotlin     : "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin",
             robolectric       : "org.robolectric:robolectric:${versions.robolectric}",
+            truth             : "com.google.truth:truth:${versions.truth}",
     ]
 }

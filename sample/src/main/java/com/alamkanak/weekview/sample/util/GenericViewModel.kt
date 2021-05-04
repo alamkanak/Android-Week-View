@@ -29,6 +29,12 @@ class GenericViewModel(
         }
     }
 
+    fun remove(id: Long) {
+        val entities = requireNotNull(viewState.value).entities.toMutableList()
+        entities.removeIf { (it as? CalendarEntity.Event)?.id == id }
+        _viewState.value = GenericViewState(entities.toList())
+    }
+
     class Factory(private val eventsRepository: EventsRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
