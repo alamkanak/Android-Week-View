@@ -37,7 +37,6 @@
         app:showNowLine="true"
         app:showNowLineDot="true"
         app:showTimeColumnSeparator="true"
-        app:singleDayHorizontalPadding="8dp"
         app:timeColumnBackgroundColor="@color/white"
         app:timeColumnPadding="8dp"
         app:timeColumnSeparatorColor="@color/gray_300"
