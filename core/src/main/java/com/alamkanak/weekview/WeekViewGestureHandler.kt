@@ -164,7 +164,10 @@ class WeekViewGestureHandler internal constructor(
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
-        scaleDetector.onTouchEvent(event)
+        if (currentScrollDirection == Vertical && currentFlingDirection == None) {
+            scaleDetector.onTouchEvent(event)
+        }
+
         val handled = gestureDetector.onTouchEvent(event)
 
         if (event.action == ACTION_UP && currentFlingDirection == None) {

@@ -26,7 +26,7 @@ internal class TextFitter(
     private fun fitSingleEvent(eventChip: EventChip): StaticLayout {
         val bounds = eventChip.bounds
         val availableHeight = bounds.height().roundToInt() - viewState.eventPaddingVertical * 2
-        val availableWidth = bounds.width().roundToInt() - viewState.eventPaddingVertical * 2
+        val availableWidth = bounds.width().roundToInt() - viewState.eventPaddingHorizontal
         return eventChip.fitText(availableWidth, availableHeight)
     }
 
@@ -45,7 +45,7 @@ internal class TextFitter(
             // Remove the last lines until there's only a single line left. If it doesn't fit
             // by that point, we need to reduce the text size.
             val startOfLastLine = textLayout.getLineStart(textLayout.lineCount)
-            text = text.substring(startIndex = 0, endIndex = startOfLastLine - 1).trim()
+            text = text.subSequence(startIndex = 0, endIndex = startOfLastLine - 1).trim()
             textLayout = text.toTextLayout(textPaint, width = availableWidth)
         }
 

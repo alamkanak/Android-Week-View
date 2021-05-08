@@ -17,8 +17,8 @@ internal class EventChipBoundsCalculator(
 
         val event = eventChip.event
 
-        val isFullWidth = event is ResolvedWeekViewEntity.BlockedTime
-        val leftOffset = if (viewState.isLtr || isFullWidth) 0 else viewState.columnGap
+        val isBlockedTime = event is ResolvedWeekViewEntity.BlockedTime
+        val leftOffset = if (viewState.isLtr || isBlockedTime) 0 else viewState.columnGap
 
         val minutesFromStart = eventChip.minutesFromStartHour
         val top = calculateDistanceFromTop(minutesFromStart)
@@ -29,7 +29,7 @@ internal class EventChipBoundsCalculator(
         val partialEventEndsAtEndOfDay = event.endTime.isAtEndOfPeriod(hour = viewState.maxHour)
         val fullEventContinuesOnNextDay = eventChip.originalEvent.endsOnLaterDay(event)
 
-        if (!(partialEventEndsAtEndOfDay && fullEventContinuesOnNextDay)) {
+        if (!(partialEventEndsAtEndOfDay && fullEventContinuesOnNextDay) && !isBlockedTime) {
             // There's only one case where we don't render a vertical margin: The partial event ends
             // at midnight, but the full event continues continues on the next day.
             bottom -= viewState.eventMarginVertical
