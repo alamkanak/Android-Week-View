@@ -1,6 +1,7 @@
 package com.alamkanak.weekview.sample.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.jsr310.WeekViewPagingAdapterJsr310
@@ -84,5 +85,13 @@ private class BasicActivityWeekViewAdapter(
 
     override fun onLoadMore(startDate: LocalDate, endDate: LocalDate) {
         loadMoreHandler(yearMonthsBetween(startDate, endDate))
+    }
+
+    override fun onVerticalScrollPositionChanged(currentOffset: Float, distance: Float) {
+        Log.d("BasicActivity", "Scrolling vertically (distance: ${distance.toInt()}, current offset ${currentOffset.toInt()})")
+    }
+
+    override fun onVerticalScrollFinished(currentOffset: Float) {
+        Log.d("BasicActivity", "Vertical scroll finished (current offset ${currentOffset.toInt()})")
     }
 }

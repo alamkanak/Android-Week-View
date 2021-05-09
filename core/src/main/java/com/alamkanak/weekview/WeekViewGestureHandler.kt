@@ -5,7 +5,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.MotionEvent.ACTION_UP
-import android.view.ViewConfiguration
 import com.alamkanak.weekview.Direction.Left
 import com.alamkanak.weekview.Direction.None
 import com.alamkanak.weekview.Direction.Right
@@ -28,20 +27,21 @@ class WeekViewGestureHandler internal constructor(
     context: Context,
     private val viewState: ViewState,
     private val touchHandler: WeekViewTouchHandler,
-    private val navigator: Navigator
+    private val navigator: Navigator,
 ) : GestureDetector.SimpleOnGestureListener() {
 
-    private var currentScrollDirection = None
-    private var currentFlingDirection = None
+    private var scrollDirection: Direction = None
+    private var flingDirection: Direction = None
 
     private val scaleDetector = ScaleGestureDetector(
         context = context,
         viewState = viewState,
-        navigator = navigator
+        navigator = navigator,
     )
+
     private val gestureDetector = GestureDetector(context, this)
 
-    private val scaledTouchSlop = context.scaledTouchSlop
+    private var preFlingFirstVisibleDate: Calendar = today()
 
     override fun onDown(e: MotionEvent): Boolean {
         goToNearestOrigin()
@@ -52,48 +52,44 @@ class WeekViewGestureHandler internal constructor(
         e1: MotionEvent,
         e2: MotionEvent,
         distanceX: Float,
-        distanceY: Float
+        distanceY: Float,
     ): Boolean {
-        currentScrollDirection = interpretScroll(distanceX, distanceY, viewState)
-        navigator.performScroll(distanceX, distanceY, currentScrollDirection)
+        if (scrollDirection == None) {
+            // Only change the scroll direction if we're starting a new scroll. If the user changes
+            // the direction while already scrolling, we stay in the current scrolling direction.
+            scrollDirection = determineScrollDirection(distanceX, distanceY)
+        }
+
+        when {
+            scrollDirection.isHorizontal -> {
+                navigator.scrollHorizontallyBy(distance = distanceX)
+            }
+            scrollDirection.isVertical -> {
+                navigator.scrollVerticallyBy(distance = distanceY)
+            }
+        }
+
         return true
     }
 
-    private fun interpretScroll(
+    private fun determineScrollDirection(
         distanceX: Float,
-        distanceY: Float,
-        viewState: ViewState
+        distanceY: Float
     ): Direction {
         val absDistanceX = abs(distanceX)
         val absDistanceY = abs(distanceY)
         val canScrollHorizontally = viewState.horizontalScrollingEnabled
 
-        return when (currentScrollDirection) {
-            None -> {
-                // Allow scrolling only in one direction.
-                if (absDistanceX > absDistanceY && canScrollHorizontally) {
-                    if (distanceX > 0) Left else Right
-                } else {
-                    Vertical
-                }
+        return if (absDistanceY > absDistanceX) {
+            Vertical
+        } else if (absDistanceX > absDistanceY && canScrollHorizontally) {
+            if (distanceX > 0) {
+                Left
+            } else {
+                Right
             }
-            Left -> {
-                // Change direction if there was enough change.
-                if (absDistanceX > absDistanceY && distanceX < -scaledTouchSlop) {
-                    Right
-                } else {
-                    currentScrollDirection
-                }
-            }
-            Right -> {
-                // Change direction if there was enough change.
-                if (absDistanceX > absDistanceY && distanceX > scaledTouchSlop) {
-                    Left
-                } else {
-                    currentScrollDirection
-                }
-            }
-            else -> currentScrollDirection
+        } else {
+            None
         }
     }
 
@@ -103,16 +99,16 @@ class WeekViewGestureHandler internal constructor(
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        if (currentFlingDirection.isHorizontal && !viewState.horizontalScrollingEnabled) {
+        if (flingDirection.isHorizontal && !viewState.horizontalScrollingEnabled) {
             return true
         }
 
         navigator.stop()
 
-        currentFlingDirection = currentScrollDirection
+        flingDirection = scrollDirection
         when {
-            currentFlingDirection.isHorizontal -> onFlingHorizontal()
-            currentFlingDirection.isVertical -> onFlingVertical(velocityY)
+            flingDirection.isHorizontal -> onFlingHorizontal()
+            flingDirection.isVertical -> onFlingVertical(velocityY)
             else -> Unit
         }
 
@@ -120,11 +116,9 @@ class WeekViewGestureHandler internal constructor(
         return true
     }
 
-    private lateinit var preFlingFirstVisibleDate: Calendar
-
     private fun onFlingHorizontal() {
         val destinationDate = preFlingFirstVisibleDate.performFling(
-            direction = currentFlingDirection,
+            direction = flingDirection,
             viewState = viewState
         )
         navigator.scrollHorizontallyTo(date = destinationDate)
@@ -159,37 +153,44 @@ class WeekViewGestureHandler internal constructor(
         }
 
         // Reset scrolling and fling direction.
-        currentFlingDirection = None
-        currentScrollDirection = currentFlingDirection
+        flingDirection = None
+        scrollDirection = flingDirection
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
-        if (currentScrollDirection == Vertical && currentFlingDirection == None) {
+        if (scrollDirection == Vertical && scrollDirection == None) {
             scaleDetector.onTouchEvent(event)
         }
 
         val handled = gestureDetector.onTouchEvent(event)
 
-        if (event.action == ACTION_UP && currentFlingDirection == None) {
-            if (currentScrollDirection.isHorizontal) {
-                goToNearestOrigin()
-            }
-            currentScrollDirection = None
-        } else if (event.action == ACTION_DOWN) {
+        val isScrolling = scrollDirection != None
+        val isFlinging = flingDirection != None
+
+        if (event.action == ACTION_UP && isScrolling && !isFlinging) {
+            handleScrollingFinished()
+        }
+
+        if (event.action == ACTION_DOWN) {
             preFlingFirstVisibleDate = viewState.firstVisibleDate.copy()
         }
 
         return handled
     }
 
-    fun forceScrollFinished() {
-        navigator.stop()
-        currentFlingDirection = None
-        currentScrollDirection = currentFlingDirection
+    private fun handleScrollingFinished() {
+        when (scrollDirection) {
+            Vertical -> navigator.notifyVerticalScrollingFinished()
+            Left, Right -> goToNearestOrigin()
+            None -> Unit
+        }
     }
 
-    private val Context.scaledTouchSlop: Int
-        get() = ViewConfiguration.get(this).scaledTouchSlop
+    fun forceScrollFinished() {
+        navigator.stop()
+        flingDirection = None
+        scrollDirection = flingDirection
+    }
 }
 
 private fun Calendar.performFling(direction: Direction, viewState: ViewState): Calendar {
@@ -210,22 +211,5 @@ private fun Calendar.performFling(direction: Direction, viewState: ViewState): C
             }
         }
         else -> throw IllegalStateException()
-    }
-}
-
-private fun Navigator.performScroll(
-    distanceX: Float,
-    distanceY: Float,
-    direction: Direction
-) {
-
-    when (direction) {
-        Left, Right -> {
-            scrollHorizontallyBy(distance = distanceX)
-        }
-        Vertical -> {
-            scrollVerticallyBy(distance = distanceY)
-        }
-        None -> Unit
     }
 }

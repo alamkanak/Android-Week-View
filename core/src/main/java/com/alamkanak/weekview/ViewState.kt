@@ -284,6 +284,24 @@ internal class ViewState {
     val displayedHours: IntProgression
         get() = timeRange step timeColumnHoursInterval
 
+    private val _firstVisibleHour: Float
+        get() = minHour + (currentOrigin.y * -1 / hourHeight)
+
+    private val visibleHours: Float
+        get() = calendarGridBounds.height() / hourHeight
+
+    val firstVisibleHour: Int
+        get() = _firstVisibleHour.toInt()
+
+    val firstFullyVisibleHour: Int
+        get() = ceil(_firstVisibleHour).toInt()
+
+    val lastVisibleHour: Int
+        get() = ceil(_firstVisibleHour + visibleHours).toInt()
+
+    val lastFullyVisibleHour: Int
+        get() = (_firstVisibleHour + visibleHours).toInt()
+
     fun getXOriginForDate(date: Calendar): Float {
         return if (isLtr) (date.daysFromToday * dayWidth * -1f) else (date.daysFromToday * dayWidth)
     }
@@ -314,7 +332,6 @@ internal class ViewState {
         }
 
         desired.hour = desired.hour.coerceIn(minimumValue = minHour, maximumValue = maxHour)
-        desired.minute = 0
 
         val fraction = desired.minute / 60f
         val verticalOffset = hourHeight * (desired.hour + fraction)

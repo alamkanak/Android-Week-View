@@ -14,7 +14,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
-import kotlin.math.ceil
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -41,8 +41,13 @@ class WeekView @JvmOverloads constructor(
             notifyRangeChangedListener()
         }
 
-        override fun onVerticalScrollPositionChanged() {
+        override fun onVerticalScrollPositionChanged(distance: Float) {
+            notifyVerticalScrollChanged(distance)
             invalidate()
+        }
+
+        override fun onVerticalScrollingFinished() {
+            notifyVerticalScrollFinished()
         }
 
         override fun requestInvalidation() {
@@ -90,7 +95,7 @@ class WeekView @JvmOverloads constructor(
             ViewCompat.setAccessibilityDelegate(this, accessibilityTouchHelper)
         }
 
-        setLayerType(LAYER_TYPE_SOFTWARE, null)
+        setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -179,13 +184,26 @@ class WeekView @JvmOverloads constructor(
         val didFirstVisibleDateChange = !currentFirstVisibleDate.isSameDate(newFirstVisibleDate)
         viewState.firstVisibleDate = newFirstVisibleDate
 
-        if (didFirstVisibleDateChange && navigator.isNotRunning) {
+        if (didFirstVisibleDateChange) {
             val newLastVisibleDate = newDateRange.last()
             adapter?.onRangeChanged(
                 firstVisibleDate = newFirstVisibleDate,
                 lastVisibleDate = newLastVisibleDate
             )
         }
+    }
+
+    private fun notifyVerticalScrollChanged(distance: Float) {
+        if (abs(distance) >= 1f) {
+            adapter?.onVerticalScrollPositionChanged(
+                currentOffset = verticalScrollOffset,
+                distance = distance
+            )
+        }
+    }
+
+    private fun notifyVerticalScrollFinished() {
+        adapter?.onVerticalScrollFinished(currentOffset = verticalScrollOffset)
     }
 
     /*
@@ -1334,14 +1352,40 @@ class WeekView @JvmOverloads constructor(
      */
     @PublicApi
     val firstVisibleHour: Int
-        get() = viewState.minHour + (viewState.currentOrigin.y * -1 / viewState.hourHeight).toInt()
+        get() = viewState.firstVisibleHour
 
     /**
      * Returns the first hour that is fully visible on the screen.
      */
     @PublicApi
     val firstFullyVisibleHour: Int
-        get() = viewState.minHour + ceil(viewState.currentOrigin.y * -1 / viewState.hourHeight).toInt()
+        get() = viewState.firstFullyVisibleHour
+
+    /**
+     * Returns the last hour that is visible on the screen.
+     */
+    @PublicApi
+    val lastVisibleHour: Int
+        get() = viewState.lastVisibleHour
+
+    /**
+     * Returns the last hour that is fully visible on the screen.
+     */
+    @PublicApi
+    val lastFullyVisibleHour: Int
+        get() = viewState.lastFullyVisibleHour
+
+    /**
+     * Returns the current vertical offset (in pixels) from the top. This is 0 if WeekView is
+     * scrolled up all the way to [minHour].
+     */
+    @PublicApi
+    val verticalScrollOffset: Float
+        get() {
+            // Invert the current origin, as it feels more natural
+            // to have a positive verticalScrollOffset.
+            return viewState.currentOrigin.y * -1
+        }
 
     /*
      ***********************************************************************************************
@@ -1584,6 +1628,23 @@ class WeekView @JvmOverloads constructor(
          * @param lastVisibleDate A [Calendar] representing the last visible date
          */
         open fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) = Unit
+
+        /**
+         * Called whenever the vertical scroll position in [WeekView] changes. A [distance] > 0
+         * indicates that the user is scrolling down towards later hours; a [distance] < 0 that the
+         * user is scrolling up towards earlier hours.
+         *
+         * @param currentOffset The current vertical offset.
+         * @param distance The distance that the user scrolled vertically.
+         */
+        open fun onVerticalScrollPositionChanged(currentOffset: Float, distance: Float) = Unit
+
+        /**
+         * Called when the vertical scrolling in [WeekView] finished.
+         *
+         * @param currentOffset The current vertical offset.
+         */
+        open fun onVerticalScrollFinished(currentOffset: Float) = Unit
     }
 
     /**
