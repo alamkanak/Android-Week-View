@@ -71,7 +71,12 @@ internal class EventChipBoundsCalculator(
         val dayWidth = viewState.drawableDayWidth
         val leftTextOffset = if (viewState.isLtr) 0 else viewState.columnGap
 
-        val dateLabelHeight = padding + viewState.dateLabelHeight + padding
+        val dateLabelHeight = if (viewState.numberOfVisibleDays > 1) {
+            padding + viewState.dateLabelHeight + padding
+        } else {
+            0f
+        }
+
         val chipHeight = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2
 
         val top = if (viewState.arrangeAllDayEventsVertically) {

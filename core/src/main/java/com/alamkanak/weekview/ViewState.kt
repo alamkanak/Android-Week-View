@@ -432,6 +432,44 @@ internal class ViewState {
     }
 
     fun calculateHeaderHeight(): Float {
+        return if (numberOfVisibleDays > 1) {
+            calculateHeaderHeightInMultiDayView()
+        } else {
+            calculateHeaderHeightInSingleDayView()
+        }
+    }
+
+    private fun calculateHeaderHeightInSingleDayView(): Float {
+        val labelHeight = headerPadding + dateLabelHeight + headerPadding
+        var chipsHeight = 0f
+
+        if (maxNumberOfAllDayEvents > 0) {
+            val numberOfRows = if (arrangeAllDayEventsVertically && allDayEventsExpanded) {
+                maxNumberOfAllDayEvents
+            } else if (arrangeAllDayEventsVertically) {
+                min(maxNumberOfAllDayEvents, 2)
+            } else {
+                1
+            }
+
+            val heightOfChips = numberOfRows * currentAllDayEventHeight
+            val heightOfSpacing = (numberOfRows - 1) * eventMarginVertical
+            chipsHeight += heightOfChips + heightOfSpacing
+
+            // Add padding below the event chips
+            chipsHeight += headerPadding
+        }
+
+        val height = max(labelHeight, chipsHeight)
+
+        return if (showHeaderBottomLine) {
+            height + headerBottomLinePaint.strokeWidth
+        } else {
+            height
+        }
+    }
+
+    private fun calculateHeaderHeightInMultiDayView(): Float {
         var newHeight = headerPadding + dateLabelHeight + headerPadding
 
         if (maxNumberOfAllDayEvents > 0) {
