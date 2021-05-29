@@ -27,6 +27,10 @@ abstract class WeekViewSimpleAdapterThreeTenAbp<T> : WeekView.SimpleAdapter<T>()
         onEmptyViewLongClick(time.toLocalDateTime())
     }
 
+    final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
+        onDragAndDropFinished(data, newStartTime.toLocalDateTime(), newEndTime.toLocalDateTime())
+    }
+
     final override fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
         onRangeChanged(firstVisibleDate.toLocalDate(), lastVisibleDate.toLocalDate())
     }
@@ -44,6 +48,16 @@ abstract class WeekViewSimpleAdapterThreeTenAbp<T> : WeekView.SimpleAdapter<T>()
      * @param time A [LocalDateTime] with the date and time
      */
     open fun onEmptyViewLongClick(time: LocalDateTime) = Unit
+
+    /**
+     * Called when a drag-&-drop gesture has finished to inform the caller of the dragged event's
+     * new start and end time.
+     *
+     * @param data The [T] entity that is associated with the dragged event
+     * @param newStartTime The new start time that the event was dragged to
+     * @param newEndTime THe new end time that the event was dragged to
+     */
+    open fun onDragAndDropFinished(data: T, newStartTime: LocalDateTime, newEndTime: LocalDateTime) = Unit
 
     /**
      * Called whenever the range of dates visible in [WeekView] changes. The list of dates is
@@ -81,6 +95,10 @@ abstract class WeekViewPagingAdapterThreeTenAbp<T> : WeekView.PagingAdapter<T>()
         onEmptyViewLongClick(time.toLocalDateTime())
     }
 
+    final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
+        onDragAndDropFinished(data, newStartTime.toLocalDateTime(), newEndTime.toLocalDateTime())
+    }
+
     final override fun onRangeChanged(firstVisibleDate: Calendar, lastVisibleDate: Calendar) {
         onRangeChanged(firstVisibleDate.toLocalDate(), lastVisibleDate.toLocalDate())
     }
@@ -102,6 +120,16 @@ abstract class WeekViewPagingAdapterThreeTenAbp<T> : WeekView.PagingAdapter<T>()
      * @param time A [LocalDateTime] with the date and time
      */
     open fun onEmptyViewLongClick(time: LocalDateTime) = Unit
+
+    /**
+     * Called when a drag-&-drop gesture has finished to inform the caller of the dragged event's
+     * new start and end time.
+     *
+     * @param data The [T] entity that is associated with the dragged event
+     * @param newStartTime The new start time that the event was dragged to
+     * @param newEndTime THe new end time that the event was dragged to
+     */
+    open fun onDragAndDropFinished(data: T, newStartTime: LocalDateTime, newEndTime: LocalDateTime) = Unit
 
     /**
      * Called whenever the range of dates visible in [WeekView] changes. The list of dates is

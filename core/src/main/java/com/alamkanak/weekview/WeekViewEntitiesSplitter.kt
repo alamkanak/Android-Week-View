@@ -18,7 +18,7 @@ internal fun ResolvedWeekViewEntity.split(viewState: ViewState): List<ResolvedWe
 
 private fun ResolvedWeekViewEntity.splitByDates(
     minHour: Int,
-    maxHour: Int
+    maxHour: Int,
 ): List<ResolvedWeekViewEntity> {
     val firstEvent = createCopy(
         startTime = startTime.limitToMinHour(minHour),

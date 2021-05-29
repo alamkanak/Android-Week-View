@@ -5,10 +5,9 @@ import com.google.gson.annotations.SerializedName
 import java.time.DateTimeException
 import java.time.LocalTime
 import java.time.YearMonth
-import kotlin.random.Random
 
 interface ApiResult {
-    fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity?
+    fun toCalendarEntity(yearMonth: YearMonth, index: Int): CalendarEntity?
 }
 
 data class ApiEvent(
@@ -22,13 +21,13 @@ data class ApiEvent(
     @SerializedName("is_all_day") val isAllDay: Boolean
 ) : ApiResult {
 
-    override fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity? {
+    override fun toCalendarEntity(yearMonth: YearMonth, index: Int): CalendarEntity? {
         return try {
             val startTime = LocalTime.parse(startTime)
             val startDateTime = yearMonth.atDay(dayOfMonth).atTime(startTime)
             val endDateTime = startDateTime.plusMinutes(duration.toLong())
             CalendarEntity.Event(
-                id = Random.nextLong(),
+                id = "100${yearMonth.year}00${yearMonth.monthValue}00$index".toLong(),
                 title = title,
                 location = location,
                 startTime = startDateTime,
@@ -49,13 +48,13 @@ data class ApiBlockedTime(
     @SerializedName("duration") val duration: Int
 ) : ApiResult {
 
-    override fun toCalendarEntity(yearMonth: YearMonth): CalendarEntity? {
+    override fun toCalendarEntity(yearMonth: YearMonth, index: Int): CalendarEntity? {
         return try {
             val startTime = LocalTime.parse(startTime)
             val startDateTime = yearMonth.atDay(dayOfMonth).atTime(startTime)
             val endDateTime = startDateTime.plusMinutes(duration.toLong())
             CalendarEntity.BlockedTimeSlot(
-                id = Random.nextLong(),
+                id = "200${yearMonth.year}00${yearMonth.monthValue}00$index".toLong(),
                 startTime = startDateTime,
                 endTime = endDateTime
             )

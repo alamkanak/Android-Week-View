@@ -11,9 +11,10 @@ import org.mockito.Mockito.`when` as whenever
 class WeekViewEventTest {
 
     private val viewState = Mockito.mock(ViewState::class.java)
+    private val factory = EventChipsFactory()
 
     init {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         whenever(viewState.minHour).thenReturn(0)
         whenever(viewState.maxHour).thenReturn(24)
     }
@@ -24,12 +25,13 @@ class WeekViewEventTest {
         val endTime = startTime + Hours(10)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = originalEvent.split(viewState)
-        assertTrue(childEvents.size == 1)
 
-        val child = childEvents.first()
-        assertFalse(child.endsOnLaterDay(originalEvent))
-        assertFalse(child.startsOnEarlierDay(originalEvent))
+        val eventChips = factory.create(listOf(originalEvent), viewState)
+        assertTrue(eventChips.size == 1)
+
+        val child = eventChips.first()
+        assertFalse(child.endsOnLaterDay)
+        assertFalse(child.startsOnEarlierDay)
     }
 
     @Test
@@ -38,17 +40,17 @@ class WeekViewEventTest {
         val endTime = (today() + Days(2)).withHour(14).withMinutes(0)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = originalEvent.split(viewState)
-        assertTrue(childEvents.size == 2)
+        val eventChips = factory.create(listOf(originalEvent), viewState)
+        assertTrue(eventChips.size == 2)
 
-        val first = childEvents.first()
-        val last = childEvents.last()
+        val first = eventChips.first()
+        val last = eventChips.last()
 
-        assertTrue(first.endsOnLaterDay(originalEvent))
-        assertTrue(last.startsOnEarlierDay(originalEvent))
+        assertTrue(first.endsOnLaterDay)
+        assertTrue(last.startsOnEarlierDay)
 
-        assertFalse(first.startsOnEarlierDay(originalEvent))
-        assertFalse(last.endsOnLaterDay(originalEvent))
+        assertFalse(first.startsOnEarlierDay)
+        assertFalse(last.endsOnLaterDay)
     }
 
     @Test
@@ -57,20 +59,18 @@ class WeekViewEventTest {
         val endTime = (today() + Days(3)).withHour(1).withMinutes(0)
 
         val originalEvent = createResolvedWeekViewEvent(startTime, endTime)
-        val childEvents = originalEvent.split(viewState)
-        assertTrue(childEvents.size == 3)
+        val eventChips = factory.create(listOf(originalEvent), viewState)
+        assertTrue(eventChips.size == 3)
 
-        val first = childEvents.first()
-        val second = childEvents[1]
-        val last = childEvents.last()
+        val (first, second, third) = eventChips
 
-        assertTrue(first.endsOnLaterDay(originalEvent))
-        assertTrue(second.startsOnEarlierDay(originalEvent))
-        assertTrue(second.endsOnLaterDay(originalEvent))
-        assertTrue(last.startsOnEarlierDay(originalEvent))
+        assertTrue(first.endsOnLaterDay)
+        assertTrue(second.startsOnEarlierDay)
+        assertTrue(second.endsOnLaterDay)
+        assertTrue(third.startsOnEarlierDay)
 
-        assertFalse(first.startsOnEarlierDay(originalEvent))
-        assertFalse(last.endsOnLaterDay(originalEvent))
+        assertFalse(first.startsOnEarlierDay)
+        assertFalse(third.endsOnLaterDay)
     }
 
     @Test

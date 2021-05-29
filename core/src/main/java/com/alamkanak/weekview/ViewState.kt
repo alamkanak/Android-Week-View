@@ -13,6 +13,12 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
+internal data class DragState(
+    val eventId: Long,
+    val dragStartTime: Calendar,
+    val draggedEventStartTime: Calendar,
+)
+
 internal class ViewState {
 
     // View
@@ -39,6 +45,9 @@ internal class ViewState {
     val startPixels: MutableList<Float> = mutableListOf()
     val dateRange: MutableList<Calendar> = createDateRange(firstVisibleDate).validate(this).toMutableList()
     val dateRangeWithStartPixels: MutableList<Pair<Calendar, Float>> = mutableListOf()
+
+    // Drag & drop
+    var dragState: DragState? = null
 
     // Time column
     var timeColumnPadding: Int = 0
@@ -593,5 +602,10 @@ internal class ViewState {
         if (Build.VERSION.SDK_INT >= 17) {
             isLtr = newConfig.layoutDirection == View.LAYOUT_DIRECTION_LTR
         }
+    }
+
+    fun minutesFromStart(eventStartTime: Calendar): Int {
+        val hoursFromStart = eventStartTime.hour - minHour
+        return hoursFromStart * 60 + eventStartTime.minute
     }
 }

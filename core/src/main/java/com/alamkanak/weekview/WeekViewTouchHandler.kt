@@ -2,6 +2,11 @@ package com.alamkanak.weekview
 
 import java.util.Calendar
 
+internal data class LongClickResult(
+    val eventChip: EventChip,
+    val handled: Boolean,
+)
+
 internal class WeekViewTouchHandler(
     private val viewState: ViewState
 ) {
@@ -29,17 +34,22 @@ internal class WeekViewTouchHandler(
         }
     }
 
-    fun handleLongClick(x: Float, y: Float) {
-        val inCalendarArea = x > viewState.timeColumnWidth
-        if (!inCalendarArea) {
-            return
+    fun handleLongClick(x: Float, y: Float): LongClickResult? {
+        val isInTimeColumn = x <= viewState.timeColumnWidth
+        val isInCalendarArea = x > viewState.timeColumnWidth && y > viewState.headerHeight
+
+        if (isInTimeColumn) {
+            return null
         }
 
-        val handled = adapter?.handleLongClick(x, y) ?: false
-        if (!handled && y > viewState.headerHeight) {
-            val time = calculateTimeFromPoint(x, y) ?: return
+        val result = adapter?.handleLongClick(x, y)
+
+        if (result == null && isInCalendarArea) {
+            val time = calculateTimeFromPoint(x, y) ?: return null
             adapter?.onEmptyViewLongClick(time)
         }
+
+        return result
     }
 
     /**

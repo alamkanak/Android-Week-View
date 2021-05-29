@@ -1,5 +1,6 @@
 package com.alamkanak.weekview.sample.ui
 
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -9,11 +10,14 @@ import com.alamkanak.weekview.jsr310.setDateFormatter
 import com.alamkanak.weekview.sample.data.model.CalendarEntity
 import com.alamkanak.weekview.sample.data.model.toWeekViewEntity
 import com.alamkanak.weekview.sample.databinding.ActivityBasicBinding
+import com.alamkanak.weekview.sample.util.GenericAction.ShowSnackbar
 import com.alamkanak.weekview.sample.util.defaultDateTimeFormatter
 import com.alamkanak.weekview.sample.util.genericViewModel
 import com.alamkanak.weekview.sample.util.setupWithWeekView
 import com.alamkanak.weekview.sample.util.showToast
+import com.alamkanak.weekview.sample.util.subscribeToEvents
 import com.alamkanak.weekview.sample.util.yearMonthsBetween
+import com.google.android.material.snackbar.Snackbar
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -38,8 +42,8 @@ class BasicActivity : AppCompatActivity() {
         binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
 
         val adapter = BasicActivityWeekViewAdapter(
-            onLongClick = { viewModel.remove(it) },
-            loadMoreHandler = viewModel::fetchEvents
+            dragHandler = viewModel::handleDrag,
+            loadMoreHandler = viewModel::fetchEvents,
         )
         binding.weekView.adapter = adapter
 
@@ -52,17 +56,28 @@ class BasicActivity : AppCompatActivity() {
         viewModel.viewState.observe(this) { viewState ->
             adapter.submitList(viewState.entities)
         }
+
+        viewModel.actions.subscribeToEvents(this) { action ->
+            when (action) {
+                is ShowSnackbar -> {
+                    Snackbar
+                        .make(binding.weekView, action.message, Snackbar.LENGTH_SHORT)
+                        .setAction("Undo") { action.undoAction() }
+                        .show()
+                }
+            }
+        }
     }
 }
 
 private class BasicActivityWeekViewAdapter(
-    private val onLongClick: (Long) -> Unit,
+    private val dragHandler: (Long, LocalDateTime, LocalDateTime) -> Unit,
     private val loadMoreHandler: (List<YearMonth>) -> Unit
 ) : WeekViewPagingAdapterJsr310<CalendarEntity>() {
 
     override fun onCreateEntity(item: CalendarEntity): WeekViewEntity = item.toWeekViewEntity()
 
-    override fun onEventClick(data: CalendarEntity) {
+    override fun onEventClick(data: CalendarEntity, bounds: RectF) {
         if (data is CalendarEntity.Event) {
             context.showToast("Clicked ${data.title}")
         }
@@ -72,10 +87,9 @@ private class BasicActivityWeekViewAdapter(
         context.showToast("Empty view clicked at ${defaultDateTimeFormatter.format(time)}")
     }
 
-    override fun onEventLongClick(data: CalendarEntity) {
+    override fun onDragAndDropFinished(data: CalendarEntity, newStartTime: LocalDateTime, newEndTime: LocalDateTime) {
         if (data is CalendarEntity.Event) {
-            context.showToast("Removing ${data.title}")
-            onLongClick(data.id)
+            dragHandler(data.id, newStartTime, newEndTime)
         }
     }
 

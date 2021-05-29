@@ -1,36 +1,38 @@
 package com.alamkanak.weekview
 
 import android.graphics.RectF
+import java.util.Calendar
 
 /**
  * This class encapsulates a [ResolvedWeekViewEntity] and its visual representation, a [RectF] which
- * is eventually drawn to the screen.
- *
- * There may be more than one [EventChip] for any even (think multi-day events). In that case,
- * multiple [EventChip]s will be used for a single [ResolvedWeekViewEntity].
+ * is drawn to the screen. There may be more than one [EventChip] for any [ResolvedWeekViewEntity],
+ * for instance in the case of multi-day events.
  */
 internal data class EventChip(
-    /**
-     * The [ResolvedWeekViewEntity] corresponding to the drawn rectangle. It might differ from
-     * [originalEvent], which may be a multi-day event.
-     */
     val event: ResolvedWeekViewEntity,
-    /**
-     * The original [ResolvedWeekViewEntity], which may be a multi-day event.
-     */
-    val originalEvent: ResolvedWeekViewEntity
+    val index: Int,
+    val startTime: Calendar,
+    val endTime: Calendar,
 ) {
 
     /**
      * A unique ID of this [EventChip].
      */
-    val id: String
-        get() = "${event.id}-${this.event.startTime.timeInMillis}"
+    val id: String = "${event.id}-$index"
 
     /**
-     * The bounds in which the [event] will be drawn.
+     * The ID of this [EventChip]'s [ResolvedWeekViewEntity].
+     */
+    val eventId: Long = event.id
+
+    /**
+     * The bounds in which [EventChip] will be drawn.
      */
     var bounds: RectF = RectF()
+
+    val durationInMinutes: Int by lazy {
+        (endTime minutesUntil startTime).minutes
+    }
 
     /**
      * The relative start position of the [EventChip].
@@ -52,12 +54,18 @@ internal data class EventChip(
     var relativeWidth: Float = 0f
 
     /**
-     * Returns whether the [EventChip] of an all-day event is currently hidden, if all-day events
-     * are arranged vertically.
+     * Returns whether the [EventChip] of an all-day event is currently hidden. This can happen when
+     * all-day events are arranged vertically.
      */
     var isHidden: Boolean = false
 
     var minutesFromStartHour: Int = 0
+
+    val startsOnEarlierDay: Boolean
+        get() = event.startTime < startTime
+
+    val endsOnLaterDay: Boolean
+        get() = event.endTime > endTime
 
     fun setEmpty() {
         bounds.setEmpty()

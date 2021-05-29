@@ -28,6 +28,7 @@ class WeekView @JvmOverloads constructor(
         ViewStateFactory.create(context, attrs)
     }
 
+    private val eventsCacheProvider: EventsCacheProvider = { adapter?.eventsCache }
     private val eventChipsCacheProvider: EventChipsCacheProvider = { adapter?.eventChipsCache }
 
     private val touchHandler = WeekViewTouchHandler(viewState)
@@ -57,11 +58,21 @@ class WeekView @JvmOverloads constructor(
 
     private val navigator = Navigator(viewState = viewState, listener = navigationListener)
 
+    private val dragHandler = DragHandler(
+        viewState = viewState,
+        touchHandler = touchHandler,
+        navigator = navigator,
+        dragListener = { id -> adapter?.handleDragAndDrop(id) },
+        eventsCacheProvider = eventsCacheProvider,
+        eventsProcessorProvider = { adapter?.eventsProcessor },
+    )
+
     private val gestureHandler = WeekViewGestureHandler(
         context = context,
         viewState = viewState,
         touchHandler = touchHandler,
-        navigator = navigator
+        navigator = navigator,
+        dragHandler = dragHandler,
     )
 
     private var accessibilityTouchHelper = WeekViewAccessibilityTouchHelper(
@@ -1504,22 +1515,16 @@ class WeekView @JvmOverloads constructor(
 
         internal fun handleClick(x: Float, y: Float): Boolean {
             val eventChip = findHitEvent(x, y) ?: return false
-            val data = findEventData(id = eventChip.originalEvent.id) ?: return false
-
-            onEventClick(data)
+            val data = findEventData(id = eventChip.eventId) ?: return false
             onEventClick(data, eventChip.bounds)
-
             return true
         }
 
-        internal fun handleLongClick(x: Float, y: Float): Boolean {
-            val eventChip = findHitEvent(x, y) ?: return false
-            val data = findEventData(id = eventChip.originalEvent.id) ?: return false
-
-            onEventLongClick(data)
-            onEventLongClick(data, eventChip.bounds)
-
-            return true
+        internal fun handleLongClick(x: Float, y: Float): LongClickResult? {
+            val eventChip = findHitEvent(x, y) ?: return null
+            val data = findEventData(id = eventChip.eventId) ?: return null
+            val handled = onEventLongClick(data, eventChip.bounds)
+            return LongClickResult(eventChip = eventChip, handled = handled)
         }
 
         private fun findHitEvent(x: Float, y: Float): EventChip? {
@@ -1543,13 +1548,11 @@ class WeekView @JvmOverloads constructor(
 
         internal fun onEventClick(id: Long, bounds: RectF) {
             val data = findEventData(id) ?: return
-            onEventClick(data)
             onEventClick(data, bounds)
         }
 
-        internal fun onEventLongClick(id: Long, bounds: RectF) {
+        internal fun handleLongClick(id: Long, bounds: RectF) {
             val data = findEventData(id) ?: return
-            onEventLongClick(data)
             onEventLongClick(data, bounds)
         }
 
@@ -1602,8 +1605,31 @@ class WeekView @JvmOverloads constructor(
          *
          * @param data The data of the [WeekViewEntity.Event]
          * @param bounds The [RectF] representing the bounds of the event's [EventChip]
+         * @return Whether the long click has been handled. If false, this will trigger drag-&-drop
+         *         to activate.
          */
-        open fun onEventLongClick(data: T, bounds: RectF) = Unit
+        open fun onEventLongClick(data: T, bounds: RectF): Boolean = false
+
+        internal fun handleDragAndDrop(id: Long) {
+            val data = findEventData(id) ?: return
+            val match = eventsCache[id] ?: return
+
+            onDragAndDropFinished(
+                data = data,
+                newStartTime = match.startTime,
+                newEndTime = match.endTime,
+            )
+        }
+
+        /**
+         * Called when a drag-&-drop gesture has finished to inform the caller of the dragged event's
+         * new start and end time.
+         *
+         * @param data The [T] entity that is associated with the dragged event
+         * @param newStartTime The new start time that the event was dragged to
+         * @param newEndTime THe new end time that the event was dragged to
+         */
+        open fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) = Unit
 
         /**
          * Returns the date and time of the location that the user clicked on.

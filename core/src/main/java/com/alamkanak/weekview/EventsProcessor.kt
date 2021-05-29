@@ -40,6 +40,17 @@ internal class EventsProcessor(
         }
     }
 
+    internal fun updateDraggedEntity(
+        event: ResolvedWeekViewEntity,
+        viewState: ViewState
+    ) {
+        eventsCache.update(event)
+        eventChipsCache.remove(eventId = event.id)
+
+        val eventChips = eventChipsFactory.create(listOf(event), viewState)
+        eventChipsCache.addAll(eventChips)
+    }
+
     @WorkerThread
     private fun submitEntities(
         entities: List<WeekViewEntity>,

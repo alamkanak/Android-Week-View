@@ -14,6 +14,10 @@ internal sealed class ResolvedWeekViewEntity {
     internal abstract val isAllDay: Boolean
     internal abstract val style: Style
 
+    internal val period: Period by lazy {
+        Period.fromDate(startTime)
+    }
+
     data class Event<T>(
         override val id: Long,
         override val title: CharSequence,
@@ -79,14 +83,6 @@ internal sealed class ResolvedWeekViewEntity {
 
         return !startTime.isAfter(other.endTime) && !endTime.isBefore(other.startTime)
     }
-
-    internal fun startsOnEarlierDay(
-        originalEvent: ResolvedWeekViewEntity
-    ): Boolean = startTime.isNotEqual(originalEvent.startTime)
-
-    internal fun endsOnLaterDay(
-        originalEvent: ResolvedWeekViewEntity
-    ): Boolean = endTime.isNotEqual(originalEvent.endTime)
 
     internal fun createCopy(
         startTime: Calendar = this.startTime,

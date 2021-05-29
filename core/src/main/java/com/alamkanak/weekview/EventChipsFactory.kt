@@ -21,11 +21,31 @@ internal class EventChipsFactory {
     private fun convertEventsToEventChips(
         events: List<ResolvedWeekViewEntity>,
         viewState: ViewState
-    ): List<EventChip> = events
-        .sortedWith(compareBy({ it.startTime }, { it.endTime }))
-        .map { event -> event.sanitize(viewState) }
-        .map { event -> event.split(viewState).map { EventChip(it, event) } }
-        .flatten()
+    ): List<EventChip> {
+        return events.sortedByTime().sanitize(viewState).toEventChips(viewState)
+    }
+
+    private fun List<ResolvedWeekViewEntity>.sortedByTime(): List<ResolvedWeekViewEntity> {
+        return sortedWith(compareBy({ it.startTime }, { it.endTime }))
+    }
+
+    private fun List<ResolvedWeekViewEntity>.sanitize(viewState: ViewState): List<ResolvedWeekViewEntity> {
+        return map { it.sanitize(viewState) }
+    }
+
+    private fun List<ResolvedWeekViewEntity>.toEventChips(viewState: ViewState): List<EventChip> {
+        return map { event ->
+            val eventParts = event.split(viewState)
+            eventParts.mapIndexed { index, eventPart ->
+                EventChip(
+                    event = event,
+                    index = index,
+                    startTime = eventPart.startTime,
+                    endTime = eventPart.endTime,
+                )
+            }
+        }.flatten()
+    }
 
     /**
      * Forms [CollisionGroup]s for all event chips and uses them to expand the [EventChip]s to their
@@ -125,13 +145,11 @@ internal class EventChipsFactory {
     }
 
     private fun calculateMinutesFromStart(eventChip: EventChip, viewState: ViewState) {
-        val event = eventChip.event
-        if (event.isAllDay) {
+        if (eventChip.event.isAllDay) {
             return
         }
 
-        val hoursFromStart = event.startTime.hour - viewState.minHour
-        eventChip.minutesFromStartHour = hoursFromStart * 60 + event.startTime.minute
+        eventChip.minutesFromStartHour = viewState.minutesFromStart(eventChip.startTime)
     }
 
     private fun expandColumnEventToMaxWidth(
@@ -233,7 +251,7 @@ internal class EventChipsFactory {
     }
 
     private fun List<EventChip>.groupedByDate(): Map<Calendar, List<EventChip>> {
-        return groupBy { it.event.startTime.atStartOfDay }
+        return groupBy { it.startTime.atStartOfDay }
     }
 }
 

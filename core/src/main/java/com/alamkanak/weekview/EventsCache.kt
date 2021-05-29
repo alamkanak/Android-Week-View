@@ -3,6 +3,8 @@ package com.alamkanak.weekview
 import androidx.collection.ArrayMap
 import java.util.Calendar
 
+internal typealias EventsCacheProvider = () -> EventsCache?
+
 /**
  * An abstract class that provides functionality to cache [ResolvedWeekViewEntity] elements.
  */
@@ -10,6 +12,7 @@ internal abstract class EventsCache {
 
     abstract val allEvents: List<ResolvedWeekViewEntity>
     abstract fun update(events: List<ResolvedWeekViewEntity>)
+    abstract fun update(event: ResolvedWeekViewEntity)
     abstract fun clear()
 
     operator fun get(id: Long): ResolvedWeekViewEntity? = allEvents.firstOrNull { it.id == id }
@@ -37,13 +40,22 @@ internal abstract class EventsCache {
  */
 internal class SimpleEventsCache : EventsCache() {
 
-    private var _allEvents: List<ResolvedWeekViewEntity>? = null
+    private var _allEvents: MutableList<ResolvedWeekViewEntity>? = null
 
     override val allEvents: List<ResolvedWeekViewEntity>
         get() = _allEvents.orEmpty()
 
     override fun update(events: List<ResolvedWeekViewEntity>) {
-        _allEvents = events
+        _allEvents = events.toMutableList()
+    }
+
+    override fun update(event: ResolvedWeekViewEntity) {
+        val index = _allEvents?.indexOfFirst { it.id == event.id }?.takeIf { it != -1 }
+
+        if (index != null) {
+            _allEvents?.removeAt(index)
+            _allEvents?.add(index, event)
+        }
     }
 
     override fun clear() {
@@ -60,13 +72,19 @@ internal class PaginatedEventsCache : EventsCache() {
     override val allEvents: List<ResolvedWeekViewEntity>
         get() = eventsByPeriod.values.flatten()
 
-    private val eventsByPeriod: ArrayMap<Period, List<ResolvedWeekViewEntity>> = ArrayMap()
+    private val eventsByPeriod: ArrayMap<Period, MutableList<ResolvedWeekViewEntity>> = ArrayMap()
 
     override fun update(events: List<ResolvedWeekViewEntity>) {
-        val groupedEvents = events.groupBy { Period.fromDate(it.startTime) }
+        val groupedEvents = events.groupBy { it.period }
         for ((period, periodEvents) in groupedEvents) {
-            eventsByPeriod[period] = periodEvents
+            eventsByPeriod[period] = periodEvents.toMutableList()
         }
+    }
+
+    override fun update(event: ResolvedWeekViewEntity) {
+        val existingEvent = allEvents.firstOrNull { it.id == event.id } ?: return
+        eventsByPeriod[existingEvent.period]?.removeAll { it.id == event.id }
+        eventsByPeriod[event.period]?.add(event)
     }
 
     internal fun determinePeriodsToFetch(range: FetchRange) = range.periods.filter { it !in this }
@@ -76,7 +94,7 @@ internal class PaginatedEventsCache : EventsCache() {
     operator fun contains(range: FetchRange) = eventsByPeriod.containsAll(range.periods)
 
     fun reserve(period: Period) {
-        eventsByPeriod[period] = listOf()
+        eventsByPeriod[period] = mutableListOf()
     }
 
     override fun clear() {

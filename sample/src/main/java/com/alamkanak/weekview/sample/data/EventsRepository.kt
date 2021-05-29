@@ -33,7 +33,9 @@ class EventsRepository(private val context: Context) {
             val apiEntities = fetchEvents() + fetchBlockedTimes()
 
             val calendarEntities = yearMonths.flatMap { yearMonth ->
-                apiEntities.mapNotNull { it.toCalendarEntity(yearMonth) }
+                apiEntities.mapIndexedNotNull { index, apiResult ->
+                    apiResult.toCalendarEntity(yearMonth, index)
+                }
             }
 
             mainHandler.post {

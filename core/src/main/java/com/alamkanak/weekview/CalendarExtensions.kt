@@ -83,6 +83,18 @@ internal operator fun Calendar.minusAssign(days: Days) {
     add(Calendar.DATE, days.days * (-1))
 }
 
+internal operator fun Calendar.plus(minutes: Minutes): Calendar {
+    return copy().apply {
+        add(Calendar.MINUTE, minutes.minutes)
+    }
+}
+
+internal operator fun Calendar.minus(minutes: Minutes): Calendar {
+    return copy().apply {
+        add(Calendar.MINUTE, minutes.minutes * (-1))
+    }
+}
+
 internal operator fun Calendar.minusAssign(minutes: Minutes) {
     add(Calendar.MINUTE, minutes.minutes * (-1))
 }
@@ -138,6 +150,11 @@ internal val Calendar.isToday: Boolean
     get() = isSameDate(today())
 
 internal fun Calendar.toEpochDays(): Int = (atStartOfDay.timeInMillis / DAY_IN_MILLIS).toInt()
+
+internal infix fun Calendar.minutesUntil(other: Calendar): Minutes {
+    val diff = (timeInMillis - other.timeInMillis) / 60_000
+    return Minutes(diff.toInt())
+}
 
 internal val Calendar.lengthOfMonth: Int
     get() = getActualMaximum(Calendar.DAY_OF_MONTH)

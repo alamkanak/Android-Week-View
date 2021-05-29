@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
 import android.view.MotionEvent.ACTION_UP
 import com.alamkanak.weekview.Direction.Left
 import com.alamkanak.weekview.Direction.None
@@ -23,11 +24,12 @@ private enum class Direction {
         get() = this == Vertical
 }
 
-class WeekViewGestureHandler internal constructor(
+internal class WeekViewGestureHandler(
     context: Context,
     private val viewState: ViewState,
     private val touchHandler: WeekViewTouchHandler,
     private val navigator: Navigator,
+    private val dragHandler: DragHandler,
 ) : GestureDetector.SimpleOnGestureListener() {
 
     private var scrollDirection: Direction = None
@@ -44,6 +46,7 @@ class WeekViewGestureHandler internal constructor(
     private var preFlingFirstVisibleDate: Calendar = today()
 
     override fun onDown(e: MotionEvent): Boolean {
+        preFlingFirstVisibleDate = viewState.firstVisibleDate.copy()
         goToNearestOrigin()
         return true
     }
@@ -139,7 +142,11 @@ class WeekViewGestureHandler internal constructor(
 
     override fun onLongPress(e: MotionEvent) {
         super.onLongPress(e)
-        touchHandler.handleLongClick(e.x, e.y)
+
+        val longClickResult = touchHandler.handleLongClick(e.x, e.y) ?: return
+        if (!longClickResult.handled) {
+            dragHandler.startDragAndDrop(longClickResult.eventChip, e.x, e.y)
+        }
     }
 
     private fun goToNearestOrigin() {
@@ -173,6 +180,14 @@ class WeekViewGestureHandler internal constructor(
 
         if (event.action == ACTION_DOWN) {
             preFlingFirstVisibleDate = viewState.firstVisibleDate.copy()
+        }
+
+        if (event.action == ACTION_MOVE && dragHandler.isDragging) {
+            dragHandler.updateDragAndDrop(event)
+        }
+
+        if (event.action == ACTION_UP && dragHandler.isDragging) {
+            dragHandler.finishDragAndDrop()
         }
 
         return handled

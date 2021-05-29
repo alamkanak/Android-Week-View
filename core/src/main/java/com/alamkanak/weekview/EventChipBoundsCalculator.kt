@@ -15,19 +15,17 @@ internal class EventChipBoundsCalculator(
             is ResolvedWeekViewEntity.BlockedTime -> viewState.dayWidth
         }
 
-        val event = eventChip.event
-
-        val isBlockedTime = event is ResolvedWeekViewEntity.BlockedTime
+        val isBlockedTime = eventChip.event is ResolvedWeekViewEntity.BlockedTime
         val leftOffset = if (viewState.isLtr || isBlockedTime) 0 else viewState.columnGap
 
         val minutesFromStart = eventChip.minutesFromStartHour
         val top = calculateDistanceFromTop(minutesFromStart)
 
-        val bottomMinutesFromStart = minutesFromStart + eventChip.event.durationInMinutes
+        val bottomMinutesFromStart = minutesFromStart + eventChip.durationInMinutes
         var bottom = calculateDistanceFromTop(bottomMinutesFromStart)
 
-        val partialEventEndsAtEndOfDay = event.endTime.isAtEndOfPeriod(hour = viewState.maxHour)
-        val fullEventContinuesOnNextDay = eventChip.originalEvent.endsOnLaterDay(event)
+        val partialEventEndsAtEndOfDay = eventChip.endTime.isAtEndOfPeriod(hour = viewState.maxHour)
+        val fullEventContinuesOnNextDay = eventChip.endsOnLaterDay
 
         if (!(partialEventEndsAtEndOfDay && fullEventContinuesOnNextDay) && !isBlockedTime) {
             // There's only one case where we don't render a vertical margin: The partial event ends
@@ -49,6 +47,12 @@ internal class EventChipBoundsCalculator(
         val hasNoOverlaps = (right == startPixel + drawableWidth)
         if (viewState.isSingleDay && hasNoOverlaps) {
             right -= viewState.singleDayHorizontalPadding * 2
+        }
+
+        val isBeingDragged = eventChip.eventId == viewState.dragState?.eventId
+        if (isBeingDragged) {
+            left = startPixel + leftOffset
+            right = left + drawableWidth
         }
 
         return RectF(left, top, right, bottom)

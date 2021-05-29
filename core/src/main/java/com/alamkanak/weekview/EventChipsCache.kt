@@ -50,7 +50,15 @@ internal class EventChipsCache {
 
     fun addAll(eventChips: List<EventChip>) {
         for (eventChip in eventChips) {
-            val key = eventChip.event.startTime.atStartOfDay.timeInMillis
+            val isExistingEvent = allEventChips.any { it.eventId == eventChip.eventId }
+            if (isExistingEvent) {
+                remove(eventId = eventChip.eventId)
+            }
+        }
+
+        for (eventChip in eventChips) {
+            val key = eventChip.startTime.atStartOfDay.timeInMillis
+
             if (eventChip.event.isAllDay) {
                 allDayEventChipsByDate.addOrReplace(key, eventChip)
             } else {
@@ -70,24 +78,30 @@ internal class EventChipsCache {
         }
     }
 
+    fun remove(eventId: Long) {
+        val eventChip = allEventChips.firstOrNull { it.eventId == eventId } ?: return
+        remove(eventChip)
+    }
+
     fun removeAll(events: List<ResolvedWeekViewEntity>) {
         val eventIds = events.map { it.id }
         val eventChips = allEventChips.filter { it.event.id in eventIds }
+        eventChips.forEach(this::remove)
+    }
 
-        for (eventChip in eventChips) {
-            val key = eventChip.event.startTime.atStartOfDay.timeInMillis
-            val eventId = eventChip.event.id
+    private fun remove(eventChip: EventChip) {
+        val key = eventChip.startTime.atStartOfDay.timeInMillis
+        val eventId = eventChip.eventId
 
-            if (eventChip.event.isAllDay) {
-                allDayEventChipsByDate[key]?.removeAll { it.event.id == eventId }
-            } else {
-                normalEventChipsByDate[key]?.removeAll { it.event.id == eventId }
-            }
+        if (eventChip.event.isAllDay) {
+            allDayEventChipsByDate[key]?.removeAll { it.event.id == eventId }
+        } else {
+            normalEventChipsByDate[key]?.removeAll { it.event.id == eventId }
         }
     }
 
     fun clearSingleEventsCache() {
-        allEventChips.filter { it.originalEvent.isNotAllDay }.forEach(EventChip::setEmpty)
+        allEventChips.filter { it.event.isNotAllDay }.forEach(EventChip::setEmpty)
     }
 
     fun clear() {

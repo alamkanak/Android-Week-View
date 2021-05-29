@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.text.StaticLayout
@@ -8,6 +9,10 @@ import android.text.StaticLayout
 internal class EventChipDrawer(
     private val viewState: ViewState
 ) {
+
+    private val dragShadow: Int by lazy {
+        Color.parseColor("#757575")
+    }
 
     private val backgroundPaint = Paint()
     private val borderPaint = Paint()
@@ -18,39 +23,38 @@ internal class EventChipDrawer(
         eventChip: EventChip,
         canvas: Canvas,
         textLayout: StaticLayout?
-    ) {
-        canvas.drawInBounds(eventChip.bounds) {
-            val event = eventChip.event
-            val bounds = eventChip.bounds
-            val cornerRadius = event.style.cornerRadius?.toFloat() ?: viewState.eventCornerRadius.toFloat()
-            updateBackgroundPaint(event, backgroundPaint)
-            drawRoundRect(bounds, cornerRadius, cornerRadius, backgroundPaint)
+    ) = with(canvas) {
+        val entity = eventChip.event
+        val bounds = eventChip.bounds
+        val cornerRadius = (entity.style.cornerRadius ?: viewState.eventCornerRadius).toFloat()
 
-            val pattern = event.style.pattern
-            if (pattern != null) {
-                drawPattern(
-                    pattern = pattern,
-                    bounds = eventChip.bounds,
-                    isLtr = viewState.isLtr,
-                    paint = patternPaint
-                )
-            }
+        val isBeingDragged = entity.id == viewState.dragState?.eventId
+        updateBackgroundPaint(entity, isBeingDragged, backgroundPaint)
+        drawRoundRect(bounds, cornerRadius, cornerRadius, backgroundPaint)
 
-            val borderWidth = event.style.borderWidth
-            if (borderWidth != null && borderWidth > 0) {
-                updateBorderPaint(event, borderPaint)
-                val borderBounds = bounds.insetBy(borderWidth / 2f)
-                drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
-            }
+        val pattern = entity.style.pattern
+        if (pattern != null) {
+            drawPattern(
+                pattern = pattern,
+                bounds = eventChip.bounds,
+                isLtr = viewState.isLtr,
+                paint = patternPaint
+            )
+        }
 
-            val originalEvent = eventChip.originalEvent
-            if (originalEvent.isMultiDay && originalEvent.isNotAllDay) {
-                drawCornersForMultiDayEvents(eventChip, cornerRadius)
-            }
+        val borderWidth = entity.style.borderWidth
+        if (borderWidth != null && borderWidth > 0) {
+            updateBorderPaint(entity, borderPaint)
+            val borderBounds = bounds.insetBy(borderWidth / 2f)
+            drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
+        }
 
-            if (textLayout != null) {
-                drawEventTitle(eventChip, textLayout)
-            }
+        if (entity.isMultiDay && entity.isNotAllDay) {
+            drawCornersForMultiDayEvents(eventChip, cornerRadius)
+        }
+
+        if (textLayout != null) {
+            drawEventTitle(eventChip, textLayout)
         }
     }
 
@@ -59,18 +63,18 @@ internal class EventChipDrawer(
         cornerRadius: Float
     ) {
         val event = eventChip.event
-        val originalEvent = eventChip.originalEvent
         val bounds = eventChip.bounds
 
-        updateBackgroundPaint(event, backgroundPaint)
+        val isBeingDragged = event.id == viewState.dragState?.eventId
+        updateBackgroundPaint(event, isBeingDragged, backgroundPaint)
 
-        if (event.startsOnEarlierDay(originalEvent)) {
+        if (eventChip.startsOnEarlierDay) {
             val topRect = RectF(bounds)
             topRect.bottom = topRect.top + cornerRadius
             drawRect(topRect, backgroundPaint)
         }
 
-        if (event.endsOnLaterDay(originalEvent)) {
+        if (eventChip.endsOnLaterDay) {
             val bottomRect = RectF(bounds)
             bottomRect.top = bottomRect.bottom - cornerRadius
             drawRect(bottomRect, backgroundPaint)
@@ -86,7 +90,6 @@ internal class EventChipDrawer(
         cornerRadius: Float
     ) {
         val event = eventChip.event
-        val originalEvent = eventChip.originalEvent
         val bounds = eventChip.bounds
 
         val borderWidth = event.style.borderWidth ?: 0
@@ -95,7 +98,7 @@ internal class EventChipDrawer(
 
         updateBorderPaint(event, backgroundPaint)
 
-        if (event.startsOnEarlierDay(originalEvent)) {
+        if (eventChip.startsOnEarlierDay) {
             drawVerticalLine(
                 horizontalOffset = borderStart,
                 startY = bounds.top,
@@ -111,7 +114,7 @@ internal class EventChipDrawer(
             )
         }
 
-        if (event.endsOnLaterDay(originalEvent)) {
+        if (eventChip.endsOnLaterDay) {
             drawVerticalLine(
                 horizontalOffset = borderStart,
                 startY = bounds.bottom - cornerRadius,
@@ -152,22 +155,29 @@ internal class EventChipDrawer(
     }
 
     private fun updateBackgroundPaint(
-        event: ResolvedWeekViewEntity,
+        entity: ResolvedWeekViewEntity,
+        isBeingDragged: Boolean,
         paint: Paint
     ) = with(paint) {
-        color = event.style.backgroundColor ?: viewState.defaultEventColor
+        color = entity.style.backgroundColor ?: viewState.defaultEventColor
         isAntiAlias = true
         strokeWidth = 0f
         style = Paint.Style.FILL
+
+        if (isBeingDragged) {
+            setShadowLayer(12f, 0f, 0f, dragShadow)
+        } else {
+            clearShadowLayer()
+        }
     }
 
     private fun updateBorderPaint(
-        event: ResolvedWeekViewEntity,
+        entity: ResolvedWeekViewEntity,
         paint: Paint
     ) = with(paint) {
-        color = event.style.borderColor ?: viewState.defaultEventColor
+        color = entity.style.borderColor ?: viewState.defaultEventColor
         isAntiAlias = true
-        strokeWidth = event.style.borderWidth?.toFloat() ?: 0f
+        strokeWidth = entity.style.borderWidth?.toFloat() ?: 0f
         style = Paint.Style.STROKE
     }
 }
