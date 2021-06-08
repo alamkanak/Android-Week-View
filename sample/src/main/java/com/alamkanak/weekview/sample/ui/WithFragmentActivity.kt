@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.alamkanak.weekview.WeekView
 import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.jsr310.WeekViewPagingAdapterJsr310
 import com.alamkanak.weekview.jsr310.maxDateAsLocalDate
 import com.alamkanak.weekview.jsr310.minDateAsLocalDate
 import com.alamkanak.weekview.sample.R
@@ -16,6 +16,8 @@ import com.alamkanak.weekview.sample.data.model.toWeekViewEntity
 import com.alamkanak.weekview.sample.databinding.FragmentWeekBinding
 import com.alamkanak.weekview.sample.util.genericViewModel
 import com.alamkanak.weekview.sample.util.setupWithWeekView
+import com.alamkanak.weekview.sample.util.yearMonthsBetween
+import java.time.LocalDate
 import java.time.YearMonth
 
 class WithFragmentActivity : AppCompatActivity(R.layout.activity_with_fragment) {
@@ -49,7 +51,7 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.toolbarContainer.toolbar.setupWithWeekView(binding.weekView)
 
-        val adapter = FragmentWeekViewAdapter()
+        val adapter = FragmentWeekViewAdapter(loadMoreHandler = viewModel::fetchEvents)
         binding.weekView.adapter = adapter
 
         // Limit WeekView to the current month
@@ -66,6 +68,14 @@ class WeekFragment : Fragment(R.layout.fragment_week) {
     }
 }
 
-private class FragmentWeekViewAdapter : WeekView.SimpleAdapter<CalendarEntity>() {
+private class FragmentWeekViewAdapter(
+    private val loadMoreHandler: (List<YearMonth>) -> Unit
+) : WeekViewPagingAdapterJsr310<CalendarEntity>() {
+
     override fun onCreateEntity(item: CalendarEntity): WeekViewEntity = item.toWeekViewEntity()
+
+    override fun onLoadMore(
+        startDate: LocalDate,
+        endDate: LocalDate
+    ) = loadMoreHandler(yearMonthsBetween(startDate, endDate))
 }
