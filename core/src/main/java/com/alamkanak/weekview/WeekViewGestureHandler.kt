@@ -165,7 +165,7 @@ internal class WeekViewGestureHandler(
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
-        if (scrollDirection == Vertical && scrollDirection == None) {
+        if (!scrollDirection.isHorizontal && flingDirection == None) {
             scaleDetector.onTouchEvent(event)
         }
 
