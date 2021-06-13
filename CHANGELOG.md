@@ -1,6 +1,15 @@
 Changelog
 =========
 
+## Version 5.3.1
+*(2021-06-13)*
+
+- Updated: WeekView now shortens events that are outside custom time ranges.
+- Fixed: WeekView didn’t properly remove deleted events when using a `PagingAdapter`.
+- Fixed: WeekView crashed when using a `windowBackground` that wasn’t a color.
+- Fixed: WeekView crashed when dealing with certain time ranges.
+- Fixed: WeekView completely omitted the subtitle when it didn’t fit.
+
 ## Version 5.3.0
 *(2021-03-03)*
 
