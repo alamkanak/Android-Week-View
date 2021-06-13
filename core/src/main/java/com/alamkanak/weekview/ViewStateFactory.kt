@@ -60,7 +60,7 @@ internal object ViewStateFactory {
         }
 
         viewState.headerBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_headerBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_headerBackgroundColor, context.colorBackground)
         }
 
         viewState.headerBackgroundWithShadowPaint.apply {
@@ -81,7 +81,7 @@ internal object ViewStateFactory {
         }
 
         viewState.dayBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_dayBackgroundColor, context.colorBackground)
         }
 
         viewState.todayBackgroundPaint = a.paintFromColor(colorIndex = R.styleable.WeekView_todayBackgroundColor)
@@ -119,7 +119,7 @@ internal object ViewStateFactory {
         }
 
         viewState.timeColumnBackgroundPaint.apply {
-            color = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, context.windowBackground)
+            color = a.getColor(R.styleable.WeekView_timeColumnBackgroundColor, context.colorBackground)
         }
 
         viewState.weekNumberTextPaint.apply {
@@ -276,8 +276,8 @@ private val Context.shadowColor: Int
 private val Context.textColorPrimary: Int
     get() = resolveColor(android.R.attr.textColorPrimary)
 
-private val Context.windowBackground: Int
-    get() = resolveColor(android.R.attr.windowBackground)
+private val Context.colorBackground: Int
+    get() = resolveColor(android.R.attr.colorBackground)
 
 private val Context.defaultTextSize: Float
     get() = sp(12)
