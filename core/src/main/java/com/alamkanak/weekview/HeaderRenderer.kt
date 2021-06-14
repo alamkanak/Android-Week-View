@@ -221,7 +221,7 @@ private class AllDayEventsUpdater(
             eventChips.forEachIndexed { index, eventChip ->
                 eventChip.updateBounds(index = index, startPixel = modifiedStartPixel)
                 if (eventChip.bounds.isNotEmpty) {
-                    eventsLabelLayouts[eventChip] = textFitter.fit(eventChip)
+                    eventsLabelLayouts[eventChip] = textFitter.fitAllDayEvent(eventChip)
                 } else {
                     eventsLabelLayouts.remove(eventChip)
                 }

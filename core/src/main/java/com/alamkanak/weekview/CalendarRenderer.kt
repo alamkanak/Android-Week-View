@@ -8,6 +8,7 @@ import androidx.collection.ArrayMap
 import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 internal class CalendarRenderer(
     viewState: ViewState,
@@ -79,11 +80,12 @@ private class SingleEventsUpdater(
     private fun List<EventChip>.calculateTextLayouts() {
         for (eventChip in this) {
             val bounds = eventChip.bounds
-            val horizontalPadding = viewState.eventPaddingHorizontal * 2
+            val horizontalPadding = viewState.eventPaddingHorizontal
             val verticalPadding = viewState.eventPaddingVertical * 2
 
-            val availableWidth = bounds.width() - horizontalPadding
-            val availableHeight = bounds.height() - verticalPadding
+            val availableWidth = bounds.width().roundToInt() - horizontalPadding
+            val availableHeight = bounds.height().roundToInt() - verticalPadding
+
             if (availableHeight <= 0 || availableWidth <= 0) {
                 // We can't fit any text into this
                 continue
@@ -96,7 +98,11 @@ private class SingleEventsUpdater(
             )
 
             if (isNotCached || didAvailableAreaChange) {
-                eventLabels[eventChip.id] = textFitter.fit(eventChip = eventChip)
+                eventLabels[eventChip.id] = textFitter.fitSingleEvent(
+                    eventChip = eventChip,
+                    availableWidth = availableWidth,
+                    availableHeight = availableHeight,
+                )
                 eventChip.updateAvailableArea(availableWidth, availableHeight)
             }
         }

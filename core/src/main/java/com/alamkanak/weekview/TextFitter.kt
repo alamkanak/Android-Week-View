@@ -2,7 +2,6 @@ package com.alamkanak.weekview
 
 import android.text.SpannableStringBuilder
 import android.text.StaticLayout
-import kotlin.math.roundToInt
 
 internal class TextFitter(
     private val viewState: ViewState
@@ -10,23 +9,12 @@ internal class TextFitter(
 
     private val spannableStringBuilder = SpannableStringBuilder()
 
-    fun fit(eventChip: EventChip): StaticLayout {
-        return if (eventChip.event.isAllDay) {
-            fitAllDayEvent(eventChip)
-        } else {
-            fitSingleEvent(eventChip)
-        }
-    }
-
-    private fun fitAllDayEvent(eventChip: EventChip): StaticLayout {
+    fun fitAllDayEvent(eventChip: EventChip): StaticLayout {
         val textPaint = viewState.getTextPaint(eventChip.event)
         return eventChip.getText(includeSubtitle = false).toTextLayout(textPaint, width = Int.MAX_VALUE)
     }
 
-    private fun fitSingleEvent(eventChip: EventChip): StaticLayout {
-        val bounds = eventChip.bounds
-        val availableHeight = bounds.height().roundToInt() - viewState.eventPaddingVertical * 2
-        val availableWidth = bounds.width().roundToInt() - viewState.eventPaddingHorizontal
+    fun fitSingleEvent(eventChip: EventChip, availableWidth: Int, availableHeight: Int): StaticLayout {
         return eventChip.fitText(availableWidth, availableHeight)
     }
 

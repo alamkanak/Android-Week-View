@@ -69,23 +69,23 @@ internal data class EventChip(
 
     fun setEmpty() {
         bounds.setEmpty()
-        widthCache = 0f
-        heightCache = 0f
+        widthCache = 0
+        heightCache = 0
     }
 
     fun isHit(x: Float, y: Float): Boolean {
         return x > bounds.left && x < bounds.right && y > bounds.top && y < bounds.bottom
     }
 
-    private var widthCache: Float = 0f
-    private var heightCache: Float = 0f
+    private var widthCache: Int = 0
+    private var heightCache: Int = 0
 
     fun didAvailableAreaChange(
-        availableWidth: Float,
-        availableHeight: Float
+        availableWidth: Int,
+        availableHeight: Int
     ): Boolean = availableWidth != widthCache || availableHeight != heightCache
 
-    fun updateAvailableArea(width: Float, height: Float) {
+    fun updateAvailableArea(width: Int, height: Int) {
         widthCache = width
         heightCache = height
     }
