@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## Version 5.3.2
+*(2021-06-14)*
+
+- Fixed: WeekView crashed when zooming in and out when very short events were displayed.
+
 ## Version 5.3.1
 *(2021-06-13)*
 
