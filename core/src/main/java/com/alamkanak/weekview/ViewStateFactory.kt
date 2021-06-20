@@ -138,6 +138,7 @@ internal object ViewStateFactory {
             showFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, false)
             showCurrentTimeFirst = a.getBoolean(R.styleable.WeekView_showCurrentTimeFirst, false)
             arrangeAllDayEventsVertically = a.getBoolean(R.styleable.WeekView_arrangeAllDayEventsVertically, true)
+            stickToActualWeek = a.getBoolean(R.styleable.WeekView_stickToWeekInWeekView, true)
         }
 
         viewState.apply {

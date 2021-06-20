@@ -6,9 +6,12 @@
         <!-- Calendar configuration -->
         <attr name="numberOfVisibleDays" format="integer" />
         <attr name="restoreNumberOfVisibleDays" format="boolean" />
-        <attr name="showFirstDayOfWeekFirst" format="boolean" />
         <attr name="showCurrentTimeFirst" format="boolean" />
         <attr name="arrangeAllDayEventsVertically" format="boolean" />
+        <attr name="stickToWeekInWeekView" format="boolean" />
+
+        <!-- Deprecated -->
+        <attr name="showFirstDayOfWeekFirst" format="boolean" />
 
         <!-- Header bottom line -->
         <attr name="showHeaderBottomLine" format="boolean" />

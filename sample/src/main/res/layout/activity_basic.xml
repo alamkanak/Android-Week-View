@@ -40,6 +40,7 @@
             app:showNowLineDot="true"
             app:showTimeColumnSeparator="true"
             app:showWeekNumber="true"
+            app:stickToWeekInWeekView="true"
             app:timeColumnPadding="16dp"
             app:timeColumnSeparatorStrokeWidth="1dp"
             app:timeColumnTextColor="@color/gray_600"

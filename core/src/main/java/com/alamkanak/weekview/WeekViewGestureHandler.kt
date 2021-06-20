@@ -46,8 +46,9 @@ internal class WeekViewGestureHandler(
     private var preFlingFirstVisibleDate: Calendar = today()
 
     override fun onDown(e: MotionEvent): Boolean {
-        preFlingFirstVisibleDate = viewState.firstVisibleDate.copy()
-        goToNearestOrigin()
+        if (scrollDirection == None && flingDirection != None) {
+            goToNearestOrigin()
+        }
         return true
     }
 
@@ -150,18 +151,45 @@ internal class WeekViewGestureHandler(
     }
 
     private fun goToNearestOrigin() {
-        val dayWidth = viewState.dayWidth
-        val daysFromOrigin = viewState.currentOrigin.x / dayWidth.toDouble()
-        val adjustedDaysFromOrigin = daysFromOrigin.roundToInt()
+        if (viewState.numberOfVisibleDays >= 7) {
+            goToNearestWeek()
+        } else {
+            goToNearestDay()
+        }
+    }
 
-        val nearestOrigin = viewState.currentOrigin.x - adjustedDaysFromOrigin * dayWidth
-        if (nearestOrigin != 0f) {
-            navigator.scrollHorizontallyTo(offset = adjustedDaysFromOrigin * dayWidth)
+    private fun goToNearestWeek() {
+        val firstVisibleDate = viewState.firstVisibleDate
+        val nearestOriginDate = viewState.currentDate
+        val daysScrolled = abs(firstVisibleDate.toEpochDays() - nearestOriginDate.toEpochDays())
+
+        val scrollTarget = if (daysScrolled > 3) {
+            if (nearestOriginDate < firstVisibleDate) {
+                nearestOriginDate.previousFirstDayOfWeek()
+            } else {
+                nearestOriginDate.nextFirstDayOfWeek()
+            }
+        } else {
+            firstVisibleDate
         }
 
-        // Reset scrolling and fling direction.
+        navigator.scrollHorizontallyTo(date = scrollTarget)
+    }
+
+    private fun goToNearestDay() {
+        val dayWidth = viewState.dayWidth
+        val daysFromOrigin = viewState.currentOrigin.x / dayWidth.toDouble()
+        val roundedDaysFromOrigin = daysFromOrigin.roundToInt()
+
+        val nearestOrigin = viewState.currentOrigin.x - roundedDaysFromOrigin * dayWidth
+        if (nearestOrigin != 0f) {
+            navigator.scrollHorizontallyTo(offset = roundedDaysFromOrigin * dayWidth)
+        }
+    }
+
+    private fun resetScrollAndFlingDirections() {
+        scrollDirection = None
         flingDirection = None
-        scrollDirection = flingDirection
     }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
@@ -171,11 +199,8 @@ internal class WeekViewGestureHandler(
 
         val handled = gestureDetector.onTouchEvent(event)
 
-        val isScrolling = scrollDirection != None
-        val isFlinging = flingDirection != None
-
-        if (event.action == ACTION_UP && isScrolling && !isFlinging) {
-            handleScrollingFinished()
+        if (event.action == ACTION_UP) {
+            onUp()
         }
 
         if (event.action == ACTION_DOWN) {
@@ -193,6 +218,14 @@ internal class WeekViewGestureHandler(
         return handled
     }
 
+    private fun onUp() {
+        if (flingDirection == None && scrollDirection != None) {
+            handleScrollingFinished()
+        }
+
+        resetScrollAndFlingDirections()
+    }
+
     private fun handleScrollingFinished() {
         when (scrollDirection) {
             Vertical -> navigator.notifyVerticalScrollingFinished()
@@ -203,8 +236,7 @@ internal class WeekViewGestureHandler(
 
     fun forceScrollFinished() {
         navigator.stop()
-        flingDirection = None
-        scrollDirection = flingDirection
+        resetScrollAndFlingDirections()
     }
 }
 

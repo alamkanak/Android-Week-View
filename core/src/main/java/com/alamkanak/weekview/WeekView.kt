@@ -248,11 +248,28 @@ class WeekView @JvmOverloads constructor(
      * Returns whether the first day of the week should be displayed at the start position
      * when WeekView is rendered for the first time.
      */
+    @Deprecated(
+        message = "Use stickToWeekInWeekView instead.",
+        replaceWith = ReplaceWith(expression = "stickToWeekInWeekView"),
+    )
     @PublicApi
     var showFirstDayOfWeekFirst: Boolean
         get() = viewState.showFirstDayOfWeekFirst
         set(value) {
             viewState.showFirstDayOfWeekFirst = value
+        }
+
+    /**
+     * Returns whether weeks should always be scrolled as a whole when showing a week view, meaning
+     * that the [firstVisibleDate] will actually be the first date of the currently displayed week
+     * (as per [Calendar.getFirstDayOfWeek]). If not, any day of the week can be the
+     * [firstVisibleDate].
+     */
+    @PublicApi
+    var stickToActualWeek: Boolean
+        get() = viewState.stickToActualWeek
+        set(value) {
+            viewState.stickToActualWeek = value
         }
 
     /**
@@ -1339,7 +1356,9 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        navigator.scrollHorizontallyTo(date = date, onFinished = { onComplete(adjustedDate) })
+        navigator.scrollHorizontallyTo(date = adjustedDate) {
+            onComplete(adjustedDate)
+        }
     }
 
     /**

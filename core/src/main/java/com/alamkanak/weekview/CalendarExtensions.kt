@@ -311,3 +311,30 @@ internal fun Calendar.format(): String {
     val sdf = SimpleDateFormat.getDateTimeInstance()
     return sdf.format(time)
 }
+
+fun Calendar.computeDifferenceWithFirstDayOfWeek(): Int {
+    val firstDayOfWeek = firstDayOfWeek
+    return if (firstDayOfWeek == Calendar.MONDAY && dayOfWeek == Calendar.SUNDAY) {
+        // Special case, because Calendar.MONDAY has constant value 2 and Calendar.SUNDAY has
+        // constant value 1. The correct result to return is 6 days, not -1 days.
+        6
+    } else {
+        dayOfWeek - firstDayOfWeek
+    }
+}
+
+fun Calendar.previousFirstDayOfWeek(): Calendar {
+    val result = this - Days(1)
+    while (result.dayOfWeek != firstDayOfWeek) {
+        result.add(Calendar.DATE, -1)
+    }
+    return result
+}
+
+fun Calendar.nextFirstDayOfWeek(): Calendar {
+    val result = this + Days(1)
+    while (result.dayOfWeek != firstDayOfWeek) {
+        result.add(Calendar.DATE, 1)
+    }
+    return result
+}
