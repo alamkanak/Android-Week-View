@@ -20,9 +20,10 @@ internal class Navigator(
 
     fun scrollHorizontallyBy(distance: Float) {
         viewState.currentOrigin.x -= distance
+
         viewState.currentOrigin.x = viewState.currentOrigin.x.coerceIn(
-            minimumValue = viewState.minX,
-            maximumValue = viewState.maxX
+            minimumValue = if (viewState.isLtr) viewState.minX else viewState.maxX,
+            maximumValue = if (viewState.isLtr) viewState.maxX else viewState.minX
         )
         listener.onHorizontalScrollPositionChanged()
     }
@@ -30,8 +31,8 @@ internal class Navigator(
     fun scrollHorizontallyTo(date: Calendar, onFinished: () -> Unit = {}) {
         val destinationOffset = viewState.getXOriginForDate(date)
         val adjustedDestinationOffset = destinationOffset.coerceIn(
-            minimumValue = viewState.minX,
-            maximumValue = viewState.maxX
+            minimumValue = if (viewState.isLtr) viewState.minX else viewState.maxX,
+            maximumValue = if (viewState.isLtr) viewState.maxX else viewState.minX
         )
         scrollHorizontallyTo(offset = adjustedDestinationOffset, onFinished = onFinished)
     }
