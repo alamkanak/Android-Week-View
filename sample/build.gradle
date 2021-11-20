@@ -1,28 +1,43 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "29.0.3"
-
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.alamkanak.weekview"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+    lintOptions {
+        abortOnError false
+    }
+    buildFeatures {
+        viewBinding true
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':library')
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation("androidx.interpolator:interpolator:1.0.0")
-    implementation 'com.squareup.retrofit:retrofit:1.9.0'
+    implementation project(':core')
+    implementation project(':emoji')
+    implementation project(':jsr310')
+
+    coreLibraryDesugaring libraries.coreLibraryDesugaring
+
+    implementation libraries.kotlin
+    implementation libraries.appCompat
+    implementation libraries.emoji
+
+    implementation 'androidx.activity:activity-ktx:1.2.2'
+    implementation 'androidx.fragment:fragment-ktx:1.3.2'
+
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

@@ -1,0 +1,32 @@
+group = 'com.github.thellmund.Android-Week-View'
+version = '5.3.0'
+
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion buildConfig.compileSdk
+    defaultConfig {
+        minSdkVersion buildConfig.minSdkJsr310
+        targetSdkVersion buildConfig.targetSdk
+        multiDexEnabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation libraries.kotlin
+    implementation libraries.appCompat
+
+    coreLibraryDesugaring libraries.coreLibraryDesugaring
+
+    testImplementation testing.jUnit
+    testImplementation testing.mockitoCore
+    testImplementation testing.mockitoInline
+}

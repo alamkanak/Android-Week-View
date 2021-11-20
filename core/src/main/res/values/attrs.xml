@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="WeekView">
+
+        <!-- Calendar configuration -->
+        <attr name="numberOfVisibleDays" format="integer" />
+        <attr name="restoreNumberOfVisibleDays" format="boolean" />
+        <attr name="showCurrentTimeFirst" format="boolean" />
+        <attr name="arrangeAllDayEventsVertically" format="boolean" />
+        <attr name="stickToWeekInWeekView" format="boolean" />
+
+        <!-- Deprecated -->
+        <attr name="showFirstDayOfWeekFirst" format="boolean" />
+
+        <!-- Header bottom line -->
+        <attr name="showHeaderBottomLine" format="boolean" />
+        <attr name="headerBottomLineColor" format="color" />
+        <attr name="headerBottomLineWidth" format="dimension" />
+
+        <!-- Header bottom shadow -->
+        <attr name="showHeaderBottomShadow" format="boolean" />
+        <attr name="headerBottomShadowColor" format="color" />
+        <attr name="headerBottomShadowRadius" format="dimension" />
+
+        <!-- Time column -->
+        <attr name="timeColumnTextColor" format="color" />
+        <attr name="timeColumnBackgroundColor" format="color" />
+        <attr name="timeColumnPadding" format="dimension" />
+        <attr name="timeColumnTextSize" format="dimension" />
+        <attr name="showMidnightHour" format="boolean" />
+        <attr name="showTimeColumnHourSeparator" format="boolean" />
+        <attr name="timeColumnHoursInterval" format="integer" />
+
+        <!-- Time column separator -->
+        <attr name="showTimeColumnSeparator" format="boolean" />
+        <attr name="timeColumnSeparatorColor" format="color" />
+        <attr name="timeColumnSeparatorStrokeWidth" format="dimension" />
+
+        <!-- Time range -->
+        <attr name="minHour" format="integer" />
+        <attr name="maxHour" format="integer" />
+
+        <!-- Header row -->
+        <attr name="headerBackgroundColor" format="color" />
+        <attr name="headerPadding" format="dimension" />
+        <attr name="headerTextSize" format="dimension" />
+        <attr name="headerTextColor" format="color" />
+        <attr name="todayHeaderTextColor" format="color" />
+        <attr name="weekendHeaderTextColor" format="color" />
+
+        <!-- Week number -->
+        <attr name="showWeekNumber" format="boolean" />
+        <attr name="weekNumberTextColor" format="color" />
+        <attr name="weekNumberTextSize" format="dimension" />
+        <attr name="weekNumberBackgroundColor" format="color" />
+        <attr name="weekNumberBackgroundCornerRadius" format="dimension" />
+
+        <!-- Event chips -->
+        <attr name="eventCornerRadius" format="dimension" />
+        <attr name="eventTextSize" format="dimension" />
+        <attr name="adaptiveEventTextSize" format="boolean" />
+        <attr name="eventTextColor" format="color" />
+        <attr name="eventPaddingHorizontal" format="dimension" />
+        <attr name="eventPaddingVertical" format="dimension" />
+        <attr name="defaultEventColor" format="color" />
+        <attr name="allDayEventTextSize" format="dimension" />
+
+        <!-- Event margins -->
+        <attr name="columnGap" format="dimension" />
+        <attr name="overlappingEventGap" format="dimension" />
+        <attr name="eventMarginVertical" format="dimension" />
+        <attr name="singleDayHorizontalPadding" format="dimension" />
+
+        <!-- Colors -->
+        <attr name="dayBackgroundColor" format="color" />
+        <attr name="todayBackgroundColor" format="color" />
+        <attr name="pastBackgroundColor" format="color" />
+        <attr name="futureBackgroundColor" format="color" />
+        <attr name="pastWeekendBackgroundColor" format="color" />
+        <attr name="futureWeekendBackgroundColor" format="color" />
+
+        <!-- Hour height -->
+        <attr name="hourHeight" format="dimension" />
+        <attr name="minHourHeight" format="dimension" />
+        <attr name="maxHourHeight" format="dimension" />
+        <attr name="showCompleteDay" format="boolean" />
+
+        <!-- Now line -->
+        <attr name="showNowLine" format="boolean" />
+        <attr name="nowLineColor" format="color" />
+        <attr name="nowLineStrokeWidth" format="dimension" />
+
+        <!-- Now line dot -->
+        <attr name="showNowLineDot" format="boolean" />
+        <attr name="nowLineDotColor" format="color" />
+        <attr name="nowLineDotRadius" format="dimension" />
+
+        <!-- Hour separators -->
+        <attr name="showHourSeparator" format="boolean" />
+        <attr name="hourSeparatorColor" format="color" />
+        <attr name="hourSeparatorStrokeWidth" format="dimension" />
+
+        <!-- Day separators -->
+        <attr name="showDaySeparator" format="boolean" />
+        <attr name="daySeparatorColor" format="color" />
+        <attr name="daySeparatorStrokeWidth" format="dimension" />
+
+        <!-- Scrolling -->
+        <attr name="horizontalScrollingEnabled" format="boolean" />
+
+        <attr name="xScrollingSpeed" format="float" />
+        <attr name="verticalFlingEnabled" format="boolean" />
+        <attr name="horizontalFlingEnabled" format="boolean" />
+        <attr name="scrollDuration" format="integer" />
+
+        <!-- Font -->
+        <attr name="fontFamily" format="string" />
+        <attr name="typeface">
+            <enum name="normal" value="0" />
+            <enum name="sans" value="1" />
+            <enum name="serif" value="2" />
+            <enum name="monospace" value="3" />
+        </attr>
+        <attr name="textStyle">
+            <flag name="normal" value="0" />
+            <flag name="bold" value="1" />
+            <flag name="italic" value="2" />
+        </attr>
+
+    </declare-styleable>
+
+</resources>

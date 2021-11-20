@@ -2,22 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    android:background="#fff"
     android:orientation="vertical"
-    android:background="#fff">
+    tools:context=".ui.MainActivity">
 
-    <Button
-        android:id="@+id/buttonBasic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/title_activity_basic"
-        style="@style/Button"/>
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
 
-    <Button
-        android:id="@+id/buttonAsynchronous"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/title_activity_asynchronous"
-        style="@style/Button"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/leftNavigationButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_chevron_left_black_24dp" />
+
+        <TextView
+            android:id="@+id/dateRangeTextView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="5"
+            android:gravity="center"
+            tools:text="01/01/2018" />
+
+        <ImageView
+            android:id="@+id/rightNavigationButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_chevron_right_black_24dp" />
+
+    </LinearLayout>
+
+    <com.alamkanak.weekview.WeekView
+        android:id="@+id/weekView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:columnGap="1dp"
+        app:eventCornerRadius="4dp"
+        app:eventTextColor="@color/white"
+        app:headerBottomLineColor="@color/gray_300"
+        app:headerBottomLineWidth="1dp"
+        app:headerPadding="12dp"
+        app:headerTextColor="@color/gray_600"
+        app:horizontalScrollingEnabled="false"
+        app:hourHeight="60dp"
+        app:nowLineColor="@color/accent"
+        app:nowLineDotColor="@color/accent"
+        app:nowLineDotRadius="5dp"
+        app:nowLineStrokeWidth="1dp"
+        app:numberOfVisibleDays="7"
+        app:overlappingEventGap="1dp"
+        app:showFirstDayOfWeekFirst="true"
+        app:showHeaderBottomLine="true"
+        app:showNowLine="true"
+        app:showNowLineDot="true"
+        app:showTimeColumnSeparator="true"
+        app:timeColumnBackgroundColor="@color/white"
+        app:timeColumnPadding="8dp"
+        app:timeColumnSeparatorColor="@color/gray_300"
+        app:timeColumnSeparatorStrokeWidth="1dp"
+        app:timeColumnTextColor="@color/gray_600"
+        app:timeColumnTextSize="12sp"
+        app:todayHeaderTextColor="@color/accent" />
+
+</LinearLayout>

@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbarContainer"
+        layout="@layout/view_toolbar" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.alamkanak.weekview.WeekView
+            android:id="@+id/weekView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:adaptiveEventTextSize="true"
+            app:allDayEventTextSize="13sp"
+            app:columnGap="6dp"
+            app:eventCornerRadius="4dp"
+            app:eventMarginVertical="2dp"
+            app:eventPaddingHorizontal="4dp"
+            app:eventPaddingVertical="5dp"
+            app:eventTextSize="13sp"
+            app:headerBottomShadowRadius="4dp"
+            app:headerPadding="8dp"
+            app:headerTextColor="@color/gray_600"
+            app:hourHeight="60dp"
+            app:nowLineDotRadius="5dp"
+            app:nowLineStrokeWidth="2dp"
+            app:numberOfVisibleDays="3"
+            app:overlappingEventGap="1dp"
+            app:showCurrentTimeFirst="true"
+            app:showHeaderBottomShadow="true"
+            app:showNowLine="true"
+            app:showNowLineDot="true"
+            app:showTimeColumnSeparator="true"
+            app:showWeekNumber="true"
+            app:stickToWeekInWeekView="true"
+            app:timeColumnPadding="16dp"
+            app:timeColumnSeparatorStrokeWidth="1dp"
+            app:timeColumnTextColor="@color/gray_600"
+            app:timeColumnTextSize="12sp"
+            app:weekNumberBackgroundCornerRadius="@dimen/corner_radius" />
+
+        <FrameLayout
+            android:id="@+id/blockingProgressIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white_alpha50"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
